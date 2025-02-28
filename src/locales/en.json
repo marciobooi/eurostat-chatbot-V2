@@ -1,0 +1,21 @@
+{
+  "input_placeholder": "Type your message...",
+  "thinking": "Analyzing your question...",
+  "typing": "Bot is typing...",
+  "show_more": "Show {{count}} more messages",
+  "scroll_to_bottom": "Scroll to bottom of conversation",
+  "clear_chat": "Clear chat history",
+  "send_message": "Send message",
+  "suggestions_title": "You might also be interested in:",
+  "bot_message": "Bot message:",
+  "user_message": "Your message:",
+  "loading": "Loading conversation...",
+  "welcome": "Welcome! How can I help you today?",
+  "chat_cleared": "Chat history has been cleared",
+  "aria_chat_container": "Chat conversation container",
+  "aria_message_list": "Message history",
+  "aria_suggestions": "Suggested topics",
+  "bot_unknown": "I don't have specific information about that, but I can help you with energy-related questions.",
+  "followUp": "Following up on {topic}...",
+  "followUpPhrases": ["what about", "how about", "and", "also", "what else", "tell me more"]
+}

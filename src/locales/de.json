@@ -1,0 +1,25 @@
+{
+  "translation": {
+    "sendButton": "Senden",
+    "input_placeholder": "Nachricht eingeben...",
+    "bot_unknown": "Ich habe keine spezifischen Informationen dazu, aber ich kann Ihnen bei Fragen zur Energie helfen.",
+    "thinking": "Bot denkt nach...",
+    "typing": "Bot schreibt...",
+    "show_more": "{{count}} weitere Nachrichten anzeigen",
+    "scroll_to_bottom": "Zum Ende der Konversation scrollen",
+    "clear_chat": "Chatverlauf löschen",
+    "send_message": "Nachricht senden",
+    "suggestions_title": "Das könnte Sie auch interessieren:",
+    "bot_message": "Bot-Nachricht:",
+    "user_message": "Ihre Nachricht:",
+    "loading": "Konversation wird geladen...",
+    "welcome": "Willkommen! Wie kann ich Ihnen helfen?",
+    "chat_cleared": "Chatverlauf wurde gelöscht",
+    "aria_chat_container": "Chat-Konversationsbereich",
+    "aria_message_list": "Nachrichtenverlauf",
+    "aria_suggestions": "Vorgeschlagene Themen",
+    "clearChat": "Chat löschen",
+    "followUp": "In Bezug auf {topic}...",
+    "followUpPhrases": ["was ist mit", "wie steht es mit", "und", "auch", "was noch", "erzählen sie mir mehr"]
+  }
+}
