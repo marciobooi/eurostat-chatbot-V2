@@ -243,7 +243,7 @@ const ChatBot = () => {
   };
 
   return (
-    <div className="chat-container flex flex-col max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg relative">
+    <div className="chat-container flex flex-col max-w-md mx-auto p-4 bg-white rounded-lg shadow-lg relative">
       <div 
         ref={messagesContainerRef}
         className="messages relative flex-grow overflow-y-auto mb-4 p-4 bg-gray-100 rounded-lg space-y-4"
