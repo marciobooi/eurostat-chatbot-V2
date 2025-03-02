@@ -243,10 +243,12 @@ const ChatBot = () => {
   };
 
   return (
-    <div className="chat-container flex flex-col max-w-md mx-auto p-4 bg-white rounded-lg shadow-lg relative">
+    <div className="chat-bot-container">
       <div 
         ref={messagesContainerRef}
-        className="messages relative flex-grow overflow-y-auto mb-4 p-4 bg-gray-100 rounded-lg space-y-4"
+        className="messages"
+        aria-live="polite"
+        aria-label={t('aria_message_list')}
       >
         {hasMoreMessages && (
           <ShowMoreHistory 
@@ -263,46 +265,49 @@ const ChatBot = () => {
           />
         ))}
         {isThinking && (
-          <div className="bot-message bg-gray-100 text-gray-700 rounded-lg p-4 shadow-lg">
-            <div className="flex items-center">
-              <FontAwesomeIcon icon={faRobot} className="mr-2" />
-              <span>{i18n.t('thinking')}</span>
+          <div className="message-wrapper bot-wrapper">
+            <div className="message-icon bot-icon">
+              <FontAwesomeIcon icon={faRobot} className="icon" />
+            </div>
+            <div className="bot-message">
+              <div className="flex items-center">
+                <span>{t('thinking')}</span>
+              </div>
             </div>
           </div>
         )}
         {isTyping && !isThinking && (
-          <div className="bot-message bg-gray-100 text-gray-700 rounded-lg p-4 shadow-lg">
-            <div className="flex items-center">
-              <FontAwesomeIcon icon={faRobot} className="mr-2" />
+          <div className="message-wrapper bot-wrapper">
+            <div className="message-icon bot-icon">
+              <FontAwesomeIcon icon={faRobot} className="icon" />
+            </div>
+            <div className="bot-message">
               <TypingIndicator />
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
-      <ScrollButton 
-        visible={showScrollButton}
-        onClick={scrollToBottom}
-        label={t('scroll_to_bottom')}
-      />
+      
+      {showScrollButton && (
+        <ScrollButton 
+          visible={true}
+          onClick={scrollToBottom}
+        />
+      )}
+      
       <SmartSuggestions 
         suggestions={suggestions}
         onSuggestionClick={handleSuggestionClick}
-        title={t('suggestions_title')}
-        ariaLabel={t('aria_suggestions')}
       />
-      <div 
-        className="input-container flex items-center p-2 border-t border-gray-300 space-x-2"
-        role="form"
-        aria-label={t('send_message')}
-      >
+      
+      <div className="input-container">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSend()}
           placeholder={t('input_placeholder')}
-          className="w-full p-2 border border-gray-300 rounded-md shadow-inner text-lg"
           aria-label={t('input_placeholder')}
         />
         <button
@@ -313,7 +318,8 @@ const ChatBot = () => {
           <FontAwesomeIcon icon={faPaperPlane} aria-hidden="true" />
         </button>
       </div>
-      <div className='flex justify-center p-2'>
+      
+      <div className="control-panel">
         <button
           onClick={handleClearChat}
           className="action-button clear-button"

@@ -8,16 +8,14 @@ const ScrollButton = ({ onClick, visible }) => {
   if (!visible) return null;
 
   return (
-    <div className="scroll-button-container">
-      <button
-        onClick={onClick}
-        className="scroll-button"
-        aria-label={t('scroll_to_bottom')}
-        title={t('scroll_to_bottom')}
-      >
-        <FontAwesomeIcon icon={faArrowDown} aria-hidden="true" />
-      </button>
-    </div>
+    <button
+      onClick={onClick}
+      className="scroll-button"
+      aria-label={t('scroll_to_bottom')}
+      title={t('scroll_to_bottom')}
+    >
+      <FontAwesomeIcon icon={faArrowDown} aria-hidden="true" />
+    </button>
   );
 };
 

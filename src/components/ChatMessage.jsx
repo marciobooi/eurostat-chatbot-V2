@@ -31,7 +31,7 @@ const ChatMessage = ({ message, onSuggestionClick }) => {
       >
         <span>{message.text}</span>
         {message.suggestions && (
-          <div className="message-suggestions mt-2">
+          <div className="message-suggestions">
             {message.suggestions.map((suggestion, index) => (
               <button
                 key={index}

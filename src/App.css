@@ -1,5 +1,10 @@
 :root {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --primary-color: #4f46e5;
+  --primary-light: #818cf8;
+  --primary-dark: #3730a3;
+  --background-gradient-start: #f8fafc;
+  --background-gradient-end: #e2e8f0;
   line-height: 1.5;
   font-weight: 400;
   font-synthesis: none;
@@ -14,7 +19,9 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f6f7f9 0%, #edf2f7 100%);
+  background: linear-gradient(135deg, var(--background-gradient-start) 0%, var(--background-gradient-end) 100%);
+  font-family: var(--font-sans);
+  color: #1e293b;
 }
 
 #root {
@@ -25,6 +32,15 @@ body {
   text-align: center;
 }
 
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -33,7 +49,7 @@ body {
 
 /* Improved focus styles for accessibility */
 :focus {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid var(--primary-color);
   outline-offset: 2px;
 }
 
@@ -49,7 +65,7 @@ html {
 
 /* Better text selection */
 ::selection {
-  background-color: #3b82f6;
+  background-color: var(--primary-light);
   color: white;
 }
 
@@ -95,4 +111,22 @@ html {
 
 .absolute {
   position: absolute;
+}
+
+@media (max-width: 768px) {
+  #root {
+    padding: 0.5rem;
+  }
+  
+  .App {
+    padding: 0.5rem;
+  }
+}
+
+/* Dark mode support for future implementation */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-gradient-start: #1e293b;
+    --background-gradient-end: #0f172a;
+  }
 }
