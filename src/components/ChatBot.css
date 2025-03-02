@@ -80,7 +80,6 @@ body {
 }
 
 .input-container {
-  .input-container {
     padding: 1.2rem .875rem .875rem .875rem;
     background-color: var(--surface-light);
     border-top: 1px solid rgba(229, 231, 235, 0.5);
@@ -88,7 +87,6 @@ body {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-}
 }
 
 input[type="text"] {
