@@ -1,3 +1,5 @@
+import { getRandomFromArray } from '../utils/random';
+
 export const unknownResponses = {
   en: [
     "I don't have specific information about that, but I can help you with energy-related questions.",
@@ -28,8 +30,4 @@ export const unknownResponses = {
   ]
 };
 
-export const getRandomUnknownResponse = (language) => {
-  const responses = unknownResponses[language] || unknownResponses.en;
-  const randomIndex = Math.floor(Math.random() * responses.length);
-  return responses[randomIndex];
-};
+// We don't need to export this function as it's now handled in randomResponses.js

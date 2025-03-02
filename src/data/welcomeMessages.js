@@ -1,3 +1,5 @@
+import { getRandomFromArray } from '../utils/random';
+
 export const welcomeMessages = {
   en: [
     "Welcome! I'm here to help you with energy statistics.",
@@ -28,8 +30,4 @@ export const welcomeMessages = {
   ]
 };
 
-export const getRandomWelcomeMessage = (language) => {
-  const messages = welcomeMessages[language] || welcomeMessages.en;
-  const randomIndex = Math.floor(Math.random() * messages.length);
-  return messages[randomIndex];
-};
+// We don't need to export this function as it's now handled in randomResponses.js
