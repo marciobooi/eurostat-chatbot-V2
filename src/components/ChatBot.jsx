@@ -73,7 +73,7 @@ const ChatBot = () => {
     if (!sessionManagerRef.current) {
       sessionManagerRef.current = new SessionManager(i18n.language);
       const sessionManager = sessionManagerRef.current.init();
-      
+
       // Initialize analytics for the session
       analyticsManager.trackSessionStart(i18n.language);
 
@@ -110,7 +110,7 @@ const ChatBot = () => {
     setTimeout(() => {
       inputRef.current?.focus();
     }, 300);
-    
+
     // Cleanup analytics when component unmounts
     return () => {
       analyticsManager.trackSessionEnd();
@@ -260,7 +260,7 @@ const ChatBot = () => {
     if (sessionManagerRef.current) {
       sessionManagerRef.current.addMessage(userMessage);
     }
-    
+
     // Track user message
     analyticsManager.trackUserMessage(trimmedInput);
 
@@ -455,10 +455,9 @@ const ChatBot = () => {
       if (sessionManagerRef.current) {
         sessionManagerRef.current.addMessage(botMessage);
       }
-      
+
       // Track successful bot response
       analyticsManager.trackBotResponse(botMessage, true);
-      
     } catch (error) {
       console.error("Error processing message:", error);
 
@@ -472,7 +471,7 @@ const ChatBot = () => {
       if (sessionManagerRef.current) {
         sessionManagerRef.current.addMessage(errorMessage);
       }
-      
+
       // Track failed bot response
       analyticsManager.trackBotResponse(errorMessage, false);
     } finally {
@@ -480,24 +479,33 @@ const ChatBot = () => {
     }
   };
 
+  // Modified handleSuggestionClick function to auto-submit
   const handleSuggestionClick = (topic) => {
+    // Set the input value
     setInput(`Tell me about ${topic}`);
-    inputRef.current?.focus();
-    
-    // Track suggestion click
+
+    // Track suggestion click in analytics
     analyticsManager.trackSuggestionClick(topic);
 
-    // Optional: Auto-submit the query
-    // setTimeout(() => {
-    //   const form = inputRef.current?.form;
-    //   if (form) form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-    // }, 100);
+    // Auto-submit after a short delay to ensure the input is updated
+    setTimeout(() => {
+      // Instead of just focusing, we'll trigger the form submission
+      const form = document.querySelector(".input-container");
+      if (form) {
+        // Create and dispatch a submit event
+        const submitEvent = new Event("submit", {
+          cancelable: true,
+          bubbles: true,
+        });
+        form.dispatchEvent(submitEvent);
+      }
+    }, 100); // Short delay to ensure state updates
   };
 
   const handleClearChat = () => {
     // Track session end before clearing
     analyticsManager.trackSessionEnd();
-    
+
     // Clear the chat and reset everything
     if (sessionManagerRef.current) {
       sessionManagerRef.current.clear();
@@ -518,7 +526,7 @@ const ChatBot = () => {
       if (sessionManagerRef.current) {
         sessionManagerRef.current.addMessage(welcomeMessage);
       }
-      
+
       // Start tracking a new session
       analyticsManager.trackSessionStart(i18n.language);
       analyticsManager.trackBotResponse(welcomeMessage);
