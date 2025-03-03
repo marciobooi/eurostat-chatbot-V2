@@ -1,4 +1,3 @@
-import { getCookie, setCookie } from "./cookies";
 import { getFollowUpQuestion } from "../data/followUpQuestions";
 
 // Storage keys
