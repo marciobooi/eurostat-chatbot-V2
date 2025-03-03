@@ -4,12 +4,10 @@
 import { energyDictionary } from "../data/energyDictionary";
 import { extractTopicFromQuery } from "./nlpHelper";
 
-// Example of path fixing for any API calls or asset loading
-// Old: const API_URL = '/api/data'
-// New:
-const API_URL = import.meta.env.PROD
-  ? "/eurostat-chatbot-V2/api/data"
-  : "/api/data";
+// Remove or use the API_URL variable
+// const API_URL = import.meta.env.PROD
+//   ? '/eurostat-chatbot-V2/api/data'
+//   : '/api/data';
 
 /**
  * Get energy information based on the user query
