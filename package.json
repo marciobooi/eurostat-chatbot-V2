@@ -8,9 +8,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
+    "preview": "vite preview --base=/eurostat-chatbot-V2/",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "node ./scripts/deploy.js",
+    "serve:preview": "serve -s dist -l 5000 --config serve.json"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.2",
@@ -26,8 +27,8 @@
     "i18next-browser-languagedetector": "^8.0.4",
     "js-cookie": "^3.0.5",
     "multilang-sentiment": "^2.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-i18next": "^15.4.1",
     "react-markdown": "^10.0.0",
     "recharts": "^2.15.1",
@@ -38,8 +39,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
+    "@types/react": "^18.2.67",
+    "@types/react-dom": "^18.2.22",
+    "@vitejs/plugin-react": "^4.2.1",
     "@vitejs/plugin-react-swc": "^3.8.0",
     "eslint": "^9.21.0",
     "eslint-plugin-react": "^7.37.4",
@@ -47,6 +49,6 @@
     "eslint-plugin-react-refresh": "^0.4.19",
     "gh-pages": "^6.3.0",
     "globals": "^15.15.0",
-    "vite": "^6.2.0"
+    "vite": "^5.2.6"
   }
 }
