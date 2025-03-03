@@ -307,10 +307,12 @@
   position: relative;
 }
 
+/* Update the control panel to fit both buttons */
 .control-panel {
   padding: 0.75rem;
   display: flex;
   justify-content: center;
+  gap: 0.75rem; /* Add space between buttons */
   border-top: 1px solid rgba(229, 231, 235, 0.2);
 }
 
@@ -343,6 +345,47 @@
   opacity: 1;
 }
 
+/* Add styles for the speech recognition button */
+.speech-button {
+  width: 3rem;
+  height: 3rem;
+  min-width: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--secondary-color);
+  color: #737272;
+  transition: var(--transition-base);
+  opacity: 0.8;
+}
+
+.speech-button:hover {
+  background-color: #c5c8cc;
+  color: #022467;
+  opacity: 1;
+}
+
+/* Add a special style for when the microphone is active */
+.speech-button.listening {
+  background-color: var(--primary-blue-light);
+  color: white;
+  animation: pulse 2s infinite;
+}
+
+/* Add a pulsing animation for the active microphone */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 51, 153, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 51, 153, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 51, 153, 0);
+  }
+}
+
 /* Add ScrollButton styles if they don't already exist */
 .scroll-button {
   position: absolute;
@@ -370,5 +413,5 @@
 }
 
 .scroll-button:active {
- opacity: 1;
+  opacity: 1;
 }

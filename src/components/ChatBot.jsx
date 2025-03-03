@@ -5,6 +5,8 @@ import {
   faUser,
   faTrash,
   faPaperPlane,
+  faMicrophone, // Add microphone icon import
+  faMicrophoneSlash, // Add microphone-slash icon import
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import SmartSuggestions from "./SmartSuggestions";
@@ -23,6 +25,8 @@ import {
   getRandomGratitudeResponse,
   getRandomErrorMessage,
   getRandomPromptMessage,
+  formatResponse,
+  getFollowUpSuggestionsForTopic,
 } from "../utils/responseUtils";
 import { ContextManager } from "../utils/contextManager";
 import { AnalyticsManager } from "../utils/analyticsManager";
@@ -44,6 +48,9 @@ const ChatBot = () => {
   const messagesContainerRef = useRef(null);
   const sessionManagerRef = useRef(null);
   const inputRef = useRef(null);
+  const [isListening, setIsListening] = useState(false); // Add state for speech recognition
+  const [speechRecognition, setSpeechRecognition] = useState(null); // Store speech recognition instance
+  const [speechSupported, setSpeechSupported] = useState(false); // Check if speech recognition is supported
 
   const contextManager = useMemo(() => new ContextManager(), []);
   const analyticsManager = useMemo(() => new AnalyticsManager(), []);
@@ -129,6 +136,102 @@ const ChatBot = () => {
     };
   }, [i18n]);
 
+  // Initialize speech recognition
+  useEffect(() => {
+    // Check if browser supports speech recognition
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (SpeechRecognition) {
+      setSpeechSupported(true);
+      const recognition = new SpeechRecognition();
+
+      // Configure speech recognition
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      // Set language based on current i18n language
+      recognition.lang =
+        i18n.language === "fr"
+          ? "fr-FR"
+          : i18n.language === "de"
+          ? "de-DE"
+          : "en-US";
+
+      // Handle results
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setInput(transcript);
+
+        // Optional: auto-submit after a short delay
+        setTimeout(() => {
+          const form = inputRef.current?.form;
+          if (form) {
+            form.dispatchEvent(
+              new Event("submit", { cancelable: true, bubbles: true })
+            );
+          }
+        }, 500);
+      };
+
+      // Handle end of speech recognition
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      // Handle errors
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        setIsListening(false);
+      };
+
+      setSpeechRecognition(recognition);
+    } else {
+      console.log("Speech recognition not supported in this browser");
+    }
+  }, [i18n.language]);
+
+  // Update recognition language when app language changes
+  useEffect(() => {
+    if (speechRecognition) {
+      speechRecognition.lang =
+        i18n.language === "fr"
+          ? "fr-FR"
+          : i18n.language === "de"
+          ? "de-DE"
+          : "en-US";
+    }
+  }, [i18n.language, speechRecognition]);
+
+  // Handle toggle of speech recognition
+  const toggleSpeechRecognition = () => {
+    if (!speechSupported || !speechRecognition) return;
+
+    if (isListening) {
+      speechRecognition.stop();
+      setIsListening(false);
+    } else {
+      try {
+        speechRecognition.start();
+        setIsListening(true);
+      } catch (error) {
+        console.error("Speech recognition error:", error);
+        // Try to reset and restart if there's an error
+        speechRecognition.stop();
+        setTimeout(() => {
+          try {
+            speechRecognition.start();
+            setIsListening(true);
+          } catch (innerError) {
+            console.error("Failed to restart speech recognition:", innerError);
+            setIsListening(false);
+          }
+        }, 100);
+      }
+    }
+  };
+
   const handleSend = async (e) => {
     e.preventDefault();
     const trimmedInput = input.trim();
@@ -188,11 +291,19 @@ const ChatBot = () => {
               // Check if we have a valid response with an answer
               if (response && response.answer) {
                 responseTopic = response.key || null;
-                botMessageText = getContextAwareResponse(
+                const baseResponse = getContextAwareResponse(
                   trimmedInput,
                   contextManager,
                   response.answer
                 );
+
+                // Use formatResponse to add topic connections and other enhancements
+                botMessageText = formatResponse(baseResponse, {
+                  topic: responseTopic,
+                  addEmpathy: true,
+                  addReassurance: true,
+                  language: i18n.language,
+                });
 
                 // Update context if available
                 if (
@@ -209,6 +320,24 @@ const ChatBot = () => {
 
                 if (relatedTopics && relatedTopics.length > 0) {
                   setSuggestions(relatedTopics);
+                }
+
+                // Add follow-up suggestions if we have a topic
+                if (responseTopic) {
+                  const followUpSuggestions = getFollowUpSuggestionsForTopic(
+                    responseTopic,
+                    i18n.language
+                  );
+
+                  // You can either add these to the bot's message or set them as separate suggestions
+                  // Here we're adding one random follow-up suggestion to the end of the bot message
+                  if (followUpSuggestions.length > 0) {
+                    const randomSuggestion =
+                      followUpSuggestions[
+                        Math.floor(Math.random() * followUpSuggestions.length)
+                      ];
+                    botMessageText = `${botMessageText}\n\n${randomSuggestion}`;
+                  }
                 }
               } else {
                 // No valid answer in the response
@@ -227,11 +356,19 @@ const ChatBot = () => {
           // Only process if we have a valid response
           if (response && response.answer) {
             responseTopic = response.key || null;
-            botMessageText = getContextAwareResponse(
+            const baseResponse = getContextAwareResponse(
               trimmedInput,
               contextManager,
               response.answer
             );
+
+            // Use formatResponse to add topic connections and other enhancements
+            botMessageText = formatResponse(baseResponse, {
+              topic: responseTopic,
+              addEmpathy: true,
+              addReassurance: true,
+              language: i18n.language,
+            });
 
             // Update context if available
             if (
@@ -248,6 +385,24 @@ const ChatBot = () => {
 
             if (relatedTopics && relatedTopics.length > 0) {
               setSuggestions(relatedTopics);
+            }
+
+            // Add follow-up suggestions if we have a topic
+            if (responseTopic) {
+              const followUpSuggestions = getFollowUpSuggestionsForTopic(
+                responseTopic,
+                i18n.language
+              );
+
+              // You can either add these to the bot's message or set them as separate suggestions
+              // Here we're adding one random follow-up suggestion to the end of the bot message
+              if (followUpSuggestions.length > 0) {
+                const randomSuggestion =
+                  followUpSuggestions[
+                    Math.floor(Math.random() * followUpSuggestions.length)
+                  ];
+                botMessageText = `${botMessageText}\n\n${randomSuggestion}`;
+              }
             }
           } else {
             // Handle unknown response with potential match info
@@ -453,6 +608,29 @@ const ChatBot = () => {
         >
           <FontAwesomeIcon icon={faTrash} />
         </button>
+
+        {/* Add speech recognition button */}
+        {speechSupported && (
+          <button
+            onClick={toggleSpeechRecognition}
+            className={`speech-button ${isListening ? "listening" : ""}`}
+            aria-label={
+              isListening
+                ? t("stop_listening", "Stop listening")
+                : t("start_listening", "Start voice input")
+            }
+            title={
+              isListening
+                ? t("stop_listening", "Stop listening")
+                : t("start_listening", "Start voice input")
+            }
+            disabled={isThinking || isTyping}
+          >
+            <FontAwesomeIcon
+              icon={isListening ? faMicrophone : faMicrophoneSlash}
+            />
+          </button>
+        )}
       </div>
     </div>
   );

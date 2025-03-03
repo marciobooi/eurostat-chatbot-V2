@@ -150,10 +150,15 @@ export const getTopicConnectionPhrase = (topic, language = "en") => {
  * @returns {Array} Array of suggestion strings
  */
 export const getFollowUpSuggestionsForTopic = (topic, language = "en") => {
-  const suggestions = followUpSuggestions[language] || followUpSuggestions.en;
-  const topicSuggestions = suggestions[topic] || suggestions.general;
-
-  return topicSuggestions || [];
+  if (!topic) return [];
+  
+  // Get the appropriate language array of suggestion templates
+  const suggestionTemplates = followUpSuggestions[language] || followUpSuggestions.en;
+  
+  // Format each template by replacing {topic} with the actual topic
+  return suggestionTemplates.map(template => 
+    template.replace('{topic}', topic)
+  );
 };
 
 /**
