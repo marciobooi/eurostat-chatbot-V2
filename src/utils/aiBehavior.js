@@ -1,9 +1,9 @@
 import i18n from "../i18n";
-import { getRandomFromArray, getRandomNumber } from "./random";
 import {
-  getRandomWelcomeMessage,
-  getRandomUnknownResponse,
-} from "./randomResponses";
+  getRandomFromArray,
+  getRandomNumber,
+  getContextAwareResponse,
+} from "./random";
 
 const MOOD_ADJUSTMENT = {
   POSITIVE: 0.8, // Faster response for positive mood
@@ -59,32 +59,5 @@ export const calculateTypingTime = (text, contextManager = null) => {
   return Math.min(baseTime + variation, 4000); // Cap at 4 seconds
 };
 
-export const getContextAwareResponse = (query, contextManager, energyInfo) => {
-  const currentLang = i18n.language;
-  const context = contextManager.getContextualSuggestions();
-  const mood = contextManager.getCurrentMood();
-
-  let response = energyInfo;
-
-  // Add emotional awareness to response
-  if (mood.isNegative) {
-    response = i18n.t("empathyPrefix") + " " + response;
-  }
-
-  // Add context-aware prefixes/suffixes
-  if (context.currentIntent === "question") {
-    if (context.needsReassurance) {
-      response = i18n.t("reassurancePrefix") + " " + response;
-    }
-  } else if (context.currentIntent === "gratitude") {
-    response = response + " " + i18n.t("gratitudeSuffix");
-  }
-
-  // Add follow-up suggestions based on context
-  if (context.shouldFollowUp && context.recentTopics.length > 0) {
-    const relatedTopic = context.recentTopics[0];
-    response += " " + i18n.t("followUpSuggestion", { topic: relatedTopic });
-  }
-
-  return response;
-};
+// Re-export contextual response function
+export { getContextAwareResponse };

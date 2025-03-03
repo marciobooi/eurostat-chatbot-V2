@@ -1,111 +1,76 @@
-// Common question phrases to filter out when extracting topics
+/**
+ * Common question phrases by language
+ */
 export const commonQuestionPhrases = {
   en: [
-    'what is',
-    'what are',
-    'what about',
-    'tell me about',
-    'can you tell me',
-    'do you know',
-    'how much',
-    'how many',
-    'where is',
-    'where are',
-    'when is',
-    'when are',
-    'why is',
-    'why are',
-    'could you',
-    'would you',
-    'please tell me',
-    'i want to know',
-    'i would like to know',
-    'explain',
-    'describe',
-    'give me information'
+    "what is",
+    "tell me about",
+    "how does",
+    "explain",
+    "describe",
+    "what are",
+    "can you tell me about",
+    "i'd like to know about",
+    "i want to know about",
+    "please explain",
+    "information on",
+    "information about",
+    "details about",
+    "tell me more about",
   ],
   fr: [
-    'qu\'est-ce que',
-    'qu\'est-ce qu\'',
-    'qu\'est ce que',
-    'qu\'est ce qu\'',
-    'que sont',
-    'parle-moi de',
-    'parlez-moi de',
-    'peux-tu me dire',
-    'pouvez-vous me dire',
-    'sais-tu',
-    'savez-vous',
-    'combien de',
-    'où est',
-    'où sont',
-    'quand est',
-    'quand sont',
-    'pourquoi est',
-    'pourquoi sont',
-    'pourrais-tu',
-    'pourriez-vous',
-    'dis-moi',
-    'dites-moi',
-    'je veux savoir',
-    'j\'aimerais savoir',
-    'explique',
-    'expliquez',
-    'décris',
-    'décrivez',
-    'donne-moi des informations',
-    'donnez-moi des informations'
+    "qu'est-ce que",
+    "qu'est ce que",
+    "parle-moi de",
+    "comment",
+    "explique",
+    "décris",
+    "quels sont",
+    "quelles sont",
+    "peux-tu me parler de",
+    "j'aimerais savoir",
+    "je veux savoir",
+    "s'il te plaît explique",
+    "information sur",
+    "détails sur",
+    "dis-moi plus sur",
   ],
   de: [
-    'was ist',
-    'was sind',
-    'erzähl mir von',
-    'erzählen sie mir von',
-    'kannst du mir sagen',
-    'können sie mir sagen',
-    'weißt du',
-    'wissen sie',
-    'wie viel',
-    'wie viele',
-    'wo ist',
-    'wo sind',
-    'wann ist',
-    'wann sind',
-    'warum ist',
-    'warum sind',
-    'könntest du',
-    'könnten sie',
-    'bitte sag mir',
-    'bitte sagen sie mir',
-    'ich möchte wissen',
-    'ich würde gerne wissen',
-    'erkläre',
-    'erklären sie',
-    'beschreibe',
-    'beschreiben sie',
-    'gib mir informationen',
-    'geben sie mir informationen'
-  ]
+    "was ist",
+    "erzähl mir von",
+    "wie",
+    "erkläre",
+    "beschreibe",
+    "was sind",
+    "kannst du mir sagen",
+    "ich möchte wissen",
+    "ich will wissen",
+    "bitte erkläre",
+    "informationen über",
+    "details über",
+    "sag mir mehr über",
+  ],
 };
 
-// Language-specific question markers
-export const questionMarkers = {
-  en: ['?', 'what', 'how', 'where', 'when', 'why', 'which', 'who', 'whose', 'whom'],
-  fr: ['?', 'que', 'quoi', 'comment', 'où', 'quand', 'pourquoi', 'quel', 'quelle', 'qui'],
-  de: ['?', 'was', 'wie', 'wo', 'wann', 'warum', 'welche', 'welcher', 'wer', 'wessen']
+/**
+ * Question words by language
+ */
+export const questionWords = {
+  en: ["what", "how", "when", "where", "which", "why", "who"],
+  fr: ["quoi", "comment", "quand", "où", "quel", "pourquoi", "qui"],
+  de: ["was", "wie", "wann", "wo", "welche", "warum", "wer"],
 };
 
-// Helper function to detect questions in different languages
-export const isQuestion = (text, language = 'en') => {
-  if (!text) return false;
-  
-  const markers = questionMarkers[language] || questionMarkers.en;
-  const normalizedText = text.toLowerCase().trim();
-  
-  // Check for question mark or question words
-  return text.includes('?') || 
-         markers.some(marker => normalizedText.startsWith(marker + ' ')) ||
-         commonQuestionPhrases[language]?.some(phrase => 
-           normalizedText.includes(phrase.toLowerCase())
-         ) || false;
+/**
+ * Check if text contains a question word
+ * @param {string} text - Text to check
+ * @param {string} language - Language code
+ * @returns {boolean} True if contains question word
+ */
+export const containsQuestionWord = (text, language = "en") => {
+  const normalizedText = text.toLowerCase();
+  const words = normalizedText.split(/\s+/);
+  const qWords = questionWords[language] || questionWords.en;
+
+  return qWords.some((qw) => words.includes(qw));
 };

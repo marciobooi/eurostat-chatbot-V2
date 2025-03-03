@@ -1,23 +1,33 @@
-import { commonQuestionPhrases } from "../data/questionPhrases";
+import {
+  commonQuestionPhrases,
+  questionWords,
+  containsQuestionWord,
+} from "../data/questionPhrases";
+import { intentPatterns, getIntent } from "../data/intentPatterns";
+import {
+  sentimentPatterns,
+  analyzeSentiment as getSentiment,
+} from "../data/sentimentPatterns";
+import { stopWords, getStopWords } from "../data/stopWords";
 import nlp from "compromise";
 import sentences from "compromise-sentences";
 import numbers from "compromise-numbers";
 import dates from "compromise-dates";
-import winkNLP from "wink-nlp";
-import model from "wink-eng-lite-web-model";
 
-// Initialize NLP processors and extend Compromise with plugins
-const nlpProcessor = winkNLP(model);
+// Initialize Compromise with plugins
 nlp.extend(sentences);
 nlp.extend(numbers);
 nlp.extend(dates);
 
-// Helper function to safely get tokens from winkNLP
+// Helper function to safely get tokens from Compromise
 const safeTokenize = (text) => {
   if (!text || typeof text !== "string") return [];
   try {
-    const doc = nlpProcessor.readDoc(text);
-    return doc.tokens().out();
+    const doc = nlp(text);
+    return doc
+      .terms()
+      .out("array")
+      .map((term) => term.toLowerCase());
   } catch (error) {
     console.warn("Error in safeTokenize:", error);
     return text.toLowerCase().split(/\s+/); // Fallback to simple tokenization
@@ -219,233 +229,12 @@ export const detectLanguage = (text) => {
   }
 };
 
-/**
- * Simple NLP utilities for intent recognition
- */
-const intentPatterns = {
-  question: {
-    en: [
-      /\?$/,
-      /what/,
-      /how/,
-      /when/,
-      /where/,
-      /which/,
-      /why/,
-      /can you/,
-      /could you/,
-    ],
-    fr: [
-      /\?$/,
-      /qu[e']/,
-      /comment/,
-      /quand/,
-      /où/,
-      /quel(le)?/,
-      /pourquoi/,
-      /peux-tu/,
-      /pourrais-tu/,
-    ],
-    de: [
-      /\?$/,
-      /was/,
-      /wie/,
-      /wann/,
-      /wo/,
-      /welche[rs]?/,
-      /warum/,
-      /kannst du/,
-      /könntest du/,
-    ],
-  },
-  command: {
-    en: [/^(please |)tell me/, /^show/, /^find/, /^search/, /^get/, /^give/],
-    fr: [
-      /^(s'il vous plaît |)dites-moi/,
-      /^montre[zr]?/,
-      /^trouve[zr]?/,
-      /^cherche[zr]?/,
-      /^donne[zr]?/,
-    ],
-    de: [/^(bitte |)sag mir/, /^zeig/, /^find/, /^such/, /^gib/],
-  },
-  gratitude: {
-    en: [/thank/, /thanks/, /appreciate/, /helpful/],
-    fr: [/merci/, /remercie/, /apprécier?/, /utile/],
-    de: [/dank/, /danke/, /schätzen/, /nützlich/],
-  },
-  greeting: {
-    en: [
-      /^hi($|\s)/,
-      /^hello($|\s)/,
-      /^hey($|\s)/,
-      /^good (morning|afternoon|evening)/,
-      /^greetings/,
-    ],
-    fr: [/^salut($|\s)/, /^bonjour($|\s)/, /^bonsoir($|\s)/, /^coucou($|\s)/],
-    de: [/^hallo($|\s)/, /^guten (morgen|tag|abend)/, /^servus($|\s)/, /^grüß/],
-  },
-  farewell: {
-    en: [/bye/, /goodbye/, /see you/, /farewell/, /until next time/],
-    fr: [/au revoir/, /adieu/, /à bientôt/, /à la prochaine/],
-    de: [/tschüss/, /auf wiedersehen/, /bis später/, /bis bald/],
-  },
-};
-
-/**
- * Detect intent from user input
- * @param {string} input - User input
- * @param {string} [language='en'] - Language code
- * @returns {string} Intent type
- */
+// Export the findIntent function but delegate implementation to data file
 export const findIntent = (input, language = "en") => {
-  if (!input) return "unknown";
-
-  const text = input.toLowerCase().trim();
-  const patterns = intentPatterns;
-  const lang = ["en", "fr", "de"].includes(language) ? language : "en";
-
-  // Check each intent type
-  for (const [intent, langPatterns] of Object.entries(patterns)) {
-    const regexes = langPatterns[lang] || langPatterns.en;
-    if (regexes.some((regex) => regex.test(text))) {
-      return intent;
-    }
-  }
-
-  // Default to question if contains specific words
-  const questionWords = {
-    en: ["what", "how", "when", "where", "which", "why"],
-    fr: ["quoi", "comment", "quand", "où", "quel", "pourquoi"],
-    de: ["was", "wie", "wann", "wo", "welche", "warum"],
-  };
-
-  const words = text.split(/\s+/);
-  if (questionWords[lang].some((qw) => words.includes(qw))) {
-    return "question";
-  }
-
-  return "statement";
+  return getIntent(input, language);
 };
 
-/**
- * Analyze sentiment of text
- * @param {string} text - Text to analyze
- * @param {string} [language='en'] - Language code
- * @returns {Object} Sentiment analysis
- */
+// Export analyzeSentiment function but delegate implementation to data file
 export const analyzeSentiment = (text, language = "en") => {
-  if (!text) return { score: 0, magnitude: 0, type: "neutral" };
-
-  try {
-    const normalizedText = text.toLowerCase().trim();
-    const lang = ["en", "fr", "de"].includes(language) ? language : "en";
-
-    const sentimentPatterns = {
-      positive: {
-        en: [
-          /good/,
-          /great/,
-          /excellent/,
-          /amazing/,
-          /wonderful/,
-          /helpful/,
-          /thanks/,
-          /thank/,
-          /love/,
-          /like/,
-        ],
-        fr: [
-          /bon/,
-          /bien/,
-          /excellent/,
-          /incroyable/,
-          /merveilleux/,
-          /utile/,
-          /merci/,
-          /adore/,
-          /aime/,
-        ],
-        de: [
-          /gut/,
-          /toll/,
-          /ausgezeichnet/,
-          /erstaunlich/,
-          /wunderbar/,
-          /hilfreich/,
-          /danke/,
-          /liebe/,
-          /mag/,
-        ],
-      },
-      negative: {
-        en: [
-          /bad/,
-          /terrible/,
-          /awful/,
-          /useless/,
-          /not helpful/,
-          /wrong/,
-          /incorrect/,
-          /stupid/,
-          /hate/,
-          /dislike/,
-        ],
-        fr: [
-          /mauvais/,
-          /terrible/,
-          /affreux/,
-          /inutile/,
-          /pas utile/,
-          /incorrecte?/,
-          /stupide/,
-          /déteste/,
-          /n'aime pas/,
-        ],
-        de: [
-          /schlecht/,
-          /schrecklich/,
-          /furchtbar/,
-          /nutzlos/,
-          /nicht hilfreich/,
-          /falsch/,
-          /dumm/,
-          /hasse/,
-          /mag nicht/,
-        ],
-      },
-    };
-
-    let positiveCount = 0;
-    let negativeCount = 0;
-
-    // Count positive and negative patterns
-    for (const pattern of sentimentPatterns.positive[lang] ||
-      sentimentPatterns.positive.en) {
-      if (pattern.test(normalizedText)) positiveCount++;
-    }
-
-    for (const pattern of sentimentPatterns.negative[lang] ||
-      sentimentPatterns.negative.en) {
-      if (pattern.test(normalizedText)) negativeCount++;
-    }
-
-    // Calculate sentiment score (-1 to 1)
-    const totalWords = normalizedText.split(/\s+/).length;
-    const magnitude = (positiveCount + negativeCount) / Math.max(totalWords, 1);
-    const score =
-      totalWords > 0
-        ? (positiveCount - negativeCount) /
-          Math.max(positiveCount + negativeCount, 1)
-        : 0;
-
-    let type = "neutral";
-    if (score > 0.3) type = "positive";
-    else if (score < -0.3) type = "negative";
-
-    return { score, magnitude, type };
-  } catch (error) {
-    console.error("Error in analyzeSentiment:", error);
-    return { score: 0, magnitude: 0, type: "neutral" };
-  }
+  return getSentiment(text, language);
 };

@@ -1,88 +1,4 @@
-import nlp from "compromise";
-import sentences from "compromise-sentences";
-import stringSimilarity from "string-similarity";
-import winkNLP from "wink-nlp";
-import model from "wink-eng-lite-web-model";
-import { filteredWords, MIN_WORD_LENGTH } from "../data/filteredWords";
-import { LanguageValidator } from "./languageUtils";
-
-// Initialize NLP processors
-const nlpProcessor = winkNLP(model);
-nlp.extend(sentences);
-
-/**
- * Simple NLP utilities for token matching and semantic similarity
- */
-
-// Stop words by language
-const stopWords = {
-  en: [
-    "a",
-    "an",
-    "the",
-    "and",
-    "or",
-    "but",
-    "about",
-    "for",
-    "in",
-    "to",
-    "of",
-    "at",
-    "by",
-    "is",
-    "it",
-    "on",
-    "that",
-    "this",
-    "with",
-  ],
-  fr: [
-    "le",
-    "la",
-    "les",
-    "un",
-    "une",
-    "des",
-    "et",
-    "ou",
-    "mais",
-    "pour",
-    "dans",
-    "à",
-    "de",
-    "par",
-    "est",
-    "il",
-    "elle",
-    "sur",
-    "que",
-    "ce",
-    "avec",
-  ],
-  de: [
-    "der",
-    "die",
-    "das",
-    "ein",
-    "eine",
-    "und",
-    "oder",
-    "aber",
-    "über",
-    "für",
-    "in",
-    "zu",
-    "von",
-    "bei",
-    "ist",
-    "es",
-    "auf",
-    "dass",
-    "diese",
-    "mit",
-  ],
-};
+import { getStopWords } from "../data/stopWords";
 
 /**
  * Tokenize a string into words and remove stop words
@@ -100,7 +16,7 @@ export const tokenize = (text, language = "en") => {
     .trim();
 
   const words = normalizedText.split(/\s+/);
-  const languageStopWords = stopWords[language] || stopWords.en;
+  const languageStopWords = getStopWords(language);
 
   return words.filter(
     (word) => word.length > 1 && !languageStopWords.includes(word)
