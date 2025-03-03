@@ -1,66 +1,9 @@
-import i18n from "../i18n";
+/**
+ * Response utilities that use the centralized botResponses dictionary
+ */
 import { getRandomFromArray } from "./random";
-
-// Welcome messages in different languages
-const welcomeMessages = {
-  en: [
-    "Hello! How can I help you with energy statistics?",
-    "Hi there! I can provide information about energy consumption and production.",
-    "Greetings! Need help with energy statistics? I'm your assistant.",
-    "Welcome! How may I assist you with energy data today?",
-  ],
-  fr: [
-    "Bonjour ! Comment puis-je vous aider avec les statistiques énergétiques ?",
-    "Salut ! Je peux vous fournir des informations sur la consommation et la production d'énergie.",
-    "Bienvenue ! Besoin d'aide avec les statistiques énergétiques ?",
-  ],
-  de: [
-    "Hallo! Wie kann ich Ihnen mit Energiestatistiken helfen?",
-    "Guten Tag! Ich kann Ihnen Informationen über Energieverbrauch und -produktion geben.",
-    "Willkommen! Brauchen Sie Hilfe mit Energiestatistiken?",
-  ],
-};
-
-// Unknown response messages
-const unknownResponses = {
-  en: [
-    "I specialize in energy statistics. Could you rephrase your question about energy data?",
-    "That's beyond my knowledge, but feel free to ask me about energy consumption or production.",
-    "I'm focused on energy topics. How can I help you with energy-related questions?",
-  ],
-  fr: [
-    "Je suis spécialisé dans les statistiques énergétiques. Pourriez-vous reformuler votre question ?",
-    "Cela dépasse mes connaissances, mais n'hésitez pas à me poser des questions sur l'énergie.",
-    "Je me concentre sur les sujets énergétiques. Comment puis-je vous aider ?",
-  ],
-  de: [
-    "Ich bin auf Energiestatistiken spezialisiert. Könnten Sie Ihre Frage zur Energie umformulieren?",
-    "Das übersteigt mein Wissen, aber fragen Sie mich gerne zur Energienutzung oder -produktion.",
-    "Ich konzentriere mich auf Energiethemen. Wie kann ich Ihnen mit energiebezogenen Fragen helfen?",
-  ],
-};
-
-// Contextual response prefixes/suffixes
-const contextualResponses = {
-  en: {
-    empathyPrefix: "I understand your interest in this topic.",
-    reassurancePrefix: "Here's what I know about that:",
-    gratitudeSuffix: "Hope that helps!",
-    followUpSuggestion: "Would you like to know more about {topic}?",
-  },
-  fr: {
-    empathyPrefix: "Je comprends votre intérêt pour ce sujet.",
-    reassurancePrefix: "Voici ce que je sais à ce sujet :",
-    gratitudeSuffix: "J'espère que cela vous aide !",
-    followUpSuggestion: "Souhaitez-vous en savoir plus sur {topic} ?",
-  },
-  de: {
-    empathyPrefix: "Ich verstehe Ihr Interesse an diesem Thema.",
-    reassurancePrefix: "Hier ist, was ich darüber weiß:",
-    gratitudeSuffix: "Ich hoffe, das hilft Ihnen weiter!",
-    followUpSuggestion: "Möchten Sie mehr über {topic} erfahren?",
-  },
-};
+import { botResponses } from "../data/botResponses";
+import i18n from "../i18n";
 
 /**
  * Get a random welcome message
@@ -68,7 +11,7 @@ const contextualResponses = {
  * @returns {string} Welcome message
  */
 export const getRandomWelcomeMessage = (language = "en") => {
-  const messages = welcomeMessages[language] || welcomeMessages.en;
+  const messages = botResponses.greeting[language] || botResponses.greeting.en;
   return getRandomFromArray(messages);
 };
 
@@ -79,16 +22,17 @@ export const getRandomWelcomeMessage = (language = "en") => {
  * @returns {string} Unknown response message
  */
 export const getRandomUnknownResponse = (language = "en", matchInfo = null) => {
-  const responses = unknownResponses[language] || unknownResponses.en;
+  const responses = botResponses.confused[language] || botResponses.confused.en;
   let response = getRandomFromArray(responses);
 
   // Add suggestion based on partial match if available
   if (matchInfo && matchInfo.topic && matchInfo.score > 0.3) {
-    const suggestionText = i18n.t("partialMatchSuggestion", {
-      topic: matchInfo.topic,
-      lng: language,
-    });
-    response += " " + suggestionText;
+    response +=
+      " " +
+      i18n.t("responses.partialMatch", {
+        topic: matchInfo.topic,
+        defaultValue: `I found some information about "${matchInfo.topic}" that might be relevant. Would you like to know more about that instead?`,
+      });
   }
 
   return response;
@@ -108,38 +52,87 @@ export const getContextAwareResponse = (
 ) => {
   if (!contextManager || !baseResponse) return baseResponse;
 
-  const currentLang = i18n.language || "en";
-  const contextResponses =
-    contextualResponses[currentLang] || contextualResponses.en;
-
   let response = baseResponse;
 
-  // Get context information if available
+  // Add contextual enhancements if available
   try {
-    const contextInfo = contextManager.getContextualSuggestions();
-    const mood = contextManager.getCurrentMood();
+    if (contextManager.getContextualSuggestions) {
+      const contextInfo = contextManager.getContextualSuggestions();
+      const mood = contextManager.getCurrentMood?.() || { engagement: 1.0 };
 
-    // Add emotional awareness based on mood
-    if (mood && mood.engagement < 0.8) {
-      response = contextResponses.empathyPrefix + " " + response;
-    }
+      // Add empathetic prefix for engaged users
+      if (mood.engagement > 0.8) {
+        response =
+          i18n.t("responses.engagedPrefix", {
+            defaultValue: "I understand your interest in this topic. ",
+          }) + response;
+      }
 
-    // Add contextual suggestions if available
-    if (
-      contextInfo &&
-      contextInfo.shouldFollowUp &&
-      contextInfo.recentTopics.length > 0
-    ) {
-      const recentTopic = contextInfo.recentTopics[0];
-      const followUpText = contextResponses.followUpSuggestion.replace(
-        "{topic}",
-        recentTopic
-      );
-      response = response + " " + followUpText;
+      // Add contextual connection if there are related previous topics
+      if (contextInfo && contextInfo.recentTopics?.length > 0) {
+        const recentTopic = contextInfo.recentTopics[0];
+        response +=
+          " " +
+          i18n.t("responses.topicConnection", {
+            topic: recentTopic,
+            defaultValue: `This is also related to our previous discussion about ${recentTopic}.`,
+          });
+      }
     }
   } catch (error) {
     console.error("Error in getContextAwareResponse:", error);
   }
 
   return response;
+};
+
+/**
+ * Get a random farewell message
+ * @param {string} language - Language code
+ * @returns {string} Farewell message
+ */
+export const getRandomFarewellMessage = (language = "en") => {
+  const messages = botResponses.farewell[language] || botResponses.farewell.en;
+  return getRandomFromArray(messages);
+};
+
+/**
+ * Get a random gratitude response
+ * @param {string} language - Language code
+ * @returns {string} Gratitude response
+ */
+export const getRandomGratitudeResponse = (language = "en") => {
+  const messages =
+    botResponses.gratitude[language] || botResponses.gratitude.en;
+  return getRandomFromArray(messages);
+};
+
+/**
+ * Get a random thinking message
+ * @param {string} language - Language code
+ * @returns {string} Thinking message
+ */
+export const getRandomThinkingMessage = (language = "en") => {
+  const messages = botResponses.thinking[language] || botResponses.thinking.en;
+  return getRandomFromArray(messages);
+};
+
+/**
+ * Get a random error message
+ * @param {string} language - Language code
+ * @returns {string} Error message
+ */
+export const getRandomErrorMessage = (language = "en") => {
+  const messages = botResponses.error[language] || botResponses.error.en;
+  return getRandomFromArray(messages);
+};
+
+/**
+ * Get a random prompt message
+ * @param {string} language - Language code
+ * @returns {string} Prompt message
+ */
+export const getRandomPromptMessage = (language = "en") => {
+  const messages = botResponses.prompt[language] || botResponses.prompt.en;
+  return getRandomFromArray(messages);
 };

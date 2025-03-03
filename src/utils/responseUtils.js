@@ -1,8 +1,18 @@
 /**
- * Response utility functions that use proper i18n translations
+ * Response utility functions that use the separate dictionary files
  */
 import { getRandomFromArray } from "./random";
-import { botResponses } from "../data/botResponses";
+
+// Import each response dictionary from its own file
+import { welcomeMessages } from "../data/welcomeMessages";
+import { unknownResponses } from "../data/unknownResponses";
+import { contextualPhrases } from "../data/contextualPhrases";
+import { farewellMessages } from "../data/farewellMessages";
+import { gratitudeMessages } from "../data/gratitudeMessages";
+import { thinkingMessages } from "../data/thinkingMessages";
+import { promptMessages } from "../data/promptMessages";
+import { errorMessages } from "../data/errorMessages";
+
 import i18n from "../i18n";
 
 /**
@@ -11,7 +21,7 @@ import i18n from "../i18n";
  * @returns {string} Welcome message
  */
 export const getRandomWelcomeMessage = (language = "en") => {
-  const messages = botResponses.greeting[language] || botResponses.greeting.en;
+  const messages = welcomeMessages[language] || welcomeMessages.en;
   return getRandomFromArray(messages);
 };
 
@@ -22,7 +32,7 @@ export const getRandomWelcomeMessage = (language = "en") => {
  * @returns {string} Unknown response message
  */
 export const getRandomUnknownResponse = (language = "en", matchInfo = null) => {
-  const responses = botResponses.confused[language] || botResponses.confused.en;
+  const responses = unknownResponses[language] || unknownResponses.en;
   let response = getRandomFromArray(responses);
 
   // Add suggestion based on partial match if available
@@ -52,20 +62,23 @@ export const getContextAwareResponse = (
 ) => {
   if (!contextManager || !baseResponse) return baseResponse;
 
+  const currentLang = i18n.language || "en";
   let response = baseResponse;
 
-  // Add contextual enhancements if available
   try {
     if (contextManager.getContextualSuggestions) {
       const contextInfo = contextManager.getContextualSuggestions();
       const mood = contextManager.getCurrentMood?.() || { engagement: 1.0 };
+      const phrases = contextualPhrases[currentLang] || contextualPhrases.en;
 
       // Add empathetic prefix for engaged users
       if (mood.engagement > 0.8) {
         response =
           i18n.t("responses.engagedPrefix", {
-            defaultValue: "I understand your interest in this topic. ",
-          }) + response;
+            defaultValue: phrases.empathyPrefix,
+          }) +
+          " " +
+          response;
       }
 
       // Add contextual connection if there are related previous topics
@@ -75,7 +88,10 @@ export const getContextAwareResponse = (
           " " +
           i18n.t("responses.topicConnection", {
             topic: recentTopic,
-            defaultValue: `This is also related to our previous discussion about ${recentTopic}.`,
+            defaultValue: phrases.topicConnection.replace(
+              "{topic}",
+              recentTopic
+            ),
           });
       }
     }
@@ -92,7 +108,7 @@ export const getContextAwareResponse = (
  * @returns {string} Farewell message
  */
 export const getRandomFarewellMessage = (language = "en") => {
-  const messages = botResponses.farewell[language] || botResponses.farewell.en;
+  const messages = farewellMessages[language] || farewellMessages.en;
   return getRandomFromArray(messages);
 };
 
@@ -102,8 +118,27 @@ export const getRandomFarewellMessage = (language = "en") => {
  * @returns {string} Gratitude response message
  */
 export const getRandomGratitudeResponse = (language = "en") => {
-  const messages =
-    botResponses.gratitude[language] || botResponses.gratitude.en;
+  const messages = gratitudeMessages[language] || gratitudeMessages.en;
+  return getRandomFromArray(messages);
+};
+
+/**
+ * Get a random thinking message
+ * @param {string} language - Language code
+ * @returns {string} Thinking message
+ */
+export const getRandomThinkingMessage = (language = "en") => {
+  const messages = thinkingMessages[language] || thinkingMessages.en;
+  return getRandomFromArray(messages);
+};
+
+/**
+ * Get a random error message
+ * @param {string} language - Language code
+ * @returns {string} Error message
+ */
+export const getRandomErrorMessage = (language = "en") => {
+  const messages = errorMessages[language] || errorMessages.en;
   return getRandomFromArray(messages);
 };
 
@@ -113,6 +148,6 @@ export const getRandomGratitudeResponse = (language = "en") => {
  * @returns {string} Prompt message
  */
 export const getRandomPromptMessage = (language = "en") => {
-  const messages = botResponses.prompt[language] || botResponses.prompt.en;
+  const messages = promptMessages[language] || promptMessages.en;
   return getRandomFromArray(messages);
 };
