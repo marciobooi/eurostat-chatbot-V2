@@ -1,103 +1,157 @@
-import { LanguageValidator } from './languageUtils';
+import { LanguageValidator } from "./languageUtils";
 
+/**
+ * Analytics manager to track user interactions with the chatbot
+ */
 export class AnalyticsManager {
   constructor() {
-    this.analytics = {
-      questionCount: 0,
-      knownTopics: {},
-      unknownQueries: [],
-      languageStats: {},
-      averageResponseTime: 0,
-      totalResponseTime: 0,
-      interactions: []
+    this.interactions = {
+      userMessages: 0,
+      botMessages: 0,
+      successfulResponses: 0,
+      failedResponses: 0,
+      topicsDiscussed: new Set(),
+      sessionsCount: 0,
+      speechRecognitionUsed: 0,
+      suggestionsClicked: 0,
+    };
+
+    this.currentSession = {
+      startTime: new Date(),
+      language: "en",
+      messageCount: 0,
+      topics: new Set(),
     };
   }
 
-  trackQuestion(query, wasKnown, language, responseTime) {
-    const validLang = LanguageValidator.validate(language);
+  /**
+   * Track a user message
+   * @param {string} message - The message text
+   */
+  trackUserMessage(message) {
+    this.interactions.userMessages++;
+    this.currentSession.messageCount++;
+    // Could add sentiment analysis or other processing here
+    this.sendAnalyticsEvent("user_message", { length: message.length });
+  }
 
-    // Update question count
-    this.analytics.questionCount++;
+  /**
+   * Track a bot response
+   * @param {Object} response - The bot response object
+   * @param {boolean} wasSuccessful - Whether the response was successful
+   */
+  trackBotResponse(response, wasSuccessful = true) {
+    this.interactions.botMessages++;
 
-    // Update language statistics
-    this.analytics.languageStats[validLang] = (this.analytics.languageStats[validLang] || 0) + 1;
+    if (wasSuccessful) {
+      this.interactions.successfulResponses++;
+    } else {
+      this.interactions.failedResponses++;
+    }
 
-    // Track response time
-    this.analytics.totalResponseTime += responseTime;
-    this.analytics.averageResponseTime = this.analytics.totalResponseTime / this.analytics.questionCount;
+    if (response.topic) {
+      this.interactions.topicsDiscussed.add(response.topic);
+      this.currentSession.topics.add(response.topic);
+    }
 
-    // Store interaction details
-    this.analytics.interactions.push({
-      timestamp: Date.now(),
-      query,
-      wasKnown,
-      language: validLang,
-      responseTime
+    this.sendAnalyticsEvent("bot_response", {
+      successful: wasSuccessful,
+      topic: response.topic || "unknown",
+      length: response.text.length,
     });
+  }
 
-    // Track unknown queries for improvement
-    if (!wasKnown) {
-      this.analytics.unknownQueries.push({
-        query,
-        language: validLang,
-        timestamp: Date.now()
-      });
+  /**
+   * Track speech recognition usage
+   * @param {boolean} successful - Whether recognition was successful
+   */
+  trackSpeechRecognition(successful = true) {
+    this.interactions.speechRecognitionUsed++;
+    this.sendAnalyticsEvent("speech_recognition", { successful });
+  }
+
+  /**
+   * Track when a user clicks a suggestion
+   * @param {string} suggestion - The suggestion that was clicked
+   */
+  trackSuggestionClick(suggestion) {
+    this.interactions.suggestionsClicked++;
+    this.sendAnalyticsEvent("suggestion_click", { suggestion });
+  }
+
+  /**
+   * Track the start of a new session
+   * @param {string} language - The session language
+   */
+  trackSessionStart(language = "en") {
+    this.interactions.sessionsCount++;
+    this.currentSession = {
+      startTime: new Date(),
+      language,
+      messageCount: 0,
+      topics: new Set(),
+    };
+    this.sendAnalyticsEvent("session_start", { language });
+  }
+
+  /**
+   * Track the end of a session
+   */
+  trackSessionEnd() {
+    const duration = (new Date() - this.currentSession.startTime) / 1000; // in seconds
+    this.sendAnalyticsEvent("session_end", {
+      duration,
+      messageCount: this.currentSession.messageCount,
+      topicsCount: this.currentSession.topics.size,
+      language: this.currentSession.language,
+    });
+  }
+
+  /**
+   * Get analytics summary
+   * @returns {Object} Analytics summary
+   */
+  getAnalyticsSummary() {
+    return {
+      ...this.interactions,
+      topicsDiscussed: Array.from(this.interactions.topicsDiscussed),
+      currentSession: {
+        ...this.currentSession,
+        topics: Array.from(this.currentSession.topics),
+        duration: (new Date() - this.currentSession.startTime) / 1000,
+      },
+    };
+  }
+
+  /**
+   * Send analytics event to tracking service (placeholder)
+   * @param {string} eventName - Name of the event
+   * @param {Object} eventData - Event data
+   * @private
+   */
+  sendAnalyticsEvent(eventName, eventData = {}) {
+    // In a real implementation, this would send data to Google Analytics,
+    // Matomo, or another analytics service
+
+    if (process.env.NODE_ENV === "development") {
+      console.log(`Analytics event: ${eventName}`, eventData);
+    }
+
+    // Example integration with Google Analytics
+    if (typeof window !== "undefined" && window.gtag) {
+      window.gtag("event", eventName, eventData);
+    }
+
+    // Example integration with Matomo/Piwik
+    if (typeof window !== "undefined" && window._paq) {
+      window._paq.push([
+        "trackEvent",
+        "Chatbot",
+        eventName,
+        JSON.stringify(eventData),
+      ]);
     }
   }
-
-  trackTopic(topic) {
-    if (!topic) return;
-    this.analytics.knownTopics[topic] = (this.analytics.knownTopics[topic] || 0) + 1;
-  }
-
-  getAnalytics() {
-    return {
-      ...this.analytics,
-      languageDistribution: this.getLanguageDistribution(),
-      topTopics: this.getTopTopics(5),
-      recentUnknownQueries: this.getRecentUnknownQueries(10)
-    };
-  }
-
-  getLanguageDistribution() {
-    const total = Object.values(this.analytics.languageStats).reduce((a, b) => a + b, 0);
-    return Object.entries(this.analytics.languageStats).reduce((acc, [lang, count]) => {
-      acc[lang] = (count / total) * 100;
-      return acc;
-    }, {});
-  }
-
-  getTopTopics(limit = 5) {
-    return Object.entries(this.analytics.knownTopics)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, limit)
-      .map(([topic, count]) => ({ topic, count }));
-  }
-
-  getRecentUnknownQueries(limit = 10) {
-    return this.analytics.unknownQueries
-      .slice(-limit)
-      .sort((a, b) => b.timestamp - a.timestamp);
-  }
-
-  getPerformanceMetrics() {
-    return {
-      averageResponseTime: this.analytics.averageResponseTime,
-      totalQuestions: this.analytics.questionCount,
-      knownTopicsCount: Object.keys(this.analytics.knownTopics).length,
-      unknownQueriesCount: this.analytics.unknownQueries.length
-    };
-  }
-
-  reset() {
-    this.analytics = {
-      questionCount: 0,
-      knownTopics: {},
-      unknownQueries: [],
-      languageStats: {},
-      averageResponseTime: 0,
-      totalResponseTime: 0,
-      interactions: []
-    };
-  }
 }
+
+export default AnalyticsManager;

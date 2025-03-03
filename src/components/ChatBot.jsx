@@ -68,11 +68,14 @@ const ChatBot = () => {
     setShowScrollButton(scrolledUp);
   };
 
-  // Initialize the session manager
+  // Initialize the session manager and analytics
   useEffect(() => {
     if (!sessionManagerRef.current) {
       sessionManagerRef.current = new SessionManager(i18n.language);
       const sessionManager = sessionManagerRef.current.init();
+      
+      // Initialize analytics for the session
+      analyticsManager.trackSessionStart(i18n.language);
 
       // Get messages from session storage
       const storedMessages = sessionManager.getMessages();
@@ -86,6 +89,7 @@ const ChatBot = () => {
         if (welcomeBackMessage) {
           setTimeout(() => {
             setMessages((prev) => [...prev, welcomeBackMessage]);
+            analyticsManager.trackBotResponse(welcomeBackMessage);
           }, 1000);
         }
       } else {
@@ -98,6 +102,7 @@ const ChatBot = () => {
         };
         setMessages([welcomeMessage]);
         sessionManager.addMessage(welcomeMessage);
+        analyticsManager.trackBotResponse(welcomeMessage);
       }
     }
 
@@ -105,7 +110,12 @@ const ChatBot = () => {
     setTimeout(() => {
       inputRef.current?.focus();
     }, 300);
-  }, [i18n.language]);
+    
+    // Cleanup analytics when component unmounts
+    return () => {
+      analyticsManager.trackSessionEnd();
+    };
+  }, [i18n.language, analyticsManager]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -204,7 +214,7 @@ const ChatBot = () => {
     }
   }, [i18n.language, speechRecognition]);
 
-  // Handle toggle of speech recognition
+  // Track speech recognition usage
   const toggleSpeechRecognition = () => {
     if (!speechSupported || !speechRecognition) return;
 
@@ -215,8 +225,10 @@ const ChatBot = () => {
       try {
         speechRecognition.start();
         setIsListening(true);
+        analyticsManager.trackSpeechRecognition(true); // Track successful start
       } catch (error) {
         console.error("Speech recognition error:", error);
+        analyticsManager.trackSpeechRecognition(false); // Track failed start
         // Try to reset and restart if there's an error
         speechRecognition.stop();
         setTimeout(() => {
@@ -248,6 +260,9 @@ const ChatBot = () => {
     if (sessionManagerRef.current) {
       sessionManagerRef.current.addMessage(userMessage);
     }
+    
+    // Track user message
+    analyticsManager.trackUserMessage(trimmedInput);
 
     setInput("");
     setSuggestions([]);
@@ -440,6 +455,10 @@ const ChatBot = () => {
       if (sessionManagerRef.current) {
         sessionManagerRef.current.addMessage(botMessage);
       }
+      
+      // Track successful bot response
+      analyticsManager.trackBotResponse(botMessage, true);
+      
     } catch (error) {
       console.error("Error processing message:", error);
 
@@ -453,6 +472,9 @@ const ChatBot = () => {
       if (sessionManagerRef.current) {
         sessionManagerRef.current.addMessage(errorMessage);
       }
+      
+      // Track failed bot response
+      analyticsManager.trackBotResponse(errorMessage, false);
     } finally {
       setIsTyping(false);
     }
@@ -461,6 +483,9 @@ const ChatBot = () => {
   const handleSuggestionClick = (topic) => {
     setInput(`Tell me about ${topic}`);
     inputRef.current?.focus();
+    
+    // Track suggestion click
+    analyticsManager.trackSuggestionClick(topic);
 
     // Optional: Auto-submit the query
     // setTimeout(() => {
@@ -470,6 +495,9 @@ const ChatBot = () => {
   };
 
   const handleClearChat = () => {
+    // Track session end before clearing
+    analyticsManager.trackSessionEnd();
+    
     // Clear the chat and reset everything
     if (sessionManagerRef.current) {
       sessionManagerRef.current.clear();
@@ -490,6 +518,10 @@ const ChatBot = () => {
       if (sessionManagerRef.current) {
         sessionManagerRef.current.addMessage(welcomeMessage);
       }
+      
+      // Start tracking a new session
+      analyticsManager.trackSessionStart(i18n.language);
+      analyticsManager.trackBotResponse(welcomeMessage);
     }, 100);
   };
 
