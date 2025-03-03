@@ -56,9 +56,9 @@ export const commonQuestionPhrases = {
  * Question words by language
  */
 export const questionWords = {
-  en: ["what", "how", "when", "where", "which", "why", "who"],
-  fr: ["quoi", "comment", "quand", "où", "quel", "pourquoi", "qui"],
-  de: ["was", "wie", "wann", "wo", "welche", "warum", "wer"],
+  en: ['what', 'how', 'why', 'where', 'when', 'which', 'who', 'whom', 'whose', 'can', 'could', 'should', 'would', 'will', 'do', 'does', 'did', 'is', 'are', 'was', 'were', 'have', 'has', 'had'],
+  fr: ['que', 'quoi', 'comment', 'pourquoi', 'où', 'quand', 'quel', 'quelle', 'quels', 'quelles', 'qui', 'peux', 'pouvez', 'peut', 'peuvent', 'est', 'sont', 'était', 'étaient', 'a', 'as', 'avez', 'ont', 'avaient'],
+  de: ['was', 'wie', 'warum', 'weshalb', 'wo', 'wann', 'welche', 'welcher', 'welches', 'wer', 'wem', 'wessen', 'kann', 'kannst', 'können', 'könnte', 'könnten', 'soll', 'sollte', 'würde', 'wird', 'ist', 'sind', 'war', 'waren', 'habe', 'hat', 'haben']
 };
 
 /**

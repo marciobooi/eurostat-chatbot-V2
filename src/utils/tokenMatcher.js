@@ -1,205 +1,143 @@
-import { getStopWords } from "../data/stopWords";
+/**
+ * Token matching utilities for semantic matching between user queries and energy topics
+ */
+import { stopWords } from "../data/stopWords"; // Fixed import path
 
 /**
- * Tokenize a string into words and remove stop words
+ * Tokenize a string and remove stopwords
  * @param {string} text - Text to tokenize
  * @param {string} language - Language code
- * @returns {string[]} Array of tokens
+ * @returns {Array} Array of tokens
  */
 export const tokenize = (text, language = "en") => {
-  if (!text) return [];
+  if (!text || typeof text !== "string") return [];
 
-  const normalizedText = text
+  // Convert to lowercase and remove special characters
+  const cleanText = text
     .toLowerCase()
     .replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "")
     .replace(/\s{2,}/g, " ")
     .trim();
 
-  const words = normalizedText.split(/\s+/);
-  const languageStopWords = getStopWords(language);
+  // Split into words
+  const tokens = cleanText.split(" ").filter((token) => token.length > 1);
 
-  return words.filter(
-    (word) => word.length > 1 && !languageStopWords.includes(word)
+  // Remove stopwords
+  const langStopwords = stopWords[language] || stopWords.en;
+  return tokens.filter((token) => !langStopwords.includes(token));
+};
+
+/**
+ * Calculate match score between tokens
+ * @param {Object} options - Match options containing token arrays
+ * @returns {Object} Match result with scores
+ */
+export const calculateMatchScore = (options) => {
+  const { query = [], key = [], keywords = [], synonyms = [] } = options;
+
+  if (!query.length)
+    return {
+      isMatch: false,
+      scores: { key: 0, keywords: 0, synonyms: 0, total: 0 },
+    };
+
+  // Count exact matches for each category
+  const keyMatches = countMatches(query, key);
+  const keywordMatches = countMatches(query, keywords);
+  const synonymMatches = countMatches(query, synonyms);
+
+  // Calculate individual scores (0-1)
+  const keyScore = key.length ? keyMatches / Math.max(key.length, 1) : 0;
+  const keywordScore = keywords.length
+    ? keywordMatches / Math.max(query.length, 1)
+    : 0;
+  const synonymScore = synonyms.length
+    ? synonymMatches / Math.max(query.length, 1)
+    : 0;
+
+  // Calculate total score with different weightings
+  const weightedScore =
+    keyScore * 0.5 + keywordScore * 0.3 + synonymScore * 0.2;
+
+  // Determine if it's a match (score >= threshold)
+  const isMatch = weightedScore >= 0.6;
+
+  return {
+    isMatch,
+    scores: {
+      key: parseFloat(keyScore.toFixed(2)),
+      keywords: parseFloat(keywordScore.toFixed(2)),
+      synonyms: parseFloat(synonymScore.toFixed(2)),
+      total: parseFloat(weightedScore.toFixed(2)),
+    },
+  };
+};
+
+/**
+ * Count the number of matches between two arrays
+ * @param {Array} tokens1 - First array of tokens
+ * @param {Array} tokens2 - Second array of tokens
+ * @returns {number} Number of matches
+ */
+const countMatches = (tokens1, tokens2) => {
+  if (!tokens1 || !tokens2 || !tokens1.length || !tokens2.length) return 0;
+
+  let matches = 0;
+
+  // Check each token from first array against second array
+  for (const token of tokens1) {
+    for (const compareToken of tokens2) {
+      // Exact match or token is part of compareToken or vice versa
+      if (
+        token === compareToken ||
+        (token.length > 3 && compareToken.includes(token)) ||
+        (compareToken.length > 3 && token.includes(compareToken))
+      ) {
+        matches++;
+        break; // Count only once per token in tokens1
+      }
+    }
+  }
+
+  return matches;
+};
+
+/**
+ * Check if query contains all required terms
+ * @param {Array} queryTokens - Tokenized query
+ * @param {Array} requiredTokens - Tokens that must be present
+ * @returns {boolean} True if all required tokens are present
+ */
+export const containsAllTerms = (queryTokens, requiredTokens) => {
+  if (!requiredTokens || !requiredTokens.length) return true;
+  if (!queryTokens || !queryTokens.length) return false;
+
+  return requiredTokens.every((required) =>
+    queryTokens.some(
+      (token) =>
+        token === required ||
+        (token.length > 3 && token.includes(required)) ||
+        (required.length > 3 && required.includes(token))
+    )
   );
 };
 
 /**
- * Get term weight using TF-IDF principle
- * @param {string} term - Term to calculate weight for
- * @param {string[]} terms - All terms in the document
- * @returns {number} Term weight
+ * Check if query contains any exclusion terms
+ * @param {Array} queryTokens - Tokenized query
+ * @param {Array} exclusionTokens - Tokens that must not be present
+ * @returns {boolean} True if any exclusion token is present
  */
-export const getTermWeight = (term, terms) => {
-  if (!terms || !Array.isArray(terms) || terms.length === 0) return 0;
+export const containsExclusionTerms = (queryTokens, exclusionTokens) => {
+  if (!exclusionTokens || !exclusionTokens.length) return false;
+  if (!queryTokens || !queryTokens.length) return false;
 
-  // Simple term frequency
-  const termCount = terms.filter((t) => t === term).length;
-  const termFrequency = termCount / terms.length;
-
-  // Simple inverse document frequency (higher weight for less common terms)
-  const documentFrequency = terms.some((t) => t === term) ? 1 : 0;
-  const inverseDocumentFrequency = documentFrequency
-    ? Math.log(terms.length / documentFrequency)
-    : 0;
-
-  return termFrequency * inverseDocumentFrequency;
-};
-
-/**
- * Calculate semantic similarity between two sets of tokens
- * @param {string[]} tokensA - First set of tokens
- * @param {string[]} tokensB - Second set of tokens
- * @returns {number} Similarity score (0-1)
- */
-export const calculateSemanticSimilarity = (tokensA, tokensB) => {
-  if (!tokensA?.length || !tokensB?.length) return 0;
-
-  try {
-    // Convert tokens to unique terms
-    const uniqueA = [...new Set(tokensA)];
-    const uniqueB = [...new Set(tokensB)];
-
-    // Calculate weights for each term
-    const weightsA = uniqueA.map((term) => ({
-      term,
-      weight: getTermWeight(term, [...tokensA, ...tokensB]) || 0.5,
-    }));
-
-    const weightsB = uniqueB.map((term) => ({
-      term,
-      weight: getTermWeight(term, [...tokensA, ...tokensB]) || 0.5,
-    }));
-
-    // Calculate matches
-    let matchScore = 0;
-    let totalPossible = 0;
-
-    weightsA.forEach(({ term: termA, weight: weightA }) => {
-      totalPossible += weightA;
-
-      // Find exact matches
-      const exactMatch = weightsB.find(({ term }) => term === termA);
-      if (exactMatch) {
-        matchScore += weightA * 1.0; // Full weight for exact match
-      } else {
-        // Find partial matches (substring or edit distance)
-        const partialMatches = weightsB.filter(
-          ({ term: termB }) =>
-            termA.includes(termB) ||
-            termB.includes(termA) ||
-            levenshteinDistance(termA, termB) /
-              Math.max(termA.length, termB.length) <
-              0.3
-        );
-
-        if (partialMatches.length > 0) {
-          // Take the best partial match
-          const bestPartialMatch = Math.max(
-            ...partialMatches.map(({ weight }) => weight)
-          );
-          matchScore += weightA * 0.6 * bestPartialMatch; // Partial credit for partial matches
-        }
-      }
-    });
-
-    // Normalize score
-    return totalPossible > 0 ? matchScore / totalPossible : 0;
-  } catch (error) {
-    console.error("Error calculating semantic similarity:", error);
-    return 0;
-  }
-};
-
-/**
- * Calculate edit distance between two strings
- * @param {string} a - First string
- * @param {string} b - Second string
- * @returns {number} Edit distance
- */
-export const levenshteinDistance = (a, b) => {
-  if (!a || !a.length) return b ? b.length : 0;
-  if (!b || !b.length) return a.length;
-
-  let matrix = [];
-
-  // Initialize matrix
-  for (let i = 0; i <= a.length; i++) {
-    matrix[i] = [i];
-  }
-  for (let j = 0; j <= b.length; j++) {
-    matrix[0][j] = j;
-  }
-
-  // Fill matrix
-  for (let i = 1; i <= a.length; i++) {
-    for (let j = 1; j <= b.length; j++) {
-      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-      matrix[i][j] = Math.min(
-        matrix[i - 1][j] + 1, // deletion
-        matrix[i][j - 1] + 1, // insertion
-        matrix[i - 1][j - 1] + cost // substitution
-      );
-    }
-  }
-
-  return matrix[a.length][b.length];
-};
-
-/**
- * Calculate overall match score between query and key/keywords/synonyms
- * @param {Object} params - Parameters
- * @param {string[]} params.query - Query tokens
- * @param {string[]} params.key - Key tokens
- * @param {string[]} params.keywords - Keyword tokens
- * @param {string[]} params.synonyms - Synonym tokens
- * @returns {Object} Match scores
- */
-export const calculateMatchScore = ({ query, key, keywords, synonyms }) => {
-  try {
-    // Calculate different match types with different weights
-    const keyScore = calculateSemanticSimilarity(query, key) * 1.0; // 100% weight for key match
-    const keywordScore = calculateSemanticSimilarity(query, keywords) * 0.8; // 80% weight for keyword match
-    const synonymScore = calculateSemanticSimilarity(query, synonyms) * 0.6; // 60% weight for synonym match
-
-    // Calculate total score (average of all non-zero scores)
-    const scores = [
-      { type: "key", score: keyScore },
-      { type: "keywords", score: keywordScore },
-      { type: "synonyms", score: synonymScore },
-    ];
-
-    const nonZeroScores = scores.filter((s) => s.score > 0);
-    const totalScore =
-      nonZeroScores.length > 0
-        ? nonZeroScores.reduce((sum, s) => sum + s.score, 0) /
-          nonZeroScores.length
-        : 0;
-
-    return {
-      query,
-      key,
-      keywords,
-      synonyms,
-      scores: {
-        key: keyScore,
-        keywords: keywordScore,
-        synonyms: synonymScore,
-        total: totalScore,
-      },
-    };
-  } catch (error) {
-    console.error("Error calculating match score:", error);
-    return {
-      query,
-      key,
-      keywords,
-      synonyms,
-      scores: {
-        key: 0,
-        keywords: 0,
-        synonyms: 0,
-        total: 0,
-      },
-    };
-  }
+  return exclusionTokens.some((excluded) =>
+    queryTokens.some(
+      (token) =>
+        token === excluded ||
+        (token.length > 3 && token.includes(excluded)) ||
+        (excluded.length > 3 && excluded.includes(token))
+    )
+  );
 };

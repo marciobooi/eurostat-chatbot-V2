@@ -1,6 +1,8 @@
 /**
- * Response utility functions that use the separate dictionary files
+ * Response utilities for generating dynamic bot responses
  */
+import { botResponses } from "../data/botResponses";
+import { followUpQuestions } from "../data/followUpQuestions";
 import { getRandomFromArray } from "./random";
 
 // Import each response dictionary from its own file
@@ -21,143 +23,177 @@ import i18n from "../i18n";
 /**
  * Get a random welcome message
  * @param {string} language - Language code
- * @returns {string} Welcome message
+ * @returns {string} Random welcome message
  */
 export const getRandomWelcomeMessage = (language = "en") => {
-  const messages = welcomeMessages[language] || welcomeMessages.en;
-  return getRandomFromArray(messages);
-};
-
-/**
- * Get a random unknown response
- * @param {string} language - Language code
- * @param {Object} matchInfo - Optional match information for partial matches
- * @returns {string} Unknown response message
- */
-export const getRandomUnknownResponse = (language = "en", matchInfo = null) => {
-  const responses = unknownResponses[language] || unknownResponses.en;
-  let response = getRandomFromArray(responses);
-
-  // Add suggestion based on partial match if available
-  if (matchInfo && matchInfo.topic && matchInfo.score > 0.3) {
-    const suggestions = followUpSuggestions[language] || followUpSuggestions.en;
-    const matchSuggestion = getRandomFromArray(suggestions).replace(
-      "{topic}",
-      matchInfo.topic
-    );
-
-    response += " " + matchSuggestion;
+  const greetings =
+    botResponses.greeting?.[language] || botResponses.greeting?.en;
+  if (!greetings || !greetings.length) {
+    return "Welcome! How can I help you with energy statistics?";
   }
-
-  return response;
-};
-
-/**
- * Get context-aware response by enhancing a base response with context
- * @param {string} query - User query
- * @param {Object} contextManager - Context manager instance
- * @param {string} baseResponse - Base response text
- * @returns {string} Context-aware response
- */
-export const getContextAwareResponse = (
-  query,
-  contextManager,
-  baseResponse
-) => {
-  if (!contextManager || !baseResponse) return baseResponse;
-
-  const currentLang = i18n.language || "en";
-  let response = baseResponse;
-
-  // Add contextual enhancements if available
-  try {
-    if (contextManager.getContextualSuggestions) {
-      const contextInfo = contextManager.getContextualSuggestions();
-      const mood = contextManager.getCurrentMood?.() || { engagement: 1.0 };
-
-      // Add empathetic prefix for engaged users
-      if (mood.engagement > 0.8) {
-        const empathies = empathyPhrases[currentLang] || empathyPhrases.en;
-        const prefix = getRandomFromArray(empathies);
-        response = prefix + " " + response;
-      }
-
-      // Add contextual connection if there are related previous topics
-      if (contextInfo && contextInfo.recentTopics?.length > 0) {
-        const recentTopic = contextInfo.recentTopics[0];
-        const connections =
-          topicConnectionPhrases[currentLang] || topicConnectionPhrases.en;
-        const connectionPhrase = getRandomFromArray(connections).replace(
-          "{topic}",
-          recentTopic
-        );
-
-        response += " " + connectionPhrase;
-      }
-    }
-  } catch (error) {
-    console.error("Error in getContextAwareResponse:", error);
-  }
-
-  return response;
+  return greetings[Math.floor(Math.random() * greetings.length)];
 };
 
 /**
  * Get a random farewell message
  * @param {string} language - Language code
- * @returns {string} Farewell message
+ * @returns {string} Random farewell message
  */
 export const getRandomFarewellMessage = (language = "en") => {
-  const messages = farewellMessages[language] || farewellMessages.en;
-  return getRandomFromArray(messages);
+  const farewells =
+    botResponses.farewell?.[language] || botResponses.farewell?.en;
+  if (!farewells || !farewells.length) {
+    return "Goodbye! Feel free to return if you have more questions.";
+  }
+  return farewells[Math.floor(Math.random() * farewells.length)];
 };
 
 /**
- * Get a random gratitude response message
+ * Get a random gratitude response
  * @param {string} language - Language code
- * @returns {string} Gratitude response message
+ * @returns {string} Random gratitude response
  */
 export const getRandomGratitudeResponse = (language = "en") => {
-  const messages = gratitudeMessages[language] || gratitudeMessages.en;
-  return getRandomFromArray(messages);
-};
-
-/**
- * Get a random thinking message
- * @param {string} language - Language code
- * @returns {string} Thinking message
- */
-export const getRandomThinkingMessage = (language = "en") => {
-  const messages = thinkingMessages[language] || thinkingMessages.en;
-  return getRandomFromArray(messages);
-};
-
-/**
- * Get a random error message
- * @param {string} language - Language code
- * @returns {string} Error message
- */
-export const getRandomErrorMessage = (language = "en") => {
-  const messages = errorMessages[language] || errorMessages.en;
-  return getRandomFromArray(messages);
+  const responses =
+    botResponses.gratitude?.[language] || botResponses.gratitude?.en;
+  if (!responses || !responses.length) {
+    return "You're welcome! Happy to help.";
+  }
+  return responses[Math.floor(Math.random() * responses.length)];
 };
 
 /**
  * Get a random prompt message
  * @param {string} language - Language code
- * @returns {string} Prompt message
+ * @returns {string} Random prompt message
  */
 export const getRandomPromptMessage = (language = "en") => {
-  const messages = promptMessages[language] || promptMessages.en;
-  return getRandomFromArray(messages);
+  const prompts = botResponses.prompt?.[language] || botResponses.prompt?.en;
+  if (!prompts || !prompts.length) {
+    return "Is there something specific about energy statistics you'd like to know?";
+  }
+  return prompts[Math.floor(Math.random() * prompts.length)];
 };
 
 /**
- * Get a random reassurance phrase
+ * Get a random error message
  * @param {string} language - Language code
- * @returns {string} Reassurance phrase
+ * @returns {string} Random error message
  */
-export const getRandomReassurancePhrase = (language = "en") => {
-  const phrases = reassurancePhrases[language] || reassurancePhrases.en;
-  return getRandomFromArray(phrases);
+export const getRandomErrorMessage = (language = "en") => {
+  const errors = botResponses.error?.[language] || botResponses.error?.en;
+  if (!errors || !errors.length) {
+    return "I'm sorry, something went wrong. Could you try again?";
+  }
+  return errors[Math.floor(Math.random() * errors.length)];
+};
+
+/**
+ * Get a random thinking message
+ * @param {string} language - Language code
+ * @returns {string} Random thinking message
+ */
+export const getRandomThinkingMessage = (language = "en") => {
+  const thinking =
+    botResponses.thinking?.[language] || botResponses.thinking?.en;
+  if (!thinking || !thinking.length) {
+    return "Let me think about that...";
+  }
+  return thinking[Math.floor(Math.random() * thinking.length)];
+};
+
+/**
+ * Get a random unknown response
+ * @param {string} language - Language code
+ * @param {Object} matchInfo - Partial match information if available
+ * @returns {string} Formatted unknown response
+ */
+export const getRandomUnknownResponse = (language = "en", matchInfo = null) => {
+  const confused =
+    botResponses.confused?.[language] || botResponses.confused?.en;
+  if (!confused || !confused.length) {
+    return "I'm not sure I understand. Could you rephrase that?";
+  }
+
+  const response = confused[Math.floor(Math.random() * confused.length)];
+
+  // If we have partial match info, add a hint
+  if (matchInfo && matchInfo.topic && matchInfo.score > 0.3) {
+    const hint =
+      language === "fr"
+        ? `Est-ce que vous voulez savoir quelque chose sur "${matchInfo.topic}"?`
+        : language === "de"
+        ? `Möchten Sie etwas über "${matchInfo.topic}" wissen?`
+        : `Are you asking about "${matchInfo.topic}"?`;
+
+    return `${response} ${hint}`;
+  }
+
+  return response;
+};
+
+/**
+ * Get context-aware response
+ * @param {string} query - User's query
+ * @param {Object} contextManager - Context manager instance
+ * @param {string} answer - Base answer to include
+ * @returns {string} Context-aware response
+ */
+export const getContextAwareResponse = (query, contextManager, answer) => {
+  if (!answer) return getRandomUnknownResponse();
+
+  // Simply return the answer if it's a direct question
+  if (
+    query.trim().endsWith("?") ||
+    query.toLowerCase().startsWith("what") ||
+    query.toLowerCase().startsWith("how") ||
+    query.toLowerCase().startsWith("why") ||
+    query.toLowerCase().startsWith("tell me")
+  ) {
+    return answer;
+  }
+
+  // Add a more conversational wrapper for non-question queries
+  const wrappers = [
+    `Here's what I know about that: ${answer}`,
+    `${answer}`,
+    `Regarding your question: ${answer}`,
+    `${answer}`,
+    `About that topic: ${answer}`,
+  ];
+
+  return wrappers[Math.floor(Math.random() * wrappers.length)];
+};
+
+/**
+ * Get a follow-up question based on topic
+ * @param {string} topic - The current topic
+ * @param {string} language - Language code
+ * @returns {string|null} Follow-up question or null if none available
+ */
+export const getFollowUpQuestion = (topic, language = "en") => {
+  if (!topic || !followUpQuestions) return null;
+
+  // Get language-specific questions or fall back to English
+  const questions = followUpQuestions[language] || followUpQuestions.en;
+  if (!questions) return null;
+
+  // Try to get topic-specific questions
+  const topicQuestions = questions[topic.toLowerCase()] || questions.general;
+  if (!topicQuestions || !topicQuestions.length) return null;
+
+  // Return a random question
+  return topicQuestions[Math.floor(Math.random() * topicQuestions.length)];
+};
+
+export default {
+  getRandomWelcomeMessage,
+  getRandomFarewellMessage,
+  getRandomGratitudeResponse,
+  getRandomPromptMessage,
+  getRandomErrorMessage,
+  getRandomThinkingMessage,
+  getRandomUnknownResponse,
+  getContextAwareResponse,
+  getFollowUpQuestion,
 };

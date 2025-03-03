@@ -1,14 +1,18 @@
+/**
+ * Natural Language Processing helper functions for the chatbot
+ * Uses separate dictionary files for data
+ */
+import { questionWords } from "../data/questionWords";
+import { stopWords } from "../data/stopWords";
 import {
-  commonQuestionPhrases,
-  questionWords,
-  containsQuestionWord,
-} from "../data/questionPhrases";
-import { intentPatterns, getIntent } from "../data/intentPatterns";
-import {
-  sentimentPatterns,
   analyzeSentiment as getSentiment,
+  getCompromisePattern,
 } from "../data/sentimentPatterns";
-import { stopWords, getStopWords } from "../data/stopWords";
+import { energyDictionary, getRelatedTopics } from "../data/energyDictionary";
+import { isGreeting as checkGreeting } from "../data/greetingPhrases";
+import { extractDateReferences } from "../data/datePatterns";
+import { stemWord as applyStemming } from "../data/stemmingRules";
+import { getIntent } from "../data/intentPatterns";
 import nlp from "compromise";
 import sentences from "compromise-sentences";
 import numbers from "compromise-numbers";
@@ -34,26 +38,31 @@ const safeTokenize = (text) => {
   }
 };
 
-// Add stemming for word roots
-const stemWord = (word) => {
-  // Simple stemming rules for energy domain
-  const rules = [
-    { suffix: "ing", minLength: 5 },
-    { suffix: "tion", minLength: 6 },
-    { suffix: "ed", minLength: 4 },
-    { suffix: "s", minLength: 3 },
-  ];
-
-  let stemmed = word.toLowerCase();
-  for (const rule of rules) {
-    if (stemmed.length >= rule.minLength && stemmed.endsWith(rule.suffix)) {
-      stemmed = stemmed.slice(0, -rule.suffix.length);
-      break;
-    }
-  }
-  return stemmed;
+/**
+ * Stem a word using language-specific rules
+ * @param {string} word - Word to stem
+ * @param {string} language - Language code (en, fr, de)
+ * @returns {string} Stemmed word
+ */
+const stemWord = (word, language = "en") => {
+  return applyStemming(word, language);
 };
 
+/**
+ * Find the intent of a user input
+ * @param {string} input - User input
+ * @param {string} language - Language code
+ * @returns {Object} Intent information
+ */
+export const findIntent = (input, language = "en") => {
+  return getIntent(input, language);
+};
+
+/**
+ * Clean and normalize a query
+ * @param {string} query - User input to clean
+ * @returns {string} Cleaned query
+ */
 export const cleanQuery = (query = "") => {
   if (!query) return "";
 
@@ -66,47 +75,129 @@ export const cleanQuery = (query = "") => {
   }
 };
 
-export const extractTopicFromQuery = (query, language) => {
-  try {
-    const cleanedQuery = cleanQuery(query);
-    if (!cleanedQuery || !language) return "";
+/**
+ * Check if text contains a question word
+ * @param {string} text - Text to check
+ * @param {string} language - Language code
+ * @returns {boolean} True if the text contains a question word
+ */
+export const containsQuestionWord = (text, language = "en") => {
+  if (!text) return false;
 
-    // For single-word queries, try stemming
-    if (!cleanedQuery.includes(" ")) {
-      return stemWord(cleanedQuery);
+  const words = text.toLowerCase().split(/\s+/);
+  const langQuestionWords = questionWords[language] || questionWords.en;
+
+  // Check for question words
+  for (const word of words) {
+    if (langQuestionWords.includes(word)) {
+      return true;
     }
-
-    const phrases = commonQuestionPhrases[language];
-    if (!phrases) {
-      console.warn(`No question phrases found for language: ${language}`);
-      return cleanedQuery;
-    }
-
-    // Use compromise for initial processing
-    let doc = nlp(cleanedQuery);
-
-    // Remove question phrases
-    phrases.forEach((phrase) => {
-      doc = doc.replace(phrase, "");
-    });
-
-    // Extract topics and nouns
-    const topics = doc.topics().text();
-    const nouns = doc.nouns().text();
-
-    // Use the most specific information available
-    const extractedTopic = topics || nouns || cleanedQuery;
-    return stemWord(extractedTopic); // Apply stemming to extracted topic
-  } catch (error) {
-    console.warn("Error in extractTopicFromQuery:", error);
-    return stemWord(query.trim()); // Apply stemming even in error case
   }
+
+  // Also check for question marks
+  return text.includes("?");
+};
+
+/**
+ * Check if text is a greeting
+ * @param {string} text - Text to check
+ * @param {string} language - Language code
+ * @returns {boolean} True if the text is a greeting
+ */
+export const isGreeting = (text, language = "en") => {
+  return checkGreeting(text, language);
+};
+
+/**
+ * Extract key topic from a query using the energyDictionary
+ * @param {string} query - User query
+ * @param {string} language - Language code
+ * @returns {string} Extracted topic
+ */
+export const extractTopicFromQuery = (query, language = "en") => {
+  if (!query) return "";
+
+  // Get stopwords for the specified language
+  const langStopwords = stopWords[language] || stopWords.en;
+
+  // Convert to lowercase and remove punctuation
+  const cleanQuery = query
+    .toLowerCase()
+    .replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "")
+    .replace(/\s{2,}/g, " ");
+
+  // Tokenize
+  const words = cleanQuery.split(" ").filter((word) => word.length > 1);
+
+  // Remove stopwords and question words
+  const langQuestionWords = questionWords[language] || questionWords.en;
+  const contentWords = words.filter(
+    (word) => !langStopwords.includes(word) && !langQuestionWords.includes(word)
+  );
+
+  // Apply stemming to each content word with language-specific rules
+  const stemmedContentWords = contentWords.map((word) =>
+    stemWord(word, language)
+  );
+
+  // Check for direct matches in energyDictionary
+  const dictionaryTopics = Object.keys(
+    energyDictionary[language] || energyDictionary.en
+  );
+
+  // Look for exact topic matches first
+  for (const topic of dictionaryTopics) {
+    if (cleanQuery.includes(topic.toLowerCase())) {
+      return topic;
+    }
+  }
+
+  // Look for stemmed word matches next
+  for (const stemmedWord of stemmedContentWords) {
+    for (const topic of dictionaryTopics) {
+      const stemmedTopic = stemWord(topic, language).toLowerCase();
+      if (
+        stemmedTopic.includes(stemmedWord) ||
+        (stemmedWord.length > 3 &&
+          stemmedTopic.split(" ").some((part) => part.includes(stemmedWord)))
+      ) {
+        return topic;
+      }
+    }
+  }
+
+  // Try original words if stems didn't match
+  for (const word of contentWords) {
+    for (const topic of dictionaryTopics) {
+      if (
+        topic.toLowerCase().includes(word) ||
+        (word.length > 3 &&
+          topic
+            .toLowerCase()
+            .split(" ")
+            .some((part) => part.includes(word)))
+      ) {
+        return topic;
+      }
+    }
+  }
+
+  // Get related topics if available
+  for (const word of contentWords) {
+    const relatedTopics = getRelatedTopics(word, language);
+    if (relatedTopics && relatedTopics.length > 0) {
+      return relatedTopics[0]; // Return the first related topic
+    }
+  }
+
+  // If no energy term found, return the first content word or empty string
+  return contentWords.length > 0 ? contentWords[0] : "";
 };
 
 /**
  * Extract entities from text with language support
  * @param {string} text - Text to analyze
- * @param {string} [language='en'] - Language code
+ * @param {string} language - Language code
  * @returns {Object} Extracted entities
  */
 export const extractEntities = (text, language = "en") => {
@@ -140,16 +231,8 @@ export const extractEntities = (text, language = "en") => {
       entities.dates = doc.dates().out("array");
     } catch (error) {
       console.warn("Date extraction failed, using fallback:", error);
-      // Language-specific date extraction patterns
-      const datePatterns = {
-        en: /\b(?:today|tomorrow|yesterday|(?:next|last) (?:week|month|year)|(?:in |after |before )?\d+ (?:days?|weeks?|months?|years?))\b/gi,
-        fr: /\b(?:aujourd'hui|demain|hier|(?:la |le )?(?:semaine|mois|année) (?:prochaine?|dernière?)|(?:dans |après |avant )?\d+ (?:jours?|semaines?|mois|ans?))\b/gi,
-        de: /\b(?:heute|morgen|gestern|(?:nächste[rn]?|letzte[rn]?) (?:Woche|Monat|Jahr)|(?:in |nach |vor )?\d+ (?:Tage?n?|Wochen?|Monate?n?|Jahre?n?))\b/gi,
-      };
-
-      const lang = ["en", "fr", "de"].includes(language) ? language : "en";
-      const dateMatches = text.match(datePatterns[lang]) || [];
-      entities.dates = dateMatches;
+      // Use our datePatterns module instead of inline patterns
+      entities.dates = extractDateReferences(text, language);
     }
 
     return entities;
@@ -159,18 +242,25 @@ export const extractEntities = (text, language = "en") => {
   }
 };
 
-export const getSentenceSentiment = (text) => {
+/**
+ * Get sentence sentiment score using compromise and sentiment patterns
+ * @param {string} text - Text to analyze
+ * @param {string} language - Language code
+ * @returns {number} Sentiment score between -1 and 1
+ */
+export const getSentenceSentiment = (text, language = "en") => {
   if (!text) return 0;
 
   try {
     const doc = nlp(text);
-    // Use simple word matching for sentiment
-    const positive = doc.match(
-      "(good|great|excellent|awesome|nice|wonderful|fantastic|amazing|love|happy|positive|helpful)"
-    ).length;
-    const negative = doc.match(
-      "(bad|poor|terrible|awful|horrible|hate|negative|unhelpful|wrong|worse|worst)"
-    ).length;
+
+    // Get patterns from sentimentPatterns instead of hardcoding
+    const positivePattern = getCompromisePattern("positive", language);
+    const negativePattern = getCompromisePattern("negative", language);
+
+    // Match against the patterns
+    const positive = doc.match(positivePattern).length;
+    const negative = doc.match(negativePattern).length;
 
     return (positive - negative) / (positive + negative + 1);
   } catch (error) {
@@ -179,6 +269,11 @@ export const getSentenceSentiment = (text) => {
   }
 };
 
+/**
+ * Extract key phrases from text
+ * @param {string} text - Text to analyze
+ * @returns {Array} Extracted phrases
+ */
 export const extractKeyPhrases = (text) => {
   if (!text) return [];
 
@@ -195,46 +290,40 @@ export const extractKeyPhrases = (text) => {
   }
 };
 
-export const detectLanguage = (text) => {
-  if (!text) return null;
+/**
+ * Check if text contains date references
+ * @param {string} text - Text to check
+ * @param {string} language - Language code
+ * @returns {boolean} True if the text contains date references
+ */
+export const containsDateReference = (text, language = "en") => {
+  if (!text) return false;
 
-  try {
-    const words = safeTokenize(text);
-
-    const langScores = {
-      en: 0,
-      fr: 0,
-      de: 0,
-    };
-
-    words.forEach((word) => {
-      if (commonQuestionPhrases.en.some((phrase) => word.includes(phrase)))
-        langScores.en++;
-      if (commonQuestionPhrases.fr.some((phrase) => word.includes(phrase)))
-        langScores.fr++;
-      if (commonQuestionPhrases.de.some((phrase) => word.includes(phrase)))
-        langScores.de++;
-    });
-
-    // Find language with highest score
-    const [detectedLang, score] = Object.entries(langScores).reduce((a, b) =>
-      a[1] > b[1] ? a : b
-    );
-
-    // Only return detected language if we have some confidence
-    return score > 0 ? detectedLang : null;
-  } catch (error) {
-    console.warn("Error in detectLanguage:", error);
-    return null;
-  }
+  const dates = extractDateReferences(text, language);
+  return dates.length > 0;
 };
 
-// Export the findIntent function but delegate implementation to data file
-export const findIntent = (input, language = "en") => {
-  return getIntent(input, language);
-};
-
-// Export analyzeSentiment function but delegate implementation to data file
+/**
+ * Analyze sentiment of text
+ * @param {string} text - Text to analyze
+ * @param {string} language - Language code
+ * @returns {Object} Sentiment analysis results
+ */
 export const analyzeSentiment = (text, language = "en") => {
   return getSentiment(text, language);
+};
+
+export default {
+  containsQuestionWord,
+  isGreeting,
+  extractTopicFromQuery,
+  extractEntities,
+  analyzeSentiment,
+  cleanQuery,
+  getSentenceSentiment,
+  extractKeyPhrases,
+  containsDateReference,
+  extractDateReferences,
+  stemWord,
+  findIntent,
 };

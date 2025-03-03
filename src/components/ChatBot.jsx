@@ -1,49 +1,38 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faRobot,
   faUser,
   faTrash,
   faPaperPlane,
-  faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import SmartSuggestions from "./SmartSuggestions";
+import ScrollButton from "./ScrollButton"; // Import the ScrollButton component
 import { getEnergyInfo } from "../utils/getEnergyInfo";
-import { energyDictionary, getRelatedTopics } from "../data/energyDictionary";
+import { getRelatedTopics } from "../data/energyDictionary";
 import {
   calculateThinkingTime,
   calculateTypingTime,
 } from "../utils/aiBehavior";
-// Fixed import from responseUtils instead of randomResponses
 import {
   getRandomWelcomeMessage,
   getRandomUnknownResponse,
   getContextAwareResponse,
-  getRandomThinkingMessage,
+  getRandomFarewellMessage,
+  getRandomGratitudeResponse,
+  getRandomErrorMessage,
+  getRandomPromptMessage,
 } from "../utils/responseUtils";
 import { ContextManager } from "../utils/contextManager";
 import { AnalyticsManager } from "../utils/analyticsManager";
 import { SessionManager } from "../utils/sessionManager";
-import { getFollowUpQuestion } from "../data/followUpQuestions";
 import "./ChatBot.css";
-
-// Scroll button component
-const ScrollButton = ({ visible, onClick }) => {
-  if (!visible) return null;
-
-  return (
-    <button
-      className="scroll-button"
-      onClick={onClick}
-      aria-label="Scroll to bottom"
-    >
-      <FontAwesomeIcon icon={faArrowDown} />
-    </button>
-  );
-};
+import { findIntent } from "../utils/nlpHelper";
 
 const ChatBot = () => {
+  // Remove the inline ScrollButton component definition since we now import it
+
   const { t, i18n } = useTranslation();
   const messagesEndRef = useRef(null);
   const [messages, setMessages] = useState([]);
@@ -158,13 +147,11 @@ const ChatBot = () => {
     }
 
     setInput("");
-    // Clear suggestions when sending a new message
     setSuggestions([]);
 
     // Start thinking animation
     setIsThinking(true);
     const thinkingTime = calculateThinkingTime(trimmedInput, contextManager);
-
     await new Promise((resolve) => setTimeout(resolve, thinkingTime));
     setIsThinking(false);
 
@@ -172,47 +159,118 @@ const ChatBot = () => {
     setIsTyping(true);
 
     try {
-      // Get response
-      const response = await getEnergyInfo(trimmedInput, i18n.language);
-
+      // First, detect intent
+      const intentResult = findIntent(trimmedInput, i18n.language);
       let botMessageText;
       let responseTopic = null;
 
-      if (response.isKnown) {
-        botMessageText =
-          energyDictionary[i18n.language][response.key]?.definition ||
-          t(`responses.${response.key}`, {
-            defaultValue: `Information about ${response.key}.`,
-          });
-        responseTopic = response.key;
+      // Handle specific intents
+      if (intentResult.intent !== "unknown" && intentResult.confidence > 0.3) {
+        // Get appropriate response based on intent from the correct dictionary
+        switch (intentResult.intent) {
+          case "greeting":
+            botMessageText = getRandomWelcomeMessage(i18n.language);
+            break;
+          case "farewell":
+            botMessageText = getRandomFarewellMessage(i18n.language);
+            break;
+          case "gratitude":
+            botMessageText = getRandomGratitudeResponse(i18n.language);
+            break;
+          case "help":
+            botMessageText = getRandomPromptMessage(i18n.language);
+            break;
+          default:
+            // Try to get domain-specific answer for other intents
+            try {
+              const response = await getEnergyInfo(trimmedInput, i18n.language);
 
-        // Enhance response with context
-        botMessageText = getContextAwareResponse(
-          trimmedInput,
-          contextManager,
-          botMessageText
-        );
+              // Check if we have a valid response with an answer
+              if (response && response.answer) {
+                responseTopic = response.key || null;
+                botMessageText = getContextAwareResponse(
+                  trimmedInput,
+                  contextManager,
+                  response.answer
+                );
 
-        // Get related topics for suggestions
-        const relatedTopics = getRelatedTopics(response.key, i18n.language);
-        if (relatedTopics && relatedTopics.length > 0) {
-          setSuggestions(relatedTopics);
+                // Update context if available
+                if (
+                  contextManager &&
+                  typeof contextManager.updateContext === "function"
+                ) {
+                  contextManager.updateContext(trimmedInput, response);
+                }
+
+                // Get related topics for suggestions
+                const relatedTopics = response.key
+                  ? getRelatedTopics(response.key, i18n.language)
+                  : [];
+
+                if (relatedTopics && relatedTopics.length > 0) {
+                  setSuggestions(relatedTopics);
+                }
+              } else {
+                // No valid answer in the response
+                botMessageText = getRandomUnknownResponse(i18n.language);
+              }
+            } catch (error) {
+              console.error("Error getting energy info:", error);
+              botMessageText = getRandomUnknownResponse(i18n.language);
+            }
         }
       } else {
-        // Handle unknown response
-        const matchScore = response.confidence || 0;
-        const matchInfo =
-          matchScore > 0.3
-            ? { score: matchScore, topic: response.baseTopic }
-            : null;
-        botMessageText = getRandomUnknownResponse(i18n.language, matchInfo);
-        setSuggestions([]);
+        // Try to get domain-specific answer for unclear intent
+        try {
+          const response = await getEnergyInfo(trimmedInput, i18n.language);
+
+          // Only process if we have a valid response
+          if (response && response.answer) {
+            responseTopic = response.key || null;
+            botMessageText = getContextAwareResponse(
+              trimmedInput,
+              contextManager,
+              response.answer
+            );
+
+            // Update context if available
+            if (
+              contextManager &&
+              typeof contextManager.updateContext === "function"
+            ) {
+              contextManager.updateContext(trimmedInput, response);
+            }
+
+            // Get related topics for suggestions
+            const relatedTopics = response.key
+              ? getRelatedTopics(response.key, i18n.language)
+              : [];
+
+            if (relatedTopics && relatedTopics.length > 0) {
+              setSuggestions(relatedTopics);
+            }
+          } else {
+            // Handle unknown response with potential match info
+            const matchScore =
+              response && typeof response.confidence !== "undefined"
+                ? response.confidence
+                : 0;
+
+            const matchInfo =
+              matchScore > 0.3 && response && response.baseTopic
+                ? { score: matchScore, topic: response.baseTopic }
+                : null;
+
+            botMessageText = getRandomUnknownResponse(i18n.language, matchInfo);
+          }
+        } catch (error) {
+          console.error("Error getting energy info for unclear intent:", error);
+          botMessageText = getRandomUnknownResponse(i18n.language);
+        }
       }
 
       // Calculate typing time
       const typingTime = calculateTypingTime(botMessageText);
-
-      // Simulate typing delay
       await new Promise((resolve) => setTimeout(resolve, typingTime));
 
       // Create and add bot response
@@ -232,9 +290,7 @@ const ChatBot = () => {
 
       const errorMessage = {
         sender: "bot",
-        text: t("error_processing", {
-          defaultValue: "Sorry, I couldn't process that request.",
-        }),
+        text: getRandomErrorMessage(i18n.language),
         timestamp: new Date().toISOString(),
       };
 
@@ -357,9 +413,8 @@ const ChatBot = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {showScrollButton && (
-        <ScrollButton visible={true} onClick={scrollToBottom} />
-      )}
+      {/* Use the imported ScrollButton component */}
+      <ScrollButton visible={showScrollButton} onClick={scrollToBottom} />
 
       <SmartSuggestions
         suggestions={suggestions}

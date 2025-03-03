@@ -1,126 +1,85 @@
 /**
- * Intent patterns for various languages
+ * Intent detection patterns for identifying user intent
+ * Using comprehensive dictionaries from intentDictionaries.js
  */
+import {
+  greetingDictionary,
+  farewellDictionary,
+  gratitudeDictionary,
+  helpDictionary,
+  confirmationDictionary,
+  negationDictionary,
+  questionDictionary,
+  infoDictionary,
+  comparisonDictionary,
+  dataDictionary,
+} from "./intentDictionaries";
+
+// Define intent patterns using the comprehensive dictionaries
 export const intentPatterns = {
-  question: {
-    en: [
-      /\?$/,
-      /what/,
-      /how/,
-      /when/,
-      /where/,
-      /which/,
-      /why/,
-      /can you/,
-      /could you/,
-    ],
-    fr: [
-      /\?$/,
-      /qu[e']/,
-      /comment/,
-      /quand/,
-      /où/,
-      /quel(le)?/,
-      /pourquoi/,
-      /peux-tu/,
-      /pourrais-tu/,
-    ],
-    de: [
-      /\?$/,
-      /was/,
-      /wie/,
-      /wann/,
-      /wo/,
-      /welche[rs]?/,
-      /warum/,
-      /kannst du/,
-      /könntest du/,
-    ],
-  },
-  command: {
-    en: [
-      /^(please |)tell me/,
-      /^show/,
-      /^find/,
-      /^search/,
-      /^get/,
-      /^give/,
-      /^explain/,
-      /^describe/,
-    ],
-    fr: [
-      /^(s'il vous plaît |)dites-moi/,
-      /^montre[zr]?/,
-      /^trouve[zr]?/,
-      /^cherche[zr]?/,
-      /^donne[zr]?/,
-      /^expliquez?/,
-      /^décri[svt]/,
-    ],
-    de: [
-      /^(bitte |)sag mir/,
-      /^zeig/,
-      /^find/,
-      /^such/,
-      /^gib/,
-      /^erklär/,
-      /^beschreib/,
-    ],
-  },
-  gratitude: {
-    en: [/thank/, /thanks/, /appreciate/, /helpful/, /grateful/],
-    fr: [/merci/, /remercie/, /apprécier?/, /utile/, /reconnaissant/],
-    de: [/dank/, /danke/, /schätzen/, /nützlich/, /dankbar/],
-  },
-  greeting: {
-    en: [
-      /^hi($|\s)/,
-      /^hello($|\s)/,
-      /^hey($|\s)/,
-      /^good (morning|afternoon|evening)/,
-      /^greetings/,
-    ],
-    fr: [
-      /^salut($|\s)/,
-      /^bonjour($|\s)/,
-      /^bonsoir($|\s)/,
-      /^coucou($|\s)/,
-      /^bienvenue/,
-    ],
-    de: [
-      /^hallo($|\s)/,
-      /^guten (morgen|tag|abend)/,
-      /^servus($|\s)/,
-      /^grüß/,
-      /^willkommen/,
-    ],
-  },
-  farewell: {
-    en: [/bye/, /goodbye/, /see you/, /farewell/, /until next time/],
-    fr: [/au revoir/, /adieu/, /à bientôt/, /à la prochaine/, /ciao/],
-    de: [/tschüss/, /auf wiedersehen/, /bis später/, /bis bald/, /ciao/],
-  },
+  greeting: greetingDictionary,
+  farewell: farewellDictionary,
+  gratitude: gratitudeDictionary,
+  help: helpDictionary,
+  confirmation: confirmationDictionary,
+  negation: negationDictionary,
+  question: questionDictionary,
+  info: infoDictionary,
+  comparison: comparisonDictionary,
+  data: dataDictionary,
 };
 
 /**
- * Get intent for a specific text in a language
- * @param {string} text - Text to analyze
+ * Find the intent of a user input
+ * @param {string} input - User input
  * @param {string} language - Language code
- * @returns {string} Intent type or 'unknown'
+ * @returns {Object} Intent information
  */
-export const getIntent = (text, language = "en") => {
-  if (!text) return "unknown";
+export const getIntent = (input, language = "en") => {
+  if (!input) return { intent: "unknown", confidence: 0 };
 
-  const normalizedText = text.toLowerCase().trim();
-  const lang = ["en", "fr", "de"].includes(language) ? language : "en";
+  const normalizedInput = input.toLowerCase().trim();
+  const validLanguage = ["en", "fr", "de"].includes(language) ? language : "en";
+
+  let highestScore = 0;
+  let detectedIntent = "unknown";
 
   // Check each intent type
-  for (const [intent, langPatterns] of Object.entries(intentPatterns)) {
-    const patterns = langPatterns[lang] || langPatterns.en;
-    if (patterns.some((pattern) => pattern.test(normalizedText))) {
-      return intent;
-    }
-  }
+  Object.entries(intentPatterns).forEach(([intent, langPatterns]) => {
+    const patterns = langPatterns[validLanguage] || langPatterns.en;
 
-  return "unknown";
+    if (!patterns || !patterns.length) return;
+
+    for (const pattern of patterns) {
+      if (normalizedInput.includes(pattern)) {
+        // Calculate confidence based on pattern length and position
+        let score = pattern.length / Math.max(normalizedInput.length, 1);
+
+        // Boost score if pattern is at the beginning of input (more significant)
+        if (normalizedInput.indexOf(pattern) === 0) {
+          score *= 1.5;
+        }
+
+        // Discount score slightly if pattern is very short (potential false positive)
+        if (pattern.length < 3) {
+          score *= 0.8;
+        }
+
+        // Cap score at 1.0
+        score = Math.min(score, 1.0);
+
+        if (score > highestScore) {
+          highestScore = score;
+          detectedIntent = intent;
+        }
+      }
+    }
+  });
+
+  return {
+    intent: detectedIntent,
+    confidence: parseFloat(highestScore.toFixed(2)),
+  };
 };
+
+export default intentPatterns;

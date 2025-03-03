@@ -1,173 +1,198 @@
-import { extractTopicFromQuery, extractEntities } from "./nlpHelper";
-import { calculateMatchScore } from "./tokenMatcher";
+/**
+ * Utility for getting energy information from various sources
+ */
 import { energyDictionary } from "../data/energyDictionary";
-import { LanguageValidator } from "./languageUtils";
-import { tokenize } from "./tokenMatcher";
-
-// Reduce minimum match score for single-word queries
-const MINIMUM_MATCH_SCORE = 0.15;
-const SINGLE_WORD_MATCH_SCORE = 0.1;
-
-const createErrorResponse = (error, language = "en") => ({
-  key: "unknown",
-  baseTopic: "unknown",
-  isKnown: false,
-  confidence: 0,
-  error: error.message,
-  language,
-});
+import { extractTopicFromQuery } from "./nlpHelper";
 
 /**
- * Match a query to energy topics
- * @param {string} query - User's question
+ * Get energy information based on the user query
+ * @param {string} query - User query
  * @param {string} language - Language code
- * @returns {Object} Match information
+ * @returns {Object} Response with answer, confidence and related data
  */
-export const getEnergyInfo = (query, language = "en") => {
+export const getEnergyInfo = async (query, language = "en") => {
   try {
-    if (!query) {
-      return { isKnown: false, confidence: 0 };
+    // For single-word queries like "oil", use them directly
+    query = query.trim();
+    let topic;
+
+    if (query.split(" ").length === 1) {
+      // If it's a single word query, use it directly as the topic
+      topic = query.toLowerCase();
+      console.log("Single word query detected:", topic);
+    } else {
+      // Otherwise extract the topic from the query
+      topic = extractTopicFromQuery(query, language);
+      console.log("Extracted topic:", topic);
     }
 
-    const topics = Object.keys(
-      energyDictionary[language] || energyDictionary.en
-    );
-
-    // Extract topic from query using NLP
-    const extractedTopic = extractTopicFromQuery(query, language);
-    console.log("Extracted topic:", extractedTopic);
-
-    // Check for exact matches first
-    for (const topic of topics) {
-      if (topic.toLowerCase() === extractedTopic.toLowerCase()) {
-        return {
-          isKnown: true,
-          key: topic,
-          confidence: 1.0,
-          exactMatch: true,
-        };
-      }
-    }
-
-    // If no exact match, do semantic matching
-    const queryTokens = tokenize(query, language);
-    let bestMatch = null;
-    let bestScore = 0;
-
-    for (const topic of topics) {
-      const topicData =
-        energyDictionary[language][topic] || energyDictionary.en[topic];
-
-      if (!topicData) continue;
-
-      const keyTokens = tokenize(topic, language);
-      const keywordTokens = tokenize(
-        (topicData.keywords || []).join(" "),
-        language
-      );
-      const synonymTokens = tokenize(
-        (topicData.synonyms || []).join(" "),
-        language
-      );
-
-      const matchResult = calculateMatchScore({
-        query: queryTokens,
-        key: keyTokens,
-        keywords: keywordTokens,
-        synonyms: synonymTokens,
-      });
-
-      console.log(`Match for ${topic}:`, matchResult.scores.total);
-
-      if (matchResult.scores.total > bestScore) {
-        bestScore = matchResult.scores.total;
-        bestMatch = {
-          key: topic,
-          score: bestScore,
-        };
-      }
-    }
-
-    // Consider it a match if the score is above threshold
-    const MATCH_THRESHOLD = 0.55;
-
-    if (bestMatch && bestMatch.score >= MATCH_THRESHOLD) {
-      console.log("Best match:", bestMatch);
+    if (!topic) {
+      console.log("No topic extracted from query");
       return {
-        isKnown: true,
-        key: bestMatch.key,
-        confidence: bestMatch.score,
-        exactMatch: false,
+        answer: null,
+        confidence: 0,
+        key: null,
+        baseTopic: null,
       };
     }
 
-    // No good match found
-    return {
-      isKnown: false,
-      confidence: bestMatch ? bestMatch.score : 0,
-      baseTopic: extractedTopic,
-    };
-  } catch (error) {
-    console.error("Error in getEnergyInfo:", error);
-    return { isKnown: false, confidence: 0, error: true };
-  }
-};
+    console.log("Looking up topic:", topic);
 
-// Export for debugging/testing purposes
-export const getMatchScore = (query, language) => {
-  try {
-    const validLang = LanguageValidator.validate(language);
+    // Look for the topic in the dictionary
+    let dictionaryData = getDictionaryEntry(topic, language);
 
-    const entries = energyDictionary[validLang];
-    if (!entries) {
-      throw new Error(`No dictionary entries found for language: ${validLang}`);
+    if (!dictionaryData) {
+      // Try fallback to partial matches more aggressively
+      const partialMatch = findPartialMatch(topic, language);
+
+      if (partialMatch) {
+        dictionaryData = partialMatch;
+        console.log("Found partial match:", partialMatch.key);
+      }
     }
 
-    const topic = extractTopicFromQuery(query, validLang);
-    const entities = extractEntities(query);
+    if (dictionaryData) {
+      // We found a match in the dictionary
+      console.log("Found dictionary match:", dictionaryData.key);
+      return {
+        answer: dictionaryData.text || dictionaryData.description,
+        confidence: dictionaryData.score || 0.9,
+        key: dictionaryData.key,
+        baseTopic: topic,
+        source: "dictionary",
+      };
+    }
 
-    return Object.entries(entries).map(([key, value]) => {
-      try {
-        const baseTopic = key.split(" ")[0];
-        const normalizedTopic = LanguageValidator.normalizeText(
-          baseTopic,
-          validLang
-        );
-
-        return {
-          key,
-          score: calculateMatchScore(
-            topic,
-            {
-              key: normalizedTopic,
-              keywords: [
-                ...value.keywords.map((kw) =>
-                  LanguageValidator.normalizeText(kw, validLang)
-                ),
-                normalizedTopic,
-                ...entities.organizations.filter((org) =>
-                  value.keywords.some((kw) =>
-                    LanguageValidator.normalizeText(org, validLang).includes(
-                      LanguageValidator.normalizeText(kw, validLang)
-                    )
-                  )
-                ),
-              ],
-              synonyms: (value.synonyms || []).map((syn) =>
-                LanguageValidator.normalizeText(syn, validLang)
-              ),
-            },
-            validLang
-          ),
-          language: validLang,
-        };
-      } catch (error) {
-        console.warn(`Error getting match score for ${key}:`, error);
-        return { key, score: 0, error: error.message, language: validLang };
-      }
-    });
+    // No match found
+    console.log("No dictionary match found for topic:", topic);
+    return {
+      answer: null,
+      confidence: 0,
+      key: null,
+      baseTopic: topic,
+    };
   } catch (error) {
-    console.warn("Error in getMatchScore:", error);
-    return [];
+    console.error("Error getting energy info:", error);
+    return {
+      answer: null,
+      confidence: 0,
+      key: null,
+      error: error.message,
+    };
   }
 };
+
+/**
+ * Get a dictionary entry by topic
+ * @param {string} topic - Topic to find
+ * @param {string} language - Language code
+ * @returns {Object|null} Dictionary entry or null if not found
+ */
+const getDictionaryEntry = (topic, language = "en") => {
+  if (!topic) return null;
+
+  // Get language-specific dictionary, fallback to English
+  const dictionary = energyDictionary[language] || energyDictionary.en;
+
+  // First try direct lookup by key
+  if (dictionary[topic]) {
+    return {
+      ...dictionary[topic],
+      key: topic,
+    };
+  }
+
+  // Try case-insensitive match
+  const normalizedTopic = topic.toLowerCase();
+
+  const key = Object.keys(dictionary).find(
+    (k) => k.toLowerCase() === normalizedTopic
+  );
+
+  if (key) {
+    return {
+      ...dictionary[key],
+      key,
+    };
+  }
+
+  return null;
+};
+
+/**
+ * Find a partial match for a topic in the dictionary
+ * @param {string} topic - Topic to find
+ * @param {string} language - Language code
+ * @returns {Object|null} Best partial match or null if none found
+ */
+const findPartialMatch = (topic, language = "en") => {
+  if (!topic) return null;
+
+  // Get language-specific dictionary, fallback to English
+  const dictionary = energyDictionary[language] || energyDictionary.en;
+
+  const normalizedTopic = topic.toLowerCase();
+  let bestMatch = null;
+  let bestScore = 0.2; // Lower threshold to catch more matches
+
+  // Check each entry for partial matches
+  Object.entries(dictionary).forEach(([key, entry]) => {
+    const lowerKey = key.toLowerCase();
+
+    // Check for partial matches in key, title, and description
+    const keyMatch =
+      lowerKey.includes(normalizedTopic) || normalizedTopic.includes(lowerKey);
+    const titleMatch =
+      entry.title &&
+      (entry.title.toLowerCase().includes(normalizedTopic) ||
+        normalizedTopic.includes(entry.title.toLowerCase()));
+
+    // Check keywords
+    const keywordMatch =
+      entry.keywords &&
+      entry.keywords.some((keyword) => {
+        const lowerKeyword = keyword.toLowerCase();
+        return (
+          lowerKeyword.includes(normalizedTopic) ||
+          normalizedTopic.includes(lowerKeyword)
+        );
+      });
+
+    if (keyMatch || titleMatch || keywordMatch) {
+      // Calculate match score
+      const baseScore =
+        Math.min(
+          normalizedTopic.length / Math.max(lowerKey.length, 1),
+          lowerKey.length / Math.max(normalizedTopic.length, 1)
+        ) * 0.5;
+
+      // Apply bonuses for different match types
+      let finalScore = baseScore;
+      if (keyMatch) finalScore += 0.2;
+      if (titleMatch) finalScore += 0.15;
+      if (keywordMatch) finalScore += 0.3;
+
+      // Bonus for exact keyword match
+      if (
+        entry.keywords &&
+        entry.keywords.some((k) => k.toLowerCase() === normalizedTopic)
+      ) {
+        finalScore += 0.2;
+      }
+
+      // Update best match if this is better
+      if (finalScore > bestScore) {
+        bestScore = finalScore;
+        bestMatch = {
+          ...entry,
+          key,
+          score: parseFloat(finalScore.toFixed(2)),
+        };
+      }
+    }
+  });
+
+  return bestMatch;
+};
+
+export default getEnergyInfo;

@@ -1,4 +1,4 @@
-import React from 'react';
+import PropTypes from "prop-types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
@@ -20,4 +20,12 @@ const ScrollButton = ({ onClick, visible }) => {
   );
 };
 
+ScrollButton.propTypes = {
+  visible: PropTypes.bool.isRequired,
+  onClick: PropTypes.func.isRequired,
+};
+
 export default ScrollButton;
+
+
+
