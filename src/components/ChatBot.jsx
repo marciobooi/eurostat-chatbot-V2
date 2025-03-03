@@ -10,6 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import SmartSuggestions from "./SmartSuggestions";
+import MobileSuggestions from "./MobileSuggestions"; // Import mobile suggestions component
 import ScrollButton from "./ScrollButton"; // Import the ScrollButton component
 import { getEnergyInfo } from "../utils/getEnergyInfo";
 import { getRelatedTopics } from "../data/energyDictionary";
@@ -32,7 +33,9 @@ import { ContextManager } from "../utils/contextManager";
 import { AnalyticsManager } from "../utils/analyticsManager";
 import { SessionManager } from "../utils/sessionManager";
 import "./ChatBot.css";
+import "./ChatBotMobile.css"; // Import mobile-specific styles
 import { findIntent } from "../utils/nlpHelper";
+import speechRecognitionHandler from "../utils/speechRecognitionHandler";
 
 const ChatBot = () => {
   // Remove the inline ScrollButton component definition since we now import it
@@ -49,8 +52,8 @@ const ChatBot = () => {
   const sessionManagerRef = useRef(null);
   const inputRef = useRef(null);
   const [isListening, setIsListening] = useState(false); // Add state for speech recognition
-  const [speechRecognition, setSpeechRecognition] = useState(null); // Store speech recognition instance
   const [speechSupported, setSpeechSupported] = useState(false); // Check if speech recognition is supported
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 767); // Add mobile detection state
 
   const contextManager = useMemo(() => new ContextManager(), []);
   const analyticsManager = useMemo(() => new AnalyticsManager(), []);
@@ -146,35 +149,17 @@ const ChatBot = () => {
     };
   }, [i18n]);
 
-  // Initialize speech recognition
+  // Check for speech recognition support on component mount
   useEffect(() => {
-    // Check if browser supports speech recognition
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const isSupported = speechRecognitionHandler.isSupported();
+    setSpeechSupported(isSupported);
 
-    if (SpeechRecognition) {
-      setSpeechSupported(true);
-      const recognition = new SpeechRecognition();
-
-      // Configure speech recognition
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-
-      // Set language based on current i18n language
-      recognition.lang =
-        i18n.language === "fr"
-          ? "fr-FR"
-          : i18n.language === "de"
-          ? "de-DE"
-          : "en-US";
-
-      // Handle results
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
+    // Set up the handler callbacks
+    if (isSupported) {
+      speechRecognitionHandler.onResult = (transcript) => {
         setInput(transcript);
 
-        // Optional: auto-submit after a short delay
+        // Auto-submit after a short delay
         setTimeout(() => {
           const form = inputRef.current?.form;
           if (form) {
@@ -185,62 +170,65 @@ const ChatBot = () => {
         }, 500);
       };
 
-      // Handle end of speech recognition
-      recognition.onend = () => {
+      speechRecognitionHandler.onEnd = () => {
         setIsListening(false);
       };
 
-      // Handle errors
-      recognition.onerror = (event) => {
-        console.error("Speech recognition error:", event.error);
+      speechRecognitionHandler.onError = () => {
         setIsListening(false);
       };
 
-      setSpeechRecognition(recognition);
-    } else {
-      console.log("Speech recognition not supported in this browser");
+      // Initialize with current language
+      speechRecognitionHandler.setLanguage(i18n.language);
     }
-  }, [i18n.language]);
 
-  // Update recognition language when app language changes
-  useEffect(() => {
-    if (speechRecognition) {
-      speechRecognition.lang =
-        i18n.language === "fr"
-          ? "fr-FR"
-          : i18n.language === "de"
-          ? "de-DE"
-          : "en-US";
-    }
-  }, [i18n.language, speechRecognition]);
-
-  // Track speech recognition usage
-  const toggleSpeechRecognition = () => {
-    if (!speechSupported || !speechRecognition) return;
-
-    if (isListening) {
-      speechRecognition.stop();
-      setIsListening(false);
-    } else {
-      try {
-        speechRecognition.start();
-        setIsListening(true);
-        analyticsManager.trackSpeechRecognition(true); // Track successful start
-      } catch (error) {
-        console.error("Speech recognition error:", error);
-        analyticsManager.trackSpeechRecognition(false); // Track failed start
-        // Try to reset and restart if there's an error
-        speechRecognition.stop();
-        setTimeout(() => {
-          try {
-            speechRecognition.start();
-            setIsListening(true);
-          } catch (innerError) {
-            console.error("Failed to restart speech recognition:", innerError);
-            setIsListening(false);
-          }
-        }, 100);
+    // Cleanup function
+    return () => {
+      if (isSupported) {
+        speechRecognitionHandler.stop();
       }
+    };
+  }, []);
+
+  // Update language when i18n language changes
+  useEffect(() => {
+    if (speechSupported) {
+      speechRecognitionHandler.setLanguage(i18n.language);
+    }
+  }, [i18n.language, speechSupported]);
+
+  // Handle visibility changes to stop recognition when page is hidden
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden" && isListening) {
+        toggleSpeechRecognition();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isListening]);
+
+  // Toggle speech recognition
+  const toggleSpeechRecognition = () => {
+    if (!speechSupported) return;
+
+    if (!isListening) {
+      // Start listening
+      const success = speechRecognitionHandler.start();
+      if (success) {
+        setIsListening(true);
+        analyticsManager.trackSpeechRecognition(true);
+      } else {
+        analyticsManager.trackSpeechRecognition(false);
+      }
+    } else {
+      // Stop listening
+      speechRecognitionHandler.stop();
+      setIsListening(false);
     }
   };
 
@@ -533,6 +521,20 @@ const ChatBot = () => {
     }, 100);
   };
 
+  // Add window resize handler to detect mobile/desktop view
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 767);
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Call once to set initial state
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   return (
     <div className="chat-bot-container">
       <div ref={messagesContainerRef} className="messages" aria-live="polite">
@@ -611,10 +613,13 @@ const ChatBot = () => {
       {/* Use the imported ScrollButton component */}
       <ScrollButton visible={showScrollButton} onClick={scrollToBottom} />
 
-      <SmartSuggestions
-        suggestions={suggestions}
-        onSuggestionClick={handleSuggestionClick}
-      />
+      {/* Show standard suggestions only on desktop */}
+      {!isMobile && (
+        <SmartSuggestions
+          suggestions={suggestions}
+          onSuggestionClick={handleSuggestionClick}
+        />
+      )}
 
       <form onSubmit={handleSend} className="input-container">
         <input
@@ -648,6 +653,14 @@ const ChatBot = () => {
         >
           <FontAwesomeIcon icon={faTrash} />
         </button>
+
+        {/* Add mobile suggestions button when in mobile view */}
+        {isMobile && (
+          <MobileSuggestions
+            suggestions={suggestions}
+            onSuggestionClick={handleSuggestionClick}
+          />
+        )}
 
         {/* Add speech recognition button */}
         {speechSupported && (

@@ -1,0 +1,510 @@
+/* Mobile-specific enhancements for the Eurostat Chatbot */
+
+/* Media queries for different device sizes */
+@media (max-width: 767px) {
+  /* Full screen chatbot on mobile */
+  .chat-container {
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+    border-radius: 0;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: 0;
+  }
+
+  /* Header adjustments */
+  .chat-header {
+    padding: 0.75rem;
+  }
+
+  /* Increase message bubble size for better readability */
+  .message-wrapper {
+    max-width: 90%;
+  }
+
+  .bot-message,
+  .user-message {
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
+
+  /* Make input area stick to bottom */
+  .input-container {
+    position: sticky;
+    bottom: 0;
+    background-color: var(--neutral-100);
+    padding: 0.75rem;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .chat-input {
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+
+  /* More touch-friendly buttons */
+  .send-button,
+  .speech-button,
+  .clear-button,
+  .suggestions-button {
+    width: 3.5rem;
+    height: 3.5rem;
+    min-width: 3.5rem;
+  }
+
+  /* Mobile suggestions button styling */
+  .suggestions-button {
+    background-color: var(--secondary-color);
+    color: #737272;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s ease;
+    opacity: 0.8;
+    z-index: 101; /* Higher than panel to show above it */
+    transition: all 0.2s ease-in-out;
+    transform: translateY(0);
+  }
+
+  .suggestions-button:hover {
+    background-color: #c5c8cc;
+    color: #022467;
+    opacity: 1;
+  }
+
+  .suggestions-button.has-suggestions {
+    animation: pulse-suggestion 2s infinite;
+    background-color: var(--secondary-yellow);
+    color: black;
+    opacity: 1;
+  }
+
+  @keyframes pulse-suggestion {
+    0% {
+      box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.5);
+      background-color: var(--secondary-yellow-light);
+    }
+    70% {
+      box-shadow: 0 0 0 7px rgba(255, 193, 7, 0);
+      background-color: var(--secondary-yellow);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+      background-color: var(--secondary-yellow-light);
+    }
+  }
+
+  /* Updated mobile suggestions button styling to show toggle state */
+  .suggestions-button.active {
+    background-color: var(--primary-blue);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Stop animation when panel is open */
+  .suggestions-button.active.has-suggestions {
+    animation: none;
+  }
+
+  /* Mobile suggestions panel */
+  .mobile-suggestions-panel {
+    position: fixed;
+    bottom: 5.5rem;
+    left: 1rem;
+    right: 1rem;
+    background-color: white;
+    border-radius: var(--radius-md);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    padding: 0; /* Remove padding as header will have its own */
+    z-index: 1000; /* Increased z-index to ensure it's above other elements */
+    transform: translateY(110%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    max-height: 60vh;
+    overflow-y: auto;
+    display: block !important;
+    pointer-events: none;
+  }
+
+  .mobile-suggestions-panel.visible {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .mobile-suggestions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--neutral-300);
+  }
+
+  .mobile-suggestions-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--neutral-900);
+    font-weight: 600;
+  }
+
+  .mobile-suggestions-header .close-button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    padding: 0.25rem;
+    cursor: pointer;
+    color: var(--neutral-600);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .mobile-suggestions-header .close-button:hover {
+    background-color: var(--neutral-200);
+    color: var(--neutral-900);
+  }
+
+  .mobile-suggestions-list {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .mobile-suggestion-item {
+    padding: 0.75rem 1rem;
+    background-color: var(--neutral-200);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--neutral-300);
+    font-size: 0.95rem;
+    text-align: left;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .mobile-suggestion-item:hover,
+  .mobile-suggestion-item:active {
+    background-color: var(--primary-blue-light);
+    color: white;
+  }
+
+  /* Better scroll button positioning */
+  .scroll-button {
+    bottom: 5.5rem;
+    right: 1rem;
+    width: 3rem;
+    height: 3rem;
+  }
+
+  /* Hide desktop suggestions on mobile */
+  .smart-suggestions {
+    display: none !important;
+  }
+
+  /* Control panel adjustments for more buttons */
+  .control-panel {
+    display: flex;
+    justify-content: space-evenly;
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  /* Dark overlay when suggestions panel is open */
+  .dark-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 99;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+  }
+
+  .dark-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Vastly improved speech button for iOS */
+  .speech-button {
+    transition: all 0.2s ease;
+    overflow: hidden;
+    position: relative;
+    transform: translateZ(0); /* Force hardware acceleration */
+  }
+
+  .speech-button.listening {
+    animation: none; /* Reset any animations */
+    background-color: var(--error-color);
+    color: white;
+    box-shadow: 0 0 0 rgba(255, 59, 48, 0.5);
+  }
+
+  .speech-button.listening::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.5);
+    animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+  }
+
+  @keyframes pulse-ring {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.5);
+    }
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 10px rgba(255, 59, 48, 0);
+    }
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(255, 59, 48, 0);
+    }
+  }
+}
+
+/* Small mobile phones */
+@media (max-width: 375px) {
+  .bot-message,
+  .user-message {
+    font-size: 0.95rem;
+    padding: 0.7rem;
+  }
+
+  .message-icon {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+
+  .chat-input {
+    font-size: 0.95rem;
+  }
+
+  /* Stack suggestions vertically on very small screens */
+  .suggestions-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .suggestion-chip {
+    margin: 0.2rem 0;
+    text-align: center;
+  }
+
+  .control-panel {
+    padding: 0.75rem 0.5rem;
+    gap: 0.3rem;
+  }
+
+  .send-button,
+  .speech-button,
+  .clear-button,
+  .suggestions-button {
+    width: 3rem;
+    height: 3rem;
+    min-width: 3rem;
+  }
+}
+
+/* Fix for iOS devices to prevent keyboard issues */
+@supports (-webkit-touch-callout: none) {
+  .chat-container {
+    height: -webkit-fill-available;
+  }
+
+  .messages {
+    padding-bottom: 4rem;
+  }
+
+  /* Fix microphone button for iOS */
+  .speech-button.listening {
+    background-color: var(--error-color);
+    color: white;
+    animation: pulse-mic 2s infinite;
+  }
+
+  @keyframes pulse-mic {
+    0% {
+      box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.5);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(255, 59, 48, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 59, 48, 0);
+    }
+  }
+
+  /* Make sure touch targets are big enough for iOS */
+  .send-button,
+  .speech-button,
+  .clear-button,
+  .suggestions-button {
+    min-height: 44px; /* Apple's recommended minimum */
+  }
+
+  .speech-button.listening::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    background: rgba(255, 59, 48, 0.2);
+    animation: ios-pulse 2s infinite;
+  }
+
+  @keyframes ios-pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.5);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0;
+    }
+  }
+
+  /* Other iOS specific styles */
+  .mobile-suggestion-item {
+    min-height: 44px;
+    padding: 0.75rem;
+  }
+
+  .mobile-suggestions-header .close-button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Fix for notch displays */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .input-container {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* Dark mode optimizations for OLED screens */
+@media (prefers-color-scheme: dark) {
+  .chat-container {
+    background-color: #121212;
+  }
+
+  .messages {
+    background-color: #1a1a1a;
+  }
+
+  .bot-message {
+    background-color: #212121;
+  }
+
+  .user-message {
+    background-color: #00335c;
+    color: white; /* Explicitly set text color to white */
+  }
+
+  .input-container {
+    background-color: #121212;
+    border-top-color: #333;
+  }
+
+  .chat-input {
+    background-color: #212121;
+    color: white;
+  }
+
+  .mobile-suggestions-panel {
+    background-color: #1a1a1a;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .mobile-suggestions-panel h3 {
+    color: #e0e0e0;
+  }
+
+  .mobile-suggestion-item {
+    background-color: #2a2a2a;
+    border-color: #3a3a3a;
+    color: #e0e0e0;
+  }
+
+  .mobile-suggestion-item:hover,
+  .mobile-suggestion-item:active {
+    background-color: var(--primary-blue);
+  }
+}
+
+/* Accessibility improvements for mobile */
+@media (max-width: 767px) {
+  /* Improve focus visibility */
+  .chat-input:focus,
+  .send-button:focus,
+  .speech-button:focus,
+  .clear-button:focus,
+  .suggestion-chip:focus {
+    outline: 2px solid var(--primary-blue);
+  }
+
+  /* Better tap targets */
+  .control-panel {
+    gap: 1rem;
+    padding: 0.75rem;
+  }
+}
+
+/* Animation improvements for mobile */
+@media (max-width: 767px) {
+  .typing-bubble {
+    width: 7px;
+    height: 7px;
+  }
+
+  @keyframes typingBubble {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+
+  /* Smoother appearing of message bubbles */
+  @keyframes messageSlide {
+    from {
+      opacity: 0;
+      transform: translateY(5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

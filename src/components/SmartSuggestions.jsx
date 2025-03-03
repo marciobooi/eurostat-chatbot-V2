@@ -5,6 +5,7 @@ import { LanguageValidator } from "../utils/languageUtils";
 
 /**
  * Displays clickable topic suggestions
+ * Uses JS default parameters instead of defaultProps
  */
 const SmartSuggestions = ({ suggestions = [], onSuggestionClick }) => {
   const { t } = useTranslation();
@@ -42,10 +43,12 @@ const SmartSuggestions = ({ suggestions = [], onSuggestionClick }) => {
   );
 };
 
-// Add PropTypes to fix the warnings
+// Add PropTypes for type checking
 SmartSuggestions.propTypes = {
   suggestions: PropTypes.arrayOf(PropTypes.string),
   onSuggestionClick: PropTypes.func.isRequired,
 };
+
+// Remove defaultProps and use default parameters in the function signature instead
 
 export default SmartSuggestions;
