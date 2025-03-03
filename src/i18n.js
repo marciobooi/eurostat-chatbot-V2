@@ -1,65 +1,77 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
-import { getLastUsedLanguage } from "./utils/chatHistory";
-import { SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE } from "./utils/languageUtils";
+import { getCookie, setCookie } from "./utils/cookies";
 
-// Import translation files directly.
 import enTranslation from "./locales/en.json";
 import frTranslation from "./locales/fr.json";
 import deTranslation from "./locales/de.json";
 
-// Create a resources object with your translations.
+// Resources for default language loading
 const resources = {
-  en: { translation: enTranslation },
-  fr: { translation: frTranslation },
-  de: { translation: deTranslation },
+  en: {
+    translation: enTranslation,
+  },
+  fr: {
+    translation: frTranslation,
+  },
+  de: {
+    translation: deTranslation,
+  },
 };
 
-// Get last used language from chat history
-const lastUsedLanguage = getLastUsedLanguage();
+const COOKIE_NAME = "preferred_language";
+const DEFAULT_LANGUAGE = "en";
 
-const instance = i18n
+i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
-    supportedLngs: SUPPORTED_LANGUAGES,
     fallbackLng: DEFAULT_LANGUAGE,
-    lng: lastUsedLanguage, // Use last used language if available
-    // debug: true,
-    interpolation: {
-      escapeValue: false, // React already escapes by default
-      format: (value, format) => {
-        if (format === "capitalize") {
-          return value.charAt(0).toUpperCase() + value.slice(1);
-        }
-        return value;
-      },
-    },
+    supportedLngs: ["en", "fr", "de"],
+
+    // Use cookies for language detection with highest priority
     detection: {
-      order: ["cookie", "localStorage", "querystring", "navigator", "htmlTag"],
-      caches: ["cookie"], // Store the language in cookies
-      cookieMinutes: 10080, // Cookie expires in 7 days (10080 minutes)
-      cookieDomain: window.location.hostname, // Use current domain
+      order: ["cookie", "navigator"],
+      lookupCookie: COOKIE_NAME,
+      caches: ["cookie"],
+      cookieExpirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
+      cookieDomain: window.location.hostname,
+    },
+
+    interpolation: {
+      escapeValue: false,
     },
   });
 
-export { i18n };
+/**
+ * Get current language from i18n (which checks cookies)
+ * @returns {string} Current language code
+ */
+export const getCurrentLanguage = () => {
+  // First check cookies directly
+  const cookieLang = getCookie(COOKIE_NAME);
+  if (cookieLang) return cookieLang;
 
-// Export a helper to get translations directly
-export const t = (key, options) => i18n.t(key, options);
-
-// Export a helper to change language
-export const changeLanguage = async (lang) => {
-  if (SUPPORTED_LANGUAGES.includes(lang)) {
-    await i18n.changeLanguage(lang);
-    return true;
-  }
-  return false;
+  // Fallback to i18n's current language
+  return i18n.language || DEFAULT_LANGUAGE;
 };
 
-// Export a helper to get current language
-export const getCurrentLanguage = () => i18n.language || DEFAULT_LANGUAGE;
+/**
+ * Change language and update cookie
+ * @param {string} language - Language code to change to
+ */
+export const changeLanguage = async (language) => {
+  if (language) {
+    try {
+      await i18n.changeLanguage(language);
+      // Update cookie to remember this language preference
+      setCookie(COOKIE_NAME, language, 365);
+    } catch (error) {
+      console.error("Failed to change language:", error);
+    }
+  }
+};
 
 export default i18n;
