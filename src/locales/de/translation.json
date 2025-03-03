@@ -1,0 +1,36 @@
+{
+  "app": {
+    "title": "Eurostat Energie-Chatbot",
+    "description": "Stellen Sie Fragen zu Energiestatistiken in Europa"
+  },
+  "chatbot": {
+    "thinking": "Ich denke nach...",
+    "send": "Senden",
+    "clear_chat": "Chat löschen",
+    "scroll_to_bottom": "Nach unten scrollen",
+    "ask_question": "Fragen Sie etwas über Energiestatistiken...",
+    "suggested_topics": "Vorgeschlagene Themen",
+    "click_to_learn_about": "Klicken Sie, um mehr über {{topic}} zu erfahren",
+    "continue_topic": "Fortfahren mit {{topic}}",
+    "start_new": "Neues Thema beginnen"
+  },
+  "responses": {
+    "topic_hint": "Möchten Sie etwas über \"{{topic}}\" wissen?",
+    "default_welcome": "Hallo! Wie kann ich Ihnen mit Energiestatistiken helfen?",
+    "default_farewell": "Auf Wiedersehen! Kommen Sie gerne wieder, wenn Sie weitere Fragen haben.",
+    "default_gratitude": "Gerne geschehen! Ich helfe gerne.",
+    "default_prompt": "Gibt es etwas Bestimmtes über Energiestatistiken, das Sie wissen möchten?",
+    "default_error": "Es tut mir leid, etwas ist schiefgelaufen. Könnten Sie es erneut versuchen?",
+    "default_thinking": "Lassen Sie mich darüber nachdenken...",
+    "default_unknown": "Ich bin mir nicht sicher, ob ich das verstehe. Könnten Sie das umformulieren?",
+    "default_empathy": "Ich verstehe, dass das wichtig ist.",
+    "default_reassurance": "Ich hoffe, das hilft Ihnen weiter."
+  },
+  "topics": {
+    "oil": "Öl",
+    "gas": "Erdgas",
+    "renewable": "Erneuerbare Energie",
+    "consumption": "Energieverbrauch",
+    "production": "Energieproduktion"
+  }
+}

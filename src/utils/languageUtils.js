@@ -1,89 +1,93 @@
 /**
- * Language utilities for the chatbot
+ * Language utility functions for language detection and processing
  */
-import { energyDictionary } from "../data/energyDictionary";
+import { questionWords } from "../data/questionWords";
+import { intentPatterns } from "../data/intentPatterns";
+import {
+  greetingDictionary,
+  farewellDictionary,
+  gratitudeDictionary,
+} from "../data/intentDictionaries";
+import { commonWords } from "../data/commonWords";
 
-// All supported languages in the application
-const SUPPORTED_LANGUAGES = ["en", "fr", "de"];
-const DEFAULT_LANGUAGE = "en";
+// Supported languages and default language
+export const SUPPORTED_LANGUAGES = ["en", "fr", "de"];
+export const DEFAULT_LANGUAGE = "en";
 
 /**
- * Extract all synonyms and keywords from energyDictionary
- * @param {string} language - Language code
- * @returns {Object} Object with words mapped to their related topics
+ * Get all words for a specific language from our dictionaries
+ * @param {string} language Language code (en, fr, de)
+ * @returns {string[]} Array of words for the specified language
  */
-export const getWordMappings = (language = DEFAULT_LANGUAGE) => {
-  const validLang = SUPPORTED_LANGUAGES.includes(language)
-    ? language
-    : DEFAULT_LANGUAGE;
-  const langDict =
-    energyDictionary[validLang] || energyDictionary[DEFAULT_LANGUAGE];
-  const mappings = {};
+const getAllWordsForLanguage = (language) => {
+  if (!SUPPORTED_LANGUAGES.includes(language)) {
+    console.warn(
+      `Language '${language}' not supported, using default language`
+    );
+    language = DEFAULT_LANGUAGE;
+  }
 
-  // Process each topic in the dictionary
-  Object.entries(langDict).forEach(([topic, data]) => {
-    // Add keywords
-    if (data.keywords && Array.isArray(data.keywords)) {
-      data.keywords.forEach((keyword) => {
-        const normalizedKeyword = keyword.toLowerCase().trim();
-        if (!mappings[normalizedKeyword]) {
-          mappings[normalizedKeyword] = [];
-        }
-        if (!mappings[normalizedKeyword].includes(topic)) {
-          mappings[normalizedKeyword].push(topic);
-        }
-      });
-    }
+  // Collect words from all our dictionaries
+  const words = new Set();
 
-    // Add synonyms
-    if (data.synonyms && Array.isArray(data.synonyms)) {
-      data.synonyms.forEach((synonym) => {
-        const normalizedSynonym = synonym.toLowerCase().trim();
-        if (!mappings[normalizedSynonym]) {
-          mappings[normalizedSynonym] = [];
-        }
-        if (!mappings[normalizedSynonym].includes(topic)) {
-          mappings[normalizedSynonym].push(topic);
-        }
-      });
-    }
+  // Add words from common words dictionary
+  if (commonWords[language]) {
+    commonWords[language].forEach((word) => words.add(word.toLowerCase()));
+  }
 
-    // Add the topic itself as a keyword
-    const normalizedTopic = topic.toLowerCase().trim();
-    if (!mappings[normalizedTopic]) {
-      mappings[normalizedTopic] = [topic];
+  // Add words from question dictionaries
+  if (questionWords[language]) {
+    questionWords[language].forEach((word) => words.add(word.toLowerCase()));
+  }
+
+  // Add words from intent dictionaries (greetings, farewell, gratitude, etc.)
+  const dictionaries = [
+    greetingDictionary,
+    farewellDictionary,
+    gratitudeDictionary,
+  ];
+
+  dictionaries.forEach((dict) => {
+    if (dict[language]) {
+      dict[language].forEach((word) => words.add(word.toLowerCase()));
     }
   });
 
-  return mappings;
+  // Add pattern words from intent patterns
+  Object.entries(intentPatterns).forEach(([, langPatterns]) => {
+    if (langPatterns[language]) {
+      langPatterns[language].forEach((pattern) => {
+        // Split patterns into words
+        pattern
+          .toLowerCase()
+          .split(/\s+/)
+          .forEach((word) => {
+            if (word.length > 2) words.add(word);
+          });
+      });
+    }
+  });
+
+  return Array.from(words);
 };
 
 /**
- * Language validator utility functions
+ * Language validation utility class
  */
 export class LanguageValidator {
   /**
-   * Check if a language code is supported
-   * @param {string} langCode - Language code to validate
-   * @returns {boolean} True if the language is supported
+   * Validate a language code and return a supported language
+   * @param {string} language - Language code to validate
+   * @returns {string} Valid language code
    */
-  static isSupported(langCode) {
-    if (!langCode || typeof langCode !== "string") {
-      return false;
+  static validate(language) {
+    if (!language || !SUPPORTED_LANGUAGES.includes(language)) {
+      console.warn(
+        `Language '${language}' not supported, using default language`
+      );
+      return DEFAULT_LANGUAGE;
     }
-    return SUPPORTED_LANGUAGES.includes(langCode.toLowerCase());
-  }
-
-  /**
-   * Validate and return a supported language code
-   * @param {string} langCode - Language code to validate
-   * @returns {string} Valid language code or default language
-   */
-  static validate(langCode) {
-    if (this.isSupported(langCode)) {
-      return langCode.toLowerCase();
-    }
-    return DEFAULT_LANGUAGE;
+    return language;
   }
 
   /**
@@ -132,7 +136,7 @@ export const findMatchingTopics = (text, language = DEFAULT_LANGUAGE) => {
 };
 
 /**
- * Detect language from text
+ * Detect language from text using all available dictionaries
  * @param {string} text - Text to analyze
  * @returns {string} Detected language code or default language
  */
@@ -141,103 +145,47 @@ export const detectLanguage = (text) => {
     return DEFAULT_LANGUAGE;
   }
 
-  // Simple language detection based on common words
-  const lowerText = text.toLowerCase();
+  // Get words for each supported language
+  const languageWords = {};
+  SUPPORTED_LANGUAGES.forEach((lang) => {
+    languageWords[lang] = getAllWordsForLanguage(lang);
+  });
 
-  // French indicators
-  const frenchWords = [
-    "je",
-    "tu",
-    "il",
-    "elle",
-    "nous",
-    "vous",
-    "ils",
-    "elles",
-    "le",
-    "la",
-    "les",
-    "un",
-    "une",
-    "des",
-    "est",
-    "sont",
-    "et",
-    "ou",
-    "mais",
-    "donc",
-    "car",
-    "pour",
-    "avec",
-    "sans",
-    "bonjour",
-    "merci",
-    "parce que",
-  ];
+  // Simple language detection based on word matching
+  const lowerText = text.toLowerCase().trim();
+  const wordMatches = {};
 
-  // German indicators
-  const germanWords = [
-    "ich",
-    "du",
-    "er",
-    "sie",
-    "es",
-    "wir",
-    "ihr",
-    "sie",
-    "ein",
-    "eine",
-    "der",
-    "die",
-    "das",
-    "ist",
-    "sind",
-    "und",
-    "oder",
-    "aber",
-    "denn",
-    "weil",
-    "für",
-    "mit",
-    "ohne",
-    "hallo",
-    "danke",
-    "weil",
-  ];
+  // Initialize counts for each language
+  SUPPORTED_LANGUAGES.forEach((lang) => {
+    wordMatches[lang] = 0;
+  });
 
-  let frCount = 0;
-  let deCount = 0;
+  // Check each language's words against the text
+  SUPPORTED_LANGUAGES.forEach((lang) => {
+    languageWords[lang].forEach((word) => {
+      // Check for whole word match (with word boundaries)
+      // This is more accurate than just checking for substring inclusion
+      const regex = new RegExp(`\\b${word}\\b`, "i");
+      if (regex.test(lowerText)) {
+        wordMatches[lang]++;
+      }
+    });
+  });
 
-  // Count occurrences of indicator words
-  frenchWords.forEach((word) => {
-    if (
-      lowerText.includes(` ${word} `) ||
-      lowerText.startsWith(`${word} `) ||
-      lowerText.endsWith(` ${word}`)
-    ) {
-      frCount++;
+  // Find language with highest match count
+  let detectedLanguage = DEFAULT_LANGUAGE;
+  let highestCount = 0;
+
+  SUPPORTED_LANGUAGES.forEach((lang) => {
+    if (wordMatches[lang] > highestCount) {
+      highestCount = wordMatches[lang];
+      detectedLanguage = lang;
     }
   });
 
-  germanWords.forEach((word) => {
-    if (
-      lowerText.includes(` ${word} `) ||
-      lowerText.startsWith(`${word} `) ||
-      lowerText.endsWith(` ${word}`)
-    ) {
-      deCount++;
-    }
-  });
-
-  // Determine language based on counts
-  if (frCount > deCount && frCount > 1) {
-    return "fr";
-  } else if (deCount > frCount && deCount > 1) {
-    return "de";
-  }
-
-  // Default to English if no clear detection
-  return DEFAULT_LANGUAGE;
+  // Only use detection if we have a minimum number of matches
+  // Otherwise return default language
+  return highestCount > 2 ? detectedLanguage : DEFAULT_LANGUAGE;
 };
 
 /**
@@ -279,6 +227,16 @@ export const getLanguageName = (langCode) => {
   return names[langCode.toLowerCase()] || names[DEFAULT_LANGUAGE];
 };
 
+/**
+ * Helper function for word mappings - implementation dependent on your data structure
+ * @param {string} language Language code
+ * @returns {Object} Word mappings for the language
+ */
+export const getWordMappings = (language = DEFAULT_LANGUAGE) => {
+  // Implementation depends on your data structure
+  return {};
+};
+
 export default {
   LanguageValidator,
   detectLanguage,
@@ -286,6 +244,7 @@ export default {
   getLanguageName,
   findMatchingTopics,
   getWordMappings,
+  getAllWordsForLanguage, // Export the function for use elsewhere
   SUPPORTED_LANGUAGES,
   DEFAULT_LANGUAGE,
 };

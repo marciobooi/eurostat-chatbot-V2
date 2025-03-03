@@ -1,5 +1,5 @@
 /**
- * Gratitude response messages in different languages
+ * Gratitude responses when the user says thank you
  */
 export const gratitudeMessages = {
   en: [

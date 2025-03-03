@@ -1,55 +1,63 @@
 /**
- * Pure utility functions for randomization
- * No hardcoded responses - only utility functions
+ * Utility functions for randomization and selections
  */
 
 /**
  * Get a random item from an array
- * @param {Array} array - The array to get a random item from
+ * @param {Array} array - The array to select from
+ * @param {Object} options - Options for selection
+ * @param {boolean} options.removeItem - Whether to remove the selected item from the array
  * @returns {*} A random item from the array
  */
-export const getRandomFromArray = (array) => {
-  if (!Array.isArray(array) || array.length === 0) return null;
+export const getRandomFromArray = (array, options = {}) => {
+  if (!array || !Array.isArray(array) || array.length === 0) {
+    console.warn("getRandomFromArray called with invalid or empty array");
+    return null;
+  }
+
   const index = Math.floor(Math.random() * array.length);
-  return array[index];
+  const item = array[index];
+
+  if (options.removeItem) {
+    array.splice(index, 1);
+  }
+
+  return item;
 };
 
 /**
- * Get a random number between min and max (inclusive)
+ * Get a random integer between min and max (inclusive)
  * @param {number} min - Minimum value
  * @param {number} max - Maximum value
- * @returns {number} Random number between min and max
+ * @returns {number} Random integer
  */
-export const getRandomNumber = (min, max) => {
+export const getRandomInt = (min, max) => {
+  min = Math.ceil(min);
+  max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
 /**
- * Randomly shuffle an array
+ * Shuffle an array using Fisher-Yates algorithm
  * @param {Array} array - The array to shuffle
- * @returns {Array} New shuffled array
+ * @returns {Array} A new shuffled array
  */
 export const shuffleArray = (array) => {
-  if (!Array.isArray(array)) return [];
-  return [...array].sort(() => Math.random() - 0.5);
+  if (!array || !Array.isArray(array)) {
+    return [];
+  }
+
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  return shuffled;
 };
 
-/**
- * Get a random boolean with specified probability
- * @param {number} probability - Probability of true (0-1)
- * @returns {boolean} Random boolean
- */
-export const getRandomBoolean = (probability = 0.5) => {
-  return Math.random() < probability;
-};
-
-/**
- * Pick a random key from an object
- * @param {Object} obj - Object to pick a key from
- * @returns {string|null} Random key or null if object is empty
- */
-export const getRandomKey = (obj) => {
-  if (!obj || typeof obj !== "object") return null;
-  const keys = Object.keys(obj);
-  return keys.length > 0 ? keys[Math.floor(Math.random() * keys.length)] : null;
+export default {
+  getRandomFromArray,
+  getRandomInt,
+  shuffleArray,
 };

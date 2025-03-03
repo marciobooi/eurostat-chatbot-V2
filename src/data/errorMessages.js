@@ -1,5 +1,5 @@
 /**
- * Error messages in different languages
+ * Error messages displayed when something goes wrong
  */
 export const errorMessages = {
   en: [

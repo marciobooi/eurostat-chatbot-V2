@@ -1,5 +1,5 @@
 /**
- * Prompt messages in different languages
+ * Messages to prompt users for more information or specific questions
  */
 export const promptMessages = {
   en: [

@@ -1,5 +1,5 @@
 /**
- * Farewell messages in different languages
+ * Farewell messages displayed when the user says goodbye
  */
 export const farewellMessages = {
   en: [

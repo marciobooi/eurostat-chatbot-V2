@@ -1,5 +1,5 @@
 /**
- * Thinking messages in different languages
+ * Messages displayed while the bot is processing a request
  */
 export const thinkingMessages = {
   en: [

@@ -1,30 +1,27 @@
 /**
- * Empathy phrases to show understanding of user's interest
+ * Empathetic phrases to add a human-like touch to responses
  */
 export const empathyPhrases = {
   en: [
-    "I understand your interest in this topic.",
-    "I can see why you're curious about this subject.",
-    "That's an interesting question about this area.",
-    "I appreciate your inquiry into this topic.",
-    "This is definitely a fascinating area to explore.",
-    "Thanks for your interest in learning more about this.",
+    "I understand that's important.",
+    "That's a great question.",
+    "I see why you're interested in that.",
+    "That's a fascinating topic.",
+    "Many people ask about this.",
   ],
   fr: [
-    "Je comprends votre intérêt pour ce sujet.",
-    "Je vois pourquoi vous êtes curieux à propos de ce sujet.",
-    "C'est une question intéressante sur ce domaine.",
-    "J'apprécie votre question sur ce sujet.",
-    "C'est vraiment un domaine fascinant à explorer.",
-    "Merci pour votre intérêt à en apprendre plus sur ce sujet.",
+    "Je comprends que c'est important.",
+    "C'est une excellente question.",
+    "Je vois pourquoi cela vous intéresse.",
+    "C'est un sujet fascinant.",
+    "Beaucoup de gens posent cette question.",
   ],
   de: [
-    "Ich verstehe Ihr Interesse an diesem Thema.",
-    "Ich sehe, warum Sie neugierig auf dieses Thema sind.",
-    "Das ist eine interessante Frage zu diesem Bereich.",
-    "Ich schätze Ihre Anfrage zu diesem Thema.",
-    "Das ist definitiv ein faszinierender Bereich zum Erkunden.",
-    "Vielen Dank für Ihr Interesse, mehr über dieses Thema zu erfahren.",
+    "Ich verstehe, dass das wichtig ist.",
+    "Das ist eine gute Frage.",
+    "Ich sehe, warum Sie sich dafür interessieren.",
+    "Das ist ein faszinierendes Thema.",
+    "Viele Menschen fragen danach.",
   ],
 };
 
