@@ -1,40 +1,35 @@
-import React, { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import ChatBot from './components/ChatBot';
-import './App.css';
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import ChatBot from "./components/ChatBot";
+import { getCurrentLanguage } from "./i18n";
+import { LanguageValidator } from "./utils/languageUtils";
+import "./App.css";
 
 function App() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    // Add animation class after initial render
-    setTimeout(() => {
-      const chatContainer = document.querySelector('.chat-container');
-      if (chatContainer) {
-        chatContainer.classList.add('chat-loaded');
-      }
-    }, 100);
+    const initializeLanguage = async () => {
+      // Language is automatically loaded from cookies via i18n configuration
+      const currentLang = getCurrentLanguage();
+      const validLang = LanguageValidator.validate(currentLang);
 
-    // Set HTML lang attribute
-    document.documentElement.lang = i18n.language;
-
-    // Update HTML lang attribute when language changes
-    const handleLanguageChange = (lang) => {
-      document.documentElement.lang = lang;
+      // Just validate the language but don't change it explicitly
+      // as i18n already handles this from cookies
+      setLoaded(true);
     };
 
-    i18n.on('languageChanged', handleLanguageChange);
-
-    return () => {
-      i18n.off('languageChanged', handleLanguageChange);
-    };
-  }, [i18n]);
+    initializeLanguage();
+  }, []);
 
   return (
-    <div className="App">
-      <div className="chat-container">
-        <ChatBot />
-      </div>
+    <div className="app-container">
+      <main className="app-main">
+        <div className={`chat-container ${loaded ? "chat-loaded" : ""}`}>
+          <ChatBot />
+        </div>
+      </main>
     </div>
   );
 }

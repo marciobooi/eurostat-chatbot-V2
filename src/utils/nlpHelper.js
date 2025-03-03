@@ -1,275 +1,329 @@
-import { commonQuestionPhrases } from '../data/questionPhrases';
-import nlp from 'compromise';
-import sentences from 'compromise-sentences';
-import numbers from 'compromise-numbers';
-import dates from 'compromise-dates';
-import winkNLP from 'wink-nlp';
-import model from 'wink-eng-lite-web-model';
+/**
+ * Natural Language Processing helper functions for the chatbot
+ * Uses separate dictionary files for data
+ */
+import { questionWords } from "../data/questionWords";
+import { stopWords } from "../data/stopWords";
+import {
+  analyzeSentiment as getSentiment,
+  getCompromisePattern,
+} from "../data/sentimentPatterns";
+import { energyDictionary, getRelatedTopics } from "../data/energyDictionary";
+import { isGreeting as checkGreeting } from "../data/greetingPhrases";
+import { extractDateReferences } from "../data/datePatterns";
+import { stemWord as applyStemming } from "../data/stemmingRules";
+import { getIntent } from "../data/intentPatterns";
+import nlp from "compromise";
+import sentences from "compromise-sentences";
+import numbers from "compromise-numbers";
+import dates from "compromise-dates";
 
-// Initialize NLP processors and extend Compromise with plugins
-const nlpProcessor = winkNLP(model);
+// Initialize Compromise with plugins
 nlp.extend(sentences);
 nlp.extend(numbers);
 nlp.extend(dates);
 
-// Helper function to safely get tokens from winkNLP
+// Helper function to safely get tokens from Compromise
 const safeTokenize = (text) => {
-  if (!text || typeof text !== 'string') return [];
+  if (!text || typeof text !== "string") return [];
   try {
-    const doc = nlpProcessor.readDoc(text);
-    return doc.tokens().out();
+    const doc = nlp(text);
+    return doc
+      .terms()
+      .out("array")
+      .map((term) => term.toLowerCase());
   } catch (error) {
-    console.warn('Error in safeTokenize:', error);
+    console.warn("Error in safeTokenize:", error);
     return text.toLowerCase().split(/\s+/); // Fallback to simple tokenization
   }
 };
 
-export const cleanQuery = (query = '') => {
-  if (!query) return '';
-  
+/**
+ * Stem a word using language-specific rules
+ * @param {string} word - Word to stem
+ * @param {string} language - Language code (en, fr, de)
+ * @returns {string} Stemmed word
+ */
+const stemWord = (word, language = "en") => {
+  return applyStemming(word, language);
+};
+
+/**
+ * Find the intent of a user input
+ * @param {string} input - User input
+ * @param {string} language - Language code
+ * @returns {Object} Intent information
+ */
+export const findIntent = (input, language = "en") => {
+  return getIntent(input, language);
+};
+
+/**
+ * Clean and normalize a query
+ * @param {string} query - User input to clean
+ * @returns {string} Cleaned query
+ */
+export const cleanQuery = (query = "") => {
+  if (!query) return "";
+
   try {
     const tokens = safeTokenize(query);
-    return tokens
-      .filter(Boolean)
-      .join(' ')
-      .toLowerCase()
-      .trim();
+    return tokens.filter(Boolean).join(" ").toLowerCase().trim();
   } catch (error) {
-    console.warn('Error in cleanQuery:', error);
+    console.warn("Error in cleanQuery:", error);
     return query.toLowerCase().trim();
   }
 };
 
-export const extractTopicFromQuery = (query, language) => {
-  try {
-    const cleanedQuery = cleanQuery(query);
-    if (!cleanedQuery || !language) return '';
+/**
+ * Check if text contains a question word
+ * @param {string} text - Text to check
+ * @param {string} language - Language code
+ * @returns {boolean} True if the text contains a question word
+ */
+export const containsQuestionWord = (text, language = "en") => {
+  if (!text) return false;
 
-    // For single-word queries, return as is if they're not in filtered words
-    if (!cleanedQuery.includes(' ')) {
-      return cleanedQuery;
+  const words = text.toLowerCase().split(/\s+/);
+  const langQuestionWords = questionWords[language] || questionWords.en;
+
+  // Check for question words
+  for (const word of words) {
+    if (langQuestionWords.includes(word)) {
+      return true;
     }
-
-    const phrases = commonQuestionPhrases[language];
-    if (!phrases) {
-      console.warn(`No question phrases found for language: ${language}`);
-      return cleanedQuery;
-    }
-    
-    // Use compromise for initial processing
-    let doc = nlp(cleanedQuery);
-    
-    // Remove question phrases
-    phrases.forEach(phrase => {
-      doc = doc.replace(phrase, '');
-    });
-
-    // Extract topics and nouns
-    const topics = doc.topics().text();
-    const nouns = doc.nouns().text();
-    
-    // Use the most specific information available
-    return topics || nouns || cleanedQuery;
-  } catch (error) {
-    console.warn('Error in extractTopicFromQuery:', error);
-    return query.trim();
   }
+
+  // Also check for question marks
+  return text.includes("?");
 };
 
-export const extractEntities = (text) => {
+/**
+ * Check if text is a greeting
+ * @param {string} text - Text to check
+ * @param {string} language - Language code
+ * @returns {boolean} True if the text is a greeting
+ */
+export const isGreeting = (text, language = "en") => {
+  return checkGreeting(text, language);
+};
+
+/**
+ * Extract key topic from a query using the energyDictionary
+ * @param {string} query - User query
+ * @param {string} language - Language code
+ * @returns {string} Extracted topic
+ */
+export const extractTopicFromQuery = (query, language = "en") => {
+  if (!query) return "";
+
+  // Get stopwords for the specified language
+  const langStopwords = stopWords[language] || stopWords.en;
+
+  // Convert to lowercase and remove punctuation
+  const cleanQuery = query
+    .toLowerCase()
+    .replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "")
+    .replace(/\s{2,}/g, " ");
+
+  // Tokenize
+  const words = cleanQuery.split(" ").filter((word) => word.length > 1);
+
+  // Remove stopwords and question words
+  const langQuestionWords = questionWords[language] || questionWords.en;
+  const contentWords = words.filter(
+    (word) => !langStopwords.includes(word) && !langQuestionWords.includes(word)
+  );
+
+  // Apply stemming to each content word with language-specific rules
+  const stemmedContentWords = contentWords.map((word) =>
+    stemWord(word, language)
+  );
+
+  // Check for direct matches in energyDictionary
+  const dictionaryTopics = Object.keys(
+    energyDictionary[language] || energyDictionary.en
+  );
+
+  // Look for exact topic matches first
+  for (const topic of dictionaryTopics) {
+    if (cleanQuery.includes(topic.toLowerCase())) {
+      return topic;
+    }
+  }
+
+  // Look for stemmed word matches next
+  for (const stemmedWord of stemmedContentWords) {
+    for (const topic of dictionaryTopics) {
+      const stemmedTopic = stemWord(topic, language).toLowerCase();
+      if (
+        stemmedTopic.includes(stemmedWord) ||
+        (stemmedWord.length > 3 &&
+          stemmedTopic.split(" ").some((part) => part.includes(stemmedWord)))
+      ) {
+        return topic;
+      }
+    }
+  }
+
+  // Try original words if stems didn't match
+  for (const word of contentWords) {
+    for (const topic of dictionaryTopics) {
+      if (
+        topic.toLowerCase().includes(word) ||
+        (word.length > 3 &&
+          topic
+            .toLowerCase()
+            .split(" ")
+            .some((part) => part.includes(word)))
+      ) {
+        return topic;
+      }
+    }
+  }
+
+  // Get related topics if available
+  for (const word of contentWords) {
+    const relatedTopics = getRelatedTopics(word, language);
+    if (relatedTopics && relatedTopics.length > 0) {
+      return relatedTopics[0]; // Return the first related topic
+    }
+  }
+
+  // If no energy term found, return the first content word or empty string
+  return contentWords.length > 0 ? contentWords[0] : "";
+};
+
+/**
+ * Extract entities from text with language support
+ * @param {string} text - Text to analyze
+ * @param {string} language - Language code
+ * @returns {Object} Extracted entities
+ */
+export const extractEntities = (text, language = "en") => {
   if (!text) return { organizations: [], places: [], numbers: [], dates: [] };
-  
+
   try {
     const doc = nlp(text);
-    
+
     // Initialize with empty arrays
     const entities = {
       organizations: [],
       places: [],
       numbers: [],
-      dates: []
+      dates: [],
     };
 
     // Extract organizations (fallback to nouns starting with capital letters)
-    const orgs = doc.match('#Organization+').out('array');
-    entities.organizations = orgs.length ? orgs : doc.match('[A-Z][a-z]+').out('array');
+    const orgs = doc.match("#Organization+").out("array");
+    entities.organizations = orgs.length
+      ? orgs
+      : doc.match("[A-Z][a-z]+").out("array");
 
     // Extract places
-    entities.places = doc.places().out('array');
+    entities.places = doc.places().out("array");
 
     // Extract numbers using the numbers plugin
-    entities.numbers = doc.numbers().out('array');
+    entities.numbers = doc.numbers().out("array");
 
     // Extract dates using the dates plugin, with fallback
     try {
-      entities.dates = doc.dates().out('array');
+      entities.dates = doc.dates().out("array");
     } catch (error) {
-      console.warn('Date extraction failed, using fallback:', error);
-      entities.dates = doc.match('(january|february|march|april|may|june|july|august|september|october|november|december|year|month|week|day|today|tomorrow|yesterday)').out('array');
+      console.warn("Date extraction failed, using fallback:", error);
+      // Use our datePatterns module instead of inline patterns
+      entities.dates = extractDateReferences(text, language);
     }
 
     return entities;
   } catch (error) {
-    console.warn('Error in extractEntities:', error);
+    console.warn("Error in extractEntities:", error);
     return { organizations: [], places: [], numbers: [], dates: [] };
   }
 };
 
-export const getSentenceSentiment = (text) => {
+/**
+ * Get sentence sentiment score using compromise and sentiment patterns
+ * @param {string} text - Text to analyze
+ * @param {string} language - Language code
+ * @returns {number} Sentiment score between -1 and 1
+ */
+export const getSentenceSentiment = (text, language = "en") => {
   if (!text) return 0;
-  
+
   try {
     const doc = nlp(text);
-    // Use simple word matching for sentiment
-    const positive = doc.match('(good|great|excellent|awesome|nice|wonderful|fantastic|amazing|love|happy|positive|helpful)').length;
-    const negative = doc.match('(bad|poor|terrible|awful|horrible|hate|negative|unhelpful|wrong|worse|worst)').length;
-    
+
+    // Get patterns from sentimentPatterns instead of hardcoding
+    const positivePattern = getCompromisePattern("positive", language);
+    const negativePattern = getCompromisePattern("negative", language);
+
+    // Match against the patterns
+    const positive = doc.match(positivePattern).length;
+    const negative = doc.match(negativePattern).length;
+
     return (positive - negative) / (positive + negative + 1);
   } catch (error) {
-    console.warn('Error in getSentenceSentiment:', error);
+    console.warn("Error in getSentenceSentiment:", error);
     return 0;
   }
 };
 
+/**
+ * Extract key phrases from text
+ * @param {string} text - Text to analyze
+ * @returns {Array} Extracted phrases
+ */
 export const extractKeyPhrases = (text) => {
   if (!text) return [];
-  
+
   try {
     const doc = nlp(text);
     return doc
       .phrases()
       .json()
-      .map(phrase => phrase.text)
-      .filter(phrase => phrase.split(' ').length > 1);
+      .map((phrase) => phrase.text)
+      .filter((phrase) => phrase.split(" ").length > 1);
   } catch (error) {
-    console.warn('Error in extractKeyPhrases:', error);
+    console.warn("Error in extractKeyPhrases:", error);
     return [];
   }
 };
 
-export const detectLanguage = (text) => {
-  if (!text) return null;
-  
-  try {
-    const words = safeTokenize(text);
-    
-    const langScores = {
-      en: 0,
-      fr: 0,
-      de: 0
-    };
+/**
+ * Check if text contains date references
+ * @param {string} text - Text to check
+ * @param {string} language - Language code
+ * @returns {boolean} True if the text contains date references
+ */
+export const containsDateReference = (text, language = "en") => {
+  if (!text) return false;
 
-    words.forEach(word => {
-      if (commonQuestionPhrases.en.some(phrase => word.includes(phrase))) langScores.en++;
-      if (commonQuestionPhrases.fr.some(phrase => word.includes(phrase))) langScores.fr++;
-      if (commonQuestionPhrases.de.some(phrase => word.includes(phrase))) langScores.de++;
-    });
-
-    // Find language with highest score
-    const [detectedLang, score] = Object.entries(langScores)
-      .reduce((a, b) => a[1] > b[1] ? a : b);
-    
-    // Only return detected language if we have some confidence
-    return score > 0 ? detectedLang : null;
-  } catch (error) {
-    console.warn('Error in detectLanguage:', error);
-    return null;
-  }
+  const dates = extractDateReferences(text, language);
+  return dates.length > 0;
 };
 
-export const findIntent = (text) => {
-  if (!text) {
-    return {
-      primary: 'unknown',
-      secondary: null,
-      patterns: [],
-      sentenceType: 'statement',
-      entities: {},
-      confidence: 0
-    };
-  }
+/**
+ * Analyze sentiment of text
+ * @param {string} text - Text to analyze
+ * @param {string} language - Language code
+ * @returns {Object} Sentiment analysis results
+ */
+export const analyzeSentiment = (text, language = "en") => {
+  return getSentiment(text, language);
+};
 
-  try {
-    const doc = nlp(text);
-    
-    // Get basic sentence type
-    const sentenceType = doc.sentences().json()[0]?.type || 'statement';
-    
-    // Get intent analysis
-    const isQuestion = sentenceType === 'question' || text.includes('?');
-    const isCommand = doc.verbs().isImperative().length > 0;
-    const sentimentValue = getSentenceSentiment(text);
-    const isSentiment = Math.abs(sentimentValue) > 0.3;
-    
-    // Check for specific patterns
-    const patterns = {
-      greeting: doc.has('(hello|hi|hey|good morning|good afternoon|good evening)'),
-      farewell: doc.has('(goodbye|bye|see you|farewell)'),
-      thanks: doc.has('(thank|thanks|appreciate)'),
-      help: doc.has('(help|assist|support)'),
-      compare: doc.has('(compare|versus|vs|difference between)'),
-      definition: doc.has('(what is|what are|define|meaning of|definition)'),
-      howTo: doc.has('(how to|how do|how can|how would)'),
-      location: doc.has('(where|location|country|region)'),
-      time: doc.has('(when|time|date|year|period)'),
-      quantity: doc.has('(how many|how much|quantity|amount)')
-    };
-
-    // Get entities
-    const entities = extractEntities(text);
-
-    // Get detected patterns
-    const detectedPatterns = Object.entries(patterns)
-      .filter(([_, hasPattern]) => hasPattern)
-      .map(([intent]) => intent);
-
-    let primaryIntent = 'unknown';
-    let secondaryIntent = null;
-    let confidence = 0.2; // Base confidence
-
-    if (isQuestion) {
-      primaryIntent = 'question';
-      secondaryIntent = detectedPatterns[0] || 'general';
-      confidence += 0.3;
-    } else if (isCommand) {
-      primaryIntent = 'command';
-      secondaryIntent = detectedPatterns[0] || 'action';
-      confidence += 0.3;
-    } else if (isSentiment) {
-      primaryIntent = 'sentiment';
-      secondaryIntent = sentimentValue > 0 ? 'positive' : 'negative';
-      confidence += 0.2;
-    } else if (detectedPatterns.length > 0) {
-      primaryIntent = detectedPatterns[0];
-      secondaryIntent = detectedPatterns[1] || null;
-      confidence += 0.2;
-    }
-
-    // Add confidence from pattern matching
-    confidence += Math.min(detectedPatterns.length * 0.1, 0.3);
-    
-    // Add confidence from entity detection
-    const entityCount = Object.values(entities)
-      .reduce((sum, arr) => sum + arr.length, 0);
-    confidence += Math.min(entityCount * 0.1, 0.2);
-
-    return {
-      primary: primaryIntent,
-      secondary: secondaryIntent,
-      patterns: detectedPatterns,
-      sentenceType,
-      entities,
-      confidence: Math.min(confidence, 1) // Normalize to 0-1 range
-    };
-  } catch (error) {
-    console.warn('Error in findIntent:', error);
-    return {
-      primary: 'unknown',
-      secondary: null,
-      patterns: [],
-      sentenceType: 'statement',
-      entities: {},
-      confidence: 0
-    };
-  }
+export default {
+  containsQuestionWord,
+  isGreeting,
+  extractTopicFromQuery,
+  extractEntities,
+  analyzeSentiment,
+  cleanQuery,
+  getSentenceSentiment,
+  extractKeyPhrases,
+  containsDateReference,
+  extractDateReferences,
+  stemWord,
+  findIntent,
 };
