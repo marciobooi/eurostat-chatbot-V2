@@ -1,36 +1,58 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRobot, faTrash, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
-import { useTranslation } from 'react-i18next';
-import ChatMessage from './ChatMessage';
-import TypingIndicator from './TypingIndicator';
-import { getEnergyInfo } from '../utils/getEnergyInfo';
-import { energyDictionary, getRelatedTopics } from '../data/energyDictionary';
-import { saveChatHistory, loadChatHistory, clearChatHistory } from '../utils/chatHistory';
-import { calculateThinkingTime, calculateTypingTime } from '../utils/aiBehavior';
-import { getRandomWelcomeMessage, getRandomUnknownResponse, getContextAwareResponse } from '../utils/randomResponses';
-import { ContextManager } from '../utils/contextManager';
-import { AnalyticsManager } from '../utils/analyticsManager';
-import { isAffirmative } from '../data/affirmativeResponses';
-import { getFollowUpQuestion, getFollowUpSuggestion } from '../data/followUpQuestions';
-import ScrollButton from './ScrollButton';
-import ShowMoreHistory from './ShowMoreHistory';
-import SmartSuggestions from './SmartSuggestions';
-import './ChatBot.css';
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faRobot,
+  faUser,
+  faTrash,
+  faPaperPlane,
+  faArrowDown,
+} from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
+import SmartSuggestions from "./SmartSuggestions";
+import { getEnergyInfo } from "../utils/getEnergyInfo";
+import { energyDictionary, getRelatedTopics } from "../data/energyDictionary";
+import {
+  calculateThinkingTime,
+  calculateTypingTime,
+} from "../utils/aiBehavior";
+import {
+  getRandomWelcomeMessage,
+  getRandomUnknownResponse,
+  getContextAwareResponse,
+} from "../utils/random";
+import { ContextManager } from "../utils/contextManager";
+import { AnalyticsManager } from "../utils/analyticsManager";
+import { SessionManager } from "../utils/sessionManager";
+import { getFollowUpQuestion } from "../data/followUpQuestions";
+import "./ChatBot.css";
+
+// Scroll button component
+const ScrollButton = ({ visible, onClick }) => {
+  if (!visible) return null;
+
+  return (
+    <button
+      className="scroll-button"
+      onClick={onClick}
+      aria-label="Scroll to bottom"
+    >
+      <FontAwesomeIcon icon={faArrowDown} />
+    </button>
+  );
+};
 
 const ChatBot = () => {
   const { t, i18n } = useTranslation();
   const messagesEndRef = useRef(null);
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
-  const [followUpTopic, setFollowUpTopic] = useState(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const [visibleMessages, setVisibleMessages] = useState(15);
   const messagesContainerRef = useRef(null);
-  const [containerHeight, setContainerHeight] = useState(0);
+  const sessionManagerRef = useRef(null);
+  const inputRef = useRef(null);
 
   const contextManager = useMemo(() => new ContextManager(), []);
   const analyticsManager = useMemo(() => new AnalyticsManager(), []);
@@ -41,345 +63,338 @@ const ChatBot = () => {
 
   const handleScroll = () => {
     if (!messagesContainerRef.current) return;
-    
-    const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
-    const scrolledUp = scrollHeight - scrollTop - clientHeight > 50; // Reduced threshold
+
+    const { scrollTop, scrollHeight, clientHeight } =
+      messagesContainerRef.current;
+    const scrolledUp = scrollHeight - scrollTop - clientHeight > 50;
     setShowScrollButton(scrolledUp);
   };
 
-  const updateContainerHeight = () => {
-    if (messagesContainerRef.current) {
-      setContainerHeight(messagesContainerRef.current.scrollHeight);
-    }
-  };
-
+  // Initialize the session manager
   useEffect(() => {
-    const resizeObserver = new ResizeObserver(updateContainerHeight);
-    if (messagesContainerRef.current) {
-      resizeObserver.observe(messagesContainerRef.current);
+    if (!sessionManagerRef.current) {
+      sessionManagerRef.current = new SessionManager(i18n.language);
+      const sessionManager = sessionManagerRef.current.init();
+
+      // Get messages from session storage
+      const storedMessages = sessionManager.getMessages();
+
+      if (storedMessages && storedMessages.length > 0) {
+        console.log("Found stored messages:", storedMessages.length);
+        setMessages(storedMessages);
+
+        // Check for welcome back message
+        const welcomeBackMessage = sessionManager.getWelcomeBackMessage();
+        if (welcomeBackMessage) {
+          setTimeout(() => {
+            setMessages((prev) => [...prev, welcomeBackMessage]);
+          }, 1000);
+        }
+      } else {
+        console.log("No stored messages, showing welcome message");
+        // Show welcome message for new sessions
+        const welcomeMessage = {
+          sender: "bot",
+          text: getRandomWelcomeMessage(i18n.language),
+          timestamp: new Date().toISOString(),
+        };
+        setMessages([welcomeMessage]);
+        sessionManager.addMessage(welcomeMessage);
+      }
     }
-    return () => resizeObserver.disconnect();
-  }, []);
 
-  useEffect(() => {
-    updateContainerHeight();
-  }, [messages, visibleMessages]);
+    // Focus input when component loads
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 300);
+  }, [i18n.language]);
 
-  useEffect(() => {
-    const messagesContainer = messagesContainerRef.current;
-    if (messagesContainer) {
-      messagesContainer.addEventListener('scroll', handleScroll);
-      return () => messagesContainer.removeEventListener('scroll', handleScroll);
-    }
-  }, []);
-
-  const loadMoreMessages = () => {
-    setVisibleMessages(prev => prev + 15);
-  };
-
-  const displayedMessages = messages.slice(-visibleMessages);
-  const hasMoreMessages = messages.length > visibleMessages;
-
+  // Scroll to bottom when messages change
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping, isThinking]);
 
-  // Load chat history on component mount
+  // Add scroll event listener
   useEffect(() => {
-    const currentLang = i18n.language || 'en';
-    const historicMessages = loadChatHistory();
-    
-    if (historicMessages.length === 0) {
-      // Only show welcome message if no history exists
-      const welcomeMessage = {
-        text: getRandomWelcomeMessage(currentLang),
-        sender: 'bot',
-        language: currentLang
-      };
-      setMessages([welcomeMessage]);
-    } else {
-      setMessages(historicMessages);
-      // Process last meaningful bot message for context
-      const lastBotMessage = historicMessages
-        .filter(msg => msg.sender === 'bot' && msg.category && msg.category !== 'unknown' && msg.category !== 'followup')
-        .pop();
-      
-      if (lastBotMessage?.category) {
-        const baseTopic = lastBotMessage.category.split(' ')[0];
-        const followUpQuestion = getFollowUpQuestion(baseTopic, currentLang);
-        if (followUpQuestion) {
-          setFollowUpTopic(followUpQuestion.topic);
-          setSuggestions(followUpQuestion.topics || []);
-        }
-      }
+    const messagesContainer = messagesContainerRef.current;
+    if (messagesContainer) {
+      messagesContainer.addEventListener("scroll", handleScroll);
+      return () =>
+        messagesContainer.removeEventListener("scroll", handleScroll);
     }
   }, []);
 
   // Handle language changes
   useEffect(() => {
     const handleLanguageChange = (lang) => {
-      // Update message history with new language
-      setMessages(prev => prev.map(msg => ({
-        ...msg,
-        language: lang,
-        text: msg.category && msg.sender === 'bot' && energyDictionary[lang]?.[msg.category]?.definition
-          ? energyDictionary[lang][msg.category].definition
-          : msg.text
-      })));
-
-      // Update suggestions in new language if any exist
-      if (followUpTopic) {
-        const newFollowUp = getFollowUpQuestion(followUpTopic, lang);
-        if (newFollowUp) {
-          setSuggestions(newFollowUp.topics || []);
-        }
+      if (sessionManagerRef.current) {
+        sessionManagerRef.current.language = lang;
       }
     };
 
-    // Listen for language changes
-    i18n.on('languageChanged', handleLanguageChange);
-
+    i18n.on("languageChanged", handleLanguageChange);
     return () => {
-      i18n.off('languageChanged', handleLanguageChange);
+      i18n.off("languageChanged", handleLanguageChange);
     };
-  }, [followUpTopic, i18n]);
-
-  // Save messages to cookie whenever they change
-  useEffect(() => {
-    if (messages.length > 0) {
-      saveChatHistory(messages);
-    }
-  }, [messages]);
+  }, [i18n]);
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    const trimmedInput = input.trim();
+    if (!trimmedInput || isTyping || isThinking) return;
 
-    const currentLang = i18n.language;
-    const userMessage = { 
-      text: input, 
-      sender: 'user',
-      language: currentLang 
+    const userMessage = {
+      text: trimmedInput,
+      sender: "user",
+      timestamp: new Date().toISOString(),
     };
-    
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    
-    // Check for affirmative response to follow-up
-    if (followUpTopic && isAffirmative(input, currentLang)) {
-      const relatedTopics = getRelatedTopics(followUpTopic, currentLang);
-      if (relatedTopics?.length > 0) {
-        setSuggestions(relatedTopics);
-        setFollowUpTopic(null);
-        
-        const botResponse = {
-          text: t('suggestions_title'),
-          sender: 'bot',
-          category: 'suggestions',
-          suggestions: relatedTopics,
-          language: currentLang
-        };
-        setMessages(prev => [...prev, botResponse]);
-        return;
-      }
+
+    // Add user message to state and session
+    setMessages((prev) => [...prev, userMessage]);
+    if (sessionManagerRef.current) {
+      sessionManagerRef.current.addMessage(userMessage);
     }
 
-    const startTime = Date.now();
+    setInput("");
+    // Clear suggestions when sending a new message
+    setSuggestions([]);
+
+    // Start thinking animation
     setIsThinking(true);
-    
-    await new Promise(resolve => setTimeout(resolve, calculateThinkingTime(input, contextManager)));
-    setIsThinking(false);
-    
-    setIsTyping(true);
-    const response = getEnergyInfo(input, currentLang);
-    
-    analyticsManager.trackQuestion(input, response.isKnown, currentLang, Date.now() - startTime);
-    
-    let botMessageText;
-    if (response.isKnown) {
-      botMessageText = energyDictionary[currentLang][response.key]?.definition;
-      analyticsManager.trackTopic(response.key);
-      contextManager.addToContext(input, response.key, currentLang);
-    } else {
-      // Enhanced unknown response handling
-      const matchScore = response.confidence || 0;
-      const matchInfo = matchScore > 0.3 ? {
-        score: matchScore,
-        topic: response.baseTopic
-      } : null;
-      
-      botMessageText = getRandomUnknownResponse(currentLang, matchInfo);
-      contextManager.addToContext(input, 'unknown', currentLang);
-    }
-    
-    if (response.isKnown) {
-      botMessageText = getContextAwareResponse(input, contextManager, botMessageText);
-      const relatedTopics = getRelatedTopics(response.key, currentLang);
-      setSuggestions(relatedTopics || []);
-    } else {
-      setSuggestions([]);
-    }
+    const thinkingTime = calculateThinkingTime(trimmedInput, contextManager);
 
-    setTimeout(() => {
-      const botMessage = { 
-        text: botMessageText, 
-        sender: 'bot',
-        category: response.key,
-        contextInfo: contextManager.getContextualSuggestions(),
-        language: currentLang
-      };
-      setMessages(prev => [...prev, botMessage]);
-      setIsTyping(false);
+    await new Promise((resolve) => setTimeout(resolve, thinkingTime));
+    setIsThinking(false);
+
+    // Start typing animation
+    setIsTyping(true);
+
+    try {
+      // Get response
+      const response = await getEnergyInfo(trimmedInput, i18n.language);
+
+      let botMessageText;
+      let responseTopic = null;
 
       if (response.isKnown) {
-        const contextSuggestions = contextManager.getContextualSuggestions();
-        if (contextSuggestions.shouldFollowUp) {
-          const newSuggestion = getFollowUpSuggestion(response.key, currentLang);
-          if (newSuggestion) {
-            setSuggestions(newSuggestion.topics);
-          }
+        botMessageText =
+          energyDictionary[i18n.language][response.key]?.definition ||
+          t(`responses.${response.key}`, {
+            defaultValue: `Information about ${response.key}.`,
+          });
+        responseTopic = response.key;
+
+        // Enhance response with context
+        botMessageText = getContextAwareResponse(
+          trimmedInput,
+          contextManager,
+          botMessageText
+        );
+
+        // Get related topics for suggestions
+        const relatedTopics = getRelatedTopics(response.key, i18n.language);
+        if (relatedTopics && relatedTopics.length > 0) {
+          setSuggestions(relatedTopics);
         }
+      } else {
+        // Handle unknown response
+        const matchScore = response.confidence || 0;
+        const matchInfo =
+          matchScore > 0.3
+            ? { score: matchScore, topic: response.baseTopic }
+            : null;
+        botMessageText = getRandomUnknownResponse(i18n.language, matchInfo);
+        setSuggestions([]);
       }
-    }, calculateTypingTime(botMessageText, contextManager));
+
+      // Calculate typing time
+      const typingTime = calculateTypingTime(botMessageText);
+
+      // Simulate typing delay
+      await new Promise((resolve) => setTimeout(resolve, typingTime));
+
+      // Create and add bot response
+      const botMessage = {
+        text: botMessageText,
+        sender: "bot",
+        topic: responseTopic,
+        timestamp: new Date().toISOString(),
+      };
+
+      setMessages((prev) => [...prev, botMessage]);
+      if (sessionManagerRef.current) {
+        sessionManagerRef.current.addMessage(botMessage);
+      }
+    } catch (error) {
+      console.error("Error processing message:", error);
+
+      const errorMessage = {
+        sender: "bot",
+        text: t("error_processing", {
+          defaultValue: "Sorry, I couldn't process that request.",
+        }),
+        timestamp: new Date().toISOString(),
+      };
+
+      setMessages((prev) => [...prev, errorMessage]);
+      if (sessionManagerRef.current) {
+        sessionManagerRef.current.addMessage(errorMessage);
+      }
+    } finally {
+      setIsTyping(false);
+    }
   };
 
-  const handleSuggestionClick = async (topic) => {
-    setIsThinking(true);
-    const response = getEnergyInfo(`tell me about ${topic}`, i18n.language);
-    await new Promise(resolve => setTimeout(resolve, calculateThinkingTime(topic, contextManager)));
-    setIsThinking(false);
-    
-    setIsTyping(true);
-    let botMessageText = response.isKnown 
-      ? energyDictionary[i18n.language][response.key]?.definition 
-      : getRandomUnknownResponse(i18n.language);
-    
-    if (response.isKnown) {
-      botMessageText = getContextAwareResponse(`tell me about ${topic}`, contextManager, botMessageText);
-    }
-    
-    setTimeout(() => {
-      const botMessage = { 
-        text: botMessageText, 
-        sender: 'bot',
-        category: response.key,
-        contextInfo: contextManager.getContextualSuggestions(),
-        language: i18n.language
-      };
-      setMessages((prevMessages) => [...prevMessages, botMessage]);
-      setIsTyping(false);
+  const handleSuggestionClick = (topic) => {
+    setInput(`Tell me about ${topic}`);
+    inputRef.current?.focus();
 
-      if (response.isKnown) {
-        const contextSuggestions = contextManager.getContextualSuggestions();
-        if (contextSuggestions.shouldFollowUp) {
-          const newSuggestion = getFollowUpSuggestion(response.key, i18n.language);
-          if (newSuggestion) {
-            setSuggestions(newSuggestion.topics);
-          }
-        }
-      }
-    }, calculateTypingTime(botMessageText, contextManager));
+    // Optional: Auto-submit the query
+    // setTimeout(() => {
+    //   const form = inputRef.current?.form;
+    //   if (form) form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    // }, 100);
   };
 
   const handleClearChat = () => {
-    clearChatHistory();
-    contextManager.clearContext();
+    // Clear the chat and reset everything
+    if (sessionManagerRef.current) {
+      sessionManagerRef.current.clear();
+    }
+
     setMessages([]);
     setSuggestions([]);
+
+    // Add a new welcome message
     setTimeout(() => {
       const welcomeMessage = {
+        sender: "bot",
         text: getRandomWelcomeMessage(i18n.language),
-        sender: 'bot'
+        timestamp: new Date().toISOString(),
       };
+
       setMessages([welcomeMessage]);
+      if (sessionManagerRef.current) {
+        sessionManagerRef.current.addMessage(welcomeMessage);
+      }
     }, 100);
   };
 
   return (
     <div className="chat-bot-container">
-      <div 
-        ref={messagesContainerRef}
-        className="messages"
-        aria-live="polite"
-        aria-label={t('aria_message_list')}
-      >
-        {hasMoreMessages && (
-          <ShowMoreHistory 
-            visible={true} 
-            onClick={loadMoreMessages}
-            remainingCount={messages.length - visibleMessages}
-          />
-        )}
-        {displayedMessages.map((msg, index) => (
-          <ChatMessage 
-            key={index} 
-            message={msg} 
-            onSuggestionClick={handleSuggestionClick}
-          />
+      <div ref={messagesContainerRef} className="messages" aria-live="polite">
+        {messages.map((msg, index) => (
+          <div
+            key={index}
+            className={`message-wrapper ${
+              msg.sender === "bot" ? "bot-wrapper" : "user-wrapper"
+            }`}
+          >
+            <div
+              className={`message-icon ${
+                msg.sender === "bot" ? "bot-icon" : "user-icon"
+              }`}
+            >
+              <FontAwesomeIcon icon={msg.sender === "bot" ? faRobot : faUser} />
+            </div>
+            <div
+              className={msg.sender === "bot" ? "bot-message" : "user-message"}
+            >
+              {msg.text}
+
+              {/* Welcome back suggestions inside the message */}
+              {msg.isWelcomeBack && msg.topic && (
+                <div className="suggestions-container">
+                  <button
+                    className="suggestion-chip"
+                    onClick={() => handleSuggestionClick(msg.topic)}
+                  >
+                    {t("continue_topic", {
+                      topic: msg.topic,
+                      defaultValue: `Continue with ${msg.topic}`,
+                    })}
+                  </button>
+                  <button
+                    className="suggestion-chip"
+                    onClick={() =>
+                      handleSuggestionClick(t("new_topic", "a new topic"))
+                    }
+                  >
+                    {t("start_new", "Start a new topic")}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         ))}
+
+        {/* Thinking indicator */}
         {isThinking && (
           <div className="message-wrapper bot-wrapper">
             <div className="message-icon bot-icon">
-              <FontAwesomeIcon icon={faRobot} className="icon" />
+              <FontAwesomeIcon icon={faRobot} />
             </div>
-            <div className="bot-message">
-              <div className="flex items-center">
-                <span>{t('thinking')}</span>
-              </div>
-            </div>
+            <div className="bot-message">{t("thinking", "Thinking...")}</div>
           </div>
         )}
+
+        {/* Typing indicator */}
         {isTyping && !isThinking && (
           <div className="message-wrapper bot-wrapper">
             <div className="message-icon bot-icon">
-              <FontAwesomeIcon icon={faRobot} className="icon" />
+              <FontAwesomeIcon icon={faRobot} />
             </div>
-            <div className="bot-message">
-              <TypingIndicator />
+            <div className="typing-indicator">
+              <span className="typing-bubble"></span>
+              <span className="typing-bubble"></span>
+              <span className="typing-bubble"></span>
             </div>
           </div>
         )}
+
         <div ref={messagesEndRef} />
       </div>
-      
+
       {showScrollButton && (
-        <ScrollButton 
-          visible={true}
-          onClick={scrollToBottom}
-        />
+        <ScrollButton visible={true} onClick={scrollToBottom} />
       )}
-      
-      <SmartSuggestions 
+
+      <SmartSuggestions
         suggestions={suggestions}
         onSuggestionClick={handleSuggestionClick}
       />
-      
-      <div className="input-container">
+
+      <form onSubmit={handleSend} className="input-container">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSend(e)}
-          placeholder={t('input_placeholder')}
-          aria-label={t('input_placeholder')}
+          placeholder={t(
+            "ask_question",
+            "Ask something about energy statistics..."
+          )}
+          disabled={isTyping || isThinking}
+          ref={inputRef}
+          className="chat-input"
         />
         <button
-          onClick={handleSend}
-          className="action-button send-button"
-          aria-label={t('send_message')}
+          type="submit"
+          className="send-button"
+          disabled={!input.trim() || isTyping || isThinking}
+          aria-label={t("send", "Send")}
         >
-          <FontAwesomeIcon icon={faPaperPlane} aria-hidden="true" />
+          <FontAwesomeIcon icon={faPaperPlane} />
         </button>
-      </div>
-      
+      </form>
+
       <div className="control-panel">
         <button
           onClick={handleClearChat}
-          className="action-button clear-button"
-          aria-label={t('clear_chat')}
-          title={t('clear_chat')}
+          className="clear-button"
+          aria-label={t("clear_chat", "Clear chat")}
+          title={t("clear_chat", "Clear chat")}
         >
-          <FontAwesomeIcon icon={faTrash} aria-hidden="true" />
+          <FontAwesomeIcon icon={faTrash} />
         </button>
       </div>
     </div>

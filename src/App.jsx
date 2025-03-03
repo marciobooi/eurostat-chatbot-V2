@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import ChatBot from "./components/ChatBot";
 import { getCurrentLanguage } from "./i18n";
@@ -25,17 +25,11 @@ function App() {
 
   return (
     <div className="app-container">
-      <header className="app-header">
-        {/* Language selector removed - language is now determined from cookies */}
-      </header>
       <main className="app-main">
         <div className={`chat-container ${loaded ? "chat-loaded" : ""}`}>
           <ChatBot />
         </div>
       </main>
-      <footer className="app-footer">
-        <p>{t("powered_by")}</p>
-      </footer>
     </div>
   );
 }

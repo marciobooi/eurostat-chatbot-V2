@@ -18,84 +18,98 @@ const createErrorResponse = (error, language = "en") => ({
 });
 
 /**
- * Extract energy information based on query
- * @param {string} query - User query
+ * Match a query to energy topics
+ * @param {string} query - User's question
  * @param {string} language - Language code
- * @returns {Object} Energy info response
+ * @returns {Object} Match information
  */
 export const getEnergyInfo = (query, language = "en") => {
   try {
     if (!query) {
-      return { isKnown: false, key: "unknown", confidence: 0 };
+      return { isKnown: false, confidence: 0 };
     }
 
-    // Use the dictionary for the requested language, or fallback to English
-    const dictionary = energyDictionary[language] || energyDictionary.en;
+    const topics = Object.keys(
+      energyDictionary[language] || energyDictionary.en
+    );
 
-    // Tokenize the query
-    const queryTokens = tokenize(query, language);
-    if (queryTokens.length === 0) {
-      return { isKnown: false, key: "unknown", confidence: 0 };
-    }
+    // Extract topic from query using NLP
+    const extractedTopic = extractTopicFromQuery(query, language);
+    console.log("Extracted topic:", extractedTopic);
 
-    // Track best match
-    let bestMatch = { key: null, score: 0 };
-
-    // Process each entry in the dictionary
-    Object.entries(dictionary).forEach(([key, entry]) => {
-      try {
-        if (!entry) return;
-
-        // Prepare tokens for matching
-        const keyTokens = tokenize(key, language);
-        const keywordTokens =
-          entry.keywords?.map((kw) => tokenize(kw, language)).flat() || [];
-        const synonymTokens =
-          entry.synonyms?.map((s) => tokenize(s, language)).flat() || [];
-
-        // Calculate match score
-        const matchResult = calculateMatchScore({
-          query: queryTokens,
-          key: keyTokens,
-          keywords: keywordTokens,
-          synonyms: synonymTokens,
-        });
-
-        const matchScore = matchResult.scores.total;
-        console.log("Match scores:", matchResult);
-        console.log(`Match for ${key}: ${matchScore}`);
-
-        // Update best match if better score found
-        if (matchScore > bestMatch.score) {
-          bestMatch = { key, score: matchScore };
-        }
-      } catch (entryError) {
-        console.error(`Error processing entry ${key}:`, entryError);
+    // Check for exact matches first
+    for (const topic of topics) {
+      if (topic.toLowerCase() === extractedTopic.toLowerCase()) {
+        return {
+          isKnown: true,
+          key: topic,
+          confidence: 1.0,
+          exactMatch: true,
+        };
       }
-    });
+    }
 
-    console.log("Best match:", bestMatch);
+    // If no exact match, do semantic matching
+    const queryTokens = tokenize(query, language);
+    let bestMatch = null;
+    let bestScore = 0;
 
-    // Return result
-    if (bestMatch.score >= 0.4) {
+    for (const topic of topics) {
+      const topicData =
+        energyDictionary[language][topic] || energyDictionary.en[topic];
+
+      if (!topicData) continue;
+
+      const keyTokens = tokenize(topic, language);
+      const keywordTokens = tokenize(
+        (topicData.keywords || []).join(" "),
+        language
+      );
+      const synonymTokens = tokenize(
+        (topicData.synonyms || []).join(" "),
+        language
+      );
+
+      const matchResult = calculateMatchScore({
+        query: queryTokens,
+        key: keyTokens,
+        keywords: keywordTokens,
+        synonyms: synonymTokens,
+      });
+
+      console.log(`Match for ${topic}:`, matchResult.scores.total);
+
+      if (matchResult.scores.total > bestScore) {
+        bestScore = matchResult.scores.total;
+        bestMatch = {
+          key: topic,
+          score: bestScore,
+        };
+      }
+    }
+
+    // Consider it a match if the score is above threshold
+    const MATCH_THRESHOLD = 0.55;
+
+    if (bestMatch && bestMatch.score >= MATCH_THRESHOLD) {
+      console.log("Best match:", bestMatch);
       return {
         isKnown: true,
         key: bestMatch.key,
         confidence: bestMatch.score,
+        exactMatch: false,
       };
-    } else if (bestMatch.score >= 0.2) {
-      return {
-        isKnown: false,
-        key: "unknown",
-        baseTopic: bestMatch.key,
-        confidence: bestMatch.score,
-      };
-    } else {
-      return { isKnown: false, key: "unknown", confidence: 0 };
     }
+
+    // No good match found
+    return {
+      isKnown: false,
+      confidence: bestMatch ? bestMatch.score : 0,
+      baseTopic: extractedTopic,
+    };
   } catch (error) {
     console.error("Error in getEnergyInfo:", error);
-    return { isKnown: false, key: "unknown", confidence: 0 };
+    return { isKnown: false, confidence: 0, error: true };
   }
 };
 
