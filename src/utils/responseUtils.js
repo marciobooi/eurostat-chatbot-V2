@@ -1,7 +1,8 @@
 /**
  * Response utilities for generating dynamic bot responses
  */
-import botResponses, { getResponseByType } from "../data/botResponses";
+import botResponses from "../data/botResponses";
+
 import { followUpQuestions } from "../data/followUpQuestions";
 import { getRandomFromArray } from "./random";
 import { containsQuestionWord } from "./nlpHelper";
@@ -17,7 +18,6 @@ import i18n from "../i18n";
  * @returns {string} Random welcome message
  */
 export const getRandomWelcomeMessage = (language = "en") => {
-  // Use the consolidated botResponses directly (not through getResponseByType)
   const messages =
     botResponses.greeting?.[language] || botResponses.greeting?.en;
   return getRandomFromArray(messages) || i18n.t("responses.default_welcome");
@@ -29,7 +29,6 @@ export const getRandomWelcomeMessage = (language = "en") => {
  * @returns {string} Random farewell message
  */
 export const getRandomFarewellMessage = (language = "en") => {
-  // Use the consolidated botResponses directly
   const messages =
     botResponses.farewell?.[language] || botResponses.farewell?.en;
   return getRandomFromArray(messages) || i18n.t("responses.default_farewell");
@@ -41,7 +40,6 @@ export const getRandomFarewellMessage = (language = "en") => {
  * @returns {string} Random gratitude response
  */
 export const getRandomGratitudeResponse = (language = "en") => {
-  // Use the consolidated botResponses directly
   const messages =
     botResponses.gratitude?.[language] || botResponses.gratitude?.en;
   return getRandomFromArray(messages) || i18n.t("responses.default_gratitude");
@@ -53,7 +51,6 @@ export const getRandomGratitudeResponse = (language = "en") => {
  * @returns {string} Random prompt message
  */
 export const getRandomPromptMessage = (language = "en") => {
-  // Use the consolidated botResponses directly
   const messages = botResponses.prompt?.[language] || botResponses.prompt?.en;
   return getRandomFromArray(messages) || i18n.t("responses.default_prompt");
 };
@@ -64,7 +61,6 @@ export const getRandomPromptMessage = (language = "en") => {
  * @returns {string} Random error message
  */
 export const getRandomErrorMessage = (language = "en") => {
-  // Use the consolidated botResponses directly
   const messages = botResponses.error?.[language] || botResponses.error?.en;
   return getRandomFromArray(messages) || i18n.t("responses.default_error");
 };
@@ -75,7 +71,6 @@ export const getRandomErrorMessage = (language = "en") => {
  * @returns {string} Random thinking message
  */
 export const getRandomThinkingMessage = (language = "en") => {
-  // Use the consolidated botResponses directly
   const messages =
     botResponses.thinking?.[language] || botResponses.thinking?.en;
   return getRandomFromArray(messages) || i18n.t("responses.default_thinking");
@@ -88,15 +83,12 @@ export const getRandomThinkingMessage = (language = "en") => {
  * @returns {string} Formatted unknown response
  */
 export const getRandomUnknownResponse = (language = "en", matchInfo = null) => {
-  // Use the consolidated botResponses directly
   const messages =
     botResponses.confused?.[language] || botResponses.confused?.en;
   const response =
     getRandomFromArray(messages) || i18n.t("responses.default_unknown");
 
-  // If we have partial match info, add a hint using translations
   if (matchInfo && matchInfo.topic && matchInfo.score > 0.3) {
-    // Use translations instead of hardcoded strings
     const hint = i18n.t("responses.topic_hint", { topic: matchInfo.topic });
     return `${response} ${hint}`;
   }
@@ -110,7 +102,6 @@ export const getRandomUnknownResponse = (language = "en", matchInfo = null) => {
  * @returns {string} Random empathy phrase
  */
 export const getRandomEmpathyPhrase = (language = "en") => {
-  // Use the consolidated botResponses directly
   const phrases = botResponses.empathy?.[language] || botResponses.empathy?.en;
   return getRandomFromArray(phrases) || i18n.t("responses.default_empathy");
 };
@@ -121,7 +112,6 @@ export const getRandomEmpathyPhrase = (language = "en") => {
  * @returns {string} Random reassurance phrase
  */
 export const getRandomReassurancePhrase = (language = "en") => {
-  // Use the consolidated botResponses directly
   const phrases =
     botResponses.reassurance?.[language] || botResponses.reassurance?.en;
   return getRandomFromArray(phrases) || i18n.t("responses.default_reassurance");
@@ -151,13 +141,12 @@ export const getTopicConnectionPhrase = (topic, language = "en") => {
  */
 export const getFollowUpSuggestionsForTopic = (topic, language = "en") => {
   if (!topic) return [];
-  
-  // Get the appropriate language array of suggestion templates
-  const suggestionTemplates = followUpSuggestions[language] || followUpSuggestions.en;
-  
-  // Format each template by replacing {topic} with the actual topic
-  return suggestionTemplates.map(template => 
-    template.replace('{topic}', topic)
+
+  const suggestionTemplates =
+    followUpSuggestions[language] || followUpSuggestions.en;
+
+  return suggestionTemplates.map((template) =>
+    template.replace("{topic}", topic)
   );
 };
 
@@ -173,23 +162,19 @@ export const getContextAwareResponse = (query, contextManager, answer) => {
 
   const language = i18n?.language || "en";
 
-  // Use containsQuestionWord from nlpHelper or use our own check with questionWords dictionary
   const isQuestion = containsQuestionWord
     ? containsQuestionWord(query, language)
     : isQuestionUsingDictionary(query, language);
 
-  // Simply return the answer if it's a direct question
   if (isQuestion) {
     return answer;
   }
 
-  // Add a more conversational wrapper for non-question queries
   const empathyPhrase =
     Math.random() > 0.7 ? `${getRandomEmpathyPhrase(language)} ` : "";
   const reassurancePhrase =
     Math.random() > 0.7 ? ` ${getRandomReassurancePhrase(language)}` : "";
 
-  // Combine elements with appropriate spacing
   return `${empathyPhrase}${answer}${reassurancePhrase}`.trim();
 };
 
@@ -202,23 +187,18 @@ export const getContextAwareResponse = (query, contextManager, answer) => {
 const isQuestionUsingDictionary = (text, language = "en") => {
   if (!text) return false;
 
-  // Check for question mark first
   if (text.includes("?")) return true;
 
-  // Get question words for the specified language or fall back to English
   const langQuestionWords = questionWords[language] || questionWords.en;
 
-  // Convert to lowercase for case-insensitive comparison
   const lowerText = text.toLowerCase();
 
-  // Check if text starts with any question word
   for (const word of langQuestionWords) {
     if (lowerText.startsWith(word.toLowerCase())) {
       return true;
     }
   }
 
-  // Check for phrases like "tell me about"
   const tellMePhrases = {
     en: ["tell me", "explain", "describe"],
     fr: ["dis-moi", "explique", "parle-moi de", "décris"],
@@ -245,15 +225,12 @@ const isQuestionUsingDictionary = (text, language = "en") => {
 export const getFollowUpQuestion = (topic, language = "en") => {
   if (!topic || !followUpQuestions) return null;
 
-  // Get language-specific questions or fall back to English
   const questions = followUpQuestions[language] || followUpQuestions.en;
   if (!questions) return null;
 
-  // Try to get topic-specific questions
   const topicQuestions = questions[topic.toLowerCase()] || questions.general;
   if (!topicQuestions || !topicQuestions.length) return null;
 
-  // Return a random question
   return getRandomFromArray(topicQuestions);
 };
 
@@ -273,12 +250,10 @@ export const formatResponse = (baseResponse, options = {}) => {
 
   let response = baseResponse;
 
-  // Add empathy phrase if requested
   if (addEmpathy && Math.random() > 0.5) {
     response = `${getRandomEmpathyPhrase(language)} ${response}`;
   }
 
-  // Add topic connection if provided
   if (topic && Math.random() > 0.7) {
     const topicConnection = getTopicConnectionPhrase(topic, language);
     if (topicConnection) {
@@ -286,7 +261,6 @@ export const formatResponse = (baseResponse, options = {}) => {
     }
   }
 
-  // Add reassurance phrase if requested
   if (addReassurance && Math.random() > 0.5) {
     response = `${response} ${getRandomReassurancePhrase(language)}`;
   }
