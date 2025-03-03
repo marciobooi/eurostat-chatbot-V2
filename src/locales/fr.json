@@ -5,7 +5,7 @@
   "thinking": "J'analyse votre question...",
   "clearChat": "Effacer la conversation",
   "followUp": "Pour faire suite à {topic}...",
-  "followUpPhrases": ["et concernant", "qu'en est-il", "et", "aussi", "quoi d'autre", "parlez-moi de"],
+  "followUpPhrases": ["et", "aussi", "quoi d'autre", "dis m'en plus", "qu'en est-il", "et concernant"],
   "translation": {
     "input_placeholder": "Tapez votre message...",
     "thinking": "Le bot réfléchit...",
@@ -25,6 +25,8 @@
     "aria_suggestions": "Sujets suggérés"
   },
   "bot_unknown": "Je n'ai pas d'informations spécifiques à ce sujet, mais je peux vous aider avec des questions liées à l'énergie.",
-  "followUp": "Pour faire suite à {topic}...",
-  "followUpPhrases": ["et concernant", "qu'en est-il", "et", "aussi", "quoi d'autre", "parlez-moi de"]
+  "empathyPrefix": "Je comprends votre préoccupation.",
+  "reassurancePrefix": "Permettez-moi de vous aider à mieux comprendre.",
+  "gratitudeSuffix": "Je suis ravi(e) d'avoir pu vous aider !",
+  "followUpSuggestion": "Au fait, souhaitez-vous en savoir plus sur {topic} ?"
 }

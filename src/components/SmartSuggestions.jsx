@@ -1,21 +1,32 @@
 import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLightbulb } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
+import { getCurrentLanguage } from '../i18n';
+import { LanguageValidator } from '../utils/languageUtils';
 
-const SmartSuggestions = ({ suggestions, onSuggestionClick, title }) => {
-  const { t } = useTranslation();
-  if (!suggestions?.length) return null;
+const SmartSuggestions = ({ suggestions = [], onSuggestionClick }) => {
+  const { t, i18n } = useTranslation();
+  
+  if (!suggestions || suggestions.length === 0) return null;
+  
+  const currentLang = getCurrentLanguage();
+  const validLang = LanguageValidator.validate(currentLang);
 
   return (
-    <div className="suggestions-container" role="region" aria-label={t('aria_suggestions')}>    
-      <div className="flex flex-wrap gap-2">
+    <div 
+      className="suggestions-container" 
+      role="region" 
+      aria-label={t('suggested_topics')}
+      lang={validLang}
+    >
+      <div className="suggestions-list">
         {suggestions.map((suggestion, index) => (
           <button
             key={index}
             onClick={() => onSuggestionClick(suggestion)}
-            className="suggestion-chip"
+            className="suggestion-button"
             role="button"
+            aria-label={t('click_to_learn_about', { topic: suggestion })}
+            lang={validLang}
           >
             {suggestion}
           </button>

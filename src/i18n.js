@@ -1,6 +1,8 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
+import { getLastUsedLanguage } from "./utils/chatHistory";
+import { SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE } from "./utils/languageUtils";
 
 // Import translation files directly.
 import enTranslation from "./locales/en.json";
@@ -14,13 +16,17 @@ const resources = {
   de: { translation: deTranslation },
 };
 
-i18n
+// Get last used language from chat history
+const lastUsedLanguage = getLastUsedLanguage();
+
+const instance = i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
-    supportedLngs: ["en", "fr", "de"],
-    fallbackLng: "en",
+    supportedLngs: SUPPORTED_LANGUAGES,
+    fallbackLng: DEFAULT_LANGUAGE,
+    lng: lastUsedLanguage, // Use last used language if available
     // debug: true,
     interpolation: {
       escapeValue: false, // React already escapes by default
@@ -38,5 +44,22 @@ i18n
       cookieDomain: window.location.hostname, // Use current domain
     },
   });
+
+export { i18n };
+
+// Export a helper to get translations directly
+export const t = (key, options) => i18n.t(key, options);
+
+// Export a helper to change language
+export const changeLanguage = async (lang) => {
+  if (SUPPORTED_LANGUAGES.includes(lang)) {
+    await i18n.changeLanguage(lang);
+    return true;
+  }
+  return false;
+};
+
+// Export a helper to get current language
+export const getCurrentLanguage = () => i18n.language || DEFAULT_LANGUAGE;
 
 export default i18n;

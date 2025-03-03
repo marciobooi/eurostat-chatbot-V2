@@ -19,7 +19,11 @@
     "aria_message_list": "Nachrichtenverlauf",
     "aria_suggestions": "Vorgeschlagene Themen",
     "clearChat": "Chat löschen",
-    "followUp": "In Bezug auf {topic}...",
-    "followUpPhrases": ["was ist mit", "wie steht es mit", "und", "auch", "was noch", "erzählen sie mir mehr"]
+    "followUp": "Im Anschluss an {topic}...",
+    "followUpPhrases": ["und", "auch", "was noch", "erzähl mir mehr", "wie ist es mit", "was ist mit"],
+    "empathyPrefix": "Ich verstehe Ihre Bedenken.",
+    "reassurancePrefix": "Lassen Sie mich Ihnen helfen, das besser zu verstehen.",
+    "gratitudeSuffix": "Ich freue mich, dass ich helfen konnte!",
+    "followUpSuggestion": "Übrigens, möchten Sie mehr über {topic} erfahren?"
   }
 }

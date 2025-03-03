@@ -17,5 +17,9 @@
   "aria_suggestions": "Suggested topics",
   "bot_unknown": "I don't have specific information about that, but I can help you with energy-related questions.",
   "followUp": "Following up on {topic}...",
-  "followUpPhrases": ["what about", "how about", "and", "also", "what else", "tell me more"]
+  "followUpPhrases": ["what about", "how about", "and", "also", "what else", "tell me more"],
+  "empathyPrefix": "I understand your concern.",
+  "reassurancePrefix": "Let me help you understand this better.",
+  "gratitudeSuffix": "I'm glad I could help!",
+  "followUpSuggestion": "By the way, would you like to learn more about {topic}?"
 }

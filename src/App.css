@@ -130,3 +130,151 @@ html {
     --background-gradient-end: #0f172a;
   }
 }
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+}
+
+.app-header {
+  padding: 1rem 2rem;
+  background: white;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.app-header h1 {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin: 0;
+  font-weight: 600;
+}
+
+.language-selector {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--surface-light);
+  padding: 0.25rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.lang-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.lang-button::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--primary-color);
+  transition: all 0.2s ease;
+  transform: translateX(-50%);
+}
+
+.lang-button:hover {
+  color: var(--text-primary);
+}
+
+.lang-button:hover::before {
+  width: 80%;
+}
+
+.lang-button.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+.lang-button.active::before {
+  width: 0;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  position: relative;
+}
+
+.chat-container {
+  width: 100%;
+  max-width: 48rem;
+  margin: 0 auto;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+.chat-container.chat-loaded {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.app-footer {
+  padding: 1rem;
+  text-align: center;
+  background: white;
+  box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.1);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* Media Queries */
+@media (max-width: 640px) {
+  .app-header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .chat-container {
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .app-main {
+    padding: 0;
+  }
+}
+
+/* RTL Support */
+[dir="rtl"] .lang-button::before {
+  left: auto;
+  right: 50%;
+  transform: translateX(50%);
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .lang-button {
+    border: 1px solid currentColor;
+  }
+
+  .lang-button.active {
+    outline: 2px solid white;
+    outline-offset: -1px;
+  }
+}
