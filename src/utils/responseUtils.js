@@ -6,7 +6,10 @@ import { getRandomFromArray } from "./random";
 // Import each response dictionary from its own file
 import { welcomeMessages } from "../data/welcomeMessages";
 import { unknownResponses } from "../data/unknownResponses";
-import { contextualPhrases } from "../data/contextualPhrases";
+import { empathyPhrases } from "../data/empathyPhrases";
+import { reassurancePhrases } from "../data/reassurancePhrases";
+import { followUpSuggestions } from "../data/followUpSuggestions";
+import { topicConnectionPhrases } from "../data/topicConnectionPhrases";
 import { farewellMessages } from "../data/farewellMessages";
 import { gratitudeMessages } from "../data/gratitudeMessages";
 import { thinkingMessages } from "../data/thinkingMessages";
@@ -37,12 +40,13 @@ export const getRandomUnknownResponse = (language = "en", matchInfo = null) => {
 
   // Add suggestion based on partial match if available
   if (matchInfo && matchInfo.topic && matchInfo.score > 0.3) {
-    response +=
-      " " +
-      i18n.t("responses.partialMatch", {
-        topic: matchInfo.topic,
-        defaultValue: `I found some information about "${matchInfo.topic}" that might be relevant. Would you like to know more about that instead?`,
-      });
+    const suggestions = followUpSuggestions[language] || followUpSuggestions.en;
+    const matchSuggestion = getRandomFromArray(suggestions).replace(
+      "{topic}",
+      matchInfo.topic
+    );
+
+    response += " " + matchSuggestion;
   }
 
   return response;
@@ -65,34 +69,30 @@ export const getContextAwareResponse = (
   const currentLang = i18n.language || "en";
   let response = baseResponse;
 
+  // Add contextual enhancements if available
   try {
     if (contextManager.getContextualSuggestions) {
       const contextInfo = contextManager.getContextualSuggestions();
       const mood = contextManager.getCurrentMood?.() || { engagement: 1.0 };
-      const phrases = contextualPhrases[currentLang] || contextualPhrases.en;
 
       // Add empathetic prefix for engaged users
       if (mood.engagement > 0.8) {
-        response =
-          i18n.t("responses.engagedPrefix", {
-            defaultValue: phrases.empathyPrefix,
-          }) +
-          " " +
-          response;
+        const empathies = empathyPhrases[currentLang] || empathyPhrases.en;
+        const prefix = getRandomFromArray(empathies);
+        response = prefix + " " + response;
       }
 
       // Add contextual connection if there are related previous topics
       if (contextInfo && contextInfo.recentTopics?.length > 0) {
         const recentTopic = contextInfo.recentTopics[0];
-        response +=
-          " " +
-          i18n.t("responses.topicConnection", {
-            topic: recentTopic,
-            defaultValue: phrases.topicConnection.replace(
-              "{topic}",
-              recentTopic
-            ),
-          });
+        const connections =
+          topicConnectionPhrases[currentLang] || topicConnectionPhrases.en;
+        const connectionPhrase = getRandomFromArray(connections).replace(
+          "{topic}",
+          recentTopic
+        );
+
+        response += " " + connectionPhrase;
       }
     }
   } catch (error) {
@@ -143,11 +143,21 @@ export const getRandomErrorMessage = (language = "en") => {
 };
 
 /**
- * Get a prompt message for the user
+ * Get a random prompt message
  * @param {string} language - Language code
  * @returns {string} Prompt message
  */
 export const getRandomPromptMessage = (language = "en") => {
   const messages = promptMessages[language] || promptMessages.en;
   return getRandomFromArray(messages);
+};
+
+/**
+ * Get a random reassurance phrase
+ * @param {string} language - Language code
+ * @returns {string} Reassurance phrase
+ */
+export const getRandomReassurancePhrase = (language = "en") => {
+  const phrases = reassurancePhrases[language] || reassurancePhrases.en;
+  return getRandomFromArray(phrases);
 };

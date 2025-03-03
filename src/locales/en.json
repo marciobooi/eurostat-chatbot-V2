@@ -39,9 +39,6 @@
       "send": "Send"
     },
     "responses": {
-      "partialMatch": "I found some information about \"{{topic}}\" that might be relevant. Would you like to know more about that instead?",
-      "engagedPrefix": "I understand your interest in this topic.",
-      "topicConnection": "This is also related to our previous discussion about {{topic}}.",
       "thinking": "Thinking...",
       "unknown": "I don't have information on that topic yet.",
       "error_processing": "Sorry, I couldn't process that request."

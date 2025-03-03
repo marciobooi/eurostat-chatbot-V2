@@ -1,9 +1,22 @@
 {
   "sendButton": "Envoyer",
-  "input placeholder": "Tapez votre message...",
-  "bot unknown": "Je n'ai pas d'informations spécifiques à ce sujet, mais je peux vous aider avec des questions liées à l'énergie.",
+  "input_placeholder": "Tapez votre message...",
   "thinking": "J'analyse votre question...",
-  "clearChat": "Effacer la conversation",
+  "typing": "Le bot écrit...",
+  "show_more": "Afficher {{count}} messages supplémentaires",
+  "scroll_to_bottom": "Défiler jusqu'au bas de la conversation",
+  "clear_chat": "Effacer l'historique",
+  "send_message": "Envoyer le message",
+  "suggestions_title": "Cela pourrait aussi vous intéresser :",
+  "bot_message": "Message du bot :",
+  "user_message": "Votre message :",
+  "loading": "Chargement de la conversation...",
+  "welcome": "Bienvenue ! Comment puis-je vous aider ?",
+  "chat_cleared": "L'historique a été effacé",
+  "aria_chat_container": "Conteneur de conversation",
+  "aria_message_list": "Historique des messages",
+  "aria_suggestions": "Sujets suggérés",
+  "bot_unknown": "Je n'ai pas d'informations spécifiques à ce sujet, mais je peux vous aider avec des questions liées à l'énergie.",
   "followUp": "Pour faire suite à {topic}...",
   "followUpPhrases": [
     "et",
@@ -39,9 +52,6 @@
       "send": "Envoyer"
     },
     "responses": {
-      "partialMatch": "J'ai trouvé des informations sur \"{{topic}}\" qui pourraient être pertinentes. Voulez-vous en savoir plus à ce sujet ?",
-      "engagedPrefix": "Je comprends votre intérêt pour ce sujet.",
-      "topicConnection": "Cela est également lié à notre discussion précédente sur {{topic}}.",
       "thinking": "En réflexion...",
       "unknown": "Je n'ai pas encore d'informations sur ce sujet.",
       "error_processing": "Désolé, je n'ai pas pu traiter cette demande."
@@ -56,7 +66,6 @@
     "ask_question": "Posez une question sur les statistiques énergétiques...",
     "error_processing": "Désolé, je n'ai pas pu traiter cette demande."
   },
-  "bot_unknown": "Je n'ai pas d'informations spécifiques à ce sujet, mais je peux vous aider avec des questions liées à l'énergie.",
   "empathyPrefix": "Je comprends votre préoccupation.",
   "reassurancePrefix": "Permettez-moi de vous aider à mieux comprendre.",
   "gratitudeSuffix": "Je suis ravi(e) d'avoir pu vous aider !",
