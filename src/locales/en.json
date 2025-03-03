@@ -52,5 +52,64 @@
     "thinking": "Thinking...",
     "ask_question": "Ask something about energy statistics...",
     "error_processing": "Sorry, I couldn't process that request."
+  },
+  "app": {
+    "title": "Eurostat Energy Chatbot",
+    "description": "Ask questions about energy statistics in Europe"
+  },
+  "chatbot": {
+    "thinking": "Thinking...",
+    "send": "Send",
+    "clear_chat": "Clear chat",
+    "start_listening": "Start voice input",
+    "stop_listening": "Stop listening",
+    "speech_not_supported": "Voice input not supported in this browser",
+    "scroll_to_bottom": "Scroll to bottom",
+    "ask_question": "Ask something about energy statistics...",
+    "suggested_topics": "Suggested topics",
+    "click_to_learn_about": "Click to learn about {{topic}}",
+    "continue_topic": "Continue with {{topic}}",
+    "start_new": "Start a new topic"
+  },
+  "responses": {
+    "topic_hint": "Are you asking about \"{{topic}}\"?",
+    "default_welcome": "Welcome! How can I help you with energy statistics?",
+    "default_farewell": "Goodbye! Feel free to return if you have more questions.",
+    "default_gratitude": "You're welcome! Happy to help.",
+    "default_prompt": "Is there something specific about energy statistics you'd like to know?",
+    "default_error": "I'm sorry, something went wrong. Could you try again?",
+    "default_thinking": "Let me think about that...",
+    "default_unknown": "I'm not sure I understand. Could you rephrase that?",
+    "default_empathy": "I understand that's important.",
+    "default_reassurance": "I hope this helps.",
+    "topic_description": "{{text}} I can provide more details about {{topic}} if you're interested.",
+    "show_visualizations": "\n\nI can show you some visualizations about {{topic}}. What would you like to see?"
+  },
+  "topics": {
+    "oil": "Oil",
+    "gas": "Natural Gas",
+    "renewable": "Renewable Energy",
+    "consumption": "Energy Consumption",
+    "production": "Energy Production"
+  },
+  "visualization": {
+    "show_options": "I can show you some visualizations about {{topic}}. What would you like to see?",
+    "available_visualizations": "Available visualizations",
+    "viz_button_label": "Show {{type}} visualization",
+    "remaining_visualizations": "More visualizations available",
+    "all_shown": "That's all the visualizations for {{topic}}. Would you like to learn about {{nextTopic}}?",
+    "pie_chart": "Pie Chart",
+    "line_chart": "Timeline",
+    "bar_chart": "Bar Chart",
+    "area_chart": "Area Chart",
+    "top_consumers": "Top Consumers",
+    "consumption_trends": "Consumption Trends",
+    "import_dependency": "Import Dependency",
+    "renewable_mix": "Renewable Energy Mix",
+    "growth_trends": "Growth Trends",
+    "country_comparison": "Country Comparison",
+    "more_to_discover": "There's more to discover about {{topic}} if you're curious. I can show you some visualizations about {{topic}}. What would you like to see?",
+    "more_options_available": "Would you like to see another visualization about {{topic}}? I have {{count}} more to show you:",
+    "suggest_next_topic": "Would you like to learn about {{nextTopic}}? You can say 'yes' to explore this topic."
   }
 }

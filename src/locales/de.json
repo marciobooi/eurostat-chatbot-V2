@@ -39,7 +39,9 @@
     "responses": {
       "thinking": "Denke nach...",
       "unknown": "Ich habe noch keine Informationen zu diesem Thema.",
-      "error_processing": "Entschuldigung, ich konnte diese Anfrage nicht verarbeiten."
+      "error_processing": "Entschuldigung, ich konnte diese Anfrage nicht verarbeiten.",
+      "topic_description": "{{text}} Ich kann Ihnen mehr Details über {{topic}} geben, wenn Sie interessiert sind.",
+      "show_visualizations": "\n\nIch kann Ihnen einige Visualisierungen zu {{topic}} zeigen. Was möchten Sie sehen?"
     },
     "suggested_topics": "Vorgeschlagene Themen",
     "click_to_learn_about": "Klicken Sie, um mehr über {{topic}} zu erfahren",
@@ -49,6 +51,23 @@
     "send": "Senden",
     "thinking": "Denke nach...",
     "ask_question": "Stellen Sie eine Frage zu Energiestatistiken...",
-    "error_processing": "Entschuldigung, ich konnte diese Anfrage nicht verarbeiten."
+    "error_processing": "Entschuldigung, ich konnte diese Anfrage nicht verarbeiten.",
+    "visualization": {
+      "show_options": "Ich kann Ihnen einige Visualisierungen zu {{topic}} zeigen. Was möchten Sie sehen?",
+      "available_visualizations": "Verfügbare Visualisierungen",
+      "viz_button_label": "{{type}} Visualisierung anzeigen",
+      "remaining_visualizations": "Weitere Visualisierungen verfügbar",
+      "all_shown": "Das waren alle Visualisierungen für {{topic}}. Möchten Sie mehr über {{nextTopic}} erfahren?",
+      "pie_chart": "Kreisdiagramm",
+      "line_chart": "Zeitverlauf",
+      "bar_chart": "Balkendiagramm",
+      "area_chart": "Flächendiagramm",
+      "top_consumers": "Top-Verbraucher",
+      "consumption_trends": "Verbrauchstrends",
+      "import_dependency": "Importabhängigkeit",
+      "renewable_mix": "Erneuerbare-Energien-Mix",
+      "growth_trends": "Wachstumstrends",
+      "country_comparison": "Ländervergleich"
+    }
   }
 }

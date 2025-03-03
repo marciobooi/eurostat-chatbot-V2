@@ -7,6 +7,10 @@ import {
   faPaperPlane,
   faMicrophone, // Add microphone icon import
   faMicrophoneSlash, // Add microphone-slash icon import
+  faChartPie,
+  faChartLine,
+  faChartBar,
+  faChartArea,
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import SmartSuggestions from "./SmartSuggestions";
@@ -36,6 +40,10 @@ import "./ChatBot.css";
 import "./ChatBotMobile.css"; // Import mobile-specific styles
 import { findIntent } from "../utils/nlpHelper";
 import speechRecognitionHandler from "../utils/speechRecognitionHandler";
+import Visualization from './Visualization';
+import { visualizationConfig } from '../data/visualizationConfig';
+import { energyDictionary } from "../data/energyDictionary";
+import { isAffirmative } from '../data/affirmativeResponses';
 
 const ChatBot = () => {
   // Remove the inline ScrollButton component definition since we now import it
@@ -54,6 +62,9 @@ const ChatBot = () => {
   const [isListening, setIsListening] = useState(false); // Add state for speech recognition
   const [speechSupported, setSpeechSupported] = useState(false); // Check if speech recognition is supported
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767); // Add mobile detection state
+  const [currentFuel, setCurrentFuel] = useState(null);
+  const [shownVisualizations, setShownVisualizations] = useState([]);
+  const [suggestedTopic, setSuggestedTopic] = useState(null);
 
   const contextManager = useMemo(() => new ContextManager(), []);
   const analyticsManager = useMemo(() => new AnalyticsManager(), []);
@@ -234,8 +245,26 @@ const ChatBot = () => {
 
   const handleSend = async (e) => {
     e.preventDefault();
-    const trimmedInput = input.trim();
+    const trimmedInput = input.trim().toLowerCase();
     if (!trimmedInput || isTyping || isThinking) return;
+
+    // Check if this is a response to a topic suggestion first
+    if (suggestedTopic && isAffirmative(trimmedInput, i18n.language)) {
+      const userMessage = {
+        text: trimmedInput,
+        sender: "user",
+        timestamp: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, userMessage]);
+      
+      // Clear the suggestion and input
+      setSuggestedTopic(null);
+      setInput("");
+      
+      // Handle the suggested topic
+      handleSuggestionClick(suggestedTopic);
+      return;
+    }
 
     const userMessage = {
       text: trimmedInput,
@@ -373,6 +402,11 @@ const ChatBot = () => {
               language: i18n.language,
             });
 
+            // Handle visualization suggestions for fuel topics
+            if (visualizationConfig[responseTopic]) {
+              handleFuelResponse(responseTopic, response);
+            }
+
             // Update context if available
             if (
               contextManager &&
@@ -431,9 +465,12 @@ const ChatBot = () => {
       const typingTime = calculateTypingTime(botMessageText);
       await new Promise((resolve) => setTimeout(resolve, typingTime));
 
-      // Create and add bot response
+      // Create initial bot response
       const botMessage = {
-        text: botMessageText,
+        text: t('responses.topic_description', {
+          text: botMessageText.split('Let me share the key facts about this:')[0],
+          topic: responseTopic
+        }),
         sender: "bot",
         topic: responseTopic,
         timestamp: new Date().toISOString(),
@@ -442,6 +479,27 @@ const ChatBot = () => {
       setMessages((prev) => [...prev, botMessage]);
       if (sessionManagerRef.current) {
         sessionManagerRef.current.addMessage(botMessage);
+      }
+
+      // If this is a fuel topic that has visualizations, add a new message after a delay
+      if (visualizationConfig[responseTopic]) {
+        // Wait before showing visualization options
+        setTimeout(() => {
+          const vizOptionsMessage = {
+            text: t('visualization.more_to_discover', { 
+              topic: responseTopic,
+              count: visualizationConfig[responseTopic].visualizations.length 
+            }),
+            sender: "bot",
+            topic: responseTopic,
+            category: 'visualization-options',
+            hasVisualizations: true,
+            timestamp: new Date().toISOString(),
+          };
+          
+          setMessages(prev => [...prev, vizOptionsMessage]);
+          handleFuelResponse(responseTopic, response);
+        }, 2000); // 2-second delay for natural flow
       }
 
       // Track successful bot response
@@ -535,55 +593,194 @@ const ChatBot = () => {
     };
   }, []);
 
+  // Reset visualization state when changing topics
+  const resetVisualizationState = () => {
+    setCurrentFuel(null);
+    setShownVisualizations([]);
+  };
+
+  // Handle fuel-related response
+  const handleFuelResponse = (fuelType, response) => {
+    if (visualizationConfig[fuelType]) {
+      setCurrentFuel(fuelType);
+      setShownVisualizations([]);
+    }
+  };
+
+  // Handle visualization selection
+  const handleVisualizationSelect = (visualization) => {
+    setShownVisualizations(prev => [...prev, visualization.type]);
+    
+    // Add visualization chart message
+    const vizMessage = {
+      text: '',
+      visualization: visualization,
+      sender: 'bot',
+      category: 'visualization',
+      timestamp: new Date().toISOString()
+    };
+    setMessages(prev => [...prev, vizMessage]);
+
+    // If there are remaining visualizations, add a new options message
+    const config = visualizationConfig[currentFuel];
+    const remainingVisualizations = config.visualizations.filter(
+      v => !shownVisualizations.includes(v.type) && v.type !== visualization.type
+    );
+
+    if (remainingVisualizations.length > 0) {
+      // Add new visualization options message
+      setTimeout(() => {
+        const vizOptionsMessage = {
+          text: t('visualization.more_options_available', { 
+            topic: currentFuel,
+            count: remainingVisualizations.length 
+          }),
+          sender: "bot",
+          topic: currentFuel,
+          category: 'visualization-options',
+          hasVisualizations: true,
+          timestamp: new Date().toISOString(),
+        };
+        setMessages(prev => [...prev, vizOptionsMessage]);
+      }, 1000);
+    } else {
+      // If no more visualizations, suggest random topic
+      const nextTopic = getRandomTopic();
+      setSuggestedTopic(nextTopic);
+      setTimeout(() => {
+        const suggestionMessage = {
+          text: t('visualization.suggest_next_topic', { 
+            currentTopic: currentFuel,
+            nextTopic: nextTopic 
+          }),
+          sender: 'bot',
+          category: 'suggestion',
+          timestamp: new Date().toISOString(),
+        };
+        setMessages(prev => [...prev, suggestionMessage]);
+        analyticsManager.trackBotResponse(suggestionMessage);
+      }, 1000);
+    }
+  };
+
+  const handleUserMessage = async (input) => {
+    const trimmedInput = input.toLowerCase();
+    
+    // Check if this is a response to a topic suggestion
+    if (suggestedTopic && (trimmedInput === 'yes' || trimmedInput === 'sure' || trimmedInput === 'ok')) {
+      setSuggestedTopic(null); // Clear the suggestion
+      // Simulate clicking the topic
+      handleSuggestionClick(suggestedTopic);
+      return;
+    }
+    
+    // Rest of existing handleUserMessage logic
+    // ...existing code...
+  };
+
+  // Get random topic from energy dictionary
+  const getRandomTopic = () => {
+    const topics = Object.keys(energyDictionary.en).filter(topic =>
+      topic !== currentFuel && // Don't suggest current topic
+      visualizationConfig[topic] && // Only suggest topics with visualizations
+      energyDictionary.en[topic].text // Make sure topic has content
+    );
+    return topics[Math.floor(Math.random() * topics.length)];
+  };
+
+  const renderVisualizationButtons = (fuel) => {
+    if (!visualizationConfig[fuel]) return null;
+    
+    const remainingVisualizations = visualizationConfig[fuel].visualizations.filter(
+      v => !shownVisualizations.includes(v.type)
+    );
+
+    if (remainingVisualizations.length === 0) return null;
+
+    return (
+      <div className="message-visualization-options">
+        {remainingVisualizations.map((viz, index) => (
+          <button
+            key={index}
+            className="message-visualization-button"
+            onClick={() => handleVisualizationSelect(viz)}
+            aria-label={t('visualization.viz_button_label', { type: viz.type })}
+          >
+            <FontAwesomeIcon icon={getVisualizationIcon(viz.type)} className="viz-icon" />
+            <span>{viz.label}</span>
+          </button>
+        ))}
+      </div>
+    );
+  };
+
+  const getVisualizationIcon = (type) => {
+    switch (type) {
+      case 'pie':
+        return faChartPie;
+      case 'line':
+        return faChartLine;
+      case 'bar':
+        return faChartBar;
+      case 'area':
+        return faChartArea;
+      default:
+        return faChartPie;
+    }
+  };
+
+  // Update the renderMessage function to handle visualization messages
+  const renderMessage = (msg) => {
+    if (msg.category === 'visualization') {
+      return (
+        <Visualization
+          type={msg.visualization.type}
+          data={msg.visualization.data}
+          description={msg.visualization.description}
+        />
+      );
+    }
+
+    return (
+      <div className="message-content">
+        {msg.text && <div className="message-text">{msg.text}</div>}
+        {msg.hasVisualizations && visualizationConfig[msg.topic] && renderVisualizationButtons(msg.topic)}
+      </div>
+    );
+  };
+
   return (
     <div className="chat-bot-container">
-      <div ref={messagesContainerRef} className="messages" aria-live="polite">
+      <div className="messages" ref={messagesContainerRef} onScroll={handleScroll}>
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`message-wrapper ${
-              msg.sender === "bot" ? "bot-wrapper" : "user-wrapper"
-            }`}
+            className={`message-wrapper ${msg.sender === "bot" ? "bot-wrapper" : "user-wrapper"}`}
           >
-            <div
-              className={`message-icon ${
-                msg.sender === "bot" ? "bot-icon" : "user-icon"
-              }`}
-            >
+            <div className="message-icon">
               <FontAwesomeIcon icon={msg.sender === "bot" ? faRobot : faUser} />
             </div>
-            <div
-              className={msg.sender === "bot" ? "bot-message" : "user-message"}
-            >
-              {msg.text}
-
-              {/* Welcome back suggestions inside the message */}
-              {msg.isWelcomeBack && msg.topic && (
-                <div className="suggestions-container">
-                  <button
-                    className="suggestion-chip"
-                    onClick={() => handleSuggestionClick(msg.topic)}
-                  >
-                    {t("continue_topic", {
-                      topic: msg.topic,
-                      defaultValue: `Continue with ${msg.topic}`,
-                    })}
-                  </button>
-                  <button
-                    className="suggestion-chip"
-                    onClick={() =>
-                      handleSuggestionClick(t("new_topic", "a new topic"))
-                    }
-                  >
-                    {t("start_new", "Start a new topic")}
-                  </button>
-                </div>
-              )}
+            <div className={msg.sender === "bot" ? "bot-message" : "user-message"}>
+              {renderMessage(msg)}
             </div>
           </div>
         ))}
 
-        {/* Thinking indicator */}
+        {/* Show typing indicator while bot is responding */}
+        {isTyping && !isThinking && (
+          <div className="message-wrapper bot-wrapper">
+            <div className="message-icon bot-icon">
+              <FontAwesomeIcon icon={faRobot} />
+            </div>
+            <div className="typing-indicator">
+              <div className="typing-bubble"></div>
+              <div className="typing-bubble"></div>
+              <div className="typing-bubble"></div>
+            </div>
+          </div>
+        )}
+
+        {/* Show thinking indicator */}
         {isThinking && (
           <div className="message-wrapper bot-wrapper">
             <div className="message-icon bot-icon">
@@ -593,25 +790,8 @@ const ChatBot = () => {
           </div>
         )}
 
-        {/* Typing indicator */}
-        {isTyping && !isThinking && (
-          <div className="message-wrapper bot-wrapper">
-            <div className="message-icon bot-icon">
-              <FontAwesomeIcon icon={faRobot} />
-            </div>
-            <div className="typing-indicator">
-              <span className="typing-bubble"></span>
-              <span className="typing-bubble"></span>
-              <span className="typing-bubble"></span>
-            </div>
-          </div>
-        )}
-
         <div ref={messagesEndRef} />
       </div>
-
-      {/* Use the imported ScrollButton component */}
-      <ScrollButton visible={showScrollButton} onClick={scrollToBottom} />
 
       {/* Show standard suggestions only on desktop */}
       {!isMobile && (
@@ -621,19 +801,22 @@ const ChatBot = () => {
         />
       )}
 
+      {/* Add scroll button */}
+      <ScrollButton visible={showScrollButton} onClick={scrollToBottom} />
+
+      {/* Input form */}
       <form onSubmit={handleSend} className="input-container">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={t(
-            "ask_question",
-            "Ask something about energy statistics..."
-          )}
+          placeholder={t("ask_question", "Ask something about energy statistics...")}
           disabled={isTyping || isThinking}
           ref={inputRef}
           className="chat-input"
         />
+        
+
         <button
           type="submit"
           className="send-button"
@@ -644,6 +827,7 @@ const ChatBot = () => {
         </button>
       </form>
 
+      {/* Control panel */}
       <div className="control-panel">
         <button
           onClick={handleClearChat}
@@ -654,17 +838,10 @@ const ChatBot = () => {
           <FontAwesomeIcon icon={faTrash} />
         </button>
 
-        {/* Add mobile suggestions button when in mobile view */}
-        {isMobile && (
-          <MobileSuggestions
-            suggestions={suggestions}
-            onSuggestionClick={handleSuggestionClick}
-          />
-        )}
-
-        {/* Add speech recognition button */}
-        {speechSupported && (
+                {/* Add speech recognition button if supported */}
+                {speechSupported && (
           <button
+            type="button"
             onClick={toggleSpeechRecognition}
             className={`speech-button ${isListening ? "listening" : ""}`}
             aria-label={
@@ -672,17 +849,19 @@ const ChatBot = () => {
                 ? t("stop_listening", "Stop listening")
                 : t("start_listening", "Start voice input")
             }
-            title={
-              isListening
-                ? t("stop_listening", "Stop listening")
-                : t("start_listening", "Start voice input")
-            }
-            disabled={isThinking || isTyping}
           >
             <FontAwesomeIcon
-              icon={isListening ? faMicrophone : faMicrophoneSlash}
+              icon={isListening ? faMicrophoneSlash : faMicrophone}
             />
           </button>
+        )}
+
+        {/* Add mobile suggestions button when in mobile view */}
+        {isMobile && (
+          <MobileSuggestions
+            suggestions={suggestions}
+            onSuggestionClick={handleSuggestionClick}
+          />
         )}
       </div>
     </div>
