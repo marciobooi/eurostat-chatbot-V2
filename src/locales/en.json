@@ -17,9 +17,43 @@
   "aria_suggestions": "Suggested topics",
   "bot_unknown": "I don't have specific information about that, but I can help you with energy-related questions.",
   "followUp": "Following up on {topic}...",
-  "followUpPhrases": ["what about", "how about", "and", "also", "what else", "tell me more"],
+  "followUpPhrases": [
+    "what about",
+    "how about",
+    "and",
+    "also",
+    "what else",
+    "tell me more"
+  ],
   "empathyPrefix": "I understand your concern.",
   "reassurancePrefix": "Let me help you understand this better.",
   "gratitudeSuffix": "I'm glad I could help!",
-  "followUpSuggestion": "By the way, would you like to learn more about {topic}?"
+  "followUpSuggestion": "By the way, would you like to learn more about {topic}?",
+  "translation": {
+    "chatbot": {
+      "title": "Energy Statistics Assistant",
+      "continue": "Continue with {{topic}}",
+      "startNew": "Start a new topic",
+      "newTopic": "a new topic",
+      "inputPlaceholder": "Ask something about energy statistics...",
+      "send": "Send"
+    },
+    "responses": {
+      "partialMatch": "I found some information about \"{{topic}}\" that might be relevant. Would you like to know more about that instead?",
+      "engagedPrefix": "I understand your interest in this topic.",
+      "topicConnection": "This is also related to our previous discussion about {{topic}}.",
+      "thinking": "Thinking...",
+      "unknown": "I don't have information on that topic yet.",
+      "error_processing": "Sorry, I couldn't process that request."
+    },
+    "suggested_topics": "Suggested topics",
+    "click_to_learn_about": "Click to learn about {{topic}}",
+    "continue_topic": "Continue with {{topic}}",
+    "start_new": "Start a new topic",
+    "clear_chat": "Clear chat",
+    "send": "Send",
+    "thinking": "Thinking...",
+    "ask_question": "Ask something about energy statistics...",
+    "error_processing": "Sorry, I couldn't process that request."
+  }
 }

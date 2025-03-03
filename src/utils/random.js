@@ -1,6 +1,9 @@
 import i18n from "../i18n";
 
-// ============== RANDOM UTILITY FUNCTIONS ==============
+/**
+ * Pure utility functions for randomization
+ * No hardcoded responses - only utility functions
+ */
 
 /**
  * Get a random item from an array

@@ -1,9 +1,6 @@
 import i18n from "../i18n";
-import {
-  getRandomFromArray,
-  getRandomNumber,
-  getContextAwareResponse,
-} from "./random";
+// Update import to use the simpler random utility
+import { getRandomNumber } from "./random";
 
 const MOOD_ADJUSTMENT = {
   POSITIVE: 0.8, // Faster response for positive mood
@@ -23,13 +20,9 @@ const BASE_TIMING = {
   },
 };
 
-const thinkingTimes = [1000, 1500, 2000]; // Thinking time in milliseconds
-const typingSpeed = 50; // Base typing speed (ms per character)
-const typingVariation = 20; // Random variation in typing speed
-
 // Updated to handle context properly or fall back to simpler calculation if no context
 export const calculateThinkingTime = (input, contextManager = null) => {
-  const baseTime = getRandomFromArray(thinkingTimes);
+  const baseTime = BASE_TIMING.THINKING.MEDIUM;
   const inputComplexity = input.length / 10; // Longer inputs = more thinking time
 
   // If contextManager is provided and has mood functionality, use it
@@ -46,8 +39,11 @@ export const calculateThinkingTime = (input, contextManager = null) => {
 export const calculateTypingTime = (text, contextManager = null) => {
   if (!text) return 0;
 
-  const baseTime = text.length * typingSpeed;
-  const variation = getRandomNumber(0, typingVariation * text.length);
+  const baseTime = text.length * BASE_TIMING.TYPING.SPEED;
+  const variation = getRandomNumber(
+    0,
+    BASE_TIMING.TYPING.VARIATION * text.length
+  );
 
   // If contextManager is provided and has speed functionality, use it
   if (contextManager && typeof contextManager.getTypingSpeed === "function") {
@@ -59,5 +55,5 @@ export const calculateTypingTime = (text, contextManager = null) => {
   return Math.min(baseTime + variation, 4000); // Cap at 4 seconds
 };
 
-// Re-export contextual response function
-export { getContextAwareResponse };
+// Import from responseUtils instead
+export { getContextAwareResponse } from "./responseUtils";

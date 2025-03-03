@@ -15,11 +15,12 @@ import {
   calculateThinkingTime,
   calculateTypingTime,
 } from "../utils/aiBehavior";
+// Update imports to use responseUtils instead of random
 import {
   getRandomWelcomeMessage,
   getRandomUnknownResponse,
   getContextAwareResponse,
-} from "../utils/random";
+} from "../utils/responseUtils";
 import { ContextManager } from "../utils/contextManager";
 import { AnalyticsManager } from "../utils/analyticsManager";
 import { SessionManager } from "../utils/sessionManager";

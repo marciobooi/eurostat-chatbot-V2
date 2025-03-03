@@ -20,10 +20,42 @@
     "aria_suggestions": "Vorgeschlagene Themen",
     "clearChat": "Chat löschen",
     "followUp": "Im Anschluss an {topic}...",
-    "followUpPhrases": ["und", "auch", "was noch", "erzähl mir mehr", "wie ist es mit", "was ist mit"],
+    "followUpPhrases": [
+      "und",
+      "auch",
+      "was noch",
+      "erzähl mir mehr",
+      "wie ist es mit",
+      "was ist mit"
+    ],
     "empathyPrefix": "Ich verstehe Ihre Bedenken.",
     "reassurancePrefix": "Lassen Sie mich Ihnen helfen, das besser zu verstehen.",
     "gratitudeSuffix": "Ich freue mich, dass ich helfen konnte!",
-    "followUpSuggestion": "Übrigens, möchten Sie mehr über {topic} erfahren?"
+    "followUpSuggestion": "Übrigens, möchten Sie mehr über {topic} erfahren?",
+    "chatbot": {
+      "title": "Assistent für Energiestatistik",
+      "continue": "Fortfahren mit {{topic}}",
+      "startNew": "Neues Thema beginnen",
+      "newTopic": "ein neues Thema",
+      "inputPlaceholder": "Stellen Sie eine Frage zu Energiestatistiken...",
+      "send": "Senden"
+    },
+    "responses": {
+      "partialMatch": "Ich habe Informationen über \"{{topic}}\" gefunden, die relevant sein könnten. Möchten Sie stattdessen mehr darüber erfahren?",
+      "engagedPrefix": "Ich verstehe Ihr Interesse an diesem Thema.",
+      "topicConnection": "Dies steht auch im Zusammenhang mit unserer früheren Diskussion über {{topic}}.",
+      "thinking": "Denke nach...",
+      "unknown": "Ich habe noch keine Informationen zu diesem Thema.",
+      "error_processing": "Entschuldigung, ich konnte diese Anfrage nicht verarbeiten."
+    },
+    "suggested_topics": "Vorgeschlagene Themen",
+    "click_to_learn_about": "Klicken Sie, um mehr über {{topic}} zu erfahren",
+    "continue_topic": "Fortfahren mit {{topic}}",
+    "start_new": "Neues Thema beginnen",
+    "clear_chat": "Chat löschen",
+    "send": "Senden",
+    "thinking": "Denke nach...",
+    "ask_question": "Stellen Sie eine Frage zu Energiestatistiken...",
+    "error_processing": "Entschuldigung, ich konnte diese Anfrage nicht verarbeiten."
   }
 }

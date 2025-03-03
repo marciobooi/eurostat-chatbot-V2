@@ -5,7 +5,14 @@
   "thinking": "J'analyse votre question...",
   "clearChat": "Effacer la conversation",
   "followUp": "Pour faire suite à {topic}...",
-  "followUpPhrases": ["et", "aussi", "quoi d'autre", "dis m'en plus", "qu'en est-il", "et concernant"],
+  "followUpPhrases": [
+    "et",
+    "aussi",
+    "quoi d'autre",
+    "dis m'en plus",
+    "qu'en est-il",
+    "et concernant"
+  ],
   "translation": {
     "input_placeholder": "Tapez votre message...",
     "thinking": "Le bot réfléchit...",
@@ -22,7 +29,32 @@
     "chat_cleared": "L'historique a été effacé",
     "aria_chat_container": "Conteneur de conversation",
     "aria_message_list": "Historique des messages",
-    "aria_suggestions": "Sujets suggérés"
+    "aria_suggestions": "Sujets suggérés",
+    "chatbot": {
+      "title": "Assistant de statistiques énergétiques",
+      "continue": "Continuer avec {{topic}}",
+      "startNew": "Commencer un nouveau sujet",
+      "newTopic": "un nouveau sujet",
+      "inputPlaceholder": "Posez une question sur les statistiques énergétiques...",
+      "send": "Envoyer"
+    },
+    "responses": {
+      "partialMatch": "J'ai trouvé des informations sur \"{{topic}}\" qui pourraient être pertinentes. Voulez-vous en savoir plus à ce sujet ?",
+      "engagedPrefix": "Je comprends votre intérêt pour ce sujet.",
+      "topicConnection": "Cela est également lié à notre discussion précédente sur {{topic}}.",
+      "thinking": "En réflexion...",
+      "unknown": "Je n'ai pas encore d'informations sur ce sujet.",
+      "error_processing": "Désolé, je n'ai pas pu traiter cette demande."
+    },
+    "suggested_topics": "Sujets suggérés",
+    "click_to_learn_about": "Cliquez pour en savoir plus sur {{topic}}",
+    "continue_topic": "Continuer avec {{topic}}",
+    "start_new": "Commencer un nouveau sujet",
+    "clear_chat": "Effacer la conversation",
+    "send": "Envoyer",
+    "thinking": "En réflexion...",
+    "ask_question": "Posez une question sur les statistiques énergétiques...",
+    "error_processing": "Désolé, je n'ai pas pu traiter cette demande."
   },
   "bot_unknown": "Je n'ai pas d'informations spécifiques à ce sujet, mais je peux vous aider avec des questions liées à l'énergie.",
   "empathyPrefix": "Je comprends votre préoccupation.",
