@@ -121,6 +121,7 @@
   display: flex;
   gap: var(--spacing-2);
   align-items: center;
+  padding-top: 1.5rem;
 }
 
 .chat-input {
