@@ -9,6 +9,7 @@ import {
   gratitudeDictionary,
 } from "../data/intentDictionaries";
 import { commonWords } from "../data/commonWords";
+import { energyDictionary } from "../data/energyDictionary";
 
 // Supported languages and default language
 export const SUPPORTED_LANGUAGES = ["en", "fr", "de"];
@@ -228,13 +229,72 @@ export const getLanguageName = (langCode) => {
 };
 
 /**
- * Helper function for word mappings - implementation dependent on your data structure
+ * Helper function for word mappings from the energy dictionary
+ * Maps words (keywords, synonyms, titles) to their respective topics
  * @param {string} language Language code
- * @returns {Object} Word mappings for the language
+ * @returns {Object} Word mappings for the language (word -> topic array)
  */
 export const getWordMappings = (language = DEFAULT_LANGUAGE) => {
-  // Implementation depends on your data structure
-  return {};
+  // Get the appropriate language dictionary, fallback to English
+  const dictionary = energyDictionary[language] || energyDictionary.en;
+  const mappings = {};
+
+  // Process each topic in the dictionary
+  Object.entries(dictionary).forEach(([topicKey, topicData]) => {
+    // Add the topic key itself as a mapping
+    addMapping(mappings, topicKey.toLowerCase(), topicKey);
+
+    // Add the title if available
+    if (topicData.title) {
+      addMapping(mappings, topicData.title.toLowerCase(), topicKey);
+    }
+
+    // Add all keywords if available
+    if (Array.isArray(topicData.keywords)) {
+      topicData.keywords.forEach((keyword) => {
+        addMapping(mappings, keyword.toLowerCase(), topicKey);
+      });
+    }
+
+    // Add all synonyms if available
+    if (Array.isArray(topicData.synonyms)) {
+      topicData.synonyms.forEach((synonym) => {
+        addMapping(mappings, synonym.toLowerCase(), topicKey);
+      });
+    }
+
+    // Add multi-word variations for better matching
+    // For example: "renewable energy" -> also add "renewable" and "energy" individually
+    if (topicKey.includes(" ")) {
+      topicKey.split(" ").forEach((word) => {
+        if (word.length > 3) {
+          // Only add meaningful words
+          addMapping(mappings, word.toLowerCase(), topicKey);
+        }
+      });
+    }
+  });
+
+  return mappings;
+};
+
+/**
+ * Helper function to add a mapping from a word to a topic
+ * @param {Object} mappings - The mappings object to modify
+ * @param {string} word - The word to map
+ * @param {string} topic - The topic to associate with the word
+ */
+const addMapping = (mappings, word, topic) => {
+  if (!word || word.length < 2) return; // Skip very short words
+
+  if (!mappings[word]) {
+    mappings[word] = [];
+  }
+
+  // Only add the topic if it's not already in the array
+  if (!mappings[word].includes(topic)) {
+    mappings[word].push(topic);
+  }
 };
 
 export default {

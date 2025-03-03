@@ -1,7 +1,7 @@
 /**
  * Response utilities for generating dynamic bot responses
  */
-import  getResponseByType  from "../data/botResponses";
+import botResponses, { getResponseByType } from "../data/botResponses";
 import { followUpQuestions } from "../data/followUpQuestions";
 import { getRandomFromArray } from "./random";
 import { containsQuestionWord } from "./nlpHelper";
@@ -9,8 +9,6 @@ import { questionWords } from "../data/questionWords";
 import { followUpSuggestions } from "../data/followUpSuggestions";
 import { topicConnectionPhrases } from "../data/topicConnectionPhrases";
 
-// We don't need to import individual response dictionaries anymore,
-// as they're already consolidated in botResponses
 import i18n from "../i18n";
 
 /**
@@ -19,8 +17,9 @@ import i18n from "../i18n";
  * @returns {string} Random welcome message
  */
 export const getRandomWelcomeMessage = (language = "en") => {
-  // Use the consolidated botResponses
-  const messages = getResponseByType("greeting", language);
+  // Use the consolidated botResponses directly (not through getResponseByType)
+  const messages =
+    botResponses.greeting?.[language] || botResponses.greeting?.en;
   return getRandomFromArray(messages) || i18n.t("responses.default_welcome");
 };
 
@@ -30,8 +29,9 @@ export const getRandomWelcomeMessage = (language = "en") => {
  * @returns {string} Random farewell message
  */
 export const getRandomFarewellMessage = (language = "en") => {
-  // Use the consolidated botResponses
-  const messages = getResponseByType("farewell", language);
+  // Use the consolidated botResponses directly
+  const messages =
+    botResponses.farewell?.[language] || botResponses.farewell?.en;
   return getRandomFromArray(messages) || i18n.t("responses.default_farewell");
 };
 
@@ -41,8 +41,9 @@ export const getRandomFarewellMessage = (language = "en") => {
  * @returns {string} Random gratitude response
  */
 export const getRandomGratitudeResponse = (language = "en") => {
-  // Use the consolidated botResponses
-  const messages = getResponseByType("gratitude", language);
+  // Use the consolidated botResponses directly
+  const messages =
+    botResponses.gratitude?.[language] || botResponses.gratitude?.en;
   return getRandomFromArray(messages) || i18n.t("responses.default_gratitude");
 };
 
@@ -52,8 +53,8 @@ export const getRandomGratitudeResponse = (language = "en") => {
  * @returns {string} Random prompt message
  */
 export const getRandomPromptMessage = (language = "en") => {
-  // Use the consolidated botResponses
-  const messages = getResponseByType("prompt", language);
+  // Use the consolidated botResponses directly
+  const messages = botResponses.prompt?.[language] || botResponses.prompt?.en;
   return getRandomFromArray(messages) || i18n.t("responses.default_prompt");
 };
 
@@ -63,8 +64,8 @@ export const getRandomPromptMessage = (language = "en") => {
  * @returns {string} Random error message
  */
 export const getRandomErrorMessage = (language = "en") => {
-  // Use the consolidated botResponses
-  const messages = getResponseByType("error", language);
+  // Use the consolidated botResponses directly
+  const messages = botResponses.error?.[language] || botResponses.error?.en;
   return getRandomFromArray(messages) || i18n.t("responses.default_error");
 };
 
@@ -74,8 +75,9 @@ export const getRandomErrorMessage = (language = "en") => {
  * @returns {string} Random thinking message
  */
 export const getRandomThinkingMessage = (language = "en") => {
-  // Use the consolidated botResponses
-  const messages = getResponseByType("thinking", language);
+  // Use the consolidated botResponses directly
+  const messages =
+    botResponses.thinking?.[language] || botResponses.thinking?.en;
   return getRandomFromArray(messages) || i18n.t("responses.default_thinking");
 };
 
@@ -86,8 +88,9 @@ export const getRandomThinkingMessage = (language = "en") => {
  * @returns {string} Formatted unknown response
  */
 export const getRandomUnknownResponse = (language = "en", matchInfo = null) => {
-  // Use the consolidated botResponses
-  const messages = getResponseByType("confused", language);
+  // Use the consolidated botResponses directly
+  const messages =
+    botResponses.confused?.[language] || botResponses.confused?.en;
   const response =
     getRandomFromArray(messages) || i18n.t("responses.default_unknown");
 
@@ -107,8 +110,8 @@ export const getRandomUnknownResponse = (language = "en", matchInfo = null) => {
  * @returns {string} Random empathy phrase
  */
 export const getRandomEmpathyPhrase = (language = "en") => {
-  // Use the consolidated botResponses
-  const phrases = getResponseByType("empathy", language);
+  // Use the consolidated botResponses directly
+  const phrases = botResponses.empathy?.[language] || botResponses.empathy?.en;
   return getRandomFromArray(phrases) || i18n.t("responses.default_empathy");
 };
 
@@ -118,8 +121,9 @@ export const getRandomEmpathyPhrase = (language = "en") => {
  * @returns {string} Random reassurance phrase
  */
 export const getRandomReassurancePhrase = (language = "en") => {
-  // Use the consolidated botResponses
-  const phrases = getResponseByType("reassurance", language);
+  // Use the consolidated botResponses directly
+  const phrases =
+    botResponses.reassurance?.[language] || botResponses.reassurance?.en;
   return getRandomFromArray(phrases) || i18n.t("responses.default_reassurance");
 };
 
