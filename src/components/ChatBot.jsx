@@ -11,6 +11,7 @@ import {
   faChartLine,
   faChartBar,
   faChartArea,
+  faBug, // Add debug icon
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import SmartSuggestions from "./SmartSuggestions";
@@ -44,6 +45,8 @@ import Visualization from './Visualization';
 import { visualizationConfig } from '../data/visualizationConfig';
 import { energyDictionary } from "../data/energyDictionary";
 import { isAffirmative } from '../data/affirmativeResponses';
+// Import the NLP test utilities
+import { showRecognizedEntities } from "../utils/testNLP";
 
 const ChatBot = () => {
   // Remove the inline ScrollButton component definition since we now import it
@@ -65,6 +68,8 @@ const ChatBot = () => {
   const [currentFuel, setCurrentFuel] = useState(null);
   const [shownVisualizations, setShownVisualizations] = useState([]);
   const [suggestedTopic, setSuggestedTopic] = useState(null);
+  // Add NLP debug mode state
+  const [debugNLPMode, setDebugNLPMode] = useState(false);
 
   const contextManager = useMemo(() => new ContextManager(), []);
   const analyticsManager = useMemo(() => new AnalyticsManager(), []);
@@ -283,6 +288,19 @@ const ChatBot = () => {
 
     setInput("");
     setSuggestions([]);
+
+    // If NLP debug mode is on, show entity recognition results
+    if (debugNLPMode) {
+      const nlpAnalysis = showRecognizedEntities(trimmedInput, i18n.language);
+      const debugMessage = {
+        text: nlpAnalysis,
+        sender: "bot",
+        category: "debug-nlp",
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, debugMessage]);
+      // Don't store debug messages in the session history
+    }
 
     // Start thinking animation
     setIsThinking(true);
@@ -752,6 +770,12 @@ const ChatBot = () => {
           description={msg.visualization.description}
         />
       );
+    } else if (msg.category === 'debug-nlp') {
+      return (
+        <div className="message-content debug-message">
+          <pre className="nlp-analysis">{msg.text}</pre>
+        </div>
+      );
     }
 
     return (
@@ -760,6 +784,22 @@ const ChatBot = () => {
         {msg.hasVisualizations && visualizationConfig[msg.topic] && renderVisualizationButtons(msg.topic)}
       </div>
     );
+  };
+
+  // Toggle NLP debug mode
+  const toggleNLPDebugMode = () => {
+    setDebugNLPMode(prev => !prev);
+    
+    // Show a message indicating the mode change
+    const message = {
+      text: debugNLPMode 
+        ? "NLP Debug Mode turned OFF" 
+        : "NLP Debug Mode turned ON - I'll now show analysis of recognized entities in your messages",
+      sender: "bot",
+      category: "system",
+      timestamp: new Date().toISOString(),
+    };
+    setMessages(prev => [...prev, message]);
   };
 
   return (
@@ -851,8 +891,18 @@ const ChatBot = () => {
           <FontAwesomeIcon icon={faTrash} />
         </button>
 
-                {/* Add speech recognition button if supported */}
-                {speechSupported && (
+        {/* Add debug mode toggle button */}
+        <button
+          onClick={toggleNLPDebugMode}
+          className={`debug-nlp-button ${debugNLPMode ? "active" : ""}`}
+          aria-label={debugNLPMode ? "Turn off NLP debug mode" : "Turn on NLP debug mode"}
+          title={debugNLPMode ? "Turn off NLP debug mode" : "Turn on NLP debug mode"}
+        >
+          <FontAwesomeIcon icon={faBug} />
+        </button>
+
+        {/* Add speech recognition button if supported */}
+        {speechSupported && (
           <button
             type="button"
             onClick={toggleSpeechRecognition}
