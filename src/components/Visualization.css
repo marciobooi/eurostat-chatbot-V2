@@ -1,0 +1,58 @@
+.visualization-container {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(14, 71, 203, 0.05);
+  margin: 1rem 0;
+}
+
+.visualization-chart {
+  background: #F8F9FA;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.visualization-description {
+  font-size: 0.9rem;
+  color: #495057;
+  line-height: 1.5;
+  margin: 0.5rem 0 0;
+  padding: 0 0.5rem;
+}
+
+/* Custom tooltip styles */
+.custom-tooltip {
+  background-color: #FFFFFF;
+  border: 1px solid #E9ECEF;
+  border-radius: 6px;
+  padding: 0.75rem;
+  box-shadow: 0 2px 4px rgba(14, 71, 203, 0.1);
+}
+
+.tooltip-label {
+  color: #495057;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+}
+
+.tooltip-value {
+  margin: 0.25rem 0;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .visualization-container {
+    padding: 1rem;
+    margin: 0.75rem 0;
+  }
+
+  .visualization-chart {
+    padding: 0.75rem;
+  }
+}
