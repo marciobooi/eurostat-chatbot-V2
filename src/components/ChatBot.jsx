@@ -483,12 +483,14 @@ const ChatBot = () => {
 
       // If this is a fuel topic that has visualizations, add a new message after a delay
       if (visualizationConfig[responseTopic]) {
+        const config = visualizationConfig[responseTopic];
+        
         // Wait before showing visualization options
         setTimeout(() => {
           const vizOptionsMessage = {
             text: t('visualization.more_to_discover', { 
               topic: responseTopic,
-              count: visualizationConfig[responseTopic].visualizations.length 
+              count: config.visualizations.length 
             }),
             sender: "bot",
             topic: responseTopic,
@@ -498,7 +500,8 @@ const ChatBot = () => {
           };
           
           setMessages(prev => [...prev, vizOptionsMessage]);
-          handleFuelResponse(responseTopic, response);
+          setCurrentFuel(responseTopic); // Set current fuel here instead of in handleFuelResponse
+          setShownVisualizations([]); // Reset shown visualizations
         }, 2000); // 2-second delay for natural flow
       }
 
@@ -667,14 +670,24 @@ const ChatBot = () => {
     const trimmedInput = input.toLowerCase();
     
     // Check if this is a response to a topic suggestion
-    if (suggestedTopic && (trimmedInput === 'yes' || trimmedInput === 'sure' || trimmedInput === 'ok')) {
-      setSuggestedTopic(null); // Clear the suggestion
-      // Simulate clicking the topic
+    if (suggestedTopic && isAffirmative(trimmedInput, i18n.language)) {
+      const userMessage = {
+        text: trimmedInput,
+        sender: "user",
+        timestamp: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, userMessage]);
+      
+      // Clear the suggestion and input
+      setSuggestedTopic(null);
+      setInput("");
+      
+      // Handle the suggested topic
       handleSuggestionClick(suggestedTopic);
       return;
     }
-    
-    // Rest of existing handleUserMessage logic
+
+    // Rest of handleUserMessage logic remains the same
     // ...existing code...
   };
 

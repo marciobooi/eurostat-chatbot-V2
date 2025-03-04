@@ -10,6 +10,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { chartColors } from '../../utils/chartColors';
 
+
 // Register ChartJS components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -95,26 +96,6 @@ const PieChart = ({ data }) => {
         role="img"
         aria-label={t('visualization.pie.aria.description')}
       >
-        {/* Legend */}
-        <div className="visualization-legend">
-          {data.map((item, index) => (
-            <div key={item.name} className="legend-item">
-              <div
-                className="legend-color"
-                style={{ backgroundColor: chartColors.blues[index % chartColors.blues.length] }}
-              />
-              <div className="legend-text">
-                <div className="legend-label">
-                  {item.name}
-                </div>
-                <div className="legend-value">
-                  {Math.round(item.value)}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
         {/* Chart */}
         <div className="visualization-chart-container">
           <Doughnut
@@ -125,6 +106,22 @@ const PieChart = ({ data }) => {
           />
         </div>
       </div>
+      
+      {/* Bottom Legend */}
+      <div className="visualization-bottom-legend">
+        {data.map((item, index) => (
+          <div key={item.name} className="legend-item">
+            <div className="legend-indicator">
+              <div
+                className="legend-dot"
+                style={{ backgroundColor: chartColors.blues[index % chartColors.blues.length] }}
+              />
+              <span className="legend-label">{item.name}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+      
       <p className="visualization-source">
         {t('visualization.source')}: {t('visualization.eurostat')}
       </p>

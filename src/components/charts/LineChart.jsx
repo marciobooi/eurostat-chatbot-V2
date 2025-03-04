@@ -13,7 +13,7 @@ import {
 } from 'chart.js';
 import { useTranslation } from 'react-i18next';
 import { chartColors } from '../../utils/chartColors';
-import './LineChart.css';
+
 
 // Register ChartJS components
 ChartJS.register(
@@ -66,10 +66,10 @@ const LineChart = ({ data }) => {
         titleFont: {
           size: 13,
           weight: 'bold',
-          family: 'Inter, system-ui, sans-serif'
+          family: 'arial, sans-serif',
         },
         bodyFont: {
-          family: 'Inter, system-ui, sans-serif'
+            family: 'arial, sans-serif',
         },
         padding: 12,
         cornerRadius: 8,
@@ -77,11 +77,11 @@ const LineChart = ({ data }) => {
         borderColor: chartColors.grid,
         borderWidth: 1,
         callbacks: {
-          label: (context) => t('visualization.line.tooltip.value', {
-            year: context.label,
-            value: Math.round(context.raw)
-          })
-        },
+            label: (context) => t('visualization.pie.tooltip.value', {
+              name: context.label,
+              value: Math.round(context.raw)
+            })
+          },
       },
     },
     scales: {
@@ -93,7 +93,7 @@ const LineChart = ({ data }) => {
         ticks: {
           color: chartColors.text,
           font: {
-            family: 'Inter, system-ui, sans-serif',
+            family: 'arial, sans-serif',
             size: 12
           }
         }
@@ -106,7 +106,7 @@ const LineChart = ({ data }) => {
         ticks: {
           color: chartColors.text,
           font: {
-            family: 'Inter, system-ui, sans-serif',
+            family: 'arial, sans-serif',
             size: 12
           }
         },
@@ -130,22 +130,6 @@ const LineChart = ({ data }) => {
         role="img"
         aria-label={t('visualization.line.aria.description')}
       >
-        {/* Legend */}
-        <div className="visualization-legend">
-          <div className="legend-header">
-            <div className="legend-title">{t('visualization.line.legendTitle')}</div>
-            <div className="legend-subtitle">{t('visualization.line.legendSubtitle')}</div>
-          </div>
-          {data.map((item) => (
-            <div key={item.year} className="legend-item">
-              <div className="legend-year">{item.year}</div>
-              <div className="legend-value" style={{ color: chartColors.primary }}>
-                {Math.round(item.value)}
-              </div>
-            </div>
-          ))}
-        </div>
-
         {/* Chart */}
         <div className="visualization-chart-container">
           <Line
@@ -156,6 +140,7 @@ const LineChart = ({ data }) => {
           />
         </div>
       </div>
+
       <p className="visualization-source">
         {t('visualization.source')}: {t('visualization.eurostat')}
       </p>

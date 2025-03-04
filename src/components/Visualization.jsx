@@ -24,10 +24,11 @@ const Visualization = ({ type, data, description }) => {
 
   return (
     <div className="visualization-container">
-      {renderChart()}
-      {description && (
-        <p className="visualization-description">{description}</p>
+         {description && (
+        <h6 className="visualization-description">{description}</h6>
       )}
+      {renderChart()}
+     
     </div>
   );
 };

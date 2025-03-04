@@ -1,65 +1,196 @@
-.visualization-container {
-  margin: .5rem;
-}
-
 .visualization-chart-wrapper {
     display: flex;
-    justify-content: space-around;
+        align-items: center;
+        position: relative;
+  }
+  
+  .visualization-legend {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .legend-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #E9ECEF;
+  }
+  
+  .legend-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #495057;
+  }
+  
+  .legend-subtitle {
+    font-size: 0.75rem;
+    color: #6B7280;
+    margin-top: 0.25rem;
+  }
+  
+  .legend-item {
+    display: flex;
     align-items: center;
-    margin: .5rem;
-}
+    justify-content: space-between;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .legend-item:hover {
+    background: rgba(14, 71, 203, 0.05);
+    transform: translateX(2px);
+  }
+  
+  .legend-year {
+    font-size: 0.875rem;
+    color: #495057;
+    font-weight: 500;
+  }
+  
+  .legend-value {
+    font-size: 0.875rem;
+    color: #0E47CB;
+    font-weight: 600;
+  }
+  
+  .visualization-chart-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .visualization-source {
+    font-size: 0.75rem;
+    color: #6B7280;
+    text-align: right;
+    margin-top: 0.75rem;
+    font-style: italic;
+    padding: 0 1.5rem;
+    display: flex;  
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .visualization-container {
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+    padding: .7rem 0;
+  }
 
-.visualization-chart {
-  background: #F8F9FA;
-  border-radius: 8px;
-  padding: 1rem;
-  margin: 1rem;
-  min-height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .visualization-bottom-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: .5rem;
+    border-top: 1px solid var(--neutral-200);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    min-width: 150px;
+  }
+
+  .legend-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+  }
+
+  .legend-line {
+    width: 16px;
+    height: 2px;
+  }
+
+  .legend-bar {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+  }
+
+  .legend-area {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+  }
+
+  .legend-label {
+    font-size: 0.75rem;
+    color: var(--neutral-700);
+  }
+
+  .legend-value {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--primary-blue);
+  }
+
+  .legend-values {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .legend-year {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--neutral-700);
+    min-width: 60px;
+  }
 
 .visualization-description {
-  font-size: 0.7rem;
-  color: #495057;
-  line-height: 1.5;
-  margin: 0.5rem 0 0;
-  padding: 0 0.5rem;
+    font-size: .8rem;
 }
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .visualization-chart-wrapper {
+      flex-direction: column-reverse;
+      padding: 1rem;
+    }
+  
+    .visualization-legend {
+      flex: none;
+      width: 100%;
+      padding: 1rem 0 0;
+    }
+  
+    .legend-header {
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+    }
+  
+    .visualization-chart-container {
+      width: 100%;
+      height: 250px;
+    }
+  
+    .visualization-source {
+      padding: 0 1rem;
+    }
 
-/* Custom tooltip styles */
-.custom-tooltip {
-  background-color: #FFFFFF;
-  border: 1px solid #E9ECEF;
-  border-radius: 6px;
-  padding: 0.75rem;
-  box-shadow: 0 2px 4px rgba(14, 71, 203, 0.1);
-}
+    .visualization-bottom-legend {
+      padding: 1rem;
+    }
 
-.tooltip-label {
-  color: #495057;
-  font-weight: 600;
-  margin: 0 0 0.5rem;
-  font-size: 0.85rem;
-}
+    .legend-item {
+      flex: 1 1 calc(50% - 1rem);
+      min-width: 0;
+    }
 
-.tooltip-value {
-  margin: 0.25rem 0;
-  font-size: 0.8rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .visualization-container {
-    padding: 1rem;
-    margin: 0.75rem 0;
+    .legend-values {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
   }
-
-  .visualization-chart {
-    padding: 0.75rem;
-  }
-}

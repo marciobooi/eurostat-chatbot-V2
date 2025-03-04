@@ -12,7 +12,7 @@ import {
 } from 'chart.js';
 import { useTranslation } from 'react-i18next';
 import { chartColors } from '../../utils/chartColors';
-import './BarChart.css';
+
 
 // Register ChartJS components
 ChartJS.register(
@@ -68,11 +68,11 @@ const BarChart = ({ data }) => {
         borderColor: chartColors.grid,
         borderWidth: 1,
         callbacks: {
-          label: (context) => t('visualization.bar.tooltip.value', {
-            country: context.label,
-            value: Math.round(context.raw)
-          })
-        },
+            label: (context) => t('visualization.pie.tooltip.value', {
+              name: context.label,
+              value: Math.round(context.raw)
+            })
+          },
       },
     },
     scales: {
@@ -96,7 +96,7 @@ const BarChart = ({ data }) => {
         ticks: {
           color: chartColors.text,
           font: {
-            family: 'Inter, system-ui, sans-serif',
+            family: 'arial, sans-serif',
             size: 12
           }
         },
@@ -121,28 +121,6 @@ const BarChart = ({ data }) => {
         role="img"
         aria-label={t('visualization.bar.aria.description')}
       >
-        {/* Legend */}
-        <div className="visualization-legend">
-          <div className="legend-header">
-            <div className="legend-title">{t('visualization.bar.legendTitle')}</div>
-            <div className="legend-subtitle">{t('visualization.bar.legendSubtitle')}</div>
-          </div>
-          {data.map((item, index) => (
-            <div key={item.country} className="legend-item">
-              <div className="legend-country-wrapper">
-                <div
-                  className="legend-color"
-                  style={{ backgroundColor: chartColors.blues[index % chartColors.blues.length] }}
-                />
-                <div className="legend-country">{item.country}</div>
-              </div>
-              <div className="legend-value" style={{ color: chartColors.primary }}>
-                {Math.round(item.value)}
-              </div>
-            </div>
-          ))}
-        </div>
-
         {/* Chart */}
         <div className="visualization-chart-container">
           <Bar
@@ -153,6 +131,7 @@ const BarChart = ({ data }) => {
           />
         </div>
       </div>
+
       <p className="visualization-source">
         {t('visualization.source')}: {t('visualization.eurostat')}
       </p>

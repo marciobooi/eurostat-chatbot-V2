@@ -14,7 +14,7 @@ import {
 } from 'chart.js';
 import { useTranslation } from 'react-i18next';
 import { chartColors } from '../../utils/chartColors';
-import './AreaChart.css';
+
 
 // Register ChartJS components
 ChartJS.register(
@@ -71,10 +71,10 @@ const AreaChart = ({ data }) => {
         titleFont: {
           size: 13,
           weight: 'bold',
-          family: 'Inter, system-ui, sans-serif'
+          family: 'arial, sans-serif',
         },
         bodyFont: {
-          family: 'Inter, system-ui, sans-serif'
+            family: 'arial, sans-serif',
         },
         padding: 12,
         cornerRadius: 8,
@@ -91,7 +91,7 @@ const AreaChart = ({ data }) => {
         ticks: {
           color: chartColors.text,
           font: {
-            family: 'Inter, system-ui, sans-serif',
+            family: 'arial, sans-serif',
             size: 12
           }
         }
@@ -105,7 +105,7 @@ const AreaChart = ({ data }) => {
         ticks: {
           color: chartColors.text,
           font: {
-            family: 'Inter, system-ui, sans-serif',
+            family: 'arial, sans-serif',
             size: 12
           }
         },
@@ -129,35 +129,6 @@ const AreaChart = ({ data }) => {
         role="img"
         aria-label={t('visualization.area.aria.description')}
       >
-        {/* Legend */}
-        <div className="visualization-legend">
-          <div className="legend-header">
-            <div className="legend-title">{t('visualization.area.legendTitle')}</div>
-            <div className="legend-subtitle">{t('visualization.area.legendSubtitle')}</div>
-          </div>
-          {data.map((item, index) => (
-            <div key={item.year} className="legend-item">
-              <div className="legend-year">{item.year}</div>
-              <div className="legend-values">
-                <div className="legend-value-item">
-                  <div 
-                    className="legend-color pipeline"
-                    style={{ backgroundColor: chartColors.primary }}
-                  />
-                  <span>{Math.round(item.pipeline)}</span>
-                </div>
-                <div className="legend-value-item">
-                  <div 
-                    className="legend-color lng"
-                    style={{ backgroundColor: chartColors.secondary }}
-                  />
-                  <span>{Math.round(item.lng)}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
         {/* Chart */}
         <div className="visualization-chart-container">
           <Line
@@ -168,6 +139,32 @@ const AreaChart = ({ data }) => {
           />
         </div>
       </div>
+
+      {/* Bottom Legend */}
+      <div className="visualization-bottom-legend">
+        {data.map((item) => (
+          <div key={item.year} className="legend-item">
+            <div className="legend-year">{item.year}</div>
+            <div className="legend-values">
+              <div className="legend-indicator">
+                <div 
+                  className="legend-area pipeline"
+                  style={{ backgroundColor: chartColors.primary }}
+                />
+                <span className="legend-label">Pipeline</span>
+              </div>
+              <div className="legend-indicator">
+                <div 
+                  className="legend-area lng"
+                  style={{ backgroundColor: chartColors.secondary }}
+                />
+                <span className="legend-label">LNG</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <p className="visualization-source">
         {t('visualization.source')}: {t('visualization.eurostat')}
       </p>
