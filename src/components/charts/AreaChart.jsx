@@ -13,6 +13,7 @@ import {
   Legend
 } from 'chart.js';
 import { useTranslation } from 'react-i18next';
+import { chartColors } from '../../utils/chartColors';
 import './AreaChart.css';
 
 // Register ChartJS components
@@ -27,14 +28,6 @@ ChartJS.register(
   Legend
 );
 
-// Eurostat color palette
-const colors = {
-  primary: '#0E47CB',
-  secondary: '#FFA629',
-  grid: '#E9ECEF',
-  text: '#495057'
-};
-
 const AreaChart = ({ data }) => {
   const chartRef = useRef(null);
   const { t } = useTranslation();
@@ -45,8 +38,8 @@ const AreaChart = ({ data }) => {
       {
         label: 'Pipeline',
         data: data.map(item => item.pipeline),
-        borderColor: colors.primary,
-        backgroundColor: `${colors.primary}20`,
+        borderColor: chartColors.primary,
+        backgroundColor: chartColors.withOpacity(chartColors.primary, 0.1),
         fill: true,
         tension: 0.4,
         borderWidth: 2,
@@ -54,8 +47,8 @@ const AreaChart = ({ data }) => {
       {
         label: 'LNG',
         data: data.map(item => item.lng),
-        borderColor: colors.secondary,
-        backgroundColor: `${colors.secondary}20`,
+        borderColor: chartColors.secondary,
+        backgroundColor: chartColors.withOpacity(chartColors.secondary, 0.1),
         fill: true,
         tension: 0.4,
         borderWidth: 2,
@@ -73,8 +66,8 @@ const AreaChart = ({ data }) => {
       tooltip: {
         enabled: true,
         backgroundColor: '#FFFFFF',
-        titleColor: colors.text,
-        bodyColor: colors.text,
+        titleColor: chartColors.text,
+        bodyColor: chartColors.text,
         titleFont: {
           size: 13,
           weight: 'bold',
@@ -86,7 +79,7 @@ const AreaChart = ({ data }) => {
         padding: 12,
         cornerRadius: 8,
         boxShadow: '0 2px 4px rgba(14, 71, 203, 0.1)',
-        borderColor: colors.grid,
+        borderColor: chartColors.grid,
         borderWidth: 1,
       },
     },
@@ -96,7 +89,7 @@ const AreaChart = ({ data }) => {
           display: false,
         },
         ticks: {
-          color: colors.text,
+          color: chartColors.text,
           font: {
             family: 'Inter, system-ui, sans-serif',
             size: 12
@@ -106,11 +99,11 @@ const AreaChart = ({ data }) => {
       y: {
         stacked: true,
         grid: {
-          color: colors.grid,
+          color: chartColors.grid,
           drawBorder: false,
         },
         ticks: {
-          color: colors.text,
+          color: chartColors.text,
           font: {
             family: 'Inter, system-ui, sans-serif',
             size: 12
@@ -149,14 +142,14 @@ const AreaChart = ({ data }) => {
                 <div className="legend-value-item">
                   <div 
                     className="legend-color pipeline"
-                    style={{ backgroundColor: colors.primary }}
+                    style={{ backgroundColor: chartColors.primary }}
                   />
                   <span>{Math.round(item.pipeline)}</span>
                 </div>
                 <div className="legend-value-item">
                   <div 
                     className="legend-color lng"
-                    style={{ backgroundColor: colors.secondary }}
+                    style={{ backgroundColor: chartColors.secondary }}
                   />
                   <span>{Math.round(item.lng)}</span>
                 </div>

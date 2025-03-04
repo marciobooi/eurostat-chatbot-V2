@@ -8,15 +8,10 @@ import {
   Legend
 } from 'chart.js';
 import { useTranslation } from 'react-i18next';
+import { chartColors } from '../../utils/chartColors';
 
 // Register ChartJS components
 ChartJS.register(ArcElement, Tooltip, Legend);
-
-// Eurostat color palette
-const colors = {
-  primary: ['#0E47CB', '#1E56D6', '#2E66E1', '#3E75EC', '#4E85F7'],
-  hover: ['#1651D4', '#2860DE', '#3870E9', '#487FF3', '#588FFF'],
-};
 
 const PieChart = ({ data }) => {
   const chartRef = useRef(null);
@@ -27,8 +22,8 @@ const PieChart = ({ data }) => {
     datasets: [
       {
         data: data.map(item => item.value),
-        backgroundColor: colors.primary,
-        hoverBackgroundColor: colors.hover,
+        backgroundColor: chartColors.blues,
+        hoverBackgroundColor: chartColors.bluesHover,
         borderColor: 'transparent',
         borderWidth: 0,
         borderRadius: 5,
@@ -53,8 +48,8 @@ const PieChart = ({ data }) => {
       tooltip: {
         enabled: true,
         backgroundColor: '#FFFFFF',
-        titleColor: '#495057',
-        bodyColor: '#495057',
+        titleColor: chartColors.text,
+        bodyColor: chartColors.text,
         titleFont: {
           size: 13,
           weight: 'bold',
@@ -66,7 +61,7 @@ const PieChart = ({ data }) => {
         padding: 12,
         cornerRadius: 8,
         boxShadow: '0 2px 4px rgba(14, 71, 203, 0.1)',
-        borderColor: '#E9ECEF',
+        borderColor: chartColors.grid,
         borderWidth: 1,
         callbacks: {
           label: (context) => t('visualization.pie.tooltip.value', {
@@ -106,7 +101,7 @@ const PieChart = ({ data }) => {
             <div key={item.name} className="legend-item">
               <div
                 className="legend-color"
-                style={{ backgroundColor: colors.primary[index] }}
+                style={{ backgroundColor: chartColors.blues[index % chartColors.blues.length] }}
               />
               <div className="legend-text">
                 <div className="legend-label">

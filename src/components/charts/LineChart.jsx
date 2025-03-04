@@ -12,6 +12,7 @@ import {
   Legend
 } from 'chart.js';
 import { useTranslation } from 'react-i18next';
+import { chartColors } from '../../utils/chartColors';
 import './LineChart.css';
 
 // Register ChartJS components
@@ -25,14 +26,6 @@ ChartJS.register(
   Legend
 );
 
-// Eurostat color palette
-const colors = {
-  primary: '#0E47CB',
-  hover: '#1651D4',
-  grid: '#E9ECEF',
-  text: '#495057'
-};
-
 const LineChart = ({ data }) => {
   const chartRef = useRef(null);
   const { t } = useTranslation();
@@ -43,15 +36,15 @@ const LineChart = ({ data }) => {
       {
         label: t('visualization.line.label'),
         data: data.map(item => item.value),
-        borderColor: colors.primary,
-        backgroundColor: `${colors.primary}20`,
+        borderColor: chartColors.primary,
+        backgroundColor: chartColors.withOpacity(chartColors.primary, 0.1),
         fill: true,
         tension: 0.4,
         borderWidth: 2,
         pointRadius: 4,
         pointHoverRadius: 6,
-        pointBackgroundColor: colors.primary,
-        pointHoverBackgroundColor: colors.hover,
+        pointBackgroundColor: chartColors.primary,
+        pointHoverBackgroundColor: chartColors.bluesHover[0],
         pointBorderColor: '#FFFFFF',
         pointBorderWidth: 2,
       },
@@ -68,8 +61,8 @@ const LineChart = ({ data }) => {
       tooltip: {
         enabled: true,
         backgroundColor: '#FFFFFF',
-        titleColor: colors.text,
-        bodyColor: colors.text,
+        titleColor: chartColors.text,
+        bodyColor: chartColors.text,
         titleFont: {
           size: 13,
           weight: 'bold',
@@ -81,7 +74,7 @@ const LineChart = ({ data }) => {
         padding: 12,
         cornerRadius: 8,
         boxShadow: '0 2px 4px rgba(14, 71, 203, 0.1)',
-        borderColor: colors.grid,
+        borderColor: chartColors.grid,
         borderWidth: 1,
         callbacks: {
           label: (context) => t('visualization.line.tooltip.value', {
@@ -94,11 +87,11 @@ const LineChart = ({ data }) => {
     scales: {
       x: {
         grid: {
-          color: colors.grid,
+          color: chartColors.grid,
           drawBorder: false,
         },
         ticks: {
-          color: colors.text,
+          color: chartColors.text,
           font: {
             family: 'Inter, system-ui, sans-serif',
             size: 12
@@ -107,11 +100,11 @@ const LineChart = ({ data }) => {
       },
       y: {
         grid: {
-          color: colors.grid,
+          color: chartColors.grid,
           drawBorder: false,
         },
         ticks: {
-          color: colors.text,
+          color: chartColors.text,
           font: {
             family: 'Inter, system-ui, sans-serif',
             size: 12
@@ -143,10 +136,10 @@ const LineChart = ({ data }) => {
             <div className="legend-title">{t('visualization.line.legendTitle')}</div>
             <div className="legend-subtitle">{t('visualization.line.legendSubtitle')}</div>
           </div>
-          {data.map((item, index) => (
+          {data.map((item) => (
             <div key={item.year} className="legend-item">
               <div className="legend-year">{item.year}</div>
-              <div className="legend-value">
+              <div className="legend-value" style={{ color: chartColors.primary }}>
                 {Math.round(item.value)}
               </div>
             </div>

@@ -205,3 +205,26 @@ npm run preview
   }
 }
 ```
+
+### Visualization System
+
+#### Framework & Libraries
+- Chart.js for core charting functionality
+- react-chartjs-2 for React integration
+- Custom styled components for layout and legends
+- i18next for multilingual support
+
+#### Chart Types
+Each chart type is implemented as a standalone component with dedicated styling:
+- **Doughnut/Pie Charts**: Distribution data with 75% cutout and gradient coloring
+- **Line Charts**: Time series with smooth curves and area fills
+- **Bar Charts**: Comparative data with rounded corners and gradient bars
+- **Area Charts**: Stacked data visualization with dual color schemes
+
+#### Technical Features
+- **Modular Architecture**: Separate components for each chart type
+- **Shared Styling**: Common design tokens and responsive layouts
+- **Smart Data Handling**: Automatic data processing and formatting
+- **Accessibility**: ARIA labels and keyboard navigation
+- **Performance**: Optimized rendering and animations
+- **i18n**: Full translation support for all chart elements

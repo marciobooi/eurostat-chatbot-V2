@@ -11,6 +11,7 @@ import {
   Legend
 } from 'chart.js';
 import { useTranslation } from 'react-i18next';
+import { chartColors } from '../../utils/chartColors';
 import './BarChart.css';
 
 // Register ChartJS components
@@ -23,14 +24,6 @@ ChartJS.register(
   Legend
 );
 
-// Eurostat color palette
-const colors = {
-  bars: ['#0E47CB', '#1E56D6', '#2E66E1', '#3E75EC', '#4E85F7'],
-  hover: ['#1651D4', '#2860DE', '#3870E9', '#487FF3', '#588FFF'],
-  grid: '#E9ECEF',
-  text: '#495057'
-};
-
 const BarChart = ({ data }) => {
   const chartRef = useRef(null);
   const { t } = useTranslation();
@@ -40,8 +33,8 @@ const BarChart = ({ data }) => {
     datasets: [
       {
         data: data.map(item => item.value),
-        backgroundColor: data.map((_, index) => colors.bars[index % colors.bars.length]),
-        hoverBackgroundColor: data.map((_, index) => colors.hover[index % colors.hover.length]),
+        backgroundColor: data.map((_, index) => chartColors.blues[index % chartColors.blues.length]),
+        hoverBackgroundColor: data.map((_, index) => chartColors.bluesHover[index % chartColors.bluesHover.length]),
         borderRadius: 6,
         maxBarThickness: 40,
         borderSkipped: false,
@@ -59,8 +52,8 @@ const BarChart = ({ data }) => {
       tooltip: {
         enabled: true,
         backgroundColor: '#FFFFFF',
-        titleColor: colors.text,
-        bodyColor: colors.text,
+        titleColor: chartColors.text,
+        bodyColor: chartColors.text,
         titleFont: {
           size: 13,
           weight: 'bold',
@@ -72,7 +65,7 @@ const BarChart = ({ data }) => {
         padding: 12,
         cornerRadius: 8,
         boxShadow: '0 2px 4px rgba(14, 71, 203, 0.1)',
-        borderColor: colors.grid,
+        borderColor: chartColors.grid,
         borderWidth: 1,
         callbacks: {
           label: (context) => t('visualization.bar.tooltip.value', {
@@ -88,7 +81,7 @@ const BarChart = ({ data }) => {
           display: false,
         },
         ticks: {
-          color: colors.text,
+          color: chartColors.text,
           font: {
             family: 'Inter, system-ui, sans-serif',
             size: 12
@@ -97,11 +90,11 @@ const BarChart = ({ data }) => {
       },
       y: {
         grid: {
-          color: colors.grid,
+          color: chartColors.grid,
           drawBorder: false,
         },
         ticks: {
-          color: colors.text,
+          color: chartColors.text,
           font: {
             family: 'Inter, system-ui, sans-serif',
             size: 12
@@ -139,11 +132,11 @@ const BarChart = ({ data }) => {
               <div className="legend-country-wrapper">
                 <div
                   className="legend-color"
-                  style={{ backgroundColor: colors.bars[index % colors.bars.length] }}
+                  style={{ backgroundColor: chartColors.blues[index % chartColors.blues.length] }}
                 />
                 <div className="legend-country">{item.country}</div>
               </div>
-              <div className="legend-value">
+              <div className="legend-value" style={{ color: chartColors.primary }}>
                 {Math.round(item.value)}
               </div>
             </div>
