@@ -1,8 +1,8 @@
-# Eurostat Energy Chatbot
+# Eurostat Energy Chatbot V2
 
-A React-based multilingual chatbot designed to provide information about energy-related topics using Eurostat data. Built with React and Vite.
+An intelligent chatbot interface for exploring European energy statistics and trends with interactive visualizations.
 
-## Technical Overview
+## Features
 
 ### Core Features
 - Multilingual support (English, French, German)
@@ -12,6 +12,65 @@ A React-based multilingual chatbot designed to provide information about energy-
 - Chat history management
 - Typing indicators and AI-like behavior simulation
 - Responsive design with accessibility features
+
+### Interactive Visualizations
+
+The chatbot now includes enhanced visualization capabilities with:
+
+- Sleek, Eurostat-themed charts and graphs
+- Animated entry and transitions
+- Responsive design for all screen sizes
+- Interactive tooltips with detailed information
+- Multiple visualization types:
+  - Pie charts for distribution data
+  - Line charts for temporal trends
+  - Bar charts for comparisons
+  - Area charts for cumulative data
+
+### Visualization Flow
+
+1. Topic Introduction:
+   - Initial response with topic overview
+   - Visualization options presented in a delayed, natural flow
+
+2. Visualization Interaction:
+   - Click-through interface for exploring different charts
+   - Progressive disclosure of additional visualization options
+   - Smart suggestions for related topics
+
+3. User Experience:
+   - Smooth animations and transitions
+   - Clear visual hierarchy
+   - Intuitive navigation between topics
+
+### Styling Guidelines
+
+#### Colors
+- Primary Blue: #0E47CB (Eurostat Blue)
+- Secondary Orange: #FFA629 (Eurostat Orange)
+- Tertiary Teal: #24B9B9
+- Quaternary Coral: #FF6B6B
+- Background: #F8F9FA
+- Grid: #E9ECEF
+- Text: #495057
+
+#### Typography
+- Font Family: Inter, system-ui, sans-serif
+- Base Font Size: 12px for charts
+- Description Text: 0.9rem
+- Tooltip Text: 0.85rem
+
+#### Layout
+- Chart Container Padding: 1.5rem
+- Border Radius: 12px (container), 8px (charts)
+- Responsive Breakpoints: 768px for mobile adaptation
+
+### Multilingual Support
+
+Visualization labels and descriptions are available in:
+- English (en)
+- French (fr)
+- German (de)
 
 ### Architecture
 
@@ -127,3 +186,22 @@ npm run preview
    - Performance optimization
    - Enhanced error handling
    - Documentation expansion
+
+## Configuration
+
+### Visualization Config Structure
+```javascript
+{
+  [fuelType]: {
+    visualizations: [
+      {
+        type: 'pie|line|bar|area',
+        label: 'Visualization Label',
+        description: 'Detailed description',
+        data: [] // Chart-specific data structure
+      }
+    ],
+    nextTopics: ['topic1', 'topic2'] // Related topics for suggestions
+  }
+}
+```

@@ -6,6 +6,18 @@ export const visualizationConfig = {
     visualizations: [
       {
         type: 'pie',
+        label: 'Top Oil Consumers',
+        description: 'Distribution of oil consumption across major European countries (2020)',
+        data: [
+          { name: 'Germany', value: 25.4 },
+          { name: 'France', value: 19.2 },
+          { name: 'Italy', value: 17.8 },
+          { name: 'Spain', value: 14.3 },
+          { name: 'Netherlands', value: 12.1 }
+        ]
+      },
+      {
+        type: 'pie',
         label: 'Top 5 Oil Consuming Countries',
         description: 'Distribution of oil consumption across top European countries',
         data: [
@@ -19,7 +31,7 @@ export const visualizationConfig = {
       {
         type: 'line',
         label: 'Oil Consumption Timeline',
-        description: 'Historical oil consumption trends in Europe (million tonnes)',
+        description: 'Historical oil consumption trends in Europe',
         data: [
           { year: '2015', value: 560 },
           { year: '2016', value: 565 },
@@ -32,7 +44,7 @@ export const visualizationConfig = {
       {
         type: 'bar',
         label: 'Oil Import Dependencies',
-        description: 'Oil import dependency rates by country (%)',
+        description: 'Oil import dependency rates by country',
         data: [
           { country: 'Cyprus', value: 98.8 },
           { country: 'Malta', value: 98.5 },

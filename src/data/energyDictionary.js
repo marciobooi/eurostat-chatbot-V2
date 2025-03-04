@@ -5,7 +5,7 @@
 
 export const energyDictionary = {
   en: {
-    oil: {
+    "oil": {
       title: "Oil",
       text: "Oil is a fossil fuel formed from organic materials over millions of years. It's a major energy source worldwide, used primarily for transportation, heating, and electricity generation. According to Eurostat, the EU imports about 90% of its crude oil. The energy sector is working to reduce oil dependence through renewable alternatives and improved efficiency.",
       keywords: ["petroleum", "crude oil", "fossil fuel", "gasoline", "diesel"],
@@ -20,9 +20,9 @@ export const energyDictionary = {
     "natural gas": {
       title: "Natural Gas",
       text: "Natural gas is a fossil fuel composed primarily of methane. It's widely used for heating, cooking, electricity generation, and as an industrial feedstock. Compared to other fossil fuels, it produces fewer greenhouse gas emissions. The EU imports approximately 80% of its natural gas, with Russia having been a major supplier before the 2022 energy crisis.",
-      keywords: ["gas", "methane", "LNG", "fossil fuel"],
+      keywords: ["gas", "methane", "fossil fuel"],
       synonyms: ["gas", "methane"],
-      related: ["oil", "fossil fuels", "energy consumption", "LNG"],
+      related: ["oil", "fossil fuels", "energy consumption"],
     },
     "renewable energy": {
       title: "Renewable Energy",

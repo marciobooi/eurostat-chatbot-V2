@@ -1,20 +1,27 @@
 .visualization-container {
-  background: #FFFFFF;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(14, 71, 203, 0.05);
-  margin: 1rem 0;
+  margin: .5rem;
+}
+
+.visualization-chart-wrapper {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: .5rem;
 }
 
 .visualization-chart {
   background: #F8F9FA;
   border-radius: 8px;
   padding: 1rem;
-  margin-bottom: 1rem;
+  margin: 1rem;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .visualization-description {
-  font-size: 0.9rem;
+  font-size: 0.7rem;
   color: #495057;
   line-height: 1.5;
   margin: 0.5rem 0 0;

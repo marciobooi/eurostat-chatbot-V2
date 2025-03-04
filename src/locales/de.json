@@ -67,7 +67,53 @@
       "import_dependency": "Importabhängigkeit",
       "renewable_mix": "Erneuerbare-Energien-Mix",
       "growth_trends": "Wachstumstrends",
-      "country_comparison": "Ländervergleich"
+      "country_comparison": "Ländervergleich",
+      "pie": {
+        "tooltip": {
+          "value": "{{name}}: {{value}}%"
+        },
+        "aria": {
+          "description": "Kreisdiagramm-Visualisierung",
+          "data": "Interaktives Kreisdiagramm zur Darstellung der Datenverteilung"
+        }
+      },
+      "line": {
+        "label": "Trendlinie",
+        "legendTitle": "Historische Daten",
+        "legendSubtitle": "Jährliche Werte im Zeitverlauf",
+        "tooltip": {
+          "value": "{{year}}: {{value}}"
+        },
+        "aria": {
+          "description": "Liniendiagramm zeigt Trend im Zeitverlauf",
+          "data": "Interaktives Liniendiagramm mit historischen Daten"
+        }
+      },
+      "bar": {
+        "legendTitle": "Ländervergleich",
+        "legendSubtitle": "Werte nach Land",
+        "tooltip": {
+          "value": "{{country}}: {{value}}"
+        },
+        "aria": {
+          "description": "Balkendiagramm zum Ländervergleich",
+          "data": "Interaktives Balkendiagramm zeigt Ländervergleiche"
+        }
+      },
+      "area": {
+        "label": "Flächendiagramm",
+        "legendTitle": "Versorgungsquellen",
+        "legendSubtitle": "Pipeline vs LNG im Zeitverlauf",
+        "tooltip": {
+          "value": "{{year}}: Pipeline {{pipeline}}, LNG {{lng}}"
+        },
+        "aria": {
+          "description": "Flächendiagramm zeigt Versorgungsquellen im Zeitverlauf",
+          "data": "Interaktives Flächendiagramm mit Pipeline- und LNG-Versorgung"
+        }
+      },
+      "source": "Quelle",
+      "eurostat": "Eurostat"
     }
   }
 }

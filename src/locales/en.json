@@ -110,6 +110,52 @@
     "country_comparison": "Country Comparison",
     "more_to_discover": "There's more to discover about {{topic}} if you're curious. I can show you some visualizations about {{topic}}. What would you like to see?",
     "more_options_available": "Would you like to see another visualization about {{topic}}? I have {{count}} more to show you:",
-    "suggest_next_topic": "Would you like to learn about {{nextTopic}}? You can say 'yes' to explore this topic."
+    "suggest_next_topic": "Would you like to learn about {{nextTopic}}? You can say 'yes' to explore this topic.",
+    "pie": {
+      "tooltip": {
+        "value": "{{name}}: {{value}}%"
+      },
+      "aria": {
+        "description": "Pie chart visualization",
+        "data": "Interactive pie chart showing data distribution"
+      }
+    },
+    "line": {
+      "label": "Trend Line",
+      "legendTitle": "Historical Data",
+      "legendSubtitle": "Annual values over time",
+      "tooltip": {
+        "value": "{{year}}: {{value}}"
+      },
+      "aria": {
+        "description": "Line chart showing trend over time",
+        "data": "Interactive line chart showing historical data"
+      }
+    },
+    "bar": {
+      "legendTitle": "Country Comparison",
+      "legendSubtitle": "Values by country",
+      "tooltip": {
+        "value": "{{country}}: {{value}}"
+      },
+      "aria": {
+        "description": "Bar chart comparing countries",
+        "data": "Interactive bar chart showing country comparisons"
+      }
+    },
+    "area": {
+      "label": "Stacked Area",
+      "legendTitle": "Supply Sources",
+      "legendSubtitle": "Pipeline vs LNG over time",
+      "tooltip": {
+        "value": "{{year}}: Pipeline {{pipeline}}, LNG {{lng}}"
+      },
+      "aria": {
+        "description": "Area chart showing supply sources over time",
+        "data": "Interactive area chart showing pipeline and LNG supply"
+      }
+    },
+    "source": "Source",
+    "eurostat": "Eurostat"
   }
 }

@@ -83,7 +83,53 @@
     "import_dependency": "Dépendance aux importations",
     "renewable_mix": "Mix d'énergies renouvelables",
     "growth_trends": "Tendances de croissance",
-    "country_comparison": "Comparaison par pays"
+    "country_comparison": "Comparaison par pays",
+    "pie": {
+      "tooltip": {
+        "value": "{{name}} : {{value}}%"
+      },
+      "aria": {
+        "description": "Visualisation en graphique circulaire",
+        "data": "Graphique circulaire interactif montrant la distribution des données"
+      }
+    },
+    "line": {
+      "label": "Ligne de tendance",
+      "legendTitle": "Données historiques",
+      "legendSubtitle": "Valeurs annuelles dans le temps",
+      "tooltip": {
+        "value": "{{year}} : {{value}}"
+      },
+      "aria": {
+        "description": "Graphique linéaire montrant la tendance dans le temps",
+        "data": "Graphique linéaire interactif montrant les données historiques"
+      }
+    },
+    "bar": {
+      "legendTitle": "Comparaison par pays",
+      "legendSubtitle": "Valeurs par pays",
+      "tooltip": {
+        "value": "{{country}} : {{value}}"
+      },
+      "aria": {
+        "description": "Graphique à barres comparant les pays",
+        "data": "Graphique à barres interactif montrant les comparaisons par pays"
+      }
+    },
+    "area": {
+      "label": "Zone empilée",
+      "legendTitle": "Sources d'approvisionnement",
+      "legendSubtitle": "Pipeline vs GNL dans le temps",
+      "tooltip": {
+        "value": "{{year}} : Pipeline {{pipeline}}, GNL {{lng}}"
+      },
+      "aria": {
+        "description": "Graphique en aires montrant les sources d'approvisionnement dans le temps",
+        "data": "Graphique en aires interactif montrant l'approvisionnement en pipeline et GNL"
+      }
+    },
+    "source": "Source",
+    "eurostat": "Eurostat"
   },
   "empathyPrefix": "Je comprends votre préoccupation.",
   "reassurancePrefix": "Permettez-moi de vous aider à mieux comprendre.",
