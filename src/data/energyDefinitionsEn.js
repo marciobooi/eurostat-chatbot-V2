@@ -1,1128 +1,2720 @@
-export const energyDefinitionsEn = {   
-      "oil": {
-        title: "Oil",
-        text: "Oil is a fossil fuel formed from organic materials over millions of years. It's a major energy source worldwide, used primarily for transportation, heating, and electricity generation. According to Eurostat, the EU imports about 90% of its crude oil. The energy sector is working to reduce oil dependence through renewable alternatives and improved efficiency.",
-        keywords: ["petroleum", "crude oil", "fossil fuel", "gasoline", "diesel"],
-        synonyms: ["petroleum", "crude", "fossil fuel", "black gold"],
-        related: [
-          "natural gas",
-          "fossil fuels",
-          "energy consumption",
-          "renewable energy",
-        ],
-      },
-      "natural gas": {
-        title: "Natural Gas",
-        text: "Natural gas is a fossil fuel composed primarily of methane. It's widely used for heating, cooking, electricity generation, and as an industrial feedstock. Compared to other fossil fuels, it produces fewer greenhouse gas emissions. The EU imports approximately 80% of its natural gas, with Russia having been a major supplier before the 2022 energy crisis.",
-        keywords: ["gas", "methane", "fossil fuel"],
-        synonyms: ["gas", "methane"],
-        related: ["oil", "fossil fuels", "energy consumption"],
-      },
-      "renewable energy": {
-        title: "Renewable Energy",
-        text: "Renewable energy comes from naturally replenishing sources like sunlight, wind, water, and geothermal heat. The EU has set a target of at least 32% renewable energy by 2030. As of 2020, renewables accounted for about 22% of the EU's energy mix, with considerable variation between member states. Wind, solar, and hydropower are the fastest-growing renewable sources in Europe.",
-        keywords: [
-          "renewables",
-          "clean energy",
-          "sustainable energy",
-          "green energy",
-        ],
-        synonyms: ["clean energy", "green energy", "sustainable energy"],
-        related: [
-          "solar energy",
-          "wind power",
-          "hydropower",
-          "bioenergy",
-          "energy transition",
-        ],
-      },
-      "solar energy": {
-        title: "Solar Energy",
-        text: "Solar energy harnesses sunlight to generate electricity through photovoltaic panels or concentrated solar power systems. It's one of the fastest-growing renewable energy sources in the EU. In 2020, solar provided approximately 5% of the EU's electricity. Southern European countries like Spain, Italy, and Greece have the highest solar potential, but Germany remains the largest installer of solar capacity.",
-        keywords: ["solar power", "photovoltaic", "PV", "solar panels"],
-        synonyms: ["solar power", "photovoltaic energy", "solar electricity"],
-        related: [
-          "renewable energy",
-          "energy transition",
-          "electricity production",
-        ],
-      },
-      "wind power": {
-        title: "Wind Power",
-        text: "Wind power converts wind energy into electricity using turbines. It's the largest source of renewable electricity in the EU, accounting for about 16% of total electricity generation as of 2020. The EU leads globally in offshore wind deployment. Denmark, Ireland, and Germany have the highest share of wind in their electricity mix. The EU aims to expand offshore wind capacity to at least 60 GW by 2030.",
-        keywords: ["wind energy", "wind farms", "wind turbines", "offshore wind"],
-        synonyms: ["wind energy", "wind generation", "wind electricity"],
-        related: [
-          "renewable energy",
-          "energy transition",
-          "electricity production",
-        ],
-      },
-      "energy consumption": {
-        title: "Energy Consumption",
-        text: "Energy consumption measures the total energy used across all sectors. In the EU, the largest energy-consuming sectors are transport (31%), households (27%), and industry (25%). Final energy consumption in the EU reached approximately 940 million tonnes of oil equivalent in 2019. The EU aims to improve energy efficiency by 32.5% by 2030, reducing overall consumption. Since 2000, energy consumption per capita has decreased by about 12% across the EU.",
-        keywords: [
-          "energy use",
-          "energy demand",
-          "final energy",
-          "energy efficiency",
-        ],
-        synonyms: ["energy use", "energy demand", "energy usage"],
-        related: [
-          "energy efficiency",
-          "household energy",
-          "industrial energy",
-          "transport energy",
-        ],
-      },
-      "energy efficiency": {
-        title: "Energy Efficiency",
-        text: "Energy efficiency means using less energy to perform the same task. The EU has set a target to improve energy efficiency by at least 32.5% by 2030. Buildings account for about 40% of energy consumption in the EU, making them a key focus for efficiency improvements. The Energy Performance of Buildings Directive requires all new buildings to be nearly zero-energy from 2021. Energy efficiency labels on appliances have helped consumers reduce household energy use across Europe.",
-        keywords: [
-          "energy saving",
-          "energy conservation",
-          "efficient energy use",
-        ],
-        synonyms: [
-          "energy conservation",
-          "energy savings",
-          "energy optimization",
-        ],
-        related: [
-          "energy consumption",
-          "building efficiency",
-          "appliance efficiency",
-        ],
-      },
-      "fossil fuels": {
-        title: "Fossil Fuels",
-        text: "Fossil fuels include coal, oil, and natural gas formed from prehistoric organic matter. They currently account for about 70% of the EU's energy mix. The EU aims to reduce fossil fuel dependency for climate goals and energy security. Fossil fuel combustion is responsible for approximately 75% of EU greenhouse gas emissions. Under the European Green Deal, the EU plans to be climate-neutral by 2050, which will require significantly reducing fossil fuel use.",
-        keywords: ["coal", "oil", "natural gas", "non-renewable energy"],
-        synonyms: ["conventional fuels", "carbon fuels", "hydrocarbons"],
-        related: ["oil", "natural gas", "coal", "emissions", "climate change"],
-      },
-      "energy mix": {
-        title: "Energy Mix",
-        text: "The energy mix refers to the combination of different energy sources used in a region. The EU's energy mix in 2020 consisted of petroleum products (35%), natural gas (24%), renewables (17%), nuclear energy (13%), and solid fossil fuels (11%). Each EU member state has a different energy mix based on available resources and policy choices. The European Green Deal aims to transform the EU's energy mix toward more renewable sources and less fossil fuels by 2050.",
-        keywords: [
-          "energy sources",
-          "energy portfolio",
-          "energy balance",
-          "fuel mix",
-        ],
-        synonyms: ["energy portfolio", "energy balance", "fuel mix"],
-        related: ["renewable energy", "fossil fuels", "nuclear energy"],
-      },
-      "energy transition": {
-        title: "Energy Transition",
-        text: "Energy transition is the shift from fossil-based to zero-carbon energy sources. The EU is committed to becoming climate-neutral by 2050 as part of the European Green Deal. This transition involves expanding renewable energy, improving energy efficiency, and developing clean technologies. The EU has allocated over €1 trillion for sustainable investments over the next decade. The transition also focuses on ensuring fairness through the Just Transition Mechanism, which supports regions heavily dependent on fossil fuels.",
-        keywords: [
-          "energy transformation",
-          "clean energy transition",
-          "low-carbon transition",
-        ],
-        synonyms: ["energy transformation", "sustainable energy shift"],
-        related: [
-          "renewable energy",
-          "European Green Deal",
-          "climate neutrality",
-        ],
-      },
-      "electricity production": {
-        title: "Electricity Production",
-        text: "Electricity production in the EU comes from various sources including fossil fuels, nuclear, and renewables. As of 2020, renewables accounted for approximately 38% of electricity generation, fossil fuels for 37%, and nuclear for 25%. Wind and hydropower are the largest renewable electricity sources in the EU. The EU aims to increase the share of renewable electricity to over 65% by 2030. Coal power has been declining rapidly, with many member states planning complete phase-outs by 2030.",
-        keywords: ["power generation", "electricity supply", "power production"],
-        synonyms: [
-          "power generation",
-          "electricity generation",
-          "power production",
-        ],
-        related: [
-          "renewable energy",
-          "nuclear energy",
-          "fossil fuels",
-          "energy mix",
-        ],
-      },
-      "energy sectors": {
-        title: "Energy Sectors Classification",
-        text: "Energy sectors are classified according to purpose of production and end use. Main activity producers generate electricity/heat for sale to third parties as their principal activity. Autoproducers generate electricity/heat wholly or partly for their own use as a supporting activity. The industry sector includes manufacturing, mining, and construction. The transport sector covers all transport activities regardless of economic sector. Commercial and public services include businesses, offices, and public sector activities.",
-        keywords: ["energy classification", "sector definitions", "energy categories"],
-        synonyms: ["energy classification", "energy categories"],
-        related: ["energy consumption", "energy efficiency", "industrial energy"]
-      },
-      
-      "transformation sector": {
-        title: "Energy Transformation Sector",
-        text: "The transformation sector converts primary energy into other forms. It includes electricity generation, heat production, oil refineries, and other conversion processes. Main activity producers and autoproducers operate various types of plants: electricity-only, combined heat and power (CHP), and heat-only units. The sector also includes patent fuel plants, coke ovens, BKB/PB plants, gas works, blast furnaces, and liquefaction facilities.",
-        keywords: ["energy conversion", "power generation", "heat production", "fuel transformation"],
-        synonyms: ["energy conversion", "energy transformation"],
-        related: ["electricity production", "energy efficiency", "fossil fuels"]
-      },
-  
-      "final consumption": {
-        title: "Final Energy Consumption",
-        text: "Final energy consumption represents energy delivered to end users for both energy and non-energy purposes. It's categorized into major sectors: industry (including subsectors like mining, food, textiles), transport (rail, road, aviation, navigation), and other sectors (commercial/public services, households, agriculture, forestry, fishing). Each sector has specific consumption patterns and efficiency measures.",
-        keywords: ["end use", "consumption sectors", "energy end users"],
-        synonyms: ["end use consumption", "final energy use"],
-        related: ["energy consumption", "energy efficiency", "industrial energy"]
-      },
-  
-      "geographical coverage": {
-        title: "Geographical Coverage in Energy Statistics",
-        text: "Energy statistics follow specific geographical definitions for reporting. For example, Australia excludes external territories, Denmark excludes Faeroe Islands and Greenland, while France includes Monaco and overseas departments. Some territories like San Marino and Vatican City are included with Italy's statistics. The classification considers political boundaries rather than geographical ones for statistical purposes.",
-        keywords: ["territorial coverage", "statistical territories", "geographical definitions"],
-        synonyms: ["territorial definitions", "statistical geography"],
-        related: ["energy statistics", "data collection", "statistical methodology"]
-      },
-  
-      "hard coal": {
-        title: "Hard Coal",
-        text: "Hard coal is a product aggregate equal to the sum of anthracite, coking coal and other bituminous coal. It includes high rank coal used for industrial and household applications (anthracite), coal suitable for coke production (coking coal), and coal used for steam raising purposes (other bituminous coal).",
-        keywords: ["anthracite", "coking coal", "bituminous coal"],
-        synonyms: ["black coal", "steam coal"],
-        related: ["coal", "fossil fuels", "energy consumption"]
-      },
-  
-      "natural gas products": {
-        title: "Natural Gas Products",
-        text: "Natural gas comprises gases occurring in underground deposits, consisting mainly of methane. It includes both 'non-associated' gas from fields producing hydrocarbons only in gaseous form, and 'associated' gas produced with crude oil. It can be liquefied (LNG) or compressed (CNG). Natural gas excludes biogas or manufactured gases which may be blended into the network.",
-        keywords: ["methane", "LNG", "CNG", "associated gas"],
-        synonyms: ["methane", "natural gas", "fossil gas"],
-        related: ["fossil fuels", "energy consumption", "gas market"]
-      },
-  
-      "petroleum products": {
-        title: "Petroleum Products",
-        text: "Petroleum products are derived from crude oil processing and include refinery gas, ethane, LPG, naphtha, motor gasoline, aviation fuels, kerosene, gas/diesel oil, fuel oil, lubricants, bitumen, paraffin waxes, petroleum coke and other products. They may contain additives/oxygenates and biofuels components.",
-        keywords: ["oil products", "refined products", "motor fuels"],
-        synonyms: ["oil products", "refined petroleum"],
-        related: ["oil", "fossil fuels", "energy consumption"]
-      },
-  
-      "renewable energy sources": {
-        title: "Renewable Energy Sources",
-        text: "Renewable energy comes from: hydro (pure, mixed, and pumped storage plants); geothermal heat; solar (photovoltaic and thermal); tide, wave and ocean; wind (onshore and offshore); industrial and municipal waste (renewable portion); and biofuels (solid, liquid and gaseous). For electricity generation, all production including small-scale and off-grid installations must be reported.",
-        keywords: ["renewables", "sustainable energy", "clean energy"],
-        synonyms: ["renewable sources", "clean energy sources"],
-        related: ["solar energy", "wind power", "hydropower", "bioenergy"]
-      },
-  
-      "biofuels classification": {
-        title: "Biofuels Classification",
-        text: "Biofuels include solid biofuels (charcoal, fuelwood, wood residues, black liquor, bagasse, animal waste), biogas (from landfills, sewage, and thermal processes), and liquid biofuels (biogasoline, biodiesels, bio jet kerosene). Only biofuels used for energy purposes should be reported. Biofuels used for non-energy purposes (e.g., wood for construction) are excluded.",
-        keywords: ["biomass", "biological fuels", "renewable fuels"],
-        synonyms: ["biomass fuels", "biological fuels"],
-        related: ["renewable energy", "energy consumption", "transport energy"]
-      },
-  
-      "manufactured gases": {
-        title: "Manufactured Gases",
-        text: "This category includes gas works gas, coke oven gas, blast furnace gas and other recovered gases. These gases are produced through industrial processes or gasification/pyrolysis of solid fuels. Gas works gas includes all types of gases produced for heat and power generation. Coke oven gas and blast furnace gas are by-products of iron and steel production.",
-        keywords: ["industrial gases", "synthetic gas", "process gas"],
-        synonyms: ["synthetic gases", "industrial gas"],
-        related: ["natural gas", "industrial energy", "energy production"]
-      },
-  
-      "hydropower": {
-        title: "Hydropower",
-        text: "Potential and kinetic energy of water converted into electricity in hydroelectric plants. This includes pure hydro plants that only use direct natural water inflow, mixed hydro plants that can also pump water uphill, and pure pumped storage plants. Pure hydro plants have no pumping capacity, while mixed plants can use both natural inflow and pumped water for generation.",
-        keywords: ["hydro power", "hydroelectric", "water power"],
-        synonyms: ["water power", "hydroelectric power"],
-        related: ["renewable energy", "electricity production"]
-      },
-  
-      "liquid biofuels": {
-        title: "Liquid Biofuels",
-        text: "Liquid fuels of natural origin produced from biomass or biodegradable waste that can be blended with or replace fossil fuels. Includes biogasoline, biodiesels, and bio jet kerosene. Only pure biofuels not yet blended with fossil fuels are reported in this category. When blended into transport fuels, they are reported within the respective petroleum product categories.",
-        keywords: ["biogasoline", "biodiesel", "bio jet fuel"],
-        synonyms: ["liquid biomass fuels", "bio-liquids"],
-        related: ["renewable energy", "transport fuels", "biofuels"]
-      },
-  
-      "ambient heat": {
-        title: "Ambient Heat",
-        text: "Heat energy at a useful temperature level extracted by heat pumps that need electricity or other auxiliary energy to function. This heat can be stored in ambient air, beneath solid earth surface, or in surface water. All heat pumps must be included regardless of their performance level, using the same methodology as under EU renewable energy directives.",
-        keywords: ["heat pump", "geothermal heat", "ambient energy"],
-        synonyms: ["environmental heat", "heat pump energy"],
-        related: ["renewable energy", "heating", "energy efficiency"]
-      },
-  
-      "municipal waste": {
-        title: "Municipal Waste",
-        text: "Wastes produced by households, hospitals, and the tertiary sector that are combusted at specific installations for energy purposes. Includes both renewable (biological origin) and non-renewable portions. The quantity is reported on a net calorific value basis, excluding waste incinerated without energy recovery.",
-        keywords: ["household waste", "waste-to-energy", "waste incineration"],
-        synonyms: ["urban waste", "household waste"],
-        related: ["waste management", "renewable energy", "energy recovery"]
-      },
-  
-      "solid biofuels": {
-        title: "Solid Biofuels",
-        text: "Covers organic, non-fossil material of biological origin used as fuel for heat or electricity generation. Includes charcoal, fuelwood, wood residues, black liquor, bagasse, animal waste, and other vegetal materials. Wood pellets are a specific form made by compressing wood residues. Only fuels used for energy purposes are included.",
-        keywords: ["biomass", "wood fuel", "organic waste"],
-        synonyms: ["solid biomass", "wood fuels"],
-        related: ["renewable energy", "bioenergy", "wood pellets"]
-      },
-  
-      "biogas": {
-        title: "Biogas",
-        text: "Gas composed mainly of methane and carbon dioxide produced by anaerobic digestion of biomass or by thermal processes. Includes landfill gas, sewage sludge gas, other biogases from anaerobic digestion (e.g., from animal slurries and agro-food waste), and biogases from thermal processes. Quantities are reported on a net calorific value basis.",
-        keywords: ["biomethane", "digester gas", "landfill gas"],
-        synonyms: ["biomethane", "digester gas"],
-        related: ["renewable energy", "methane", "waste management"]
-      },
-  
-      "motor gasoline": {
-        title: "Motor Gasoline",
-        text: "A mixture of light hydrocarbons distilling between 35°C and 215°C, used as fuel for land-based spark ignition engines. Includes additives, oxygenates and octane enhancers. Motor gasoline may contain biogasoline components and is categorized into blended biogasoline and non-biogasoline based on biofuel content.",
-        keywords: ["gasoline", "petrol", "motor fuel"],
-        synonyms: ["petrol", "gas"],
-        related: ["petroleum products", "transport fuels", "biogasoline"]
-      },
-  
-      "aviation fuels": {
-        title: "Aviation Fuels",
-        text: "Includes aviation gasoline for piston engines (octane number suited to engine, freezing point of -60°C), gasoline type jet fuel (light hydrocarbons between 100°C-250°C, max 25% aromatics), and kerosene type jet fuel (distillate between 150°C-300°C with specific requirements for freezing point and other aviation specifications).",
-        keywords: ["jet fuel", "aviation gasoline", "kerosene"],
-        synonyms: ["jet fuel", "avgas", "aviation fuel"],
-        related: ["petroleum products", "transport fuels", "kerosene"]
-      },
-  
-      "gas diesel oil": {
-        title: "Gas/Diesel Oil",
-        text: "Medium distillate fuel distilling between 180°C and 380°C. Includes road diesel, light heating oil, marine diesel and rail diesel. Several grades available depending on use. May include biodiesel components. Divided into blended biodiesels and non-biodiesels categories when reporting.",
-        keywords: ["diesel fuel", "heating oil", "marine diesel"],
-        synonyms: ["diesel", "gasoil"],
-        related: ["petroleum products", "transport fuels", "biodiesel"]
-      },
-  
-      "fuel oil": {
-        title: "Fuel Oil",
-        text: "All residual (heavy) fuel oils, including those obtained by blending. Characterized by kinematic viscosity above 10 cSt at 80°C, flash point above 50°C, and density over 0.90 kg/l. Categorized into low sulphur (<0.5%) and high sulphur (≥0.5%) fuel oil.",
-        keywords: ["heavy fuel oil", "residual oil", "bunker fuel"],
-        synonyms: ["heavy oil", "residual fuel oil"],
-        related: ["petroleum products", "industrial fuels", "marine fuels"]
-      },
-  
-      "refinery products": {
-        title: "Refinery Products",
-        text: "Products from petroleum refining including refinery gas, ethane, LPG, naphtha, lubricants, bitumen, paraffin waxes, and petroleum coke. Refinery gas is a mixture of non-condensable gases mainly consisting of hydrogen, methane, ethane and olefins. LPG consists mainly of propane and butane or their combinations.",
-        keywords: ["refined products", "refinery output", "petroleum derivatives"],
-        synonyms: ["refined petroleum products", "oil products"],
-        related: ["petroleum products", "industrial fuels", "chemical feedstocks"]
-      },
-  
-      "crude oil": {
-        title: "Crude Oil",
-        text: "A mineral oil of natural origin comprising a mixture of hydrocarbons and associated impurities, such as sulphur. It exists in the liquid state under normal surface temperature and pressure and its physical characteristics (density, viscosity, etc.) are highly variable. This includes field or lease condensate recovered from associated and non-associated gas where it is commingled with the commercial crude oil stream.",
-        keywords: ["mineral oil", "petroleum", "crude petroleum"],
-        synonyms: ["mineral oil", "crude petroleum"],
-        related: ["petroleum products", "oil", "fossil fuels"]
-      },
-  
-      "natural gas liquids": {
-        title: "Natural Gas Liquids (NGL)",
-        text: "Liquid or liquefied hydrocarbons recovered from natural gas in separation facilities or gas processing plants. NGL include ethane, propane, butane (normal and iso-), (iso) pentane and pentanes plus (sometimes referred to as natural gasoline or plant condensate).",
-        keywords: ["NGL", "gas liquids", "condensate"],
-        synonyms: ["NGL", "gas condensate"],
-        related: ["natural gas", "petroleum products", "gas processing"]
-      },
-  
-      "refinery feedstocks": {
-        title: "Refinery Feedstocks",
-        text: "A processed oil destined for further processing (e.g. straight run fuel oil or vacuum gas oil) excluding blending. With further processing, it will be transformed into one or more components and/or finished products. This includes returns from the petrochemical industry to the refining industry (e.g. pyrolysis gasoline, C4 fractions, gasoil and fuel oil fractions).",
-        keywords: ["feedstock", "process oil", "refinery input"],
-        synonyms: ["process oil", "refinery input"],
-        related: ["petroleum products", "oil refining", "petrochemicals"]
-      },
-  
-      "additives oxygenates": {
-        title: "Additives/Oxygenates",
-        text: "Non-hydrocarbon compounds added to or blended with petroleum products to modify their properties (octane, cetane, cold properties, etc.). Includes oxygenates (alcohols, ethers), esters (like rapeseed oil or dimethylester), and chemical compounds (like TML, TEL and detergents). This category includes biofuels that are blended with liquid fossil fuels.",
-        keywords: ["fuel additives", "oxygenates", "fuel modifiers"],
-        synonyms: ["fuel additives", "fuel improvers"],
-        related: ["petroleum products", "biofuels", "motor fuels"]
-      },
-  
-      "other hydrocarbons": {
-        title: "Other Hydrocarbons",
-        text: "Includes synthetic crude oil from tar sands, shale oil, liquids from coal liquefaction, output of liquids from natural gas conversion into gasoline, emulsified oils (e.g. orimulsion), and other liquid hydrocarbons. Excludes oil shale but includes the shale oil (secondary product).",
-        keywords: ["synthetic oil", "coal liquids", "unconventional oil"],
-        synonyms: ["synthetic crude", "unconventional hydrocarbons"],
-        related: ["oil", "petroleum products", "fossil fuels"]
-      },
-  
-      "white spirit": {
-        title: "White Spirit and SBP",
-        text: "Refined distillate intermediates with distillation in the naphtha/kerosene range. White spirit has a flash point above 30°C and distillation range of 135-200°C. Industrial spirit (SBP) includes light oils distilling between 30-200°C in 7-8 grades, defined by temperature difference between 5% volume and 90% volume distillation points not exceeding 60°C.",
-        keywords: ["mineral spirits", "industrial spirit", "SBP"],
-        synonyms: ["mineral spirits", "petroleum spirits"],
-        related: ["petroleum products", "solvents", "industrial chemicals"]
-      },
-  
-      "lubricants": {
-        title: "Lubricants",
-        text: "Hydrocarbons produced from distillate by-product, mainly used to reduce friction between bearing surfaces. Includes all finished grades of lubricating oil, from spindle oil to cylinder oil, and those used in greases, motor oils and all grades of lubricating oil base stocks.",
-        keywords: ["lube oil", "motor oil", "grease"],
-        synonyms: ["lube oils", "lubricating oils"],
-        related: ["petroleum products", "industrial oils", "automotive products"]
-      },
-  
-      "bitumen": {
-        title: "Bitumen",
-        text: "Solid, semi-solid or viscous hydrocarbon with a colloidal structure, being brown to black in colour, obtained as a residue in the distillation of crude oil, by vacuum distillation of oil residues from atmospheric distillation. Bitumen is often referred to as asphalt and is primarily used for the construction of roads and for roofing material. Includes fluidised and cut back bitumen.",
-        keywords: ["asphalt", "road tar", "roofing material"],
-        synonyms: ["asphalt", "road tar"],
-        related: ["petroleum products", "construction materials", "road construction"]
-      },
-  
-      "paraffin waxes": {
-        title: "Paraffin Waxes",
-        text: "Saturated aliphatic hydrocarbons extracted when dewaxing lubricant oils. They have a crystalline structure which is more or less fine depending on the grade. Their main characteristics are: colourless, odourless and translucent, with a melting point above 45°C.",
-        keywords: ["wax", "petroleum wax", "paraffin"],
-        synonyms: ["petroleum wax", "mineral wax"],
-        related: ["petroleum products", "industrial products", "lubricants"]
-      },
-  
-      "petroleum coke": {
-        title: "Petroleum Coke",
-        text: "Black solid by-product, obtained mainly by cracking and carbonising petroleum derived feedstock, vacuum bottoms, tar and pitches in processes such as delayed coking or fluid coking. It consists mainly of carbon (90-95%) and has a low ash content. Used as feedstock in coke ovens for the steel industry, heating purposes, electrode manufacture and chemicals production.",
-        keywords: ["green coke", "calcinated coke", "catalyst coke"],
-        synonyms: ["pet coke", "coker coke"],
-        related: ["petroleum products", "industrial fuels", "steel industry"]
-      },
-  
-      "other petroleum": {
-        title: "Other Petroleum Products",
-        text: "All products not specifically mentioned elsewhere, including tar and sulphur from petroleum refining. Includes aromatics (e.g. BTX or benzene, toluene and xylene) and olefins (e.g. propylene) produced within refineries.",
-        keywords: ["tar", "sulphur", "aromatics", "olefins"],
-        synonyms: ["other oil products", "specialty products"],
-        related: ["petroleum products", "chemical industry", "petrochemicals"]
-      },
-  
-      "hydrogen": {
-        title: "Hydrogen",
-        text: "Hydrogen used as a feedstock, a fuel or an energy carrier/storage must be reported, including auto-produced and auto-consumed. Only extracted/separated hydrogen for energy or non-energy use is reported, not hydrogen present in mixtures.",
-        keywords: ["hydrogen fuel", "hydrogen carrier", "hydrogen storage"],
-        synonyms: ["H2", "hydrogen energy"],
-        related: ["energy storage", "renewable energy", "energy carriers"]
-      },
-  
-      "gas works gas": {
-        title: "Gas Works Gas",
-        text: "Covers all types of gases produced in public utility or private plants for gas manufacture, transport and distribution. Includes gas from carbonisation, total gasification with/without enrichment with oil products, reforming and simple mixing of gases and/or air. Quantity transferred from other coal gases to gas works should be reported as gas works gas production.",
-        keywords: ["manufactured gas", "town gas", "coal gas"],
-        synonyms: ["town gas", "coal gas"],
-        related: ["manufactured gases", "natural gas", "coal products"]
-      },
-  
-      "coke oven gas": {
-        title: "Coke Oven Gas",
-        text: "Gas obtained as a by-product of the manufacture of coke oven coke for iron and steel production. This gas is recovered and used as a fuel partly within the plant and partly in other steel industry processes or in power stations equipped to burn it.",
-        keywords: ["coking gas", "coke gas", "steel industry gas"],
-        synonyms: ["coking gas", "steel plant gas"],
-        related: ["manufactured gases", "iron and steel", "industrial energy"]
-      },
-  
-      "blast furnace gas": {
-        title: "Blast Furnace Gas",
-        text: "Gas produced during the combustion of coke in blast furnaces in the iron and steel industry. It is recovered and used partly within the plant and partly in other steel industry processes or in power stations equipped to burn it. The quantity is reported on a gross calorific value basis.",
-        keywords: ["furnace gas", "iron industry gas", "BF gas"],
-        synonyms: ["BF gas", "iron industry gas"],
-        related: ["manufactured gases", "iron and steel", "industrial energy"]
-      },
-  
-      "other recovered gases": {
-        title: "Other Recovered Gases",
-        text: "By-product gases from steel production in oxygen furnaces, also known as converter gas, LD gas or BOS gas. Also includes non-specified manufactured gases from carbonaceous materials recovered from manufacturing and chemical processes not defined elsewhere.",
-        keywords: ["converter gas", "LD gas", "BOS gas"],
-        synonyms: ["steel converter gas", "oxygen furnace gas"],
-        related: ["manufactured gases", "industrial gases", "steel industry"]
-      },
-  
-      "peat": {
-        title: "Peat",
-        text: "A combustible soft, porous or compressed, sedimentary deposit of plant origin with high water content (up to 90% in raw state), easily cut, of light to dark brown color. Includes sod peat and milled peat. Peat used for non-energy purposes is excluded.",
-        keywords: ["sod peat", "milled peat", "fuel peat"],
-        synonyms: ["turf", "bog fuel"],
-        related: ["solid fuels", "biofuels", "energy sources"]
-      },
-  
-      "peat briquettes": {
-        title: "Peat Products",
-        text: "Products such as peat briquettes derived directly or indirectly from sod peat and milled peat. These are processed and compressed forms of peat used primarily as a fuel.",
-        keywords: ["peat fuel", "compressed peat", "processed peat"],
-        synonyms: ["peat fuel products", "processed peat"],
-        related: ["peat", "solid fuels", "energy products"]
-      },
-  
-      "annual energy statistics": {
-        title: "Annual Energy Statistics",
-        text: "Annual collection of energy statistics covering calendar year data (January to December), starting from reference year 2022. Data must be submitted by October 31st of the following year through Eurostat's single entry point, conforming to specified interchange standards. Includes detailed reporting of supply, transformation, energy sector consumption, and final energy consumption.",
-        keywords: ["energy reporting", "statistical collection", "annual data"],
-        synonyms: ["yearly energy data", "annual energy reporting"],
-        related: ["energy statistics", "data collection", "energy reporting"]
-      },
-  
-      "supply categories": {
-        title: "Energy Supply Categories",
-        text: "Categories for reporting energy supply including production (underground and surface), receipts from other sources (recovered slurries, middlings, low-grade coal), imports, exports, international marine bunkers, and stock changes. For certain products, imports and exports must be reported by country of origin and destination.",
-        keywords: [
-          "energy supply",
-          "production",
-          "trade",
-          "stocks",
-        ],
-        synonyms: ["supply reporting", "energy sources"],
-        related: ["energy statistics", "energy production", "energy trade"],
-      },
-  
-      "transformation sector reporting": {
-        title: "Transformation Sector Reporting",
-        text: "Reporting categories for energy transformation activities including main activity producers and autoproducers of electricity and heat, patent fuel plants, coke ovens, BKB/PB plants, gas works, blast furnaces, coal liquefaction, and hydrogen production. Distinguishes between electricity-only, CHP, and heat-only units.",
-        keywords: ["energy conversion", "power generation", "fuel transformation"],
-        synonyms: ["conversion sector", "transformation activities"],
-        related: ["energy sector", "electricity production", "heat production"]
-      },
-  
-      "energy sector consumption": {
-        title: "Energy Sector Consumption",
-        text: "Energy consumption within the energy sector itself, including electricity and heat plants, coal mines, patent fuel plants, coke ovens, gas works, blast furnaces, refineries, and hydrogen production facilities. Also covers transmission and distribution losses.",
-        keywords: ["own use", "sector consumption", "energy losses"],
-        synonyms: ["energy industry use", "sector energy use"],
-        related: ["energy consumption", "energy efficiency", "distribution losses"]
-      },
-  
-      "final consumption reporting": {
-        title: "Final Energy Consumption Reporting",
-        text: "Detailed reporting of final energy consumption across industry (including iron and steel, chemicals, non-ferrous metals, etc.), transport (rail, domestic navigation), and other sectors (commercial, households, agriculture, forestry, fishing). Includes both energy and non-energy use.",
-        keywords: ["end use", "sectoral consumption", "final use"],
-        synonyms: ["end-use reporting", "consumption reporting"],
-        related: ["energy consumption", "industrial energy", "transport energy"]
-      },
-  
-      "calorific values": {
-        title: "Calorific Values",
-        text: "Both gross and net calorific values must be reported for specific energy products and uses, including production, imports, exports, and various transformation and consumption categories. Values are reported in MJ/t (mega-joules per tonne), while quantities are generally reported in kt (kilo-tonnes) or TJ GCV for gases.",
-        keywords: ["heating value", "energy content", "fuel value"],
-        synonyms: ["heating value", "energy content"],
-        related: ["energy measurement", "energy statistics", "fuel properties"]
-      },
-  
-      "natural gas supply": {
-        title: "Natural Gas Supply",
-        text: "Supply sector reporting must include volumes in both energy (TJ GCV) and physical units (10⁶ m³), with gross and net calorific values. Includes indigenous production (offshore, associated gas, non-associated gas, colliery gas), imports, exports, international marine bunkers, and stock changes. Gas vented and flared must be reported separately.",
-        keywords: ["gas production", "gas imports", "gas stocks", "indigenous gas"],
-        synonyms: ["gas supply", "gas availability"],
-        related: ["natural gas", "gas storage", "gas transmission"]
-      },
-  
-      "gas storage facilities": {
-        title: "Gas Storage Facilities",
-        text: "Covers both gaseous gas storage (depleted fields, aquifers, salt caverns) and LNG terminals. Working capacity excludes cushion gas (permanent inventory). Each facility must report name, type, working capacity, peak output, and for LNG terminals, regasifying/liquefying capacity. All measurements use reference conditions (15°C, 101325 Pa).",
-        keywords: ["gas storage", "LNG terminal", "underground storage"],
-        synonyms: ["storage facilities", "gas storage sites"],
-        related: ["natural gas", "LNG", "gas infrastructure"]
-      },
-  
-      "gas transmission": {
-        title: "Gas Transmission",
-        text: "Covers transmission and distribution losses in gas networks. Pipeline transport is reported under transport sector consumption. System includes high-pressure transmission networks and local distribution networks. Losses must be reported separately for transmission and distribution.",
-        keywords: ["gas network", "pipeline losses", "gas distribution"],
-        synonyms: ["gas transport", "gas distribution"],
-        related: ["natural gas", "energy infrastructure", "energy losses"]
-      },
-  
-      "gas consumption sectors": {
-        title: "Gas Consumption Sectors",
-        text: "Final consumption is categorized into transformation sector (power plants, gas works, etc.), energy sector (mines, refineries, etc.), transport sector (road, pipeline), industry sector (iron and steel, chemicals, etc.), and other sectors (services, households, agriculture). Both energy and non-energy use must be reported separately.",
-        keywords: ["gas use", "consumption categories", "end use"],
-        synonyms: ["gas end use", "sectoral consumption"],
-        related: ["natural gas", "energy consumption", "industrial energy"]
-      },
-  
-      "gas measurement standards": {
-        title: "Gas Measurement Standards",
-        text: "All gas volumes must be reported at reference conditions of 15°C temperature and 101325 Pa pressure. Energy content is reported in TJ based on gross calorific value (GCV). Physical quantities use million cubic meters (10⁶ m³). Storage and terminal capacities are reported in million cubic meters per day (10⁶ m³/day).",
-        keywords: ["gas measurement", "reference conditions", "energy content"],
-        synonyms: ["measurement standards", "gas reporting units"],
-        related: ["natural gas", "energy measurement", "statistical reporting"]
-      },
-  
-      "indigenous gas production": {
-        title: "Indigenous Gas Production",
-        text: "Total domestic production of natural gas including offshore production. Comprises associated gas (produced with crude oil), non-associated gas (from fields producing only gaseous hydrocarbons), and colliery gas (methane from coal mines). Production must be reported in both energy units (TJ GCV) and volume (10⁶ m³).",
-        keywords: ["domestic gas", "offshore gas", "gas fields"],
-        synonyms: ["domestic production", "local gas production"],
-        related: ["natural gas", "gas production", "energy supply"]
-      },
-  
-      "gas venting and flaring": {
-        title: "Gas Venting and Flaring",
-        text: "Gas venting refers to intentional release of gas into the atmosphere at production sites or processing plants. Gas flaring is the burning of gas in flares at production sites or processing plants. Both quantities must be reported separately, with no requirement for calorific values declaration.",
-        keywords: ["gas release", "gas burning", "production losses"],
-        synonyms: ["vented gas", "flared gas"],
-        related: ["natural gas", "gas processing", "emissions"]
-      },
-  
-      "gas stocks": {
-        title: "Gas Stocks and Storage",
-        text: "Opening and closing stock levels must be declared separately for stocks on national territory and abroad. Stock level means quantity available for delivery during input-output cycle. Recoverable gas refers to gas stored in special facilities (depleted fields, aquifers, salt cavities) and LNG facilities, excluding cushion gas.",
-        keywords: ["gas inventory", "stored gas", "gas reserves"],
-        synonyms: ["gas storage levels", "gas inventories"],
-        related: ["natural gas", "gas storage", "LNG"]
-      },
-  
-      "lng terminals": {
-        title: "LNG Terminals",
-        text: "Facilities for liquefying natural gas or importing/regasifying LNG. Must be reported separately as import or export terminals. Each terminal must declare name, working capacity (in gas equivalent), and regasifying/liquefying capacity. Working capacity excludes cushion gas used for maintaining pressure.",
-        keywords: ["LNG facility", "gas terminal", "regasification"],
-        synonyms: ["gas terminals", "LNG facilities"],
-        related: ["natural gas", "gas storage", "gas infrastructure"]
-      },
-  
-      "gas transformation": {
-        title: "Gas Transformation",
-        text: "Transformation of natural gas includes use in electricity-only plants, CHP units, heat-only plants (both main activity producers and autoproducers), gas works, coke ovens, blast furnaces, gas-to-liquids plants, and hydrogen production. Each category must be reported separately with quantities in energy and volume units.",
-        keywords: ["gas conversion", "gas processing", "power generation"],
-        synonyms: ["gas conversion", "gas processing"],
-        related: ["natural gas", "energy transformation", "electricity generation"]
-      },
-  
-      "gas energy sector": {
-        title: "Gas Energy Sector",
-        text: "Covers gas consumption within the energy sector including coal mines, oil/gas extraction, refineries, coke ovens, blast furnaces, gas works, power plants, and LNG/gasification facilities. Includes gas used for liquefaction and regasification processes in LNG terminals and gas used in pipeline operations.",
-        keywords: ["own use", "energy industry", "gas operations"],
-        synonyms: ["gas industry use", "energy sector gas"],
-        related: ["natural gas", "energy sector", "gas infrastructure"]
-      },
-  
-      "gas transport sector": {
-        title: "Gas Transport Sector",
-        text: "Gas consumption in transport covers road transport using natural gas vehicles and pipeline transport operations. Pipeline transport refers to gas used in supporting pipeline operations including compression. Both energy and non-energy use must be declared separately for each transport category.",
-        keywords: ["gas vehicles", "pipeline operations", "transport fuel"],
-        synonyms: ["transport gas use", "gas fuel"],
-        related: ["natural gas", "transport energy", "pipeline transport"]
-      },
-  
-      "gas industry sector": {
-        title: "Gas Industry Sector",
-        text: "Industrial consumption of gas must be reported separately for energy and non-energy use across specific subsectors: iron and steel, chemical/petrochemical, non-ferrous metals, non-metallic minerals, transport equipment, machinery, mining, food/beverages, pulp/paper, wood products, construction, and textiles/leather.",
-        keywords: ["industrial gas", "manufacturing", "industrial consumption"],
-        synonyms: ["industrial gas use", "manufacturing gas"],
-        related: ["natural gas", "industrial energy", "energy consumption"]
-      },
-  
-      "gas storage reporting": {
-        title: "Gas Storage Reporting",
-        text: "Gas storage capacities must be reported separately for gaseous gas storage facilities and LNG terminals (import/export). Each facility must report: name, type (for gaseous storage only - e.g., depleted field, aquifer, salt cavern), working capacity (excluding cushion gas), peak output, and regasifying/liquefying capacity for LNG terminals.",
-        keywords: ["storage capacity", "working capacity", "peak output"],
-        synonyms: ["storage reporting", "capacity reporting"],
-        related: ["natural gas", "LNG", "gas infrastructure"]
-      },
-  
-      "gas trade reporting": {
-        title: "Gas Trade Reporting",
-        text: "For imports and exports, both total natural gas quantities and the LNG portion must be declared separately, broken down by country of origin for imports and country of destination for exports. All quantities must be reported in both energy units (TJ GCV) and physical units (10⁶ m³).",
-        keywords: ["gas imports", "gas exports", "LNG trade"],
-        synonyms: ["gas trade statistics", "international gas flows"],
-        related: ["natural gas", "LNG", "energy trade"]
-      },
-  
-      "oil supply reporting": {
-        title: "Oil Supply Reporting",
-        text: "Supply data must be reported for crude oil, NGL, refinery feedstocks, additives/oxygenates, and other hydrocarbons. Includes indigenous production (except for refinery feedstocks and biofuels), receipts from other sources, backflows from petrochemical sector, products transferred, imports/exports, direct use, and stock changes. All quantities must be reported in kt.",
-        keywords: ["oil supply", "crude oil", "NGL", "feedstocks"],
-        synonyms: ["petroleum supply", "oil availability"],
-        related: ["oil products", "refinery operations", "petrochemicals"]
-      },
-  
-      "refinery operations": {
-        title: "Refinery Operations",
-        text: "Covers observed refinery intake, refinery losses (difference between intake and output), and gross refinery output. Includes refinery fuel consumption in electricity, CHP, and heat-only units. Losses may occur during distillation due to evaporation, with possible volumetric gains but no mass gains.",
-        keywords: ["refinery intake", "refinery output", "refinery losses"],
-        synonyms: ["refining operations", "refinery processes"],
-        related: ["oil products", "petroleum refining", "energy sector"]
-      },
-  
-      "petrochemical sector reporting": {
-        title: "Petrochemical Sector Reporting",
-        text: "Reports deliveries of finished petroleum products to petrochemical sector, including both energy use (fuel for steam cracking) and non-energy use (feedstock for ethylene, propylene, butylene, synthesis gas, aromatics). Backflows from petrochemical sector to refineries must be reported separately.",
-        keywords: ["petrochemical use", "steam cracking", "chemical feedstock"],
-        synonyms: ["chemical industry reporting", "petrochemical consumption"],
-        related: ["oil products", "industrial energy", "chemical industry"]
-      },
-  
-      "refinery capacity reporting": {
-        title: "Refinery Capacity Reporting",
-        text: "Annual reporting of national total refining capacity and breakdown by refinery in thousand metric tons per year. Must include atmospheric/vacuum distillation, thermal/catalytic cracking (including FCC and hydrocracking), reforming, desulphurisation, and other processes like alkylation and etherification.",
-        keywords: ["refining capacity", "distillation", "cracking processes"],
-        synonyms: ["refinery capabilities", "processing capacity"],
-        related: ["oil refining", "petroleum products", "industrial capacity"]
-      },
-  
-      "oil products trade": {
-        title: "Oil Products Trade",
-        text: "Trade data includes quantities imported/exported under processing agreements (refining on account). Crude oil and NGLs reported by ultimate origin; refinery feedstocks and products by last consignment. Includes gas liquids from LNG regasification and direct petrochemical trade. Pure biofuels trade excluded. Re-exports from bonded areas reported as exports from processing country.",
-        keywords: ["oil imports", "oil exports", "processing agreements"],
-        synonyms: ["oil trade", "petroleum trade"],
-        related: ["oil products", "refinery operations", "international trade"]
-      },
-  
-      "refinery fuel usage": {
-        title: "Refinery Fuel Usage",
-        text: "Fuels used at refineries must be reported, including those used for electricity and heat production for sale. Usage reported separately for electricity-only units, CHP units, and heat-only units. Part of refinery own use in energy sector consumption reporting.",
-        keywords: ["refinery consumption", "own use", "fuel consumption"],
-        synonyms: ["refinery consumption", "own use fuel"],
-        related: ["refinery operations", "energy sector", "fuel consumption"]
-      },
-  
-      "petrochemical deliveries": {
-        title: "Petrochemical Deliveries",
-        text: "Covers delivery of finished petroleum products from primary sources to petrochemical sector. Distinguishes between energy use (steam cracking fuel) and non-energy use (ethylene, propylene production). Excludes backflows to refineries, which are reported separately. Quantities declared in kt (kilo-tonnes).",
-        keywords: ["chemical industry", "petrochemical supply", "feedstock"],
-        synonyms: ["chemical deliveries", "petrochemical supply"],
-        related: ["oil products", "chemical industry", "industrial consumption"]
-      },
-  
-      "refinery processes": {
-        title: "Refinery Processes",
-        text: "National refineries must report annual capacity for: atmospheric and vacuum distillation, thermal cracking (including visbreaking and coking), catalytic cracking (including FCC and hydrocracking), reforming, desulphurisation, and alkylation/polymerisation/isomerisation/etherification. Capacities reported in thousand metric tons per year.",
-        keywords: ["refining process", "distillation", "cracking"],
-        synonyms: ["refining operations", "processing units"],
-        related: ["oil refining", "petroleum products", "refinery capacity"]
-      },
-  
-      "refinery capacity breakdown": {
-        title: "Refinery Capacity Breakdown",
-        text: "Each refinery must report: name/location, atmospheric distillation, vacuum distillation, thermal cracking (with separate visbreaking and coking), catalytic cracking (with separate FCC and hydrocracking), reforming, desulphurisation, alkylation/polymerisation/isomerisation, and etherification capacities.",
-        keywords: ["refinery units", "processing capacity", "unit capacity"],
-        synonyms: ["unit breakdown", "process capacity"],
-        related: ["refinery processes", "oil refining", "industrial capacity"]
-      },
-  
-      "petrochemical consumption": {
-        title: "Petrochemical Consumption",
-        text: "Covers energy use (fuel for steam cracking) and non-energy use (feedstock for ethylene, propylene, butylene, synthesis gas, aromatics production) in petrochemical sector. Quantities in kt. Excludes amounts used as fuel. Includes processes like steam cracking, aromatics plants and steam reforming.",
-        keywords: ["chemical feedstock", "steam cracking", "aromatics"],
-        synonyms: ["chemical use", "petrochemical use"],
-        related: ["industrial energy", "chemical industry", "feedstocks"]
-      },
-  
-      "renewable electricity production": {
-        title: "Renewable Electricity Production",
-        text: "Gross electricity production must be reported separately for main activity producers and autoproducers. Categories include pure/mixed hydro plants, pumped storage, geothermal, solar PV (with size and rooftop/off-grid subcategories), solar thermal, tide/wave/ocean, and wind (onshore/offshore). Only quantities used for energy purposes should be reported.",
-        keywords: ["renewable power", "green electricity", "clean energy"],
-        synonyms: ["renewable power", "green power"],
-        related: ["hydropower", "solar energy", "wind power"]
-      },
-  
-      "solar photovoltaic categories": {
-        title: "Solar Photovoltaic Categories",
-        text: "Solar PV installations must be reported in three size categories: less than 30 kW, from 30 to 1000 kW, and more than 1000 kW. Each category requires subcategories for rooftop and off-grid installations, with off-grid reporting mandatory only when it represents 1% or more of capacity in its size category.",
-        keywords: ["solar PV", "photovoltaic", "rooftop solar"],
-        synonyms: ["PV installations", "solar power"],
-        related: ["renewable energy", "electricity production", "solar energy"]
-      },
-  
-      "heat pumps reporting": {
-        title: "Heat Pumps Reporting",
-        text: "Ambient heat from heat pumps must be reported for specific sectors including transformation (heat sold only), energy sector total, industry total, commercial services, and households. Three categories required under indigenous production: aerothermal, geothermal, and hydrothermal, each with subcategory for heat pumps with SPF above threshold per Directives 2009/28/EC and 2018/2001.",
-        keywords: ["heat pump", "ambient heat", "thermal energy"],
-        synonyms: ["thermal pumps", "heat extraction"],
-        related: ["renewable heat", "thermal energy", "energy efficiency"]
-      },
-  
-      "biofuel production capacity": {
-        title: "Biofuel Production Capacity",
-        text: "Annual production capacity must be reported for biogasoline, biodiesels, bio jet kerosene, and other liquid biofuels. Includes reporting of average net calorific values. For solid biofuels production, detailed breakdown required for fuelwood/wood residues, wood pellets, black liquor, bagasse, animal waste, and vegetal materials.",
-        keywords: ["biofuel capacity", "production capacity", "biofuel production"],
-        synonyms: ["biofuel facilities", "production plants"],
-        related: ["biofuels", "renewable energy", "energy production"]
-      },
-  
-      "thermal capacity heat pumps": {
-        title: "Thermal Capacity of Heat Pumps",
-        text: "Detailed reporting required for aerothermal (air-air, air-water, including reversible systems), geothermal (ground-air, ground-water), and hydrothermal heat (water-air, water-water) capacities. Each category must report subcategory for heat pumps with SPF above directive threshold. SPF threshold follows renewable energy directives 2009/28/EC and 2018/2001.",
-        keywords: ["heat pump capacity", "thermal output", "heat extraction"],
-        synonyms: ["heating capacity", "thermal power"],
-        related: ["heat pumps", "renewable heat", "energy efficiency"]
-      },
-  
-      "hydro categories": {
-        title: "Hydropower Categories",
-        text: "Hydro plants must be reported in three categories: pure hydro plants (natural water inflow only), mixed hydro plants (natural inflow and pumping), and pure pumped storage. For mixed plants, pumping component must be reported separately. Capacity reporting uses net maximum electrical capacity as of December 31st.",
-        keywords: ["hydro plants", "pumped storage", "water power"],
-        synonyms: ["hydro facilities", "water power plants"],
-        related: ["hydropower", "electricity production", "renewable energy"]
-      },
-  
-      "solar thermal measurement": {
-        title: "Solar Thermal Measurement",
-        text: "Solar collector surface area must be reported for all installations used in solar thermal heat production. Excludes collector surface for electricity generation (PV and concentrated solar). Includes all collector types: glazed, unglazed, flat-plate and vacuum tube, using liquid or air as energy carrier.",
-        keywords: ["solar collectors", "thermal surface", "solar heating"],
-        synonyms: ["solar thermal area", "collector surface"],
-        related: ["solar energy", "thermal energy", "renewable heat"]
-      },
-  
-      "waste energy reporting": {
-        title: "Waste Energy Reporting",
-        text: "Municipal waste must be reported separately as renewable and non-renewable portions. Only waste used for energy purposes (electricity/heat generation, combustion with energy recovery) should be included. Non-energy uses like furniture, construction, paper/cardboard production are excluded. Passive thermal energy (e.g. passive solar heating) is not reported.",
-        keywords: ["waste combustion", "energy recovery", "municipal waste"],
-        synonyms: ["waste-to-energy", "energy from waste"],
-        related: ["renewable energy", "waste management", "energy recovery"]
-      },
-  
-      "non-energy use reporting": {
-        title: "Non-Energy Use Reporting",
-        text: "From reference year 2024, non-energy use must be reported for transport, industry, and other sectors. Applies to solid biofuels, liquid biofuels, and biogases when used to replace fossil fuels. Must be reported separately from energy use quantities. Until 2027, only total final consumption for non-energy use can be reported instead of sectoral breakdown.",
-        keywords: ["non-energy consumption", "biofuel feedstock", "material use"],
-        synonyms: ["material consumption", "non-fuel use"],
-        related: ["biofuels", "industrial use", "material applications"]
-      },
-  
-      "solar pv installation": {
-        title: "Solar PV Installation Categories",
-        text: "PV installations must be classified by size: <30 kW, 30-1000 kW, >1000 kW. Each category requires rooftop and off-grid subcategories, with off-grid reporting mandatory only when representing ≥1% of category capacity. Net maximum electrical capacity is reported as of December 31st, including both electricity-only and CHP units.",
-        keywords: ["photovoltaic", "solar power", "PV capacity"],
-        synonyms: ["solar installation", "PV systems"],
-        related: ["renewable electricity", "solar energy", "electrical capacity"]
-      },
-  
-      "waste energy reporting": {
-        title: "Waste Energy Reporting",
-        text: "Municipal waste must be reported separately as renewable and non-renewable portions. Only waste used for energy purposes (electricity/heat generation, combustion with energy recovery) should be included. Non-energy uses like furniture, construction, paper/cardboard production are excluded. Passive thermal energy (e.g. passive solar heating) is not reported.",
-        keywords: ["waste combustion", "energy recovery", "municipal waste"],
-        synonyms: ["waste-to-energy", "energy from waste"],
-        related: ["renewable energy", "waste management", "energy recovery"]
-      },
-  
-      "non-energy use reporting": {
-        title: "Non-Energy Use Reporting",
-        text: "From reference year 2024, non-energy use must be reported for transport, industry, and other sectors. Applies to solid biofuels, liquid biofuels, and biogases when used to replace fossil fuels. Must be reported separately from energy use quantities. Until 2027, only total final consumption for non-energy use can be reported instead of sectoral breakdown.",
-        keywords: ["non-energy consumption", "biofuel feedstock", "material use"],
-        synonyms: ["material consumption", "non-fuel use"],
-        related: ["biofuels", "industrial use", "material applications"]
-      },
-  
-      "solar pv installation": {
-        title: "Solar PV Installation Categories",
-        text: "PV installations must be classified by size: <30 kW, 30-1000 kW, >1000 kW. Each category requires rooftop and off-grid subcategories, with off-grid reporting mandatory only when representing ≥1% of category capacity. Net maximum electrical capacity is reported as of December 31st, including both electricity-only and CHP units.",
-        keywords: ["photovoltaic", "solar power", "PV capacity"],
-        synonyms: ["solar installation", "PV systems"],
-        related: ["renewable electricity", "solar energy", "electrical capacity"]
-      },
-  
-      "solar collector reporting": {
-        title: "Solar Collector Reporting",
-        text: "Total surface area of installed solar collectors must be reported in 1000 m². Only includes collectors for solar thermal heat production, excluding surfaces for electricity generation (PV and concentrated solar power). Must include all types: glazed, unglazed, flat-plate and vacuum tube collectors, with either liquid or air as energy carrier.",
-        keywords: ["solar thermal", "collector surface", "thermal collectors"],
-        synonyms: ["solar thermal area", "collector installation"],
-        related: ["solar energy", "thermal energy", "heat production"]
-      },
-  
-      "heat pump capacity": {
-        title: "Heat Pump Capacity",
-        text: "Thermal capacity must be reported for aerothermal (including air-air, air-water, reversible, and exhaust air systems), geothermal (ground-air, ground-water), and hydrothermal (water-air, water-water) heat pumps. Each category requires subcategory reporting for units with SPF above threshold per Directives 2009/28/EC and 2018/2001.",
-        keywords: ["thermal capacity", "heat extraction", "SPF threshold"],
-        synonyms: ["heating capacity", "thermal output"],
-        related: ["renewable heat", "ambient heat", "heat pumps"]
-      },
-  
-      "biofuel production capacity": {
-        title: "Biofuel Production Capacity",
-        text: "Annual production capacity must be reported in kt/year for biogasoline, biodiesels, bio jet kerosene, and other liquid biofuels. Average net calorific values must be reported for each biofuel type, including bioethanol and charcoal. Imports and exports must be reported by country of origin/destination for all liquid biofuels and wood pellets.",
-        keywords: ["biofuel capacity", "production volume", "calorific value"],
-        synonyms: ["biofuel output", "production capability"],
-        related: ["biofuels", "renewable fuels", "energy production"]
-      },
-  
-      "solid biofuels production": {
-        title: "Solid Biofuels Production",
-        text: "Total production of solid biofuels (excluding charcoal) must be categorized as: fuelwood/wood residues/by-products (with wood pellets as subcategory), black liquor, bagasse, animal waste, other vegetal materials/residues, and renewable fraction of industrial waste. Quantities reported in TJ NCV except charcoal (kt).",
-        keywords: ["biomass", "wood products", "industrial waste"],
-        synonyms: ["solid biomass", "wood fuel"],
-        related: ["biofuels", "renewable energy", "waste energy"]
-      },
-  
-      "biogas production": {
-        title: "Biogas Production",
-        text: "Total biogas production must be split by production method: anaerobic fermentation (with subcategories for landfill gas, sewage sludge gas, and other biogases) and thermal processes. Quantities in TJ NCV. For anaerobic fermentation, source materials and process types must be specified.",
-        keywords: ["anaerobic digestion", "landfill gas", "sewage gas"],
-        synonyms: ["biogas generation", "gas fermentation"],
-        related: ["renewable gas", "waste treatment", "energy recovery"]
-      },
-  
-      "electricity capacity reporting": {
-        title: "Electricity Capacity Reporting",
-        text: "Net maximum electrical capacity must be reported as of December 31st for both electricity-only and CHP units. Represents continuous running capacity (15+ hours/day) of solely active power at network outlet point. All renewable sources require separate capacity reporting by technology type.",
-        keywords: ["electrical capacity", "power output", "generation capacity"],
-        synonyms: ["power capacity", "electrical output"],
-        related: ["power generation", "renewable electricity", "grid connection"]
-      },
-  
-      "nuclear fuel production": {
-        title: "Nuclear Fuel Production",
-        text: "Production of fresh nuclear fuel elements in fabrication plants. Only finished elements are counted, excluding rods or partial products. MOX fuel (mixed oxide of plutonium and uranium) is reported separately. Production capacity is measured in tonnes of heavy metal (tHM) per year.",
-        keywords: ["nuclear fuel", "fuel elements", "MOX fuel", "fuel fabrication"],
-        synonyms: ["nuclear fuel manufacturing", "fuel element production"],
-        related: ["nuclear energy", "uranium enrichment", "plutonium"]
-      },
-  
-      "nuclear enrichment": {
-        title: "Nuclear Enrichment",
-        text: "Annual enrichment capacity for isotopic separation of uranium, measured in tonnes of separative work units (tSWU). Enrichment is a key step in nuclear fuel production, increasing the concentration of fissile uranium-235.",
-        keywords: ["uranium enrichment", "isotopic separation", "enrichment capacity"],
-        synonyms: ["uranium processing", "isotope separation"],
-        related: ["nuclear fuel", "uranium production", "fuel fabrication"]
-      },
-  
-      "nuclear heat": {
-        title: "Nuclear Heat",
-        text: "Total heat generated by nuclear reactors for electricity production or other useful applications. Measured in terajoules (TJ). Nuclear burnup is reported in gigawatt-days per tonne of heavy metal (GWd/tHM) for discharged fuel elements.",
-        keywords: ["nuclear generation", "thermal output", "reactor heat"],
-        synonyms: ["reactor heat", "nuclear thermal"],
-        related: ["nuclear power", "electricity generation", "thermal energy"]
-      },
-  
-      "hydrogen production": {
-        title: "Hydrogen Production",
-        text: "Production of hydrogen from various sources including natural gas, oil, coal, renewables, and electrolysis. Production and capacity are measured in TJ (NCV). For electrolysis, separate reporting required for renewable, nuclear, and fossil electricity sources with direct transmission lines.",
-        keywords: ["hydrogen generation", "electrolysis", "hydrogen sources"],
-        synonyms: ["H2 production", "hydrogen generation"],
-        related: ["renewable energy", "natural gas", "electrolysis"]
-      },
-  
-      "hydrogen applications": {
-        title: "Hydrogen Applications",
-        text: "Use of hydrogen across sectors including transformation (electricity/heat production), industry (energy and non-energy use), transport, and blending with other fuels. Includes blending with natural gas, motor fuels, and renewables. Quantities reported in TJ (NCV).",
-        keywords: ["hydrogen use", "fuel blending", "hydrogen consumption"],
-        synonyms: ["hydrogen utilization", "H2 applications"],
-        related: ["energy sector", "transport sector", "fuel blending"]
-      },
-  
-      "industrial energy consumption": {
-        title: "Industrial Energy Consumption",
-        text: "Energy consumption in industry sector is reported by subsectors including mining, manufacturing, and processing industries. Covers both energy and non-energy use of fuels. Data must be reported according to specific industrial activity classifications.",
-        keywords: ["industry consumption", "manufacturing energy", "industrial sectors"],
-        synonyms: ["industrial use", "factory consumption"],
-        related: ["energy use", "final consumption", "industry sector"]
-      },
-  
-      "mining energy consumption": {
-        title: "Mining Energy Consumption",
-        text: "Energy consumption in mining and quarrying activities, including metal ore mining, other mining/quarrying, and mining support services. Reports energy used in extraction and processing operations.",
-        keywords: ["mining operations", "quarrying", "mineral extraction"],
-        synonyms: ["extractive industries", "mining sector"],
-        related: ["industrial consumption", "metal ores", "mining support"]
-      },
-  
-      "manufacturing energy use": {
-        title: "Manufacturing Energy Use",
-        text: "Covers energy consumption across manufacturing subsectors including food/beverages, textiles, wood products, paper, chemicals, metals, machinery, and transport equipment. Includes both process energy and facility energy use.",
-        keywords: ["manufacturing", "industrial processing", "factory energy"],
-        synonyms: ["industrial manufacturing", "factory consumption"],
-        related: ["industrial energy", "process energy", "facility energy"]
-      },
-  
-      "transport energy consumption": {
-        title: "Transport Energy Consumption",
-        text: "Energy consumption in transport sector divided by mode: rail (high-speed, conventional, metro/tram), road (freight, collective, cars/vans), and vehicle categories. Separate reporting for passenger and freight transport.",
-        keywords: ["transport fuel", "vehicle energy", "mobility energy"],
-        synonyms: ["transportation energy", "fuel consumption"],
-        related: ["fuel use", "vehicle types", "transport modes"]
-      },
-  
-      "commercial energy use": {
-        title: "Commercial Energy Use",
-        text: "Energy consumption in commercial and public services including retail, offices, hospitality, healthcare, education, and data centers. Data centers with total power capacity ≥1 MW must be reported separately from 2024.",
-        keywords: ["service sector", "commercial buildings", "public services"],
-        synonyms: ["service sector energy", "tertiary sector"],
-        related: ["building energy", "office consumption", "data centers"]
-      },
-  
-      "household energy consumption": {
-        title: "Household Energy Consumption",
-        text: "Residential energy use categorized by end-use: space heating, space cooling, water heating, cooking, lighting and appliances (electricity only), and other uses. Reported separately for different energy products.",
-        keywords: ["residential energy", "domestic consumption", "home energy"],
-        synonyms: ["residential use", "domestic energy"],
-        related: ["space heating", "appliances", "cooking"]
-      },
-  
-      "preliminary annual data": {
-        title: "Preliminary Annual Data",
-        text: "Early reporting of key energy statistics including production, imports, exports, and stock changes for all major energy products. Must be submitted by May 31st of the year following the reported year.",
-        keywords: ["early reporting", "provisional data", "annual statistics"],
-        synonyms: ["preliminary statistics", "early data"],
-        related: ["energy statistics", "reporting deadlines", "data transmission"]
-      },
-  
-      "detailed consumption reporting": {
-        title: "Detailed Consumption Reporting",
-        text: "Comprehensive reporting of final energy consumption broken down by sector, subsector, and end-use. Covers all energy products with specific measurement units: kt for solid/liquid fuels, TJ GCV for gases, GWh for electricity, TJ NCV for heat and most renewables.",
-        keywords: ["consumption data", "energy use reporting", "sectoral data"],
-        synonyms: ["consumption statistics", "energy use data"],
-        related: ["final consumption", "sectoral breakdown", "energy reporting"]
-      },
-  
-      "monthly reporting": {
-        title: "Monthly Energy Statistics",
-        text: "Monthly collection of energy statistics covering calendar months, submitted within specified deadlines through Eurostat's single entry point. Data must conform to specified interchange standards and transmission formats.",
-        keywords: ["monthly data", "energy reporting", "statistical collection"],
-        synonyms: ["monthly statistics", "energy data"],
-        related: ["reporting period", "data transmission", "statistical standards"]
-      },
-  
-      "solid fuels reporting": {
-        title: "Solid Fuels Monthly Reporting",
-        text: "Monthly reporting for hard coal, brown coal, peat, oil shale/sands, and coke oven coke. Includes production, trade, stocks, and deliveries data. Quantities reported in kt (kilo-tonnes) within two months of reported month.",
-        keywords: ["coal reporting", "solid fuel data", "monthly coal"],
-        synonyms: ["coal statistics", "solid fuel reporting"],
-        related: ["hard coal", "brown coal", "coke"]
-      },
-  
-      "electricity reporting": {
-        title: "Electricity Monthly Reporting",
-        text: "Monthly net electricity production data by source (nuclear, thermal, renewables) and trade data. Includes detailed breakdown of conventional thermal generation by fuel type. Quantities in GWh, submitted within two months of reported month.",
-        keywords: ["power generation", "electricity data", "monthly electricity"],
-        synonyms: ["power statistics", "electricity statistics"],
-        related: ["net production", "thermal generation", "renewable power"]
-      },
-  
-      "petroleum reporting": {
-        title: "Oil and Petroleum Products Monthly Reporting",
-        text: "Monthly reporting covering crude oil, NGL, refinery feedstocks, and finished products. Includes supply, refinery activity, trade, stocks, and deliveries data. Requires detailed stock reporting by location and ownership.",
-        keywords: ["oil reporting", "petroleum data", "monthly oil"],
-        synonyms: ["oil statistics", "petroleum statistics"],
-        related: ["crude oil", "refined products", "oil stocks"]
-      },
-  
-      "stock reporting": {
-        title: "Stock Level Reporting",
-        text: "Detailed reporting of opening and closing stocks by location (national territory, abroad) and ownership (government, stockholding organization, others). Includes stocks under bilateral agreements and those with known foreign destination.",
-        keywords: ["inventory levels", "stock data", "storage reporting"],
-        synonyms: ["inventory reporting", "storage statistics"],
-        related: ["oil stocks", "emergency stocks", "storage capacity"]
-      },
-  
-      "monthly coal aggregates": {
-        title: "Coal Monthly Aggregates",
-        text: "Key data points for hard coal including production, recovered products, imports/exports, stocks, and deliveries to various sectors. Special focus on deliveries to main activity producers, coke ovens, and iron/steel industry.",
-        keywords: ["coal data", "monthly coal", "coal deliveries"],
-        synonyms: ["coal statistics", "coal reporting"],
-        related: ["hard coal", "coal stocks", "coal trade"]
-      },
-  
-      "monthly electricity aggregates": {
-        title: "Electricity Monthly Aggregates",
-        text: "Net electricity production data broken down by source: nuclear, conventional thermal (by fuel type), hydro (pure, mixed, pumped storage), wind (onshore/offshore), solar (PV/thermal), and other renewables. Includes trade data with EU/non-EU breakdown.",
-        keywords: ["electricity data", "power generation", "monthly power"],
-        synonyms: ["power statistics", "generation data"],
-        related: ["net production", "power sources", "electricity trade"]
-      },
-  
-      "petroleum supply": {
-        title: "Petroleum Supply Reporting",
-        text: "Monthly supply chain reporting for crude oil, NGL, feedstocks, and additives. Covers indigenous production, receipts, backflows, transfers, trade, direct use, and refinery intake/losses. Includes detailed stock level reporting.",
-        keywords: ["oil supply", "petroleum flow", "supply chain"],
-        synonyms: ["oil supply chain", "petroleum supply"],
-        related: ["crude oil", "refineries", "oil stocks"]
-      },
-  
-      "finished products": {
-        title: "Finished Products Supply",
-        text: "Monthly reporting of finished petroleum products covering refinery output, recycled products, fuel use, trade, bunkers, transfers, and gross inland deliveries. Includes specific reporting for aviation, power plants, road transport, and petrochemicals.",
-        keywords: ["oil products", "product supply", "refined products"],
-        synonyms: ["product statistics", "refined products"],
-        related: ["refinery output", "product trade", "inland deliveries"]
-      },
-  
-      "stock categories": {
-        title: "Stock Categories",
-        text: "Classification of petroleum stocks by location and ownership including stocks on national territory, stocks held under bilateral agreements, stocks with foreign destination, bonded stocks, consumer stocks, vessel stocks, and government/stockholding organization stocks.",
-        keywords: ["stock types", "inventory categories", "storage types"],
-        synonyms: ["inventory types", "storage categories"],
-        related: ["oil stocks", "storage facilities", "emergency stocks"]
-      },
-  
-      "natural gas production": {
-        title: "Natural Gas Indigenous Production",
-        text: "Dry marketable production within national boundaries, including offshore production. Measured after purification, NGL extraction and sulphur removal. Excludes extraction losses, reinjected/vented/flared quantities. Includes gas industry own use in extraction, pipelines and processing plants.",
-        keywords: ["gas production", "indigenous production", "marketable gas"],
-        synonyms: ["domestic gas production", "national gas production"],
-        related: ["natural gas", "gas processing", "offshore production"]
-      },
-  
-      "natural gas imports": {
-        title: "Natural Gas Imports (Entries)",
-        text: "All natural gas volumes physically crossing national boundaries, regardless of customs clearance. Includes transit volumes and LNG imports (as dry marketable equivalent). LNG regasification own consumption reported separately under industry own use/losses.",
-        keywords: ["gas imports", "gas entries", "LNG imports"],
-        synonyms: ["gas entries", "imported gas"],
-        related: ["natural gas", "LNG", "gas trade"]
-      },
-  
-      "natural gas exports": {
-        title: "Natural Gas Exports (Exits)",
-        text: "All natural gas volumes physically crossing national boundaries, including transit volumes. Reported by destination country, with direct pipeline connection or LNG loading country for shipped gas.",
-        keywords: ["gas exports", "gas exits", "transit volumes"],
-        synonyms: ["gas exits", "exported gas"],
-        related: ["natural gas", "gas trade", "pipeline transport"]
-      },
-  
-      "gross inland deliveries": {
-        title: "Observed Gross Inland Deliveries",
-        text: "Deliveries of marketable gas to inland market, including gas industry own use for heating/equipment operation (extraction, pipeline, processing plants). Includes transmission and distribution losses.",
-        keywords: ["inland deliveries", "domestic market", "gas consumption"],
-        synonyms: ["domestic deliveries", "inland consumption"],
-        related: ["natural gas", "gas distribution", "gas consumption"]
-      },
-  
-      "gas industry consumption": {
-        title: "Natural Gas Industry Own Use and Losses",
-        text: "Gas quantities used by industry for heating and equipment operation in extraction, pipeline systems, and processing plants. Includes transmission and distribution losses in the network.",
-        keywords: ["own use", "industry consumption", "system losses"],
-        synonyms: ["operational gas", "industry use"],
-        related: ["natural gas", "gas processing", "transmission losses"]
-      },
-  
-      "natural gas stocks": {
-        title: "Natural Gas Stocks",
-        text: "Gas stored in both gaseous and liquefied forms, reported as opening and closing levels for stocks on national territory and abroad. Stock build shown as positive, stock draw as negative.",
-        keywords: ["gas storage", "gas stocks", "inventory levels"],
-        synonyms: ["gas inventory", "stored gas"],
-        related: ["natural gas", "LNG", "storage facilities"]
-      },
-  
-      "crude oil imports": {
-        title: "Crude Oil Imports",
-        text: "Quantities entering customs territory or from other Member States for non-transit purposes, including stock building. Excludes oil extracted from national seabed. Requires reporting of oil type, API gravity, sulphur content, volume, CIF price.",
-        keywords: ["oil imports", "crude imports", "oil supply"],
-        synonyms: ["petroleum imports", "oil entries"],
-        related: ["crude oil", "oil trade", "petroleum"]
-      },
-  
-      "crude oil supply": {
-        title: "Crude Oil Supply",
-        text: "Covers imported crude oil and domestic production during reference period, excluding stock releases. Reported with volume supplied and weighted average CIF price. CIF price includes FOB price plus transport, insurance, and transfer costs.",
-        keywords: ["oil supply", "crude supply", "oil availability"],
-        synonyms: ["oil provision", "crude availability"],
-        related: ["crude oil", "oil production", "oil imports"]
-      },
-  
-      "oil pricing": {
-        title: "Crude Oil Pricing",
-        text: "CIF (Cost, Insurance, Freight) price includes FOB price plus transport, insurance, and transfer costs. For domestic production, calculated at port of discharge or frontier. Reported in US dollars per barrel and per tonne.",
-        keywords: ["CIF price", "FOB price", "oil cost"],
-        synonyms: ["oil price", "crude price"],
-        related: ["crude oil", "oil trade", "oil imports"]
-      },
-  
-      "oil characteristics": {
-        title: "Crude Oil Characteristics",
-        text: "Includes API gravity (measure of crude density compared to water) and sulphur content. API gravity calculated as (141.5 ÷ specific gravity) - 131.5. Required for import reporting along with volume and pricing data.",
-        keywords: ["API gravity", "sulphur content", "oil density"],
-        synonyms: ["oil properties", "crude specifications"],
-        related: ["crude oil", "oil quality", "oil grades"]
+export const energyDefinitionsEn = {
+  "oil": {
+    title: "Oil",
+    text: "Oil is a fossil fuel formed from organic materials over millions of years. It's a major energy source worldwide, used primarily for transportation, heating, and electricity generation. According to Eurostat, the EU imports about 90% of its crude oil. The energy sector is working to reduce oil dependence through renewable alternatives and improved efficiency.",
+    keywords: ["petroleum", "crude oil", "fossil fuel", "gasoline", "diesel", "oil products", "petroleum products", "hydrocarbon", "refinery", "motor fuel", "fuel oil", "lubricants"],
+    synonyms: ["petroleum", "crude", "fossil fuel", "black gold", "liquid fuel"],
+    related: ["natural gas", "fossil fuels", "energy consumption", "renewable energy", "oil products", "crude oil", "petroleum products"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ti_oil", "nrg_cb_oilm"],
+    fuelCode: "O4000",
+    nrg_bal: "PPRD",
+    siec: "O4000",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["pie", "line", "bar", "area"],
+    statisticalConcepts: ["imports", "consumption", "production", "prices", "stocks", "trade"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "energy_production",
+    isMainFuel: true,
+    subFuels: [
+      {
+        name: "Crude oil",
+        fuelCode: "O4100",
+        siec: "O4100"
+      },
+      {
+        name: "Natural gas liquids",
+        fuelCode: "O4200",
+        siec: "O4200"
+      },
+      {
+        name: "Refinery feedstocks",
+        fuelCode: "O4300",
+        siec: "O4300"
+      },
+      {
+        name: "Additives and oxygenates",
+        fuelCode: "O4400",
+        siec: "O4400"
+      },
+      {
+        name: "Other hydrocarbons",
+        fuelCode: "O4500",
+        siec: "O4500"
       }
-    
+    ]
+  },
+  "natural gas": {
+    title: "Natural Gas",
+    text: "Natural gas is a fossil fuel composed primarily of methane. It's widely used for heating, cooking, electricity generation, and as an industrial feedstock. Compared to other fossil fuels, it produces fewer greenhouse gas emissions. The EU imports approximately 80% of its natural gas, with Russia having been a major supplier before the 2022 energy crisis.",
+    keywords: ["gas", "methane", "fossil fuel", "natural gas liquids", "LNG", "CNG", "gas imports", "pipeline gas", "gas storage", "associated gas", "non-associated gas", "gaseous fuel"],
+    synonyms: ["gas", "methane", "fossil gas", "pipeline gas"],
+    related: ["oil", "fossil fuels", "energy consumption", "gas market", "liquefied natural gas", "compressed natural gas"],
+    dataset: "nrg_ti_gas",
+    additionalDatasets: ["nrg_cb_gasm", "nrg_bal_c", "nrg_ind_peh"],
+    fuelCode: "G3000",
+    nrg_bal: "IMP",
+    siec: "G3000",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["pie", "line", "bar", "area"],
+    statisticalConcepts: ["imports", "consumption", "production", "storage", "distribution", "supply"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_ti_gas?lang=en",
+    queryType: "energy_imports",
+    isMainFuel: true,
+    subFuels: [
+      {
+        name: "Compressed natural gas",
+        fuelCode: "G3100",
+        siec: "G3100"
+      },
+      {
+        name: "Liquefied natural gas",
+        fuelCode: "G3200",
+        siec: "G3200"
+      }
+    ]
+  },
+  "renewable energy": {
+    title: "Renewable Energy",
+    text: "Renewable energy comes from naturally replenishing sources like sunlight, wind, water, and geothermal heat. The EU has set a target of at least 32% renewable energy by 2030. As of 2020, renewables accounted for about 22% of the EU's energy mix, with considerable variation between member states. Wind, solar, and hydropower are the fastest-growing renewable sources in Europe.",
+    keywords: ["renewables", "clean energy", "sustainable energy", "green energy", "solar power", "wind power", "hydropower", "bioenergy", "geothermal energy", "tide", "wave energy", "ocean energy", "biofuels", "biomass", "renewable electricity", "renewable heat", "ambient heat"],
+    synonyms: ["clean energy", "green energy", "sustainable energy", "renewable sources", "zero-carbon energy"],
+    related: ["solar energy", "wind power", "hydropower", "bioenergy", "energy transition", "geothermal", "biomass", "solid biofuels", "liquid biofuels", "biogases", "climate neutrality"],
+    dataset: "nrg_ind_ren",
+    additionalDatasets: ["nrg_bal_c", "nrg_share", "nrg_ind_peh"],
+    fuelCode: "RA000",
+    nrg_bal: "PPRD",
+    siec: "RA000",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["pie", "line", "bar", "area"],
+    statisticalConcepts: ["production", "consumption", "shares", "capacity", "electricity generation", "heating", "cooling", "transport"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_ind_ren?lang=en",
+    queryType: "renewable_energy_production",
+    isMainFuel: true,
+    subFuels: [
+      {
+        name: "Hydro",
+        fuelCode: "RA100",
+        siec: "RA100"
+      },
+      {
+        name: "Wind",
+        fuelCode: "RA300",
+        siec: "RA300"
+      },
+      {
+        name: "Solar",
+        fuelCode: "RA400",
+        siec: "RA400"
+      },
+      {
+        name: "Tide, wave, ocean",
+        fuelCode: "RA500",
+        siec: "RA500"
+      },
+      {
+        name: "Geothermal",
+        fuelCode: "RA200",
+        siec: "RA200"
+      },
+      {
+        name: "Ambient heat (heat pumps)",
+        fuelCode: "RA600",
+        siec: "RA600"
+      },
+      {
+        name: "Biofuels",
+        fuelCode: "R5000",
+        siec: "R5000"
+      }
+    ]
+  },
+  "solar energy": {
+    title: "Solar Energy",
+    text: "Solar energy harnesses sunlight to generate electricity through photovoltaic panels or concentrated solar power systems. It's one of the fastest-growing renewable energy sources in the EU. In 2020, solar provided approximately 5% of the EU's electricity. Southern European countries like Spain, Italy, and Greece have the highest solar potential, but Germany remains the largest installer of solar capacity.",
+    keywords: ["solar power", "photovoltaic", "PV", "solar panels", "solar thermal", "solar electricity", "solar collectors", "concentrated solar power", "CSP", "rooftop solar", "utility-scale solar", "solar irradiance", "solar capacity"],
+    synonyms: ["solar power", "photovoltaic energy", "solar electricity", "solar thermal energy", "sun energy"],
+    related: ["renewable energy", "energy transition", "electricity production", "photovoltaic", "solar thermal", "solar heating"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_ind_peh", "nrg_ind_ren"],
+    fuelCode: "RA400",
+    nrg_bal: "PPRD",
+    siec: "RA400",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["line", "bar", "area", "pie"],
+    statisticalConcepts: ["production", "capacity", "electricity", "installation", "generation", "distribution"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "solar_energy_production",
+    isMainFuel: true,
+    subFuels: [
+      {
+        name: "Solar photovoltaic",
+        fuelCode: "RA420",
+        siec: "RA420"
+      },
+      {
+        name: "Solar thermal",
+        fuelCode: "RA410",
+        siec: "RA410"
+      }
+    ]
+  },
+  "wind power": {
+    title: "Wind Power",
+    text: "Wind power converts wind energy into electricity using turbines. It's the largest source of renewable electricity in the EU, accounting for about 16% of total electricity generation as of 2020. The EU leads globally in offshore wind deployment. Denmark, Ireland, and Germany have the highest share of wind in their electricity mix. The EU aims to expand offshore wind capacity to at least 60 GW by 2030.",
+    keywords: ["wind energy", "wind farms", "wind turbines", "offshore wind", "onshore wind", "wind capacity", "wind generation", "renewable electricity", "wind power plants", "horizontal axis turbines", "vertical axis turbines", "wind resources"],
+    synonyms: ["wind energy", "wind generation", "wind electricity", "aeolian energy"],
+    related: ["renewable energy", "energy transition", "electricity production", "offshore wind", "onshore wind"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_ind_peh", "nrg_ind_ren"],
+    fuelCode: "RA300",
+    nrg_bal: "PPRD",
+    siec: "RA300",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["line", "bar", "area", "pie"],
+    statisticalConcepts: ["production", "capacity", "electricity", "installation", "generation", "capacity factor", "distribution"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "wind_energy_production",
+    isMainFuel: true,
+    subFuels: [
+      {
+        name: "Wind on shore",
+        fuelCode: "RA310",
+        siec: "RA310"
+      },
+      {
+        name: "Wind off shore",
+        fuelCode: "RA320",
+        siec: "RA320"
+      }
+    ]
+  },
+  "energy consumption": {
+    title: "Energy Consumption",
+    text: "Energy consumption measures the total energy used across all sectors. In the EU, the largest energy-consuming sectors are transport (31%), households (27%), and industry (25%). Final energy consumption in the EU reached approximately 940 million tonnes of oil equivalent in 2019. The EU aims to improve energy efficiency by 32.5% by 2030, reducing overall consumption. Since 2000, energy consumption per capita has decreased by about 12% across the EU.",
+    keywords: ["energy use", "energy demand", "final energy", "energy efficiency", "energy intensity", "sectoral consumption", "primary energy", "energy end use", "consumption patterns", "household energy", "industrial energy", "transport energy", "energy services"],
+    synonyms: ["energy use", "energy demand", "energy usage", "energy utilization"],
+    related: ["energy efficiency", "household energy", "industrial energy", "transport energy", "final consumption", "primary energy"],
+    dataset: "nrg_cb_e",
+    additionalDatasets: ["nrg_bal_c", "nrg_ind_peh", "nrg_ind_eff"],
+    fuelCode: "TOTAL",
+    nrg_bal: "FC_E",
+    siec: "TOTAL",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["pie", "line", "bar", "area"],
+    statisticalConcepts: ["consumption", "efficiency", "sectors", "end use", "intensity", "demand", "utilization"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_cb_e?lang=en",
+    queryType: "energy_consumption",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "energy efficiency": {
+    title: "Energy Efficiency",
+    text: "Energy efficiency means using less energy to perform the same task. The EU has set a target to improve energy efficiency by at least 32.5% by 2030. Buildings account for about 40% of energy consumption in the EU, making them a key focus for efficiency improvements. The Energy Performance of Buildings Directive requires all new buildings to be nearly zero-energy from 2021. Energy efficiency labels on appliances have helped consumers reduce household energy use across Europe.",
+    keywords: ["energy saving", "energy conservation", "efficient energy use", "energy intensity reduction", "energy performance", "primary energy savings", "final energy savings", "building efficiency", "appliance efficiency", "energy labeling", "energy standards", "near-zero energy buildings", "energy management", "energy audits"],
+    synonyms: ["energy conservation", "energy savings", "energy optimization", "energy productivity"],
+    related: ["energy consumption", "building efficiency", "appliance efficiency", "energy performance", "energy labeling", "energy standards"],
+    dataset: "nrg_ind_eff",
+    additionalDatasets: ["nrg_bal_c", "nrg_ind_effind"],
+    fuelCode: "TOTAL",
+    nrg_bal: "FEC_EED",
+    siec: "TOTAL",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["line", "bar"],
+    statisticalConcepts: ["efficiency", "consumption", "savings", "intensity", "productivity", "performance indicators"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_ind_eff?lang=en",
+    queryType: "energy_efficiency",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "fossil fuels": {
+    title: "Fossil Fuels",
+    text: "Fossil fuels include coal, oil, and natural gas formed from prehistoric organic matter. They currently account for about 70% of the EU's energy mix. The EU aims to reduce fossil fuel dependency for climate goals and energy security. Fossil fuel combustion is responsible for approximately 75% of EU greenhouse gas emissions.",
+    keywords: ["coal", "oil", "natural gas", "non-renewable energy", "solid fossil fuels", "petroleum products", "manufactured gases", "lignite", "anthracite", "bituminous coal", "fossil carbon", "conventional fuels", "hydrocarbon fuels", "petroleum coke", "crude oil"],
+    synonyms: ["conventional fuels", "carbon fuels", "hydrocarbons", "non-renewable resources", "mineral fuels"],
+    related: ["oil", "natural gas", "coal", "emissions", "climate change", "energy mix", "energy transition", "hard coal", "solid fossil fuels", "lignite"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_sff", "nrg_cb_gasm", "nrg_cb_oilm"],
+    fuelCode: "FF",
+    nrg_bal: "PPRD",
+    siec: "FF",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["pie", "line", "bar", "area"],
+    statisticalConcepts: ["imports", "consumption", "production", "emissions", "energy security", "dependency"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "energy_production",
+    isMainFuel: true,
+    subFuels: [
+      {
+        name: "Solid fossil fuels",
+        fuelCode: "C0000X0350-0370",
+        siec: "C0000X0350-0370"
+      },
+      {
+        name: "Manufactured gases",
+        fuelCode: "C0350-0370",
+        siec: "C0350-0370"
+      },
+      {
+        name: "Oil and petroleum products",
+        fuelCode: "O4000XBIO",
+        siec: "O4000XBIO"
+      },
+      {
+        name: "Natural gas",
+        fuelCode: "G3000",
+        siec: "G3000"
+      }
+    ]
+  },
+  "energy mix": {
+    title: "Energy Mix",
+    text: "The energy mix refers to the combination of different energy sources used in a region. The EU's energy mix in 2020 consisted of petroleum products (35%), natural gas (24%), renewables (17%), nuclear energy (13%), and solid fossil fuels (11%). Each EU member state has a different energy mix based on available resources and policy choices. The European Green Deal aims to transform the EU's energy mix toward more renewable sources and less fossil fuels by 2050.",
+    keywords: ["energy sources", "energy portfolio", "energy balance", "fuel mix", "primary energy supply", "energy basket", "energy supply composition", "fossil fuels share", "renewable energy share", "nuclear share", "energy consumption structure", "electricity generation mix", "primary energy consumption", "final energy consumption"],
+    synonyms: ["energy portfolio", "energy balance", "fuel mix", "energy supply structure"],
+    related: ["renewable energy", "fossil fuels", "nuclear energy", "electricity production", "energy transition", "energy security", "energy dependency"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_ind_share", "nrg_ind_peh"],
+    fuelCode: "TOTAL",
+    nrg_bal: "PPRD",
+    siec: "TOTAL",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["pie", "bar", "area"],
+    statisticalConcepts: ["production", "consumption", "shares", "energy dependency", "import dependency", "diversification", "energy security"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "energy_mix",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "energy transition": {
+    title: "Energy Transition",
+    text: "Energy transition is the shift from fossil-based to zero-carbon energy sources. The EU is committed to becoming climate-neutral by 2050 as part of the European Green Deal. This transition involves expanding renewable energy, improving energy efficiency, and developing clean technologies. The EU has allocated over €1 trillion for sustainable investments over the next decade. The transition also focuses on ensuring fairness through the Just Transition Mechanism.",
+    keywords: ["energy transformation", "clean energy transition", "low-carbon transition"],
+    synonyms: ["energy transformation", "sustainable energy shift"],
+    related: ["renewable energy", "European Green Deal", "climate neutrality"],
+    dataset: "nrg_ind_share",
+    additionalDatasets: ["nrg_bal_c"],
+    fuelCode: "RA000",
+    nrg_bal: "PPRD",
+    siec: "RA000",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["line", "bar"],
+    statisticalConcepts: ["shares", "trends", "development"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_ind_share?lang=en",
+    queryType: "energy_transition",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "electricity production": {
+    title: "Electricity Production",
+    text: "Electricity production in the EU comes from various sources including fossil fuels, nuclear, and renewables. As of 2020, renewables accounted for approximately 38% of electricity generation, fossil fuels for 37%, and nuclear for 25%. Wind and hydropower are the largest renewable electricity sources in the EU. The EU aims to increase the share of renewable electricity to over 65% by 2030. Coal power has been declining rapidly, with many member states planning complete phase-outs by 2030.",
+    keywords: ["power generation", "electricity supply", "power production", "electricity generation", "gross electricity production", "net electricity production", "main activity producers", "autoproducers", "electricity-only plants", "CHP units", "energy transformation", "low-carbon electricity", "electricity mix", "power plants", "power output", "grid supply", "electricity capacity", "baseload power", "peak load", "thermal power", "electrical energy"],
+    synonyms: ["power generation", "electricity generation", "power production", "electrical power generation"],
+    related: ["renewable energy", "nuclear energy", "fossil fuels", "energy mix", "wind power", "solar energy", "hydropower", "coal power", "natural gas", "energy transition"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_ind_peh", "nrg_cb_e", "nrg_ind_pehnf"],
+    fuelCode: "E7000",
+    nrg_bal: "GEP",
+    siec: "E7000",
+    unit: "GWH",
+    hasVisualization: true,
+    visualizationType: ["pie", "line", "bar", "area"],
+    statisticalConcepts: ["production", "sources", "capacity", "consumption", "imports", "exports", "transformation", "generation mix"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "electricity_production",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "energy sectors": {
+    title: "Energy Sectors Classification",
+    text: "Energy sectors are classified according to purpose of production and end use. Main activity producers generate electricity/heat for sale to third parties as their principal activity. Autoproducers generate electricity/heat wholly or partly for their own use as a supporting activity. The industry sector includes manufacturing, mining, and construction. The transport sector covers all transport activities regardless of economic sector. Commercial and public services include businesses, offices, and public sector activities.",
+    keywords: ["energy classification", "sector definitions", "energy categories", "main activity producers", "autoproducers", "industry classification", "transformation sector", "energy sector", "end-use sectors", "energy supply", "energy demand", "final consumption sectors", "energy classification system"],
+    synonyms: ["energy classification", "energy categories", "energy sector classification", "energy use categories"],
+    related: ["energy consumption", "energy efficiency", "industrial energy", "energy transformation", "final consumption", "electricity production"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: ["classification", "sectoral division", "energy flows"],
+    link: "https://ec.europa.eu/eurostat/web/interactive-publications/energy-2024",
+    queryType: "",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "energy transformation": {
+    title: "Energy Transformation Sector",
+    text: "The transformation sector converts primary energy into other forms. It includes electricity generation, heat production, oil refineries, and other conversion processes. Main activity producers and autoproducers operate various types of plants: electricity-only, combined heat and power (CHP), and heat-only units. The sector also includes patent fuel plants, coke ovens, BKB/PB plants, gas works, blast furnaces, and liquefaction facilities.",
+    keywords: ["energy conversion", "power generation", "heat production", "fuel transformation"],
+    synonyms: ["energy conversion", "energy transformation"],
+    related: ["electricity production", "energy efficiency", "fossil fuels"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "TI_E",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "https://ec.europa.eu/eurostat/web/interactive-publications/energy-2024",
+    queryType: "",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "final consumption": {
+    title: "Final Energy Consumption",
+    text: "Final energy consumption represents energy delivered to end users for both energy and non-energy purposes. It's categorized into major sectors: industry (including subsectors like mining, food, textiles), transport (rail, road, aviation, navigation), and other sectors (commercial/public services, households, agriculture, forestry, fishing). Each sector has specific consumption patterns and efficiency measures.",
+    keywords: ["end use", "consumption sectors", "energy end users"],
+    synonyms: ["end use consumption", "final energy use"],
+    related: ["energy consumption", "energy efficiency", "industrial energy"],
+    dataset: "nrg_bal_c",
+    fuelCode: "TOTAL",
+    nrg_bal: "FC_E",
+    siec: "TOTAL",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["pie", "bar"],
+    statisticalConcepts: ["consumption", "sectors", "end use"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "energy_consumption",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "geographical coverage": {
+    title: "Geographical Coverage in Energy Statistics",
+    text: "Energy statistics follow specific geographical definitions for reporting. For example, Australia excludes external territories, Denmark excludes Faeroe Islands and Greenland, while France includes Monaco and overseas departments. Some territories like San Marino and Vatican City are included with Italy's statistics. The classification considers political boundaries rather than geographical ones for statistical purposes.",
+    keywords: ["territorial coverage", "statistical territories", "geographical definitions"],
+    synonyms: ["territorial definitions", "statistical geography"],
+    related: ["energy statistics", "data collection", "statistical methodology"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "https://ec.europa.eu/eurostat/web/interactive-publications/energy-2024",
+    queryType: "",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "hard coal": {
+    title: "Hard Coal",
+    text: "Hard coal is a product aggregate equal to the sum of anthracite, coking coal and other bituminous coal. It includes high rank coal used for industrial and household applications (anthracite), coal suitable for coke production (coking coal), and coal used for steam raising purposes (other bituminous coal).",
+    keywords: ["anthracite", "coking coal", "bituminous coal"],
+    synonyms: ["black coal", "steam coal"],
+    related: ["coal", "fossil fuels", "energy consumption"],
+    dataset: "nrg_cb_sff",
+    additionalDatasets: ["nrg_bal_c", "nrg_ti_sff"],
+    fuelCode: "C0100",
+    nrg_bal: "PPRD",
+    siec: "C0100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["pie", "bar"],
+    statisticalConcepts: ["production", "trade", "stocks"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_cb_sff?lang=en",
+    queryType: "coal_production",
+    isMainFuel: true,
+    subFuels: [
+      {
+        name: "Anthracite",
+        fuelCode: "C0110",
+        siec: "C0110"
+      },
+      {
+        name: "Coking coal",
+        fuelCode: "C0121",
+        siec: "C0121"
+      },
+      {
+        name: "Other bituminous coal",
+        fuelCode: "C0129",
+        siec: "C0129"
+      }
+    ]
+  },
+  "natural gas products": {
+    title: "Natural Gas Products",
+    text: "Natural gas comprises gases occurring in underground deposits, consisting mainly of methane. It includes both 'non-associated' gas from fields producing hydrocarbons only in gaseous form, and 'associated' gas produced with crude oil. It can be liquefied (LNG) or compressed (CNG). Natural gas excludes biogas or manufactured gases which may be blended into the network.",
+    keywords: ["methane", "LNG", "CNG", "associated gas"],
+    synonyms: ["methane", "natural gas", "fossil gas"],
+    related: ["fossil fuels", "energy consumption", "gas market"],
+    dataset: "nrg_cb_gasm",
+    additionalDatasets: ["nrg_bal_c", "nrg_ti_gas"],
+    fuelCode: "G3000",
+    nrg_bal: "PPRD",
+    siec: "G3000",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["pie", "line", "bar"],
+    statisticalConcepts: ["imports", "production", "consumption"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_cb_gasm?lang=en",
+    queryType: "gas_production",
+    isMainFuel: true,
+    subFuels: [
+      {
+        name: "Compressed natural gas",
+        fuelCode: "G3100",
+        siec: "G3100"
+      },
+      {
+        name: "Liquefied natural gas",
+        fuelCode: "G3200",
+        siec: "G3200"
+      }
+    ]
+  },
+    "petroleum products": {
+    title: "Petroleum Products",
+    text: "Petroleum products are derived from crude oil processing and include refinery gas, ethane, LPG, naphtha, motor gasoline, aviation fuels, kerosene, gas/diesel oil, fuel oil, lubricants, bitumen, paraffin waxes, petroleum coke and other products. They may contain additives/oxygenates and biofuels components.",
+    keywords: ["oil products", "refined products", "motor fuels"],
+    synonyms: ["oil products", "refined petroleum"],
+    related: ["oil", "fossil fuels", "energy consumption"],
+    dataset: "nrg_bal_c",
+    fuelCode: "PP100",
+    nrg_bal: "PPRD",
+    siec: "PP100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["pie", "line", "bar"],
+    statisticalConcepts: ["production", "trade", "stocks"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "petroleum_production",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ind_peh"],
+    isMainFuel: true,
+    subFuels: [
+      {
+        name: "Motor gasoline",
+        fuelCode: "MG100",
+        siec: "MG100"
+      },
+      {
+        name: "Aviation fuels",
+        fuelCode: "AF100",
+        siec: "AF100"
+      },
+      {
+        name: "Gas/diesel oil",
+        fuelCode: "GDO100",
+        siec: "GDO100"
+      },
+      {
+        name: "Fuel oil",
+        fuelCode: "FO100",
+        siec: "FO100"
+      }
+    ]
+  },
+  "renewable energy sources": {
+    title: "Renewable Energy Sources",
+    text: "Renewable energy comes from: hydro (pure, mixed, and pumped storage plants); geothermal heat; solar (photovoltaic and thermal); tide, wave and ocean; wind (onshore and offshore); industrial and municipal waste (renewable portion); and biofuels (solid, liquid and gaseous). For electricity generation, all production including small-scale and off-grid installations must be reported.",
+    keywords: ["renewables", "sustainable energy", "clean energy"],
+    synonyms: ["renewable sources", "clean energy sources"],
+    related: ["solar energy", "wind power", "hydropower", "bioenergy"],
+    dataset: "nrg_ind_ren",
+    fuelCode: "RA000",
+    nrg_bal: "PPRD",
+    siec: "RA000",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["pie", "line", "bar", "area"],
+    statisticalConcepts: ["production", "consumption", "shares"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_ind_ren?lang=en",
+    queryType: "renewable_energy_production",
+    additionalDatasets: ["nrg_cb_ren", "nrg_ind_peh"],
+    isMainFuel: true,
+    subFuels: [
+      {
+        name: "Hydropower",
+        fuelCode: "RA100",
+        siec: "RA100"
+      },
+      {
+        name: "Wind power", 
+        fuelCode: "RA200",
+        siec: "RA200"
+      },
+      {
+        name: "Solar energy",
+        fuelCode: "RA300",
+        siec: "RA300"
+      },
+      {
+        name: "Biofuels",
+        fuelCode: "R5000",
+        siec: "R5000"
+      }
+    ]
+  },
+  "biofuels classification": {
+    title: "Biofuels Classification",
+    text: "Biofuels include solid biofuels (charcoal, fuelwood, wood residues, black liquor, bagasse, animal waste), biogas (from landfills, sewage, and thermal processes), and liquid biofuels (biogasoline, biodiesels, bio jet kerosene). Only biofuels used for energy purposes should be reported. Biofuels used for non-energy purposes (e.g., wood for construction) are excluded.",
+    keywords: ["biomass", "biological fuels", "renewable fuels", "solid biofuels", "liquid biofuels", "biogas"],
+    synonyms: ["biomass fuels", "biological fuels"],
+    related: ["renewable energy", "energy consumption", "transport energy", "biofuels", "solid biofuels", "liquid biofuels", "biogas"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_bio", "nrg_ind_peh"],
+    fuelCode: "BIO100",
+    nrg_bal: "PPRD",
+    siec: "BIO100",
+    unit: "TJ_GCV",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "https://ec.europa.eu/eurostat/web/interactive-publications/energy-2024",
+    queryType: "biofuels",
+    isMainFuel: true,
+    subFuels: [
+      {
+        name: "Solid biofuels",
+        fuelCode: "SB100",
+        siec: "SB100"
+      },
+      {
+        name: "Liquid biofuels",
+        fuelCode: "LB100",
+        siec: "LB100"
+      },
+      {
+        name: "Biogas",
+        fuelCode: "BG100",
+        siec: "BG100"
+      }
+    ]
+  },
+  "manufactured gases": {
+    title: "Manufactured Gases",
+    text: "This category includes gas works gas, coke oven gas, blast furnace gas and other recovered gases. These gases are produced through industrial processes or gasification/pyrolysis of solid fuels. Gas works gas includes all types of gases produced for heat and power generation. Coke oven gas and blast furnace gas are by-products of iron and steel production.",
+    keywords: ["industrial gases", "synthetic gas", "process gas", "gas works gas", "coke oven gas", "blast furnace gas"],
+    synonyms: ["synthetic gases", "industrial gas"],
+    related: ["natural gas", "industrial energy", "energy production", "gas works gas", "coke oven gas", "blast furnace gas"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_gasm"],
+    fuelCode: "MG100",
+    nrg_bal: "PPRD",
+    siec: "MG100",
+    unit: "TJ_GCV",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "https://ec.europa.eu/eurostat/web/interactive-publications/energy-2024",
+    queryType: "manufactured_gases",
+    isMainFuel: true,
+    subFuels: [
+      {
+        name: "Gas works gas",
+        fuelCode: "C0350",
+        siec: "C0350"
+      },
+      {
+        name: "Coke oven gas",
+        fuelCode: "C0311",
+        siec: "C0311"
+      },
+      {
+        name: "Blast furnace gas",
+        fuelCode: "C0312",
+        siec: "C0312"
+      }
+    ]
+  },
+  "hydropower": {
+    title: "Hydropower",
+    text: "Potential and kinetic energy of water converted into electricity in hydroelectric plants. This includes pure hydro plants that only use direct natural water inflow, mixed hydro plants that can also pump water uphill, and pure pumped storage plants. Pure hydro plants have no pumping capacity, while mixed plants can use both natural inflow and pumped water for generation.",
+    keywords: ["hydro power", "hydroelectric", "water power"],
+    synonyms: ["water power", "hydroelectric power"],
+    related: ["renewable energy", "electricity production"],
+    dataset: "nrg_ind_ren",
+    fuelCode: "RA100", // Corrected from RA200
+    nrg_bal: "PPRD",
+    siec: "RA200",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["bar", "line"],
+    statisticalConcepts: ["production", "capacity"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_ind_ren?lang=en",
+    queryType: "renewable_energy_production",
+    additionalDatasets: ["nrg_cb_ren", "nrg_ind_peh"],
+    isMainFuel: false,
+    subFuels: []
+  },
+  "liquid biofuels": {
+    title: "Liquid Biofuels",
+    text: "Liquid fuels of natural origin produced from biomass or biodegradable waste that can be blended with or replace fossil fuels. Includes biogasoline, biodiesels, and bio jet kerosene. Only pure biofuels not yet blended with fossil fuels are reported in this category. When blended into transport fuels, they are reported within the respective petroleum product categories.",
+    keywords: ["biogasoline", "biodiesel", "bio jet fuel", "ethanol", "biomethanol", "bioethers"],
+    synonyms: ["liquid biomass fuels", "bio-liquids"],
+    related: ["renewable energy", "transport fuels", "biofuels", "biogasoline", "biodiesel", "bio jet fuel"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_bio", "nrg_ind_peh"],
+    fuelCode: "LB100",
+    nrg_bal: "PPRD",
+    siec: "LB100",
+    unit: "TJ_GCV",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "https://ec.europa.eu/eurostat/web/interactive-publications/energy-2024",
+    queryType: "liquid_biofuels",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "ambient heat": {
+    title: "Ambient Heat",
+    text: "Heat energy at a useful temperature level extracted by heat pumps that need electricity or other auxiliary energy to function. This heat can be stored in ambient air, beneath solid earth surface, or in surface water. All heat pumps must be included regardless of their performance level, using the same methodology as under EU renewable energy directives.",
+    keywords: ["heat pump", "geothermal heat", "ambient energy", "environmental heat", "renewable heat"],
+    synonyms: ["environmental heat", "heat pump energy"],
+    related: ["renewable energy", "heating", "energy efficiency", "geothermal energy"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_ren", "nrg_ind_peh"],
+    fuelCode: "AH100",
+    nrg_bal: "PPRD",
+    siec: "AH100",
+    unit: "TJ_GCV",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "https://ec.europa.eu/eurostat/web/interactive-publications/energy-2024",
+    queryType: "ambient_heat",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "municipal waste": {
+    title: "Municipal Waste",
+    text: "Wastes produced by households, hospitals, and the tertiary sector that are combusted at specific installations for energy purposes. Includes both renewable (biological origin) and non-renewable portions. The quantity is reported on a net calorific value basis, excluding waste incinerated without energy recovery.",
+    keywords: ["household waste", "waste-to-energy", "waste incineration", "urban waste", "tertiary waste"],
+    synonyms: ["urban waste", "household waste"],
+    related: ["waste management", "renewable energy", "energy recovery", "incineration"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_was", "nrg_ind_peh"],
+    fuelCode: "MW100",
+    nrg_bal: "PPRD",
+    siec: "MW100",
+    unit: "TJ_GCV",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "https://ec.europa.eu/eurostat/web/interactive-publications/energy-2024",
+    queryType: "municipal_waste",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "solid biofuels": {
+    title: "Solid Biofuels",
+    text: "Covers organic, non-fossil material of biological origin used as fuel for heat or electricity generation. Includes charcoal, fuelwood, wood residues, black liquor, bagasse, animal waste, and other vegetal materials. Wood pellets are a specific form made by compressing wood residues. Only fuels used for energy purposes are included.",
+    keywords: ["biomass", "wood fuel", "organic waste", "wood pellets", "charcoal", "fuelwood"],
+    synonyms: ["solid biomass", "wood fuels"],
+    related: ["renewable energy", "bioenergy", "wood pellets", "biomass"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_bio", "nrg_ind_peh"],
+    fuelCode: "SB100",
+    nrg_bal: "PPRD",
+    siec: "SB100",
+    unit: "TJ_GCV",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "https://ec.europa.eu/eurostat/web/interactive-publications/energy-2024",
+    queryType: "solid_biofuels",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "biogas": {
+    title: "Biogas",
+    text: "Gas composed mainly of methane and carbon dioxide produced by anaerobic digestion of biomass or by thermal processes. Includes landfill gas, sewage sludge gas, other biogases from anaerobic digestion (e.g., from animal slurries and agro-food waste), and biogases from thermal processes. Quantities are reported on a net calorific value basis.",
+    keywords: ["biomethane", "digester gas", "landfill gas", "sewage gas", "anaerobic digestion"],
+    synonyms: ["biomethane", "digester gas"],
+    related: ["renewable energy", "methane", "waste management", "biomass"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_bio", "nrg_ind_peh"],
+    fuelCode: "BG100",
+    nrg_bal: "PPRD",
+    siec: "BG100",
+    unit: "TJ_GCV",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "https://ec.europa.eu/eurostat/web/interactive-publications/energy-2024",
+    queryType: "biogas",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "motor gasoline": {
+    title: "Motor Gasoline",
+    text: "A mixture of light hydrocarbons distilling between 35°C and 215°C, used as fuel for land-based spark ignition engines. Includes additives, oxygenates and octane enhancers. Motor gasoline may contain biogasoline components and is categorized into blended biogasoline and non-biogasoline based on biofuel content.",
+    keywords: ["gasoline", "petrol", "motor fuel"],
+    synonyms: ["petrol", "gas"],
+    related: ["petroleum products", "transport fuels", "biogasoline"],
+    dataset: "nrg_bal_c",
+    fuelCode: "MG100",
+    nrg_bal: "PPRD",
+    siec: "MG100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["pie", "line", "bar"],
+    statisticalConcepts: ["consumption", "prices"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "motor_fuel",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ind_peh"],
+    isMainFuel: false,
+    subFuels: []
+  },
+  "aviation fuels": {
+    title: "Aviation Fuels",
+    text: "Includes aviation gasoline for piston engines (octane number suited to engine, freezing point of -60°C), gasoline type jet fuel (light hydrocarbons between 100°C-250°C, max 25% aromatics), and kerosene type jet fuel (distillate between 150°C-300°C with specific requirements for freezing point and other aviation specifications).",
+    keywords: ["jet fuel", "aviation gasoline", "kerosene"],
+    synonyms: ["jet fuel", "avgas", "aviation fuel"],
+    related: ["petroleum products", "transport fuels", "kerosene"],
+    dataset: "nrg_bal_c",
+    fuelCode: "AF100",
+    nrg_bal: "PPRD",
+    siec: "AF100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["line", "bar"],
+    statisticalConcepts: ["consumption", "trade"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "aviation_fuel",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ind_peh"],
+    isMainFuel: false,
+    subFuels: []
+  },
+  "gas diesel oil": {
+    title: "Gas/Diesel Oil",
+    text: "Medium distillate fuel distilling between 180°C and 380°C. Includes road diesel, light heating oil, marine diesel and rail diesel. Several grades available depending on use. May include biodiesel components. Divided into blended biodiesels and non-biodiesels categories when reporting.",
+    keywords: ["diesel fuel", "heating oil", "marine diesel"],
+    synonyms: ["diesel", "gasoil"],
+    related: ["petroleum products", "transport fuels", "biodiesel"],
+    dataset: "nrg_bal_c",
+    fuelCode: "GDO100",
+    nrg_bal: "PPRD",
+    siec: "GDO100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["line", "bar"],
+    statisticalConcepts: ["consumption", "prices"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "diesel_fuel",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ind_peh"],
+    isMainFuel: false,
+    subFuels: []
+  },
+  "fuel oil": {
+    title: "Fuel Oil",
+    text: "All residual (heavy) fuel oils, including those obtained by blending. Characterized by kinematic viscosity above 10 cSt at 80°C, flash point above 50°C, and density over 0.90 kg/l. Categorized into low sulphur (<0.5%) and high sulphur (≥0.5%) fuel oil.",
+    keywords: ["heavy fuel oil", "residual oil", "bunker fuel"],
+    synonyms: ["heavy oil", "residual fuel oil"],
+    related: ["petroleum products", "industrial fuels", "marine fuels"],
+    dataset: "nrg_bal_c",
+    fuelCode: "FO100",
+    nrg_bal: "PPRD",
+    siec: "FO100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["line", "bar", "pie"],
+    statisticalConcepts: ["consumption", "stocks"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "fuel_oil",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ind_peh"],
+    isMainFuel: false,
+    subFuels: []
+  },
+  "refinery products": {
+    title: "Refinery Products",
+    text: "Products from petroleum refining including refinery gas, ethane, LPG, naphtha, lubricants, bitumen, paraffin waxes, and petroleum coke. Refinery gas is a mixture of non-condensable gases mainly consisting of hydrogen, methane, ethane and olefins. LPG consists mainly of propane and butane or their combinations.",
+    keywords: ["refined products", "refinery output", "petroleum derivatives"],
+    synonyms: ["refined petroleum products", "oil products"],
+    related: ["petroleum products", "industrial fuels", "chemical feedstocks"],
+    dataset: "nrg_bal_c",
+    fuelCode: "RP100",
+    nrg_bal: "PPRD",
+    siec: "RP100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["line", "bar", "pie"],
+    statisticalConcepts: ["production", "trade"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "refinery_products",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ind_peh"],
+    isMainFuel: true,
+    subFuels: []
+  },
+  "crude oil": {
+    title: "Crude Oil",
+    text: "A mineral oil of natural origin comprising a mixture of hydrocarbons and associated impurities, such as sulphur. It exists in the liquid state under normal surface temperature and pressure and its physical characteristics (density, viscosity, etc.) are highly variable. This includes field or lease condensate recovered from associated and non-associated gas where it is commingled with the commercial crude oil stream.",
+    keywords: ["mineral oil", "petroleum", "crude petroleum"],
+    synonyms: ["mineral oil", "crude petroleum"],
+    related: ["petroleum products", "oil", "fossil fuels"],
+    dataset: "nrg_bal_c",
+    fuelCode: "CO100",
+    nrg_bal: "PPRD",
+    siec: "CO100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["line", "bar", "pie"],
+    statisticalConcepts: ["production", "consumption"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "crude_oil",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ind_peh"],
+    isMainFuel: true,
+    subFuels: [
+      {
+        name: "Natural gas liquids",
+        fuelCode: "NGL100",
+        siec: "NGL100"
+      },
+      {
+        name: "Refinery feedstocks",
+        fuelCode: "RF100", 
+        siec: "RF100"
+      }
+    ]
+  },
+  "natural gas liquids": {
+    title: "Natural Gas Liquids (NGL)",
+    text: "Liquid or liquefied hydrocarbons recovered from natural gas in separation facilities or gas processing plants. NGL include ethane, propane, butane (normal and iso-), (iso) pentane and pentanes plus (sometimes referred to as natural gasoline or plant condensate).",
+    keywords: ["NGL", "gas liquids", "condensate"],
+    synonyms: ["NGL", "gas condensate"],
+    related: ["natural gas", "petroleum products", "gas processing"],
+    dataset: "nrg_bal_c",
+    fuelCode: "NGL100",
+    nrg_bal: "PPRD",
+    siec: "NGL100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["bar", "line"],
+    statisticalConcepts: ["production", "trade"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "natural_gas_liquids",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ind_peh"],
+    isMainFuel: false,
+    subFuels: []
+  },
+  "refinery feedstocks": {
+    title: "Refinery Feedstocks",
+    text: "A processed oil destined for further processing (e.g. straight run fuel oil or vacuum gas oil) excluding blending. With further processing, it will be transformed into one or more components and/or finished products. This includes returns from the petrochemical industry to the refining industry (e.g. pyrolysis gasoline, C4 fractions, gasoil and fuel oil fractions).",
+    keywords: ["feedstock", "process oil", "refinery input"],
+    synonyms: ["process oil", "refinery input"],
+    related: ["petroleum products", "oil refining", "petrochemicals"],
+    dataset: "nrg_bal_c",
+    fuelCode: "RF100",
+    nrg_bal: "PPRD",
+    siec: "RF100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["line", "bar"],
+    statisticalConcepts: ["production"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "refinery_feedstocks",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ind_peh"],
+    isMainFuel: false,
+    subFuels: []
+  },
+  "additives oxygenates": {
+    title: "Additives/Oxygenates",
+    text: "Non-hydrocarbon compounds added to or blended with petroleum products to modify their properties (octane, cetane, cold properties, etc.). Includes oxygenates (alcohols, ethers), esters (like rapeseed oil or dimethylester), and chemical compounds (like TML, TEL and detergents). This category includes biofuels that are blended with liquid fossil fuels.",
+    keywords: ["fuel additives", "oxygenates", "fuel modifiers"],
+    synonyms: ["fuel additives", "fuel improvers"],
+    related: ["petroleum products", "biofuels", "motor fuels"],
+    dataset: "nrg_bal_c",
+    fuelCode: "AO100",
+    nrg_bal: "PPRD",
+    siec: "AO100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["line", "bar"],
+    statisticalConcepts: ["production"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "additives_oxygenates",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ind_peh"],
+    isMainFuel: false,
+    subFuels: []
+  },
+  "other hydrocarbons": {
+    title: "Other Hydrocarbons",
+    text: "Includes synthetic crude oil from tar sands, shale oil, liquids from coal liquefaction, output of liquids from natural gas conversion into gasoline, emulsified oils (e.g. orimulsion), and other liquid hydrocarbons. Excludes oil shale but includes the shale oil (secondary product).",
+    keywords: ["synthetic oil", "coal liquids", "unconventional oil", "shale oil", "tar sands"],
+    synonyms: ["synthetic crude", "unconventional hydrocarbons"],
+    related: ["oil", "petroleum products", "fossil fuels", "shale oil", "tar sands"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ind_peh"],
+    fuelCode: "OH100",
+    nrg_bal: "PPRD",
+    siec: "OH100",
+    unit: "TJ_GCV",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "https://ec.europa.eu/eurostat/web/interactive-publications/energy-2024",
+    queryType: "other_hydrocarbons",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "white spirit": {
+    title: "White Spirit and SBP",
+    text: "Refined distillate intermediates with distillation in the naphtha/kerosene range. White spirit has a flash point above 30°C and distillation range of 135-200°C. Industrial spirit (SBP) includes light oils distilling between 30-200°C in 7-8 grades, defined by temperature difference between 5% volume and 90% volume distillation points not exceeding 60°C.",
+    keywords: ["mineral spirits", "industrial spirit", "SBP"],
+    synonyms: ["mineral spirits", "petroleum spirits"],
+    related: ["petroleum products", "solvents", "industrial chemicals"],
+    dataset: "nrg_bal_c",
+    fuelCode: "WS100",
+    nrg_bal: "PPRD",
+    siec: "WS100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["bar", "line"],
+    statisticalConcepts: [],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "white_spirit",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ind_peh"],
+    isMainFuel: false,
+    subFuels: []
+  },
+  "lubricants": {
+    title: "Lubricants",
+    text: "Hydrocarbons produced from distillate by-product, mainly used to reduce friction between bearing surfaces. Includes all finished grades of lubricating oil, from spindle oil to cylinder oil, and those used in greases, motor oils and all grades of lubricating oil base stocks.",
+    keywords: ["lube oil", "motor oil", "grease"],
+    synonyms: ["lube oils", "lubricating oils"],
+    related: ["petroleum products", "industrial oils", "automotive products"],
+    dataset: "nrg_bal_c",
+    fuelCode: "LUB100",
+    nrg_bal: "PPRD",
+    siec: "LUB100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["line", "bar"],
+    statisticalConcepts: ["consumption"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "lubricants",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ind_peh"],
+    isMainFuel: false,
+    subFuels: []
+  },
+  "bitumen": {
+    title: "Bitumen",
+    text: "Solid, semi-solid or viscous hydrocarbon with a colloidal structure, being brown to black in colour, obtained as a residue in the distillation of crude oil, by vacuum distillation of oil residues from atmospheric distillation. Bitumen is often referred to as asphalt and is primarily used for the construction of roads and for roofing material. Includes fluidised and cut back bitumen.",
+    keywords: ["asphalt", "road tar", "roofing material"],
+    synonyms: ["asphalt", "road tar"],
+    related: ["petroleum products", "construction materials", "road construction"],
+    dataset: "nrg_bal_c",
+    fuelCode: "BIT100",
+    nrg_bal: "PPRD",
+    siec: "BIT100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["bar", "line"],
+    statisticalConcepts: [],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "bitumen",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ind_peh"],
+    isMainFuel: false,
+    subFuels: []
+  },
+  "paraffin waxes": {
+    title: "Paraffin Waxes",
+    text: "Saturated aliphatic hydrocarbons extracted when dewaxing lubricant oils. They have a crystalline structure which is more or less fine depending on the grade. Their main characteristics are: colourless, odourless and translucent, with a melting point above 45°C.",
+    keywords: ["wax", "petroleum wax", "paraffin"],
+    synonyms: ["petroleum wax", "mineral wax"],
+    related: ["petroleum products", "industrial products", "lubricants"],
+    dataset: "nrg_bal_c",
+    fuelCode: "PW100",
+    nrg_bal: "PPRD",
+    siec: "PW100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["bar", "line"],
+    statisticalConcepts: [],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "paraffin_waxes",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ind_peh"],
+    isMainFuel: false,
+    subFuels: []
+  },
+  "petroleum coke": {
+    title: "Petroleum Coke",
+    text: "Black solid by-product, obtained mainly by cracking and carbonising petroleum derived feedstock, vacuum bottoms, tar and pitches in processes such as delayed coking or fluid coking. It consists mainly of carbon (90-95%) and has a low ash content. Used as feedstock in coke ovens for the steel industry, heating purposes, electrode manufacture and chemicals production.",
+    keywords: ["green coke", "calcinated coke", "catalyst coke"],
+    synonyms: ["pet coke", "coker coke"],
+    related: ["petroleum products", "industrial fuels", "steel industry"],
+    dataset: "nrg_bal_c",
+    fuelCode: "PC100",
+    nrg_bal: "PPRD",
+    siec: "PC100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["bar", "line"],
+    statisticalConcepts: ["production", "consumption"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "petroleum_coke",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ind_peh"],
+    isMainFuel: false,
+    subFuels: []
+  },
+  "other petroleum": {
+    title: "Other Petroleum Products",
+    text: "All products not specifically mentioned elsewhere, including tar and sulphur from petroleum refining. Includes aromatics (e.g. BTX or benzene, toluene and xylene) and olefins (e.g. propylene) produced within refineries.",
+    keywords: ["tar", "sulphur", "aromatics", "olefins"],
+    synonyms: ["other oil products", "specialty products"],
+    related: ["petroleum products", "chemical industry", "petrochemicals"],
+    dataset: "nrg_bal_c",
+    fuelCode: "OP100",
+    nrg_bal: "PPRD",
+    siec: "OP100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["bar", "line"],
+    statisticalConcepts: ["trade", "production"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "other_petroleum",
+    additionalDatasets: ["nrg_cb_oil", "nrg_ind_peh"],
+    isMainFuel: false,
+    subFuels: []
+  },
+  "hydrogen": {
+    title: "Hydrogen",
+    text: "Hydrogen used as a feedstock, a fuel or an energy carrier/storage must be reported, including auto-produced and auto-consumed. Only extracted/separated hydrogen for energy or non-energy use is reported, not hydrogen present in mixtures.",
+    keywords: ["hydrogen fuel", "hydrogen carrier", "hydrogen storage", "green hydrogen", "blue hydrogen", "grey hydrogen"],
+    synonyms: ["H2", "hydrogen energy"],
+    related: ["energy storage", "renewable energy", "energy carriers", "fuel cells"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_hyd", "nrg_ind_peh"],
+    fuelCode: "H2100",
+    nrg_bal: "PPRD",
+    siec: "H2100",
+    unit: "TJ_GCV",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "https://ec.europa.eu/eurostat/web/interactive-publications/energy-2024",
+    queryType: "hydrogen",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "gas works gas": {
+    title: "Gas Works Gas",
+    text: "Covers all types of gases produced in public utility or private plants for gas manufacture, transport and distribution. Includes gas from carbonisation, total gasification with/without enrichment with oil products, reforming and simple mixing of gases and/or air. Quantity transferred from other coal gases to gas works should be reported as gas works gas production.",
+    keywords: ["manufactured gas", "town gas", "coal gas", "utility gas", "synthetic gas", "gasification", "gas production", "gas manufacture", "gas distribution", "carbonisation gas"],
+    synonyms: ["town gas", "coal gas", "manufactured gas", "utility gas"],
+    related: ["manufactured gases", "natural gas", "coal products", "coke oven gas", "blast furnace gas", "other recovered gases"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_gasm"],
+    fuelCode: "C0350",
+    nrg_bal: "PPRD",
+    siec: "C0350",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["line", "bar"],
+    statisticalConcepts: ["production", "consumption", "distribution"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "manufactured_gas",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "coke oven gas": {
+    title: "Coke Oven Gas",
+    text: "Gas obtained as a by-product of the manufacture of coke oven coke for iron and steel production. This gas is recovered and used as a fuel partly within the plant and partly in other steel industry processes or in power stations equipped to burn it.",
+    keywords: ["coking gas", "coke gas", "steel industry gas", "coke production", "industrial gas", "by-product gas", "steel plant gas", "metallurgical gas", "coke manufacturing", "coke oven by-product"],
+    synonyms: ["coking gas", "steel plant gas", "metallurgical gas"],
+    related: ["manufactured gases", "iron and steel", "industrial energy", "coke", "coal products", "blast furnace gas"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_gasm"],
+    fuelCode: "C0311",
+    nrg_bal: "PPRD",
+    siec: "C0311",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["line", "bar"],
+    statisticalConcepts: ["production", "consumption", "energy recovery"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "coke_oven_gas",
+    isMainFuel: false,
+    subFuels: []
+  },
+    "blast furnace gas": {
+    title: "Blast Furnace Gas",
+    text: "Gas produced during the combustion of coke in blast furnaces in the iron and steel industry. It is recovered and used partly within the plant and partly in other steel industry processes or in power stations equipped to burn it. The quantity is reported on a gross calorific value basis.",
+    keywords: ["furnace gas", "iron industry gas", "BF gas", "derived gas", "industrial gas", "steel production gas", "recovered gas", "by-product gas"],
+    synonyms: ["BF gas", "iron industry gas", "blast furnace derived gas"],
+    related: ["manufactured gases", "iron and steel", "industrial energy", "coke", "other recovered gases", "transformation sector"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_gas"],
+    fuelCode: "C0350",
+    nrg_bal: "TI_E",
+    siec: "C0350",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["bar", "line"],
+    statisticalConcepts: ["production", "consumption", "transformation input"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "blast_furnace_gas",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "other recovered gases": {
+    title: "Other Recovered Gases",
+    text: "By-product gases from steel production in oxygen furnaces, also known as converter gas, LD gas or BOS gas. Also includes non-specified manufactured gases from carbonaceous materials recovered from manufacturing and chemical processes not defined elsewhere.",
+    keywords: ["converter gas", "LD gas", "BOS gas", "steel process gas", "oxygen furnace gas", "by-product gas", "manufactured gas", "industrial process gas"],
+    synonyms: ["steel converter gas", "oxygen furnace gas", "basic oxygen steel gas", "Linz-Donawitz gas"],
+    related: ["manufactured gases", "industrial gases", "steel industry", "blast furnace gas", "iron and steel sector"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_gas"],
+    fuelCode: "C0360",
+    nrg_bal: "TI_E",
+    siec: "C0360",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["bar", "line"],
+    statisticalConcepts: ["production", "consumption", "transformation"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "other_recovered_gases",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "peat": {
+    title: "Peat",
+    text: "A combustible soft, porous or compressed, sedimentary deposit of plant origin with high water content (up to 90% in raw state), easily cut, of light to dark brown color. Includes sod peat and milled peat. Peat used for non-energy purposes is excluded.",
+    keywords: ["sod peat", "milled peat", "fuel peat", "bog fuel", "organic fuel", "peatland fuel", "solid biofuel", "traditional fuel"],
+    synonyms: ["turf", "bog fuel", "peat fuel"],
+    related: ["solid fuels", "biofuels", "energy sources", "peat briquettes", "solid fossil fuels"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_peat"],
+    fuelCode: "P1000",
+    nrg_bal: "PPRD",
+    siec: "P1000",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["bar", "line", "area"],
+    statisticalConcepts: ["production", "consumption", "supply"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "peat",
+    isMainFuel: true,
+    subFuels: [
+      {
+        name: "Peat products",
+        fuelCode: "P1100",
+        siec: "P1100"
+      }
+    ]
+  },
+  "peat briquettes": {
+    title: "Peat Products",
+    text: "Products such as peat briquettes derived directly or indirectly from sod peat and milled peat. These are processed and compressed forms of peat used primarily as a fuel.",
+    keywords: ["peat fuel", "compressed peat", "processed peat", "peat briquettes", "peat pellets", "shaped peat", "dried peat"],
+    synonyms: ["peat fuel products", "processed peat", "peat pellets"],
+    related: ["peat", "solid fuels", "energy products", "biofuels"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_peat"],
+    fuelCode: "P1100",
+    nrg_bal: "PPRD",
+    siec: "P1100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["bar", "line"],
+    statisticalConcepts: ["production", "consumption"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "peat_briquettes",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "annual energy statistics": {
+    title: "Annual Energy Statistics",
+    text: "Annual collection of energy statistics covering calendar year data (January to December), starting from reference year 2022. Data must be submitted by October 31st of the following year through Eurostat's single entry point, conforming to specified interchange standards. Includes detailed reporting of supply, transformation, energy sector consumption, and final energy consumption.",
+    keywords: ["energy reporting", "statistical collection", "annual data"],
+    synonyms: ["yearly energy data", "annual energy reporting"],
+    related: ["energy statistics", "data collection", "energy reporting"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "annual_energy_statistics",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "supply categories": {
+    title: "Energy Supply Categories",
+    text: "Categories for reporting energy supply including production (underground and surface), receipts from other sources (recovered slurries, middlings, low-grade coal), imports, exports, international marine bunkers, and stock changes. For certain products, imports and exports must be reported by country of origin and destination.",
+    keywords: ["energy supply", "production", "trade", "stocks"],
+    synonyms: ["supply reporting", "energy sources"],
+    related: ["energy statistics", "energy production", "energy trade"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "supply_categories",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "transformation sector reporting": {
+    title: "Transformation Sector Reporting",
+    text: "Reporting categories for energy transformation activities including main activity producers and autoproducers of electricity and heat, patent fuel plants, coke ovens, BKB/PB plants, gas works, blast furnaces, coal liquefaction, and hydrogen production. Distinguishes between electricity-only, CHP, and heat-only units.",
+    keywords: ["energy conversion", "power generation", "fuel transformation"],
+    synonyms: ["conversion sector", "transformation activities"],
+    related: ["energy sector", "electricity production", "heat production"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "transformation_reporting",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "energy sector consumption": {
+    title: "Energy Sector Consumption",
+    text: "Energy consumption within the energy sector itself, including electricity and heat plants, coal mines, patent fuel plants, coke ovens, gas works, blast furnaces, refineries, and hydrogen production facilities. Also covers transmission and distribution losses.",
+    keywords: ["own use", "sector consumption", "energy losses"],
+    synonyms: ["energy industry use", "sector energy use"],
+    related: ["energy consumption", "energy efficiency", "distribution losses"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "energy_sector_consumption",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "final consumption reporting": {
+    title: "Final Energy Consumption Reporting",
+    text: "Detailed reporting of final energy consumption across industry (including iron and steel, chemicals, non-ferrous metals, etc.), transport (rail, domestic navigation), and other sectors (commercial, households, agriculture, forestry, fishing). Includes both energy and non-energy use.",
+    keywords: ["end use", "sectoral consumption", "final use"],
+    synonyms: ["end-use reporting", "consumption reporting"],
+    related: ["energy consumption", "industrial energy", "transport energy"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "final_consumption_reporting",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "calorific values": {
+    title: "Calorific Values",
+    text: "Both gross and net calorific values must be reported for specific energy products and uses, including production, imports, exports, and various transformation and consumption categories. Values are reported in MJ/t (mega-joules per tonne), while quantities are generally reported in kt (kilo-tonnes) or TJ GCV for gases.",
+    keywords: ["heating value", "energy content", "fuel value"],
+    synonyms: ["heating value", "energy content"],
+    related: ["energy measurement", "energy statistics", "fuel properties"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "calorific_values",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "natural gas supply": {
+    title: "Natural Gas Supply",
+    text: "Supply sector reporting must include volumes in both energy (TJ GCV) and physical units (10⁶ m³), with gross and net calorific values. Includes indigenous production (offshore, associated gas, non-associated gas, colliery gas), imports, exports, international marine bunkers, and stock changes. Gas vented and flared must be reported separately.",
+    keywords: ["gas production", "gas imports", "gas stocks", "indigenous gas"],
+    synonyms: ["gas supply", "gas availability"],
+    related: ["natural gas", "gas storage", "gas transmission"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "TJ_GCV",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "natural_gas_supply",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "gas storage facilities": {
+    title: "Gas Storage Facilities",
+    text: "Covers both gaseous gas storage (depleted fields, aquifers, salt caverns) and LNG terminals. Working capacity excludes cushion gas (permanent inventory). Each facility must report name, type, working capacity, peak output, and for LNG terminals, regasifying/liquefying capacity. All measurements use reference conditions (15°C, 101325 Pa).",
+    keywords: ["gas storage", "LNG terminal", "underground storage"],
+    synonyms: ["storage facilities", "gas storage sites"],
+    related: ["natural gas", "LNG", "gas infrastructure"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "gas_storage_facilities",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "gas transmission": {
+    title: "Gas Transmission",
+    text: "Covers transmission and distribution losses in gas networks. Pipeline transport is reported under transport sector consumption. System includes high-pressure transmission networks and local distribution networks. Losses must be reported separately for transmission and distribution.",
+    keywords: ["gas network", "pipeline losses", "gas distribution"],
+    synonyms: ["gas transport", "gas distribution"],
+    related: ["natural gas", "energy infrastructure", "energy losses"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "gas_transmission",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "gas consumption sectors": {
+    title: "Gas Consumption Sectors",
+    text: "Final consumption is categorized into transformation sector (power plants, gas works, etc.), energy sector (mines, refineries, etc.), transport sector (road, pipeline), industry sector (iron and steel, chemicals, etc.), and other sectors (services, households, agriculture). Both energy and non-energy use must be reported separately.",
+    keywords: ["gas use", "consumption categories", "end use"],
+    synonyms: ["gas end use", "sectoral consumption"],
+    related: ["natural gas", "energy consumption", "industrial energy"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "gas_consumption_sectors",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "gas measurement standards": {
+    title: "Gas Measurement Standards",
+    text: "All gas volumes must be reported at reference conditions of 15°C temperature and 101325 Pa pressure. Energy content is reported in TJ based on gross calorific value (GCV). Physical quantities use million cubic meters (10⁶ m³). Storage and terminal capacities are reported in million cubic meters per day (10⁶ m³/day).",
+    keywords: ["gas measurement", "reference conditions", "energy content"],
+    synonyms: ["measurement standards", "gas reporting units"],
+    related: ["natural gas", "energy measurement", "statistical reporting"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "gas_measurement_standards",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "indigenous gas production": {
+    title: "Indigenous Gas Production",
+    text: "Total domestic production of natural gas including offshore production. Comprises associated gas (produced with crude oil), non-associated gas (from fields producing only gaseous hydrocarbons), and colliery gas (methane from coal mines). Production must be reported in both energy units (TJ GCV) and volume (10⁶ m³).",
+    keywords: ["domestic gas", "offshore gas", "gas fields"],
+    synonyms: ["domestic production", "local gas production"],
+    related: ["natural gas", "gas production", "energy supply"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "TJ_GCV",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "indigenous_gas_production",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "gas venting and flaring": {
+    title: "Gas Venting and Flaring",
+    text: "Gas venting refers to intentional release of gas into the atmosphere at production sites or processing plants. Gas flaring is the burning of gas in flares at production sites or processing plants. Both quantities must be reported separately, with no requirement for calorific values declaration.",
+    keywords: ["gas release", "gas burning", "production losses"],
+    synonyms: ["vented gas", "flared gas"],
+    related: ["natural gas", "gas processing", "emissions"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "TJ_GCV",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "gas_venting_flaring",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "gas stocks": {
+    title: "Gas Stocks and Storage",
+    text: "Opening and closing stock levels must be declared separately for stocks on national territory and abroad. Stock level means quantity available for delivery during input-output cycle. Recoverable gas refers to gas stored in special facilities (depleted fields, aquifers, salt cavities) and LNG facilities, excluding cushion gas.",
+    keywords: ["gas inventory", "stored gas", "gas reserves"],
+    synonyms: ["gas storage levels", "gas inventories"],
+    related: ["natural gas", "gas storage", "LNG"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "gas_stocks",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "lng terminals": {
+    title: "LNG Terminals",
+    text: "Facilities for liquefying natural gas or importing/regasifying LNG. Must be reported separately as import or export terminals. Each terminal must declare name, working capacity (in gas equivalent), and regasifying/liquefying capacity. Working capacity excludes cushion gas used for maintaining pressure.",
+    keywords: ["LNG facility", "gas terminal", "regasification"],
+    synonyms: ["gas terminals", "LNG facilities"],
+    related: ["natural gas", "gas storage", "gas infrastructure"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "lng_terminals",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "gas transformation": {
+    title: "Gas Transformation",
+    text: "Transformation of natural gas includes use in electricity-only plants, CHP units, heat-only plants (both main activity producers and autoproducers), gas works, coke ovens, blast furnaces, gas-to-liquids plants, and hydrogen production. Each category must be reported separately with quantities in energy and volume units.",
+    keywords: ["gas conversion", "gas processing", "power generation"],
+    synonyms: ["gas conversion", "gas processing"],
+    related: ["natural gas", "energy transformation", "electricity generation"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "TJ_GCV",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "gas_transformation",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "gas energy sector": {
+    title: "Gas Energy Sector",
+    text: "Covers gas consumption within the energy sector including coal mines, oil/gas extraction, refineries, coke ovens, blast furnaces, gas works, power plants, and LNG/gasification facilities. Includes gas used for liquefaction and regasification processes in LNG terminals and gas used in pipeline operations.",
+    keywords: ["own use", "energy industry", "gas operations"],
+    synonyms: ["gas industry use", "energy sector gas"],
+    related: ["natural gas", "energy sector", "gas infrastructure"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "gas_energy_sector",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "gas transport sector": {
+    title: "Gas Transport Sector",
+    text: "Gas consumption in transport covers road transport using natural gas vehicles and pipeline transport operations. Pipeline transport refers to gas used in supporting pipeline operations including compression. Both energy and non-energy use must be declared separately for each transport category.",
+    keywords: ["gas vehicles", "pipeline operations", "transport fuel"],
+    synonyms: ["transport gas use", "gas fuel"],
+    related: ["natural gas", "transport energy", "pipeline transport"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "gas_transport_sector",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "gas industry sector": {
+    title: "Gas Industry Sector",
+    text: "Industrial consumption of gas must be reported separately for energy and non-energy use across specific subsectors: iron and steel, chemical/petrochemical, non-ferrous metals, non-metallic minerals, transport equipment, machinery, mining, food/beverages, pulp/paper, wood products, construction, and textiles/leather.",
+    keywords: ["industrial gas", "manufacturing", "industrial consumption"],
+    synonyms: ["industrial gas use", "manufacturing gas"],
+    related: ["natural gas", "industrial energy", "energy consumption"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "gas_industry_sector",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "gas storage reporting": {
+    title: "Gas Storage Reporting",
+    text: "Gas storage capacities must be reported separately for gaseous gas storage facilities and LNG terminals (import/export). Each facility must report: name, type (for gaseous storage only – e.g., depleted field, aquifer, salt cavern), working capacity (excluding cushion gas), peak output, and regasifying/liquefying capacity for LNG terminals.",
+    keywords: ["storage capacity", "working capacity", "peak output"],
+    synonyms: ["storage reporting", "capacity reporting"],
+    related: ["natural gas", "LNG", "gas infrastructure"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "gas_storage_reporting",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "gas trade reporting": {
+    title: "Gas Trade Reporting",
+    text: "For imports and exports, both total natural gas quantities and the LNG portion must be declared separately, broken down by country of origin for imports and country of destination for exports. All quantities must be reported in both energy units (TJ GCV) and physical units (10⁶ m³).",
+    keywords: ["gas imports", "gas exports", "LNG trade"],
+    synonyms: ["gas trade statistics", "international gas flows"],
+    related: ["natural gas", "LNG", "energy trade"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "gas_trade_reporting",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "oil supply reporting": {
+    title: "Oil Supply Reporting",
+    text: "Supply data must be reported for crude oil, NGL, refinery feedstocks, additives/oxygenates, and other hydrocarbons. Includes indigenous production (except for refinery feedstocks and biofuels), receipts from other sources, backflows from petrochemical sector, products transferred, imports/exports, direct use, and stock changes. All quantities must be reported in kt.",
+    keywords: ["oil supply", "crude oil", "NGL", "feedstocks", "oil imports", "oil exports", "oil stocks", "oil production", "petroleum supply chain", "oil reporting"],
+    synonyms: ["petroleum supply", "oil availability", "oil supply data"],
+    related: ["oil products", "refinery operations", "petrochemicals", "crude oil", "natural gas liquids", "petroleum products"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_oil"],
+    fuelCode: "OSR100",
+    nrg_bal: "PPRD",
+    siec: "OSR100",
+    unit: "KT",
+    hasVisualization: true,
+    visualizationType: ["bar", "line", "stacked"],
+    statisticalConcepts: ["production", "trade", "stocks", "supply"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "oil_supply_reporting",
+    isMainFuel: true,
+    subFuels: []
+  },
+  "refinery operations": {
+    title: "Refinery Operations",
+    text: "Covers observed refinery intake, refinery losses (difference between intake and output), and gross refinery output. Includes refinery fuel consumption in electricity, CHP, and heat-only units. Losses may occur during distillation due to evaporation, with possible volumetric gains but no mass gains.",
+    keywords: ["refinery intake", "refinery output", "refinery losses", "petroleum processing", "oil refining", "refinery fuel", "refinery throughput", "refinery yield", "oil distillation"],
+    synonyms: ["refining operations", "refinery processes", "petroleum refining"],
+    related: ["oil products", "petroleum refining", "energy sector", "oil supply", "petroleum products"],
+    dataset: "nrg_bal_c",
+    additionalDatasets: ["nrg_cb_oil"],
+    fuelCode: "RO100",
+    nrg_bal: "PPRD",
+    siec: "RO100",
+    unit: "KT",
+    hasVisualization: true,
+    visualizationType: ["bar", "line", "pie"],
+    statisticalConcepts: ["losses", "production", "transformation", "refining"],
+    link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+    queryType: "refinery_operations",
+    isMainFuel: true,
+    subFuels: []
+  },
+    "petrochemical sector reporting": {
+    title: "Petrochemical Sector Reporting",
+    text: "Reports deliveries of finished petroleum products to the petrochemical sector, including both energy use (fuel for steam cracking) and non-energy use (feedstock for ethylene, propylene, butylene, synthesis gas, aromatics). Backflows from the petrochemical sector to refineries must be reported separately.",
+    keywords: ["petrochemical use", "steam cracking", "chemical feedstock"],
+    synonyms: ["chemical industry reporting", "petrochemical consumption"],
+    related: ["oil products", "industrial energy", "chemical industry"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "petrochemical_reporting",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "refinery capacity reporting": {
+    title: "Refinery Capacity Reporting",
+    text: "Annual reporting of national total refining capacity and breakdown by refinery in thousand metric tons per year. Must include atmospheric/vacuum distillation, thermal/catalytic cracking (including FCC and hydrocracking), reforming, desulphurisation, and other processes like alkylation and etherification.",
+    keywords: ["refining capacity", "distillation", "cracking processes"],
+    synonyms: ["refinery capabilities", "processing capacity"],
+    related: ["oil refining", "petroleum products", "industrial capacity"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "KT",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "refinery_capacity_reporting",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "oil products trade": {
+    title: "Oil Products Trade",
+    text: "Trade data includes quantities imported/exported under processing agreements (refining on account). Crude oil and NGLs reported by ultimate origin; refinery feedstocks and products by last consignment. Includes gas liquids from LNG regasification and direct petrochemical trade. Pure biofuels trade excluded. Re-exports from bonded areas reported as exports from processing country.",
+    keywords: ["oil imports", "oil exports", "processing agreements"],
+    synonyms: ["oil trade", "petroleum trade"],
+    related: ["oil products", "refinery operations", "international trade"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "KT",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "oil_products_trade",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "refinery fuel usage": {
+    title: "Refinery Fuel Usage",
+    text: "Fuels used at refineries must be reported, including those used for electricity and heat production for sale. Usage reported separately for electricity-only units, CHP units, and heat-only units. Part of refinery own use in energy sector consumption reporting.",
+    keywords: ["refinery consumption", "own use", "fuel consumption"],
+    synonyms: ["refinery consumption", "own use fuel"],
+    related: ["refinery operations", "energy sector", "fuel consumption"],
+    dataset: "nrg_bal_c",
+    fuelCode: "RFU100",
+    nrg_bal: "PPRD",
+    siec: "RFU100",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["bar", "line"],
+    statisticalConcepts: ["consumption"],
+    link: "",
+    queryType: "refinery_fuel_usage",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "petrochemical deliveries": {
+    title: "Petrochemical Deliveries",
+    text: "Covers delivery of finished petroleum products from primary sources to the petrochemical sector. Distinguishes between energy use (steam cracking fuel) and non-energy use (ethylene, propylene production). Excludes backflows to refineries, which are reported separately. Quantities declared in kt (kilo-tonnes).",
+    keywords: ["chemical industry", "petrochemical supply", "feedstock"],
+    synonyms: ["chemical deliveries", "petrochemical supply"],
+    related: ["oil products", "chemical industry", "industrial consumption"],
+    dataset: "nrg_bal_c",
+    fuelCode: "PD100",
+    nrg_bal: "PPRD",
+    siec: "PD100",
+    unit: "KT",
+    hasVisualization: true,
+    visualizationType: ["bar", "line"],
+    statisticalConcepts: ["delivery", "trade"],
+    link: "",
+    queryType: "petrochemical_deliveries",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "refinery processes": {
+    title: "Refinery Processes",
+    text: "National refineries must report annual capacity for: atmospheric and vacuum distillation, thermal cracking (including visbreaking and coking), catalytic cracking (including FCC and hydrocracking), reforming, desulphurisation, and alkylation/polymerisation/isomerisation/etherification. Capacities reported in thousand metric tons per year.",
+    keywords: ["refining process", "distillation", "cracking"],
+    synonyms: ["refining operations", "processing units"],
+    related: ["oil refining", "petroleum products", "refinery capacity"],
+    dataset: "nrg_bal_c",
+    fuelCode: "RP100",
+    nrg_bal: "PPRD",
+    siec: "RP100",
+    unit: "KT",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: ["capacity"],
+    link: "",
+    queryType: "refinery_processes",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "refinery capacity breakdown": {
+    title: "Refinery Capacity Breakdown",
+    text: "Each refinery must report: name/location, atmospheric distillation, vacuum distillation, thermal cracking (with separate visbreaking and coking), catalytic cracking (with separate FCC and hydrocracking), reforming, desulphurisation, alkylation/polymerisation/isomerisation, and etherification capacities.",
+    keywords: ["refinery units", "processing capacity", "unit capacity"],
+    synonyms: ["unit breakdown", "process capacity"],
+    related: ["refinery processes", "oil refining", "industrial capacity"],
+    dataset: "nrg_bal_c",
+    fuelCode: "RCB100",
+    nrg_bal: "PPRD",
+    siec: "RCB100",
+    unit: "KT",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "refinery_capacity_breakdown",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "petrochemical consumption": {
+    title: "Petrochemical Consumption",
+    text: "Covers energy use (fuel for steam cracking) and non-energy use (feedstock for ethylene, propylene, butylene, synthesis gas, aromatics production) in the petrochemical sector. Quantities in kt. Excludes amounts used as fuel. Includes processes like steam cracking, aromatics plants and steam reforming.",
+    keywords: ["chemical feedstock", "steam cracking", "aromatics"],
+    synonyms: ["chemical use", "petrochemical use"],
+    related: ["industrial energy", "chemical industry", "feedstocks"],
+    dataset: "nrg_bal_c",
+    fuelCode: "PCN100",
+    nrg_bal: "PPRD",
+    siec: "PCN100",
+    unit: "KT",
+    hasVisualization: true,
+    visualizationType: ["bar", "line"],
+    statisticalConcepts: ["consumption"],
+    link: "",
+    queryType: "petrochemical_consumption",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "renewable electricity production": {
+    title: "Renewable Electricity Production",
+    text: "Gross electricity production must be reported separately for main activity producers and autoproducers. Categories include pure/mixed hydro plants, pumped storage, geothermal, solar PV (with size and rooftop/off-grid subcategories), solar thermal, tide/wave/ocean, and wind (onshore/offshore). Only quantities used for energy purposes should be reported.",
+    keywords: ["renewable power", "green electricity", "clean energy"],
+    synonyms: ["renewable power", "green power"],
+    related: ["hydropower", "solar energy", "wind power"],
+    dataset: "nrg_bal_c",
+    fuelCode: "REP100",
+    nrg_bal: "PPRD",
+    siec: "REP100",
+    unit: "GWH",
+    hasVisualization: true,
+    visualizationType: ["pie", "line", "bar"],
+    statisticalConcepts: ["production", "capacity"],
+    link: "",
+    queryType: "renewable_electricity_production",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "solar photovoltaic categories": {
+    title: "Solar Photovoltaic Categories",
+    text: "Solar PV installations must be reported in three size categories: less than 30 kW, from 30 to 1000 kW, and more than 1000 kW. Each category requires subcategories for rooftop and off-grid installations, with off-grid reporting mandatory only when it represents 1% or more of capacity in its size category.",
+    keywords: ["solar PV", "photovoltaic", "rooftop solar"],
+    synonyms: ["PV installations", "solar power"],
+    related: ["renewable energy", "electricity production", "solar energy"],
+    dataset: "nrg_bal_c",
+    fuelCode: "SPV100",
+    nrg_bal: "PPRD",
+    siec: "SPV100",
+    unit: "",
+    hasVisualization: true,
+    visualizationType: ["bar"],
+    statisticalConcepts: ["capacity"],
+    link: "",
+    queryType: "solar_pv_categories",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "heat pumps reporting": {
+    title: "Heat Pumps Reporting",
+    text: "Ambient heat from heat pumps must be reported for specific sectors including transformation (heat sold only), energy sector total, industry total, commercial services, and households. Three categories required under indigenous production: aerothermal, geothermal, and hydrothermal, each with subcategory for heat pumps with SPF above threshold per Directives 2009/28/EC and 2018/2001.",
+    keywords: ["heat pump", "ambient heat", "thermal energy"],
+    synonyms: ["thermal pumps", "heat extraction"],
+    related: ["renewable heat", "thermal energy", "energy efficiency"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "TJ_GCV",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "heat_pumps_reporting",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "biofuel production capacity": {
+    title: "Biofuel Production Capacity",
+    text: "Annual production capacity must be reported in kt/year for biogasoline, biodiesels, bio jet kerosene, and other liquid biofuels. Includes reporting of average net calorific values. For solid biofuels production, detailed breakdown required for fuelwood/wood residues, wood pellets, black liquor, bagasse, animal waste, and vegetal materials.",
+    keywords: ["biofuel capacity", "production capacity", "biofuel production"],
+    synonyms: ["biofuel facilities", "production plants"],
+    related: ["biofuels", "renewable energy", "energy production"],
+    dataset: "",
+    fuelCode: "BPC100",
+    nrg_bal: "",
+    siec: "",
+    unit: "KT",
+    hasVisualization: true,
+    visualizationType: ["bar"],
+    statisticalConcepts: ["production"],
+    link: "",
+    queryType: "biofuel_production_capacity",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "thermal capacity heat pumps": {
+    title: "Thermal Capacity of Heat Pumps",
+    text: "Detailed reporting required for aerothermal (air-air, air-water, including reversible systems), geothermal (ground-air, ground-water), and hydrothermal heat (water-air, water-water) capacities. Each category must report subcategory for heat pumps with SPF above directive threshold per Directives 2009/28/EC and 2018/2001.",
+    keywords: ["heat pump capacity", "thermal output", "heat extraction"],
+    synonyms: ["heating capacity", "thermal power"],
+    related: ["heat pumps", "renewable heat", "energy efficiency"],
+    dataset: "",
+    fuelCode: "THP100",
+    nrg_bal: "",
+    siec: "",
+    unit: "TJ",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "thermal_capacity_heat_pumps",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "hydro categories": {
+    title: "Hydropower Categories",
+    text: "Hydro plants must be reported in three categories: pure hydro plants (natural water inflow only), mixed hydro plants (natural inflow and pumping), and pure pumped storage. For mixed plants, pumping component must be reported separately. Capacity reporting uses net maximum electrical capacity as of December 31st.",
+    keywords: ["hydro plants", "pumped storage", "water power"],
+    synonyms: ["hydro facilities", "water power plants"],
+    related: ["hydropower", "electricity production", "renewable energy"],
+    dataset: "nrg_ind_ren",
+    fuelCode: "HCAT100",
+    nrg_bal: "PPRD",
+    siec: "HCAT100",
+    unit: "MW",
+    hasVisualization: true,
+    visualizationType: ["bar", "line"],
+    statisticalConcepts: ["capacity", "production"],
+    link: "",
+    queryType: "hydro_categories",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "solar thermal measurement": {
+    title: "Solar Thermal Measurement",
+    text: "Solar collector surface area must be reported for all installations used in solar thermal heat production. Excludes collector surface for electricity generation (PV and concentrated solar). Includes all collector types: glazed, unglazed, flat-plate and vacuum tube, using liquid or air as energy carrier.",
+    keywords: ["solar collectors", "thermal surface", "solar heating"],
+    synonyms: ["solar thermal area", "collector surface"],
+    related: ["solar energy", "thermal energy", "renewable heat"],
+    dataset: "nrg_bal_c",
+    fuelCode: "STM100",
+    nrg_bal: "",
+    siec: "",
+    unit: "m²",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "solar_thermal_measurement",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "waste energy reporting": {
+    title: "Waste Energy Reporting",
+    text: "Municipal waste must be reported separately as renewable and non-renewable portions. Only waste used for energy purposes (electricity/heat generation, combustion with energy recovery) should be included. Non-energy uses like furniture, construction, paper/cardboard production are excluded. Passive thermal energy (e.g. passive solar heating) is not reported.",
+    keywords: ["waste combustion", "energy recovery", "municipal waste"],
+    synonyms: ["waste-to-energy", "energy from waste"],
+    related: ["renewable energy", "waste management", "energy recovery"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "waste_energy_reporting",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "non-energy use reporting": {
+    title: "Non-Energy Use Reporting",
+    text: "From reference year 2024, non-energy use must be reported for transport, industry, and other sectors. Applies to solid biofuels, liquid biofuels, and biogases when used to replace fossil fuels. Must be reported separately from energy use quantities. Until 2027, only total final consumption for non-energy use can be reported instead of sectoral breakdown.",
+    keywords: ["non-energy consumption", "biofuel feedstock", "material use"],
+    synonyms: ["material consumption", "non-fuel use"],
+    related: ["biofuels", "industrial use", "material applications"],
+    dataset: "",
+    fuelCode: "",
+    nrg_bal: "",
+    siec: "",
+    unit: "",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "non_energy_use_reporting",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "solar pv installation": {
+    title: "Solar PV Installation Categories",
+    text: "PV installations must be classified by size: <30 kW, 30-1000 kW, >1000 kW. Each category requires rooftop and off-grid subcategories, with off-grid reporting mandatory only when representing ≥1% of category capacity. Net maximum electrical capacity is reported as of December 31st, including both electricity-only and CHP units.",
+    keywords: ["photovoltaic", "solar power", "PV capacity"],
+    synonyms: ["solar installation", "PV systems"],
+    related: ["renewable electricity", "solar energy", "electrical capacity"],
+    dataset: "nrg_bal_c",
+    fuelCode: "SPVI100",
+    nrg_bal: "PPRD",
+    siec: "SPVI100",
+    unit: "",
+    hasVisualization: true,
+    visualizationType: ["bar"],
+    statisticalConcepts: ["capacity"],
+    link: "",
+    queryType: "solar_pv_installation",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "solar collector reporting": {
+    title: "Solar Collector Reporting",
+    text: "Total surface area of installed solar collectors must be reported in 1000 m². Only includes collectors for solar thermal heat production, excluding surfaces for electricity generation (PV and concentrated solar power). Must include all types: glazed, unglazed, flat-plate and vacuum tube collectors, with either liquid or air as energy carrier.",
+    keywords: ["solar thermal", "collector surface", "thermal collectors"],
+    synonyms: ["solar thermal area", "collector installation"],
+    related: ["solar energy", "thermal energy", "heat production"],
+    dataset: "nrg_bal_c",
+    fuelCode: "SCR100",
+    nrg_bal: "",
+    siec: "",
+    unit: "1000 m²",
+    hasVisualization: false,
+    visualizationType: [],
+    statisticalConcepts: [],
+    link: "",
+    queryType: "solar_collector_reporting",
+    isMainFuel: false,
+    subFuels: []
+  },
+  "heat pump capacity": {
+    title: "Heat Pump Capacity",
+    text: "Thermal capacity must be reported for aerothermal (including air-air, air-water, reversible, and exhaust air systems), geothermal (ground-air, ground-water), and hydrothermal (water-air, water-water) heat pumps. Each category requires subcategory reporting for units with SPF above threshold per Directives 2009/28/EC and 2018/2001.",
+    keywords: ["thermal capacity", "heat extraction", "SPF threshold"],
+    synonyms: ["heating capacity", "thermal output"],
+    related: ["renewable heat", "ambient heat", "heat pumps"],
+    dataset: "nrg_bal_c",
+    fuelCode: "HPC100",
+    nrg_bal: "",
+    siec: "",
+    unit: "TJ_GCV",
+    hasVisualization: true,
+    visualizationType: ["bar", "line"],
+    statisticalConcepts: ["capacity"],
+    link: "",
+    queryType: "heat_pump_capacity",
+    isMainFuel: false,
+    subFuels: []
+  },
+"nuclear enrichment": {
+  title: "Nuclear Enrichment",
+  text: "Annual enrichment capacity for isotopic separation of uranium, measured in tonnes of separative work units (tSWU). Enrichment is a key step in nuclear fuel production, increasing the concentration of fissile uranium-235.",
+  keywords: ["uranium enrichment", "isotopic separation", "enrichment capacity"],
+  synonyms: ["uranium processing", "isotope separation"],
+  related: ["nuclear fuel", "uranium production", "fuel fabrication"],
+  dataset: "nrg_inf_nuc",
+  fuelCode: "N900E",
+  nrg_bal: "",
+  siec: "N900",
+  unit: "tSWU",
+  hasVisualization: true,
+  visualizationType: ["bar"],
+  statisticalConcepts: ["capacity", "nuclear fuel cycle"],
+  link: "",
+  queryType: "nuclear_enrichment",
+  isMainFuel: false,
+  subFuels: []
+},
+
+"nuclear heat": {
+  title: "Nuclear Heat",
+  text: "Total heat generated by nuclear reactors for electricity production or other useful applications. Measured in terajoules (TJ). Nuclear burnup is reported in gigawatt-days per tonne of heavy metal (GWd/tHM) for discharged fuel elements.",
+  keywords: ["nuclear generation", "thermal output", "reactor heat"],
+  synonyms: ["reactor heat", "nuclear thermal"],
+  related: ["nuclear power", "electricity generation", "thermal energy"],
+  dataset: "nrg_bal_c",
+  fuelCode: "N900H",
+  nrg_bal: "THEAT",
+  siec: "N900",
+  unit: "TJ",
+  hasVisualization: true,
+  visualizationType: ["line", "bar"],
+  statisticalConcepts: ["heat generation", "thermal output"],
+  link: "",
+  queryType: "nuclear_heat",
+  isMainFuel: false,
+  subFuels: []
+},
+
+"hydrogen production": {
+  title: "Hydrogen Production",
+  text: "Production of hydrogen from various sources including natural gas, oil, coal, renewables, and electrolysis. Production and capacity are measured in TJ (NCV). For electrolysis, separate reporting required for renewable, nuclear, and fossil electricity sources with direct transmission lines.",
+  keywords: ["hydrogen generation", "electrolysis", "hydrogen sources"],
+  synonyms: ["H2 production", "hydrogen generation"],
+  related: ["renewable energy", "natural gas", "electrolysis"],
+  dataset: "nrg_bal_h2",
+  fuelCode: "H2",
+  nrg_bal: "PROD",
+  siec: "H2",
+  unit: "TJ_NCV",
+  hasVisualization: true,
+  visualizationType: ["bar", "pie"],
+  statisticalConcepts: ["production", "energy sources"],
+  link: "",
+  queryType: "hydrogen_production",
+  isMainFuel: false,
+  subFuels: []
+},
+
+"hydrogen applications": {
+  title: "Hydrogen Applications",
+  text: "Use of hydrogen across sectors including transformation (electricity/heat production), industry (energy and non-energy use), transport, and blending with other fuels. Includes blending with natural gas, motor fuels, and renewables. Quantities reported in TJ (NCV).",
+  keywords: ["hydrogen use", "fuel blending", "hydrogen consumption"],
+  synonyms: ["hydrogen utilization", "H2 applications"],
+  related: ["energy sector", "transport sector", "fuel blending"],
+  dataset: "nrg_bal_h2",
+  fuelCode: "H2",
+  nrg_bal: "FC",
+  siec: "H2",
+  unit: "TJ_NCV",
+  hasVisualization: true,
+  visualizationType: ["pie", "bar"],
+  statisticalConcepts: ["consumption", "end-use"],
+  link: "",
+  queryType: "hydrogen_applications",
+  isMainFuel: false,
+  subFuels: []
+},
+
+"industrial energy consumption": {
+  title: "Industrial Energy Consumption",
+  text: "Energy consumption in industry sector is reported by subsectors including mining, manufacturing, and processing industries. Covers both energy and non-energy use of fuels. Data must be reported according to specific industrial activity classifications.",
+  keywords: ["industry consumption", "manufacturing energy", "industrial sectors"],
+  synonyms: ["industrial use", "factory consumption"],
+  related: ["energy use", "final consumption", "industry sector"],
+  dataset: "nrg_bal_c",
+  fuelCode: "",
+  nrg_bal: "FC_IND_E",
+  siec: "",
+  unit: "KTOE",
+  hasVisualization: true,
+  visualizationType: ["bar", "pie"],
+  statisticalConcepts: ["consumption", "industrial breakdown"],
+  link: "",
+  queryType: "industrial_energy_consumption",
+  isMainFuel: false,
+  subFuels: []
+},
+
+"mining energy consumption": {
+  title: "Mining Energy Consumption",
+  text: "Energy consumption in mining and quarrying activities, including metal ore mining, other mining/quarrying, and mining support services. Reports energy used in extraction and processing operations.",
+  keywords: ["mining operations", "quarrying", "mineral extraction"],
+  synonyms: ["extractive industries", "mining sector"],
+  related: ["industrial consumption", "metal ores", "mining support"],
+  dataset: "nrg_bal_c",
+  fuelCode: "",
+  nrg_bal: "FC_IND_MQ_E",
+  siec: "",
+  unit: "KTOE",
+  hasVisualization: true,
+  visualizationType: ["bar"],
+  statisticalConcepts: ["consumption"],
+  link: "",
+  queryType: "mining_energy_consumption",
+  isMainFuel: false,
+  subFuels: []
+},
+
+"manufacturing energy use": {
+  title: "Manufacturing Energy Use",
+  text: "Covers energy consumption across manufacturing subsectors including food/beverages, textiles, wood products, paper, chemicals, metals, machinery, and transport equipment. Includes both process energy and facility energy use.",
+  keywords: ["manufacturing", "industrial processing", "factory energy"],
+  synonyms: ["industrial manufacturing", "factory consumption"],
+  related: ["industrial energy", "process energy", "facility energy"],
+  dataset: "nrg_bal_c",
+  fuelCode: "",
+  nrg_bal: "FC_IND_MF_E",
+  siec: "",
+  unit: "KTOE",
+  hasVisualization: true,
+  visualizationType: ["bar", "pie"],
+  statisticalConcepts: ["consumption", "sectoral breakdown"],
+  link: "",
+  queryType: "manufacturing_energy_use",
+  isMainFuel: false,
+  subFuels: []
+},
+
+"transport energy consumption": {
+  title: "Transport Energy Consumption",
+  text: "Energy consumption in transport sector divided by mode: rail (high-speed, conventional, metro/tram), road (freight, collective, cars/vans), and vehicle categories. Separate reporting for passenger and freight transport.",
+  keywords: ["transport fuel", "vehicle energy", "mobility energy", "aviation fuel", "marine bunkers", "road transport", "rail transport", "domestic navigation", "international aviation", "passenger transport", "freight transport", "biofuels in transport"],
+  synonyms: ["transportation energy", "fuel consumption", "mobility fuel use", "transport sector energy"],
+  related: ["fuel use", "vehicle types", "transport modes", "oil products", "aviation fuel", "diesel", "petrol", "biofuels"],
+  dataset: "nrg_bal_c",
+  additionalDatasets: ["nrg_cb_em", "nrg_ind_id"],
+  fuelCode: "",
+  nrg_bal: "FC_TRA_E",
+  siec: "TOTAL",
+  unit: "KTOE",
+  hasVisualization: true,
+  visualizationType: ["bar", "pie", "line"],
+  statisticalConcepts: ["consumption", "modal split", "fuel mix", "energy intensity"],
+  link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+  queryType: "transport_energy_consumption",
+  isMainFuel: true,
+  subFuels: [
+    {
+      name: "Rail transport",
+      fuelCode: "",
+      nrg_bal: "FC_TRA_RAIL_E"
+    },
+    {
+      name: "Road transport",
+      fuelCode: "",
+      nrg_bal: "FC_TRA_ROAD_E"
+    },
+    {
+      name: "International aviation",
+      fuelCode: "",
+      nrg_bal: "FC_TRA_AVIINT_E"
+    },
+    {
+      name: "Domestic aviation",
+      fuelCode: "",
+      nrg_bal: "FC_TRA_AVIDOM_E"
+    },
+    {
+      name: "Domestic navigation",
+      fuelCode: "",
+      nrg_bal: "FC_TRA_NAVDOM_E"
+    }
+  ]
+},
+
+"commercial energy use": {
+  title: "Commercial Energy Use",
+  text: "Energy consumption in commercial and public services including retail, offices, hospitality, healthcare, education, and data centers. Data centers with total power capacity ≥1 MW must be reported separately from 2024.",
+  keywords: ["service sector", "commercial buildings", "public services", "office energy", "retail energy", "hospitality energy", "healthcare facilities", "educational buildings", "data centers", "building energy", "tertiary sector energy"],
+  synonyms: ["service sector energy", "tertiary sector", "commercial sector consumption", "public service energy"],
+  related: ["building energy", "office consumption", "data centers", "electricity consumption", "heating", "cooling", "lighting", "residential energy"],
+  dataset: "nrg_bal_c",
+  additionalDatasets: ["nrg_d_hhq"],
+  fuelCode: "",
+  nrg_bal: "FC_OTH_CP_E",
+  siec: "TOTAL",
+  unit: "KTOE",
+  hasVisualization: true,
+  visualizationType: ["bar", "pie", "line", "area"],
+  statisticalConcepts: ["consumption", "energy intensity", "building efficiency", "service sector breakdown"],
+  link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+  queryType: "commercial_energy_use",
+  isMainFuel: true,
+  subFuels: [
+    {
+      name: "Commercial and public services",
+      fuelCode: "",
+      nrg_bal: "FC_OTH_CP_E"
+    },
+    {
+      name: "Data centers",
+      fuelCode: "",
+      nrg_bal: "FC_OTH_DC_E"
+    }
+  ]
+},
+"household energy consumption": {
+  title: "Household Energy Consumption",
+  text: "Residential energy use categorized by end-use: space heating, space cooling, water heating, cooking, lighting and appliances (electricity only), and other uses. Reported separately for different energy products.",
+  keywords: ["residential energy", "domestic consumption", "home energy"],
+  synonyms: ["residential use", "domestic energy"],
+  related: ["space heating", "appliances", "cooking"],
+  dataset: "nrg_bal_c",
+  fuelCode: "",
+  nrg_bal: "FC_OTH_HH_E",
+  siec: "",
+  unit: "KTOE",
+  hasVisualization: true,
+  visualizationType: ["bar", "pie"],
+  statisticalConcepts: ["consumption", "end-use"],
+  link: "",
+  queryType: "household_energy_consumption"
+},
+
+"preliminary annual data": {
+  title: "Preliminary Annual Data",
+  text: "Early reporting of key energy statistics including production, imports, exports, and stock changes for all major energy products. Must be submitted by May 31st of the year following the reported year.",
+  keywords: ["early reporting", "provisional data", "annual statistics"],
+  synonyms: ["preliminary statistics", "early data"],
+  related: ["energy statistics", "reporting deadlines", "data transmission"],
+  dataset: "",
+  fuelCode: "",
+  nrg_bal: "",
+  siec: "",
+  unit: "",
+  hasVisualization: false,
+  visualizationType: [],
+  statisticalConcepts: ["statistics", "reporting"],
+  link: "",
+  queryType: "preliminary_annual_data"
+},
+
+"detailed consumption reporting": {
+  title: "Detailed Consumption Reporting",
+  text: "Comprehensive reporting of final energy consumption broken down by sector, subsector, and end-use. Covers all energy products with specific measurement units: kt for solid/liquid fuels, TJ GCV for gases, GWh for electricity, TJ NCV for heat and most renewables.",
+  keywords: ["consumption data", "energy use reporting", "sectoral data"],
+  synonyms: ["consumption statistics", "energy use data"],
+  related: ["final consumption", "sectoral breakdown", "energy reporting"],
+  dataset: "",
+  fuelCode: "",
+  nrg_bal: "FC",
+  siec: "",
+  unit: "",
+  hasVisualization: false,
+  visualizationType: [],
+  statisticalConcepts: ["consumption", "sectoral breakdown"],
+  link: "",
+  queryType: "detailed_consumption_reporting"
+},
+
+"monthly reporting": {
+  title: "Monthly Energy Statistics",
+  text: "Monthly collection of energy statistics covering calendar months, submitted within specified deadlines through Eurostat's single entry point. Data must conform to specified interchange standards and transmission formats.",
+  keywords: ["monthly data", "energy reporting", "statistical collection"],
+  synonyms: ["monthly statistics", "energy data"],
+  related: ["reporting period", "data transmission", "statistical standards"],
+  dataset: "nrg_m",
+  fuelCode: "",
+  nrg_bal: "",
+  siec: "",
+  unit: "",
+  hasVisualization: false,
+  visualizationType: [],
+  statisticalConcepts: ["statistics", "reporting"],
+  link: "",
+  queryType: "monthly_reporting"
+},
+
+"solid fuels reporting": {
+  title: "Solid Fuels Monthly Reporting",
+  text: "Monthly reporting for hard coal, brown coal, peat, oil shale/sands, and coke oven coke. Includes production, trade, stocks, and deliveries data. Quantities reported in kt (kilo-tonnes) within two months of reported month.",
+  keywords: ["coal reporting", "solid fuel data", "monthly coal"],
+  synonyms: ["coal statistics", "solid fuel reporting"],
+  related: ["hard coal", "brown coal", "coke"],
+  dataset: "nrg_m",
+  fuelCode: "C0000",
+  nrg_bal: "",
+  siec: "C0000",
+  unit: "KT",
+  hasVisualization: true,
+  visualizationType: ["line"],
+  statisticalConcepts: ["production", "trade", "stocks"],
+  link: "",
+  queryType: "solid_fuels_reporting"
+},
+
+"electricity reporting": {
+  title: "Electricity Monthly Reporting",
+  text: "Monthly net electricity production data by source (nuclear, thermal, renewables) and trade data. Includes detailed breakdown of conventional thermal generation by fuel type. Quantities in GWh, submitted within two months of reported month.",
+  keywords: ["power generation", "electricity data", "monthly electricity"],
+  synonyms: ["power statistics", "electricity statistics"],
+  related: ["net production", "thermal generation", "renewable power"],
+  dataset: "nrg_m",
+  fuelCode: "E7000",
+  nrg_bal: "PPRD",
+  siec: "E7000",
+  unit: "GWH",
+  hasVisualization: true,
+  visualizationType: ["line", "bar"],
+  statisticalConcepts: ["production", "generation mix", "trade"],
+  link: "",
+  queryType: "electricity_reporting"
+},
+
+"petroleum reporting": {
+  title: "Oil and Petroleum Products Monthly Reporting",
+  text: "Monthly reporting covering crude oil, NGL, refinery feedstocks, and finished products. Includes supply, refinery activity, trade, stocks, and deliveries data. Requires detailed stock reporting by location and ownership.",
+  keywords: ["oil reporting", "petroleum data", "monthly oil"],
+  synonyms: ["oil statistics", "petroleum statistics"],
+  related: ["crude oil", "refined products", "oil stocks"],
+  dataset: "nrg_m",
+  fuelCode: "O4000",
+  nrg_bal: "",
+  siec: "O4000",
+  unit: "KT",
+  hasVisualization: true,
+  visualizationType: ["line"],
+  statisticalConcepts: ["supply", "trade", "stocks"],
+  link: "",
+  queryType: "petroleum_reporting"
+},
+
+"stock reporting": {
+  title: "Stock Level Reporting",
+  text: "Detailed reporting of opening and closing stocks by location (national territory, abroad) and ownership (government, stockholding organization, others). Includes stocks under bilateral agreements and those with known foreign destination.",
+  keywords: ["inventory levels", "stock data", "storage reporting"],
+  synonyms: ["inventory reporting", "storage statistics"],
+  related: ["oil stocks", "emergency stocks", "storage capacity"],
+  dataset: "nrg_m",
+  fuelCode: "",
+  nrg_bal: "SSTK",
+  siec: "",
+  unit: "KT",
+  hasVisualization: true,
+  visualizationType: ["line"],
+  statisticalConcepts: ["stocks", "inventory", "storage"],
+  link: "",
+  queryType: "stock_reporting"
+},
+
+"monthly coal aggregates": {
+  title: "Coal Monthly Aggregates",
+  text: "Key data points for hard coal including production, recovered products, imports/exports, stocks, and deliveries to various sectors. Special focus on deliveries to main activity producers, coke ovens, and iron/steel industry.",
+  keywords: ["coal data", "monthly coal", "coal deliveries"],
+  synonyms: ["coal statistics", "coal reporting"],
+  related: ["hard coal", "coal stocks", "coal trade"],
+  dataset: "nrg_m",
+  fuelCode: "C0100",
+  nrg_bal: "",
+  siec: "C0100",
+  unit: "KT",
+  hasVisualization: true,
+  visualizationType: ["line", "bar"],
+  statisticalConcepts: ["production", "trade", "deliveries"],
+  link: "",
+  queryType: "monthly_coal_aggregates"
+},
+
+"monthly electricity aggregates": {
+  title: "Electricity Monthly Aggregates",
+  text: "Net electricity production data broken down by source: nuclear, conventional thermal (by fuel type), hydro (pure, mixed, pumped storage), wind (onshore/offshore), solar (PV/thermal), and other renewables. Includes trade data with EU/non-EU breakdown.",
+  keywords: ["electricity data", "power generation", "monthly power"],
+  synonyms: ["power statistics", "generation data"],
+  related: ["net production", "power sources", "electricity trade"],
+  dataset: "nrg_m",
+  fuelCode: "E7000",
+  nrg_bal: "NPRD",
+  siec: "E7000",
+  unit: "GWH",
+  hasVisualization: true,
+  visualizationType: ["line", "bar", "pie"],
+  statisticalConcepts: ["production", "generation mix", "trade"],
+  link: "",
+  queryType: "monthly_electricity_aggregates"
+},
+
+"petroleum supply": {
+  title: "Petroleum Supply Reporting",
+  text: "Monthly supply chain reporting for crude oil, NGL, feedstocks, and additives. Covers indigenous production, receipts, backflows, transfers, trade, direct use, and refinery intake/losses. Includes detailed stock level reporting.",
+  keywords: ["oil supply", "petroleum flow", "supply chain"],
+  synonyms: ["oil supply chain", "petroleum supply"],
+  related: ["crude oil", "refineries", "oil stocks"],
+  dataset: "nrg_m",
+  fuelCode: "O4100",
+  nrg_bal: "",
+  siec: "O4100",
+  unit: "KT",
+  hasVisualization: true,
+  visualizationType: ["line", "bar"],
+  statisticalConcepts: ["supply", "flow", "refining"],
+  link: "",
+  queryType: "petroleum_supply"
+},
+
+"finished products": {
+  title: "Finished Products Supply",
+  text: "Monthly reporting of finished petroleum products covering refinery output, recycled products, fuel use, trade, bunkers, transfers, and gross inland deliveries. Includes specific reporting for aviation, power plants, road transport, and petrochemicals.",
+  keywords: ["oil products", "product supply", "refined products"],
+  synonyms: ["product statistics", "refined products"],
+  related: ["refinery output", "product trade", "inland deliveries"],
+  dataset: "nrg_m",
+  fuelCode: "O4600",
+  nrg_bal: "",
+  siec: "O4600",
+  unit: "KT",
+  hasVisualization: true,
+  visualizationType: ["line", "bar"],
+  statisticalConcepts: ["supply", "deliveries", "consumption"],
+  link: "",
+  queryType: "finished_products"
+},
+
+"stock categories": {
+  title: "Stock Categories",
+  text: "Classification of petroleum stocks by location and ownership including stocks on national territory, stocks held under bilateral agreements, stocks with foreign destination, bonded stocks, consumer stocks, vessel stocks, and government/stockholding organization stocks.",
+  keywords: ["stock types", "inventory categories", "storage types"],
+  synonyms: ["inventory types", "storage categories"],
+  related: ["oil stocks", "storage facilities", "emergency stocks"],
+  dataset: "",
+  fuelCode: "",
+  nrg_bal: "SSTK",
+  siec: "",
+  unit: "",
+  hasVisualization: false,
+  visualizationType: [],
+  statisticalConcepts: ["stocks", "classification"],
+  link: "",
+  queryType: "stock_categories"
+},
+
+"natural gas production": {
+  title: "Natural Gas Indigenous Production",
+  text: "Dry marketable production within national boundaries, including offshore production. Measured after purification, NGL extraction and sulphur removal. Excludes extraction losses, reinjected/vented/flared quantities. Includes gas industry own use in extraction, pipelines and processing plants.",
+  keywords: ["gas production", "indigenous production", "marketable gas"],
+  synonyms: ["domestic gas production", "national gas production"],
+  related: ["natural gas", "gas processing", "offshore production"],
+  dataset: "nrg_cb_gasm",
+  fuelCode: "G3000",
+  nrg_bal: "INDPROD",
+  siec: "G3000",
+  unit: "TJ_GCV",
+  hasVisualization: true,
+  visualizationType: ["line", "bar"],
+  statisticalConcepts: ["production", "extraction"],
+  link: "",
+  queryType: "natural_gas_production"
+},
+
+"natural gas imports": {
+  title: "Natural Gas Imports (Entries)",
+  text: "All natural gas volumes physically crossing national boundaries, regardless of customs clearance. Includes transit volumes and LNG imports (as dry marketable equivalent). LNG regasification own consumption reported separately under industry own use/losses.",
+  keywords: ["gas imports", "gas entries", "LNG imports"],
+  synonyms: ["gas entries", "imported gas"],
+  related: ["natural gas", "LNG", "gas trade"],
+  dataset: "nrg_ti_gas",
+  fuelCode: "G3000",
+  nrg_bal: "IMP",
+  siec: "G3000",
+  unit: "TJ_GCV",
+  hasVisualization: true,
+  visualizationType: ["line", "bar"],
+  statisticalConcepts: ["imports", "trade", "LNG"],
+  link: "",
+  queryType: "natural_gas_imports"
+},
+
+"natural gas exports": {
+  title: "Natural Gas Exports (Exits)",
+  text: "All natural gas volumes physically crossing national boundaries, including transit volumes. Reported by destination country, with direct pipeline connection or LNG loading country for shipped gas.",
+  keywords: ["gas exports", "gas exits", "transit volumes"],
+  synonyms: ["gas exits", "exported gas"],
+  related: ["natural gas", "gas trade", "pipeline transport"],
+  dataset: "nrg_te_gas",
+  fuelCode: "G3000",
+  nrg_bal: "EXP",
+  siec: "G3000",
+  unit: "TJ_GCV",
+  hasVisualization: true,
+  visualizationType: ["line", "bar"],
+  statisticalConcepts: ["exports", "trade", "LNG"],
+  link: "",
+  queryType: "natural_gas_exports"
+},
+
+"gross inland deliveries": {
+  title: "Observed Gross Inland Deliveries",
+  text: "Deliveries of marketable gas to inland market, including gas industry own use for heating/equipment operation (extraction, pipeline, processing plants). Includes transmission and distribution losses.",
+  keywords: ["inland deliveries", "domestic market", "gas consumption"],
+  synonyms: ["domestic deliveries", "inland consumption"],
+  related: ["natural gas", "gas distribution", "gas consumption"],
+  dataset: "nrg_cb_gasm",
+  fuelCode: "G3000",
+  nrg_bal: "GID",
+  siec: "G3000",
+  unit: "TJ_GCV",
+  hasVisualization: true,
+  visualizationType: ["line", "bar"],
+  statisticalConcepts: ["consumption", "deliveries"],
+  link: "",
+  queryType: "gross_inland_deliveries"
+},
+
+"gas industry consumption": {
+  title: "Natural Gas Industry Own Use and Losses",
+  text: "Gas quantities used by industry for heating and equipment operation in extraction, pipeline systems, and processing plants. Includes transmission and distribution losses in the network.",
+  keywords: ["own use", "industry consumption", "system losses"],
+  synonyms: ["operational gas", "industry use"],
+  related: ["natural gas", "gas processing", "transmission losses"],
+  dataset: "nrg_cb_gasm",
+  fuelCode: "G3000",
+  nrg_bal: "OWN",
+  siec: "G3000",
+  unit: "TJ_GCV",
+  hasVisualization: true,
+  visualizationType: ["line"],
+  statisticalConcepts: ["consumption", "losses"],
+  link: "",
+  queryType: "gas_industry_consumption"
+},
+
+"natural gas stocks": {
+  title: "Natural Gas Stocks",
+  text: "Gas stored in both gaseous and liquefied forms, reported as opening and closing levels for stocks on national territory and abroad. Stock build shown as positive, stock draw as negative.",
+  keywords: ["gas storage", "gas stocks", "inventory levels"],
+  synonyms: ["gas inventory", "stored gas"],
+  related: ["natural gas", "LNG", "storage facilities"],
+  dataset: "nrg_cb_gasm",
+  fuelCode: "G3000",
+  nrg_bal: "CSTK",
+  siec: "G3000",
+  unit: "TJ_GCV",
+  hasVisualization: true,
+  visualizationType: ["line"],
+  statisticalConcepts: ["stocks", "storage"],
+  link: "",
+  queryType: "natural_gas_stocks"
+},
+
+"crude oil imports": {
+  title: "Crude Oil Imports",
+  text: "Quantities entering customs territory or from other Member States for non-transit purposes, including stock building. Excludes oil extracted from national seabed. Requires reporting of oil type, API gravity, sulphur content, volume, CIF price.",
+  keywords: ["oil imports", "crude imports", "oil supply"],
+  synonyms: ["petroleum imports", "oil entries"],
+  related: ["crude oil", "oil trade", "petroleum"],
+  dataset: "nrg_ti_oil",
+  fuelCode: "O4100",
+  nrg_bal: "IMP",
+  siec: "O4100",
+  unit: "KT",
+  hasVisualization: true,
+  visualizationType: ["line", "bar"],
+  statisticalConcepts: ["imports", "trade", "oil supply"],
+  link: "",
+  queryType: "crude_oil_imports"
+},
+
+"crude oil supply": {
+  title: "Crude Oil Supply",
+  text: "Covers imported crude oil and domestic production during reference period, excluding stock releases. Reported with volume supplied and weighted average CIF price. CIF price includes FOB price plus transport, insurance, and transfer costs.",
+  keywords: ["oil supply", "crude supply", "oil availability"],
+  synonyms: ["oil provision", "crude availability"],
+  related: ["crude oil", "oil production", "oil imports"],
+  dataset: "nrg_cb_oilm",
+  fuelCode: "O4100",
+  nrg_bal: "PPRD",
+  siec: "O4100",
+  unit: "KT",
+  hasVisualization: true,
+  visualizationType: ["line", "bar"],
+  statisticalConcepts: ["supply", "production", "imports"],
+  link: "",
+  queryType: "crude_oil_supply"
+},
+
+"oil pricing": {
+  title: "Crude Oil Pricing",
+  text: "CIF (Cost, Insurance, Freight) price includes FOB price plus transport, insurance, and transfer costs. For domestic production, calculated at port of discharge or frontier. Reported in US dollars per barrel and per tonne.",
+  keywords: ["CIF price", "FOB price", "oil cost"],
+  synonyms: ["oil price", "crude price"],
+  related: ["crude oil", "oil trade", "oil imports"],
+  dataset: "nrg_pc_pcoilm",
+  fuelCode: "O4100",
+  nrg_bal: "",
+  siec: "O4100",
+  unit: "USD",
+  hasVisualization: true,
+  visualizationType: ["line"],
+  statisticalConcepts: ["prices", "costs"],
+  link: "",
+  queryType: "oil_pricing"
+},
+
+"oil characteristics": {
+  title: "Crude Oil Characteristics",
+  text: "Includes API gravity (measure of crude density compared to water) and sulphur content. API gravity calculated as (141.5 ÷ specific gravity) - 131.5. Required for import reporting along with volume and pricing data.",
+  keywords: ["API gravity", "sulphur content", "oil density"],
+  synonyms: ["oil properties", "crude specifications"],
+  related: ["crude oil", "oil quality", "oil grades"],
+  dataset: "nrg_ti_oil",
+  fuelCode: "O4100",
+  nrg_bal: "",
+  siec: "O4100",
+  unit: "",
+  hasVisualization: false,
+  visualizationType: [],
+  statisticalConcepts: ["quality", "characteristics"],
+  link: "",
+  queryType: "oil_characteristics"
+},
+
+"natural gas imports": {
+  title: "Natural Gas Imports",
+  text: "All natural gas volumes physically crossing national boundaries, regardless of customs clearance. Includes transit volumes and LNG imports (as dry marketable equivalent). LNG regasification own consumption reported separately under industry own use/losses.",
+  keywords: ["gas imports", "gas entries", "LNG imports"],
+  synonyms: ["gas entries", "imported gas"],
+  related: ["natural gas", "LNG", "gas trade"],
+  dataset: "nrg_ti_sff",
+  fuelCode: "G3000",
+  nrg_bal: "IMP",
+  siec: "G3000",
+  unit: "TJ_GCV",
+  hasVisualization: true,
+  visualizationType: ["line", "bar", "area"],
+  statisticalConcepts: ["imports", "sources", "volumes"],
+  queryType: "gas_imports"
+},
+
+"electricity prices": {
+  title: "Electricity Prices",
+  text: "Prices for electricity supplied to end consumers in the EU. Price components include energy, network costs, and taxes/levies. Prices vary significantly between member states due to different energy mixes, network costs, policy decisions, and taxation structures. Industrial consumers typically pay less than households due to economies of scale and tax exemptions.",
+  keywords: ["electricity cost", "power prices", "energy rates", "household electricity", "industrial electricity", "electricity tariffs", "energy bills", "utility costs", "consumer prices", "price components", "energy taxation", "price trends"],
+  synonyms: ["electricity rates", "power costs", "energy prices", "utility rates", "electricity tariffs"],
+  related: ["energy costs", "electricity production", "energy market", "natural gas prices", "renewable energy", "energy consumption", "energy efficiency"],
+  dataset: "nrg_pc_204",
+  additionalDatasets: ["nrg_pc_205", "nrg_pc_202", "nrg_pc_203"],
+  fuelCode: "E7000",
+  nrg_bal: "",
+  siec: "E7000",
+  unit: "EUR",
+  hasVisualization: true,
+  visualizationType: ["line", "bar", "map"],
+  statisticalConcepts: ["prices", "trends", "comparisons", "taxation", "price components", "household consumption", "industrial consumption"],
+  link: "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_pc_204?lang=en",
+  queryType: "electricity_prices",
+  isMainFuel: false,
+  subFuels: []
 }
+};
