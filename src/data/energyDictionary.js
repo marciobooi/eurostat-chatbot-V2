@@ -13,30 +13,26 @@ export const energyDictionary = {
   de: energyDefinitionsDe
 };
 
+// Export helper functions for working with the dictionary
+
 /**
  * Get related topics for a specific topic
  * @param {string} topic - The topic to find related topics for
- * @param {string} language - Language code (en, fr, de)
- * @returns {Array} Array of related topics
+ * @param {string} language - The language code
+ * @returns {string[]} - Array of related topics
  */
-export const getRelatedTopics = (topic, language = "en") => {
-  const dictionary = energyDictionary[language] || energyDictionary.en;
-
-  // Check if topic exists in the dictionary
-  if (dictionary[topic] && dictionary[topic].related) {
-    return dictionary[topic].related;
-  }
-
-  // Try case-insensitive search
-  const normalizedTopic = topic.toLowerCase();
-
-  for (const [key, entry] of Object.entries(dictionary)) {
-    if (key.toLowerCase() === normalizedTopic && entry.related) {
-      return entry.related;
-    }
-  }
-
-  return [];
+export const getRelatedTopics = (topic, language = 'en') => {
+  const dict = energyDictionary[language] || energyDictionary.en;
+  return dict[topic.toLowerCase()]?.related || [];
 };
 
-export default energyDictionary;
+/**
+ * Get keywords for a specific topic
+ * @param {string} topic - The topic to find keywords for
+ * @param {string} language - The language code
+ * @returns {string[]} - Array of keywords
+ */
+export const getKeywords = (topic, language = 'en') => {
+  const dict = energyDictionary[language] || energyDictionary.en;
+  return dict[topic.toLowerCase()]?.keywords || [];
+};

@@ -129,7 +129,18 @@
       }
     },
     "source": "Source",
-    "eurostat": "Eurostat"
+    "eurostat": "Eurostat",
+    "topConsumersChart": "Principaux consommateurs de {{topic}} en Europe",
+    "consumptionDistributionDesc": "Distribution de la consommation de {{topic}} dans les pays européens",
+    "consumptionTimelineChart": "Évolution de la consommation de {{topic}}",
+    "historicalTrendsDesc": "Tendances historiques de la consommation de {{topic}}",
+    "byCountryChart": "{{topic}} par pays",
+    "countryStatisticsDesc": "Comparaison des statistiques de {{topic}} entre pays",
+    "productionConsumptionChart": "Production et consommation de {{topic}}",
+    "productionConsumptionDesc": "Comparaison des tendances de production et de consommation de {{topic}}",
+    "more_to_discover": "Il y a plus à découvrir sur {{topic}}. Je peux vous montrer quelques visualisations. Que souhaitez-vous voir ?",
+    "more_options_available": "Souhaitez-vous voir une autre visualisation sur {{topic}} ? J'en ai encore {{count}} à vous montrer :",
+    "suggest_next_topic": "Voulez-vous en savoir plus sur {{nextTopic}} ? Vous pouvez dire 'oui' pour explorer ce sujet."
   },
   "empathyPrefix": "Je comprends votre préoccupation.",
   "reassurancePrefix": "Permettez-moi de vous aider à mieux comprendre.",

@@ -113,7 +113,18 @@
         }
       },
       "source": "Quelle",
-      "eurostat": "Eurostat"
+      "eurostat": "Eurostat",
+      "topConsumersChart": "Größte {{topic}}-Verbraucher in Europa",
+      "consumptionDistributionDesc": "Verteilung des {{topic}}-Verbrauchs in europäischen Ländern",
+      "consumptionTimelineChart": "{{topic}}-Verbrauch im Zeitverlauf",
+      "historicalTrendsDesc": "Historische Entwicklung des {{topic}}-Verbrauchs",
+      "byCountryChart": "{{topic}} nach Land",
+      "countryStatisticsDesc": "Vergleich der {{topic}}-Statistiken zwischen Ländern",
+      "productionConsumptionChart": "{{topic}}-Produktion und -Verbrauch",
+      "productionConsumptionDesc": "Vergleich der Entwicklung von {{topic}}-Produktion und -Verbrauch",
+      "more_to_discover": "Es gibt noch mehr über {{topic}} zu entdecken. Ich kann Ihnen einige Visualisierungen zu {{topic}} zeigen. Was möchten Sie sehen?",
+      "more_options_available": "Möchten Sie eine weitere Visualisierung zu {{topic}} sehen? Ich habe noch {{count}} weitere:",
+      "suggest_next_topic": "Möchten Sie mehr über {{nextTopic}} erfahren? Sie können 'ja' sagen, um dieses Thema zu erkunden."
     }
   }
 }

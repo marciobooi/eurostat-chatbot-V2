@@ -42,11 +42,19 @@ import "./ChatBotMobile.css"; // Import mobile-specific styles
 import { findIntent } from "../utils/nlpHelper";
 import speechRecognitionHandler from "../utils/speechRecognitionHandler";
 import Visualization from './Visualization';
-import { visualizationConfig } from '../data/visualizationConfig';
+import { getVisualizationConfig } from '../data/visualizationConfig';
 import { energyDictionary } from "../data/energyDictionary";
 import { isAffirmative } from '../data/affirmativeResponses';
 // Import the NLP test utilities
 import { showRecognizedEntities } from "../utils/testNLP";
+import { visualizationConfig } from '../data/visualizationConfig';
+
+// Update the setTopicVisualizations function to actually set the visualizations
+const setTopicVisualizations = (topic, config) => {
+  console.log(`Setting visualizations for topic: ${topic}`, config);
+  // Store the config in the visualizationConfig object for easy access
+  visualizationConfig[topic] = config;
+};
 
 const ChatBot = () => {
   // Remove the inline ScrollButton component definition since we now import it
@@ -500,27 +508,39 @@ const ChatBot = () => {
       }
 
       // If this is a fuel topic that has visualizations, add a new message after a delay
-      if (visualizationConfig[responseTopic]) {
-        const config = visualizationConfig[responseTopic];
-        
-        // Wait before showing visualization options
-        setTimeout(() => {
-          const vizOptionsMessage = {
-            text: t('visualization.more_to_discover', { 
-              topic: responseTopic,
-              count: config.visualizations.length 
-            }),
-            sender: "bot",
-            topic: responseTopic,
-            category: 'visualization-options',
-            hasVisualizations: true,
-            timestamp: new Date().toISOString(),
-          };
-          
-          setMessages(prev => [...prev, vizOptionsMessage]);
-          setCurrentFuel(responseTopic); // Set current fuel here instead of in handleFuelResponse
-          setShownVisualizations([]); // Reset shown visualizations
-        }, 2000); // 2-second delay for natural flow
+      if (responseTopic) {
+        // Use getVisualizationConfig function to get visualizations for the topic
+        getVisualizationConfig(responseTopic, i18n.language)
+          .then(config => {
+            if (config && config.visualizations && config.visualizations.length > 0) {
+              // Set current fuel for visualization buttons to work
+              setCurrentFuel(responseTopic);
+              
+              // Wait before showing visualization options
+              setTimeout(() => {
+                const vizOptionsMessage = {
+                  text: t('visualization.more_to_discover', { 
+                    topic: responseTopic,
+                    count: config.visualizations.length 
+                  }),
+                  sender: "bot",
+                  topic: responseTopic,
+                  category: 'visualization-options',
+                  hasVisualizations: true,
+                  timestamp: new Date().toISOString(),
+                };
+                
+                // Add the visualization options message
+                setMessages(prevMessages => [...prevMessages, vizOptionsMessage]);
+                
+                // Store the visualization config for later use
+                setTopicVisualizations(responseTopic, config);
+              }, 1500); // Show after 1.5 seconds
+            }
+          })
+          .catch(error => {
+            console.error("Error getting visualizations:", error);
+          });
       }
 
       // Track successful bot response
@@ -622,47 +642,50 @@ const ChatBot = () => {
 
   // Handle fuel-related response
   const handleFuelResponse = (fuelType, response) => {
-    if (visualizationConfig[fuelType]) {
-      setCurrentFuel(fuelType);
-      setShownVisualizations([]);
-    }
+    console.log('Handling fuel response for:', fuelType);
+    setCurrentFuel(fuelType);
+    setShownVisualizations([]);
   };
 
   // Handle visualization selection
-  const handleVisualizationSelect = (visualization) => {
-    setShownVisualizations(prev => [...prev, visualization.type]);
-    
+  const handleVisualizationSelect = async (visualization) => {
+    console.log('Selected visualization:', visualization);
+    setShownVisualizations((prev) => [...prev, visualization.type]);
+  
+    // Fetch the data for the selected visualization
+    const data = await visualization.getData();
+  
     // Add visualization chart message
     const vizMessage = {
       text: '',
-      visualization: visualization,
+      visualization: { ...visualization, data },
       sender: 'bot',
       category: 'visualization',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-    setMessages(prev => [...prev, vizMessage]);
-
+    setMessages((prev) => [...prev, vizMessage]);
+  
     // If there are remaining visualizations, add a new options message
     const config = visualizationConfig[currentFuel];
     const remainingVisualizations = config.visualizations.filter(
-      v => !shownVisualizations.includes(v.type) && v.type !== visualization.type
+      (v) => !shownVisualizations.includes(v.type) && v.type !== visualization.type
     );
-
+  
     if (remainingVisualizations.length > 0) {
       // Add new visualization options message
       setTimeout(() => {
         const vizOptionsMessage = {
-          text: t('visualization.more_options_available', { 
+          text: t('visualization.more_options_available', {
             topic: currentFuel,
-            count: remainingVisualizations.length 
+            count: remainingVisualizations.length,
           }),
-          sender: "bot",
+          sender: 'bot',
           topic: currentFuel,
           category: 'visualization-options',
           hasVisualizations: true,
           timestamp: new Date().toISOString(),
         };
-        setMessages(prev => [...prev, vizOptionsMessage]);
+        setMessages((prev) => [...prev, vizOptionsMessage]);
       }, 1000);
     } else {
       // If no more visualizations, suggest random topic
@@ -670,19 +693,20 @@ const ChatBot = () => {
       setSuggestedTopic(nextTopic);
       setTimeout(() => {
         const suggestionMessage = {
-          text: t('visualization.suggest_next_topic', { 
+          text: t('visualization.suggest_next_topic', {
             currentTopic: currentFuel,
-            nextTopic: nextTopic 
+            nextTopic: nextTopic,
           }),
           sender: 'bot',
           category: 'suggestion',
           timestamp: new Date().toISOString(),
         };
-        setMessages(prev => [...prev, suggestionMessage]);
+        setMessages((prev) => [...prev, suggestionMessage]);
         analyticsManager.trackBotResponse(suggestionMessage);
       }, 1000);
     }
   };
+  
 
   const handleUserMessage = async (input) => {
     const trimmedInput = input.toLowerCase();
@@ -719,15 +743,26 @@ const ChatBot = () => {
     return topics[Math.floor(Math.random() * topics.length)];
   };
 
+  // Update renderVisualizationButtons to check currentFuel first
   const renderVisualizationButtons = (fuel) => {
-    if (!visualizationConfig[fuel]) return null;
+    console.log('Rendering visualization buttons for fuel:', fuel);
+    console.log('Current fuel:', currentFuel);
+    console.log('Visualization config for fuel:', visualizationConfig[fuel]);
+    
+    if (!fuel || !visualizationConfig[fuel]) {
+      console.log('No visualization config found for fuel:', fuel);
+      return null;
+    }
     
     const remainingVisualizations = visualizationConfig[fuel].visualizations.filter(
-      v => !shownVisualizations.includes(v.type)
+      (v) => !shownVisualizations.includes(v.type)
     );
-
-    if (remainingVisualizations.length === 0) return null;
-
+  
+    if (remainingVisualizations.length === 0) {
+      console.log('No remaining visualizations for fuel:', fuel);
+      return null;
+    }
+  
     return (
       <div className="message-visualization-options">
         {remainingVisualizations.map((viz, index) => (
@@ -760,8 +795,9 @@ const ChatBot = () => {
     }
   };
 
-  // Update the renderMessage function to handle visualization messages
+  // Update renderMessage to check for currentFuel and topic
   const renderMessage = (msg) => {
+    console.log('Rendering message:', msg);
     if (msg.category === 'visualization') {
       return (
         <Visualization
@@ -778,10 +814,24 @@ const ChatBot = () => {
       );
     }
 
+    // For visualization options, check if we have the config and use the message topic
+    if (msg.hasVisualizations && msg.topic) {
+      // If this is a visualization options message, make sure we have the right fuel set
+      if (msg.category === 'visualization-options' && msg.topic !== currentFuel) {
+        setCurrentFuel(msg.topic);
+      }
+      
+      return (
+        <div className="message-content">
+          {msg.text && <div className="message-text">{msg.text}</div>}
+          {renderVisualizationButtons(msg.topic)}
+        </div>
+      );
+    }
+
     return (
       <div className="message-content">
         {msg.text && <div className="message-text">{msg.text}</div>}
-        {msg.hasVisualizations && visualizationConfig[msg.topic] && renderVisualizationButtons(msg.topic)}
       </div>
     );
   };
