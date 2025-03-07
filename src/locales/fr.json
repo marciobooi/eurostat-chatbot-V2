@@ -5,41 +5,49 @@
     "loading": "Chargement...",
     "error": "Erreur",
     "close": "Fermer",
-    "search": "Rechercher"
+    "search": "Rechercher",
+    "chat": "Chat"
   },
   "chat": {
-    "placeholder": "Tapez votre message ici...",
+    "placeholder": "Posez une question sur les statistiques de l'énergie...",
     "thinking": "Réflexion...",
     "typing": "En train d'écrire...",
-    "ask_question": "Posez une question sur les statistiques énergétiques...",
-    "clear_confirm": "Voulez-vous vraiment effacer la conversation ?",
-    "no_messages": "Pas encore de messages"
+    "ask_question": "Posez une question sur les statistiques de l'énergie...",
+    "clear_confirm": "Êtes-vous sûr de vouloir effacer l'historique de conversation ?",
+    "no_messages": "Pas encore de messages. Commencez une conversation !",
+    "show_more": "Afficher plus d'historique"
   },
   "accessibility": {
     "bot_message": "Message du bot",
     "user_message": "Votre message",
     "send_button": "Envoyer le message",
-    "clear_button": "Effacer l'historique",
-    "scroll_button": "Défiler vers le bas",
-    "input_field": "Champ de saisie du message",
+    "clear_button": "Effacer l'historique de conversation",
+    "scroll_button": "Défiler jusqu'au bas",
+    "input_field": "Champ de saisie du chat",
     "thinking_indicator": "Le bot réfléchit",
-    "typing_indicator": "Le bot écrit"
+    "typing_indicator": "Le bot écrit",
+    "show_more_button": "Charger plus de messages"
   },
   "suggestions": {
     "title": "Sujets suggérés",
     "related_topics": "Sujets connexes",
     "click_to_learn": "Cliquez pour en savoir plus sur {{topic}}",
-    "no_suggestions": "Aucune suggestion disponible"
+    "no_suggestions": "Aucune suggestion disponible",
+    "subFuels": "Combustibles associés",
+    "related": "Voir aussi"
   },
   "visualization": {
     "show_chart": "Afficher le graphique {{type}}",
-    "view_as": "Voir en graphique {{type}}",
+    "view_as": "Voir comme graphique {{type}}",
     "loading": "Chargement du graphique...",
-    "error": "Erreur de chargement du graphique",
+    "error": "Erreur lors du chargement du graphique",
     "title": "Visualisation des données",
     "description": "Représentation visuelle des données {{dataset}}",
     "back": "Retour au chat",
     "export": "Exporter les données",
     "fullscreen": "Voir en plein écran"
+  },
+  "toast": {
+    "clearChat": "Historique de conversation effacé !"
   }
 }

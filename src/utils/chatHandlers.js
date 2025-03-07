@@ -1,6 +1,15 @@
 import { findEnergyDefinition } from './energyHandlers';
-import { createBotResponse } from './botResponseHandlers';
+import { createBotResponse, createErrorResponse } from './botResponseHandlers';
+import { clearChatFromCookie } from './storageHandlers';
 import toast from 'react-hot-toast';
+
+/**
+ * Constants for timing and animation
+ */
+const CONSTANTS = {
+  TYPING_DELAY: 1000, // ms
+  TOAST_DURATION: 2000 // ms
+};
 
 /**
  * Handles sending a message in the chat
@@ -13,42 +22,68 @@ import toast from 'react-hot-toast';
  * @param {boolean} isTyping - Current typing state
  */
 export const handleSendMessage = (input, language, setMessages, setIsTyping, setInput, messages, isTyping) => {
+  // Validate input
   if (!input.trim() || isTyping) {
     return;
   }
   
+  // Create user message object
   const userMessage = { 
     sender: 'user', 
     text: input.trim(),
     language 
   };
   
+  // Add user message to chat
   setMessages(prev => [...prev, userMessage]);
 
-  const definition = findEnergyDefinition(input.trim(), language);
-  
-  if (definition) {
+  try {
+    // Find definition based on user input
+    const definition = findEnergyDefinition(input.trim(), language);
+    
+    // Always show typing indicator, whether definition found or not
     setIsTyping(true);
+    
     setTimeout(() => {
+      // Create bot response (will handle null definition cases)
       const botResponse = createBotResponse(definition, language);
       setMessages(prev => [...prev, botResponse]);
       setIsTyping(false);
-    }, 1000);
+    }, CONSTANTS.TYPING_DELAY);
+  } catch (error) {
+    // Handle any errors in processing
+    console.error("Error processing message:", error);
+    setIsTyping(true);
+    
+    setTimeout(() => {
+      const errorResponse = createErrorResponse(
+        "Sorry, I encountered an error processing your request.", 
+        language
+      );
+      setMessages(prev => [...prev, errorResponse]);
+      setIsTyping(false);
+    }, CONSTANTS.TYPING_DELAY);
   }
   
+  // Clear input field
   setInput('');
 };
 
 /**
  * Handles clearing the chat history
  * @param {Function} setMessages - Function to update messages state
- * @param {Function} confirmMessage - Function to show confirmation dialog
- * @returns {void}
+ * @param {Function} t - Translation function
  */
 export const handleClearChat = (setMessages, t) => {
+  // Clear the messages state
   setMessages([]);
+  
+  // Clear the stored chat history from cookies and localStorage
+  clearChatFromCookie();
+  
+  // Show confirmation toast to user
   toast.success(t('toast.clearChat'), {
-    duration: 2000,
+    duration: CONSTANTS.TOAST_DURATION,
     position: 'top-right',
     style: {
       background: '#ebfbee',
@@ -69,34 +104,60 @@ export const handleClearChat = (setMessages, t) => {
  * @param {boolean} isTyping - Current typing state
  */
 export const handleSuggestionClick = (topic, language, setMessages, setIsTyping, setInput, messages, isTyping) => {
+  // Prevent processing if already typing
+  if (isTyping) {
+    return;
+  }
+  
+  // Create user message for suggestion
   const userMessage = { 
     sender: 'user', 
     text: topic,
     language 
   };
   
+  // Add user message to chat
   setMessages(prev => [...prev, userMessage]);
   
-  // When clicking a suggestion, use an exact match search to find the specific definition
-  const definition = findEnergyDefinition(topic, language, true); // Pass true for exactMatch
-  
-  if (definition) {
+  try {
+    // Use exact match for suggestions to get the specific definition
+    const definition = findEnergyDefinition(topic, language, true);
+    
+    // Show typing indicator
     setIsTyping(true);
+    
     setTimeout(() => {
+      // Create bot response
       const botResponse = createBotResponse(definition, language);
       setMessages(prev => [...prev, botResponse]);
       setIsTyping(false);
-    }, 1000);
+    }, CONSTANTS.TYPING_DELAY);
+  } catch (error) {
+    console.error("Error processing suggestion:", error);
+    setIsTyping(true);
+    
+    setTimeout(() => {
+      const errorResponse = createErrorResponse(
+        "Sorry, I couldn't find information about that topic.", 
+        language
+      );
+      setMessages(prev => [...prev, errorResponse]);
+      setIsTyping(false);
+    }, CONSTANTS.TYPING_DELAY);
   }
 };
 
 /**
- * Handles scrolling in the chat container
+ * Determines if scroll button should be shown based on scroll position
  * @param {HTMLElement} containerRef - Reference to the container element
  * @param {Function} setShowScrollButton - Function to update scroll button visibility
  */
 export const handleScroll = (containerRef, setShowScrollButton) => {
   if (!containerRef) return;
+  
   const { scrollTop, scrollHeight, clientHeight } = containerRef;
-  setShowScrollButton(scrollHeight - scrollTop - clientHeight > 100);
+  const scrollThreshold = 100; // px
+  const shouldShow = scrollHeight - scrollTop - clientHeight > scrollThreshold;
+  
+  setShowScrollButton(shouldShow);
 };

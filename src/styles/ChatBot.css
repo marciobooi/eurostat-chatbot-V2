@@ -753,3 +753,74 @@ button:focus,
   transform: translateY(0);
 }
 
+/* Show More Button Styles */
+.show-more-container {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+  margin-bottom: 8px;
+}
+
+.show-more-button {
+  background: var(--primary-light);
+  color: var(--primary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.show-more-button:hover {
+  background: var(--primary-color);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.show-more-button:active {
+  transform: translateY(0);
+}
+
+/* Add this to your existing responsive styles section */
+@media (max-width: 640px) {
+  .show-more-button {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+  }
+}
+
+/* Add this to your existing accessibility focus styles section */
+.show-more-button:focus {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 2px;
+}
+
+/* Add this to your existing dark mode support section */
+@media (prefers-color-scheme: dark) {
+  .show-more-button {
+    background-color: var(--neutral-800);
+    border-color: var(--neutral-700);
+    color: var(--primary-blue-light);
+  }
+
+  .show-more-button:hover,
+  .show-more-button:focus {
+    background-color: var(--primary-blue);
+    color: var(--neutral-100);
+  }
+}
+
+/* Add this to your existing better touch targets for mobile section */
+@media (max-width: 768px) {
+  .show-more-button {
+    min-height: 44px;
+    padding: 8px 16px;
+  }
+}
+

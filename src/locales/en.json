@@ -14,7 +14,8 @@
     "typing": "Typing...",
     "ask_question": "Ask something about energy statistics...",
     "clear_confirm": "Are you sure you want to clear the chat history?",
-    "no_messages": "No messages yet. Start a conversation!"
+    "no_messages": "No messages yet. Start a conversation!",
+    "show_more": "Show More History"
   },
   "accessibility": {
     "bot_message": "Bot message",
@@ -24,7 +25,8 @@
     "scroll_button": "Scroll to bottom",
     "input_field": "Chat input",
     "thinking_indicator": "Bot is thinking",
-    "typing_indicator": "Bot is typing"
+    "typing_indicator": "Bot is typing",
+    "show_more_button": "Load more chat messages"
   },
   "suggestions": {
     "title": "Suggested topics",

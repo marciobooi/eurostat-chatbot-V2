@@ -5,31 +5,36 @@
     "loading": "Lädt...",
     "error": "Fehler",
     "close": "Schließen",
-    "search": "Suchen"
+    "search": "Suchen",
+    "chat": "Chat"
   },
   "chat": {
-    "placeholder": "Nachricht eingeben...",
-    "thinking": "Denkt nach...",
-    "typing": "Schreibt...",
+    "placeholder": "Fragen zu Energiestatistiken stellen...",
+    "thinking": "Nachdenken...",
+    "typing": "Tippen...",
     "ask_question": "Stellen Sie eine Frage zu Energiestatistiken...",
-    "clear_confirm": "Möchten Sie den Chat wirklich löschen?",
-    "no_messages": "Noch keine Nachrichten"
+    "clear_confirm": "Möchten Sie den Chat-Verlauf wirklich löschen?",
+    "no_messages": "Noch keine Nachrichten. Beginnen Sie eine Unterhaltung!",
+    "show_more": "Mehr Verlauf anzeigen"
   },
   "accessibility": {
     "bot_message": "Bot-Nachricht",
     "user_message": "Ihre Nachricht",
     "send_button": "Nachricht senden",
-    "clear_button": "Chatverlauf löschen",
-    "scroll_button": "Nach unten scrollen",
-    "input_field": "Nachrichteneingabefeld",
+    "clear_button": "Chat-Verlauf löschen",
+    "scroll_button": "Zum Ende scrollen",
+    "input_field": "Chat-Eingabefeld",
     "thinking_indicator": "Bot denkt nach",
-    "typing_indicator": "Bot schreibt"
+    "typing_indicator": "Bot tippt",
+    "show_more_button": "Weitere Chat-Nachrichten laden"
   },
   "suggestions": {
     "title": "Vorgeschlagene Themen",
     "related_topics": "Verwandte Themen",
-    "click_to_learn": "Klicken Sie hier, um mehr über {{topic}} zu erfahren",
-    "no_suggestions": "Keine Vorschläge verfügbar"
+    "click_to_learn": "Klicken Sie, um mehr über {{topic}} zu erfahren",
+    "no_suggestions": "Keine Vorschläge verfügbar",
+    "subFuels": "Verwandte Brennstoffe",
+    "related": "Siehe auch"
   },
   "visualization": {
     "show_chart": "{{type}}-Diagramm anzeigen",
@@ -40,6 +45,9 @@
     "description": "Visuelle Darstellung der {{dataset}}-Daten",
     "back": "Zurück zum Chat",
     "export": "Daten exportieren",
-    "fullscreen": "Vollbildansicht"
+    "fullscreen": "In Vollbild anzeigen"
+  },
+  "toast": {
+    "clearChat": "Chat-Verlauf gelöscht!"
   }
 }
