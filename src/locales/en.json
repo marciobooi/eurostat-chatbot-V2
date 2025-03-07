@@ -1,19 +1,20 @@
 {
   "common": {
     "send": "Send",
-    "clear_chat": "Clear chat",
+    "clear_chat": "Clear Chat",
     "loading": "Loading...",
     "error": "Error",
     "close": "Close",
-    "search": "Search"
+    "search": "Search",
+    "chat": "Chat"
   },
   "chat": {
-    "placeholder": "Type your message here...",
+    "placeholder": "Ask about energy statistics...",
     "thinking": "Thinking...",
     "typing": "Typing...",
     "ask_question": "Ask something about energy statistics...",
-    "clear_confirm": "Are you sure you want to clear the chat?",
-    "no_messages": "No messages yet"
+    "clear_confirm": "Are you sure you want to clear the chat history?",
+    "no_messages": "No messages yet. Start a conversation!"
   },
   "accessibility": {
     "bot_message": "Bot message",
@@ -21,15 +22,17 @@
     "send_button": "Send message",
     "clear_button": "Clear chat history",
     "scroll_button": "Scroll to bottom",
-    "input_field": "Message input field",
+    "input_field": "Chat input",
     "thinking_indicator": "Bot is thinking",
     "typing_indicator": "Bot is typing"
   },
   "suggestions": {
     "title": "Suggested topics",
-    "related_topics": "Related topics",
+    "related_topics": "Related Topics",
     "click_to_learn": "Click to learn about {{topic}}",
-    "no_suggestions": "No suggestions available"
+    "no_suggestions": "No suggestions available",
+    "subFuels": "Related Fuels",
+    "related": "See Also"
   },
   "visualization": {
     "show_chart": "Show {{type}} chart",

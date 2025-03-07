@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import ChatBot from "./components/ChatBot";
 import { getCurrentLanguage, isValidLanguage } from "./i18n";
 import "./App.css";
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -22,6 +23,7 @@ function App() {
 
   return (
     <div className="app-container">
+      <Toaster />
       <main className="app-main">
         <div className={`chat-container ${loaded ? "chat-loaded" : ""}`}>
           <ChatBot />

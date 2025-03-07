@@ -1,7 +1,7 @@
 export const energyDefinitionsEn = {
 "solid fossil fuels": {
   "title": "Solid Fossil Fuels",
-  "description": "Solid fossil fuels, including hard coal, lignite, and their derivatives like coke and patent fuel, are essential for power generation, industrial processes, and heating applications. These fuels are mined through surface and underground methods, and data covers production, consumption, trade flows, and carbon emissions. The information also includes the thermal efficiency of coal and how it's used across different sectors, as well as the energy balance associated with coal mining regions.",
+  "text": "Solid fossil fuels, including hard coal, lignite, and their derivatives like coke and patent fuel, are essential for power generation, industrial processes, and heating applications. These fuels are mined through surface and underground methods, and data covers production, consumption, trade flows, and carbon emissions. The information also includes the thermal efficiency of coal and how it's used across different sectors, as well as the energy balance associated with coal mining regions.",
   "key_concepts": [
     "Coal production", 
     "Coal consumption", 
@@ -74,12 +74,4 @@ export const energyDefinitionsEn = {
     "carbon emissions"
   ],
 }
-
-
-
-
-
-
 };
-
-export default energyDefinitionsEn;

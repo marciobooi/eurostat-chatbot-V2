@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import ScrollButton from './ScrollButton';
 import ChatMessage from './ChatMessage';
 import TypingIndicator from './TypingIndicator';
-import { findEnergyDefinition, createBotResponse } from '../utils/energyHandlers';
+import { handleSendMessage, handleClearChat, handleSuggestionClick, handleScroll } from '../utils/chatHandlers';
 import '../styles/ChatBot.css';
 
 const ChatBot = () => {
@@ -23,45 +23,31 @@ const ChatBot = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleScroll = () => {
-    if (!messagesContainerRef.current) return;
-    const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
-    setShowScrollButton(scrollHeight - scrollTop - clientHeight > 100);
+  const onScroll = () => {
+    handleScroll(messagesContainerRef.current, setShowScrollButton);
   };
 
-  const handleSend = (e) => {
+  const onSend = (e) => {
     e.preventDefault();
-    if (!input.trim() || isTyping) return;
-    
-    const userMessage = { 
-      sender: 'user', 
-      text: input.trim(),
-      language: i18n.language 
-    };
-    setMessages(prev => [...prev, userMessage]);
-
-    const definition = findEnergyDefinition(input.trim(), i18n.language);
-    if (definition) {
-      setIsTyping(true);
-      setTimeout(() => {
-        const botResponse = createBotResponse(definition, i18n.language);
-        setMessages(prev => [...prev, botResponse]);
-        setIsTyping(false);
-      }, 1000);
+    if (!input.trim()) {
+      return;
     }
-    
-    setInput('');
+    handleSendMessage(input, i18n.language, setMessages, setIsTyping, setInput, messages, isTyping);
   };
 
-  const handleClearChat = () => {
-    if (window.confirm(t('chat.clear_confirm'))) {
-      setMessages([]);
-    }
+  const onClearChat = () => {
+    handleClearChat(setMessages, t('chat.clear_confirm'));
   };
 
-  const handleSuggestionClick = (topic) => {
-    setInput(topic);
-    handleSend({ preventDefault: () => {} });
+  const onSuggestionClick = (topic) => {
+    handleSuggestionClick(topic, i18n.language, setMessages, setIsTyping, setInput, messages, isTyping);
+  };
+
+  const getSmartMessages = () => {
+    if (!messages.length) return [];
+    const lastMessage = messages[messages.length - 1];
+    return lastMessage.sender === 'bot' && lastMessage.suggestions ? 
+           lastMessage.suggestions : [];
   };
 
   useEffect(() => {
@@ -77,7 +63,7 @@ const ChatBot = () => {
       <div 
         className="messages" 
         ref={messagesContainerRef} 
-        onScroll={handleScroll}
+        onScroll={onScroll}
         role="log"
         aria-live="polite"
       >
@@ -91,7 +77,7 @@ const ChatBot = () => {
           <ChatMessage
             key={index}
             message={msg}
-            onSuggestionClick={handleSuggestionClick}
+            onSuggestionClick={onSuggestionClick}
           />
         ))}
 
@@ -106,8 +92,24 @@ const ChatBot = () => {
         ariaLabel={t('accessibility.scroll_button')}
       />
 
+      {/* Smart Messages Container */}
+      {getSmartMessages().length > 0 && (
+        <div className="smart-messages-container" role="region" aria-label={t('suggestions.title')}>
+          {getSmartMessages().map((suggestion, index) => (
+            <button
+              key={index}
+              className="smart-message-btn"
+              onClick={() => onSuggestionClick(suggestion)}
+              aria-label={t('suggestions.click_to_learn', { topic: suggestion })}
+            >
+              {suggestion}
+            </button>
+          ))}
+        </div>
+      )}
+
       <form 
-        onSubmit={handleSend} 
+        onSubmit={onSend} 
         className="input-container"
         role="form"
       >
@@ -136,7 +138,7 @@ const ChatBot = () => {
 
       <div className="control-panel">
         <button
-          onClick={handleClearChat}
+          onClick={onClearChat}
           className="clear-button"
           aria-label={t('accessibility.clear_button')}
           title={t('common.clear_chat')}

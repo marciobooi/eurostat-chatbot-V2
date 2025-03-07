@@ -3,6 +3,14 @@
   Eurostat Chatbot V2 
 */
 
+:root {
+  --primary-light: #e6f0ff;
+  --primary-color: #1a73e8;
+  --border-color: #e0e0e0;
+  --text-color: #333333;
+  /* ...existing variables... */
+}
+
 /* Chat Container */
 .chat-container {
   width: 100%;
@@ -21,7 +29,7 @@
   position: absolute;
   bottom: 5%;
   right: 5%;
-  z-index: 999999999999999;
+  z-index: 999;
 }
 
 .chat-container.chat-loaded {
@@ -104,7 +112,7 @@
 
 .bot-message {
   background-color: var(--neutral-100);
-  color: var(--neutral-900);
+  color: var (--neutral-900);
   border-radius: var(--radius-md) var(--radius-md) var(--radius-md) 0;
   box-shadow: var(--shadow-sm);
 }
@@ -755,7 +763,7 @@ button:focus,
   .suggestion-chip,
   .message-visualization-button {
     background-color: var(--neutral-800);
-    border-color: var(--neutral-700);
+    border-color: var (--neutral-700);
     color: var(--primary-blue-light);
   }
 
@@ -774,3 +782,33 @@ button:focus,
   color: var(--primary-blue);
   font-weight: 600;
 }
+
+/* Add these new styles at the end of the file */
+
+.smart-messages-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+  margin: 8px 0;
+  border-top: 1px solid var(--border-color);
+}
+
+.smart-message-btn {
+  background: var(--primary-light);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.smart-message-btn:hover {
+  background: var(--primary-color);
+  color: white;
+  transform: translateY(-1px);
+}
+
