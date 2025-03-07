@@ -46,6 +46,90 @@ export const stemmingRules = {
     { suffix: "er", minLength: 4 }, // spieler -> spiel
     { suffix: "st", minLength: 4 }, // spielst -> spiel
   ],
+
+  // Time-related terms
+  "monthly": "month",
+  "monthly data": "month",
+  "per month": "month",
+  "month by month": "month",
+  "months": "month",
+  "annual": "year",
+  "annually": "year",
+  "yearly": "year",
+  "per year": "year",
+  "year by year": "year",
+  "years": "year",
+  
+  // Fuel types
+  "natural gas": "gas",
+  "lng": "gas",
+  "liquefied natural gas": "gas",
+  "petroleum": "oil",
+  "crude oil": "oil",
+  "crude": "oil",
+  "petrol": "oil",
+  "gasoline": "oil",
+  "diesel": "oil",
+  
+  // Activities
+  "imports": "import",
+  "importing": "import",
+  "imported": "import",
+  "exports": "export",
+  "exporting": "export",
+  "exported": "export",
+  "produces": "produce",
+  "produced": "produce",
+  "producing": "produce",
+  "production": "produce",
+  "consumes": "consume",
+  "consumed": "consume",
+  "consuming": "consume",
+  "consumption": "consume",
+  
+  // Units
+  "cubic meters": "m3",
+  "cubic metre": "m3",
+  "cubic metres": "m3",
+  "m³": "m3",
+  "million cubic meters": "mcm",
+  "million cubic metres": "mcm",
+  "terajoules": "tj",
+  "gigawatt hours": "gwh",
+  "gigawatt hour": "gwh",
+  "gwhr": "gwh",
+  "thousand tonnes": "kt",
+  "kilotonnes": "kt",
+  "thousand tons": "kt",
+  "million tonnes": "mt",
+  "megatonnes": "mt",
+  "million tons": "mt",
+  
+  // Time periods
+  "january": "jan",
+  "february": "feb",
+  "march": "mar",
+  "april": "apr",
+  "may": "may",
+  "june": "jun",
+  "july": "jul",
+  "august": "aug",
+  "september": "sep",
+  "october": "oct",
+  "november": "nov",
+  "december": "dec",
+  
+  // Common combinations
+  "monthly gas": "gas month",
+  "monthly oil": "oil month",
+  "annual gas": "gas year",
+  "annual oil": "oil year",
+  "gas consumption": "gas consume",
+  "oil consumption": "oil consume",
+  "gas production": "gas produce",
+  "oil production": "oil produce",
+  "electricity generation": "electricity produce",
+  "power generation": "electricity produce"
 };
 
 /**
@@ -75,4 +159,39 @@ export const stemWord = (word, language = "en") => {
   return stemmed;
 };
 
-export default stemmingRules;
+export const applyStemming = (text) => {
+  if (!text) return text;
+  
+  const words = text.toLowerCase().split(' ');
+  const stemmed = [];
+  
+  // First try multi-word matches
+  for (let i = 0; i < words.length; i++) {
+      let found = false;
+      
+      // Try increasingly smaller phrases
+      for (let j = 3; j > 0; j--) {
+          if (i + j <= words.length) {
+              const phrase = words.slice(i, i + j).join(' ');
+              if (stemmingRules[phrase]) {
+                  stemmed.push(stemmingRules[phrase]);
+                  i += j - 1;
+                  found = true;
+                  break;
+              }
+          }
+      }
+      
+      // If no multi-word match found, try single word
+      if (!found) {
+          stemmed.push(stemmingRules[words[i]] || words[i]);
+      }
+  }
+  
+  return stemmed.join(' ');
+};
+
+export default {
+  stemmingRules,
+  applyStemming
+};

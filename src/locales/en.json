@@ -163,7 +163,53 @@
         "data": "Interactive area chart showing pipeline and LNG supply"
       }
     },
+    "chart_types": {
+      "pie": "Distribution Chart",
+      "line": "Timeline Chart", 
+      "bar": "Comparison Chart",
+      "area": "Trend Chart"
+    },
+    "legends": {
+      "title": "Legend",
+      "year": "Year",
+      "value": "Value",
+      "total": "Total",
+      "unit": "Unit"
+    },
+    "tooltips": {
+      "click_to_show": "Click to show {{type}} visualization",
+      "hover_info": "Hover for more details"
+    },
+    "axis": {
+      "year": "Year",
+      "value": "Value",
+      "percentage": "Percentage (%)",
+      "quantity": "Quantity"
+    },
+    "accessibility": {
+      "chart_desc": "Interactive chart showing {{type}} data",
+      "legend_desc": "Chart legend showing data categories",
+      "data_table": "Data table version of chart"
+    },
+    "loading": {
+      "fetching": "Fetching data...",
+      "preparing": "Preparing visualization...",
+      "error": "Error loading visualization"
+    },
     "source": "Source",
     "eurostat": "Eurostat"
+  },
+  "chart_messages": {
+    "no_data": "No data available for this period",
+    "loading": "Loading chart data...",
+    "error": "Error loading chart",
+    "retry": "Retry loading"
+  },
+  "units": {
+    "gwh": "Gigawatt hours",
+    "ktoe": "Thousand tonnes of oil equivalent",
+    "tj": "Terajoules",
+    "mio_m3": "Million cubic meters",
+    "kt": "Thousand tonnes"
   }
 }

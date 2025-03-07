@@ -124,7 +124,53 @@
       "productionConsumptionDesc": "Vergleich der Entwicklung von {{topic}}-Produktion und -Verbrauch",
       "more_to_discover": "Es gibt noch mehr über {{topic}} zu entdecken. Ich kann Ihnen einige Visualisierungen zu {{topic}} zeigen. Was möchten Sie sehen?",
       "more_options_available": "Möchten Sie eine weitere Visualisierung zu {{topic}} sehen? Ich habe noch {{count}} weitere:",
-      "suggest_next_topic": "Möchten Sie mehr über {{nextTopic}} erfahren? Sie können 'ja' sagen, um dieses Thema zu erkunden."
+      "suggest_next_topic": "Möchten Sie mehr über {{nextTopic}} erfahren? Sie können 'ja' sagen, um dieses Thema zu erkunden.",
+      "chart_types": {
+        "pie": "Verteilungsdiagramm",
+        "line": "Zeitverlaufsdiagramm",
+        "bar": "Vergleichsdiagramm",
+        "area": "Trenddiagramm"
+      },
+      "legends": {
+        "title": "Legende",
+        "year": "Jahr",
+        "value": "Wert",
+        "total": "Gesamt",
+        "unit": "Einheit"
+      },
+      "tooltips": {
+        "click_to_show": "Klicken Sie, um die {{type}}-Visualisierung anzuzeigen",
+        "hover_info": "Mauszeiger bewegen für mehr Details"
+      },
+      "axis": {
+        "year": "Jahr",
+        "value": "Wert",
+        "percentage": "Prozentsatz (%)",
+        "quantity": "Menge"
+      },
+      "accessibility": {
+        "chart_desc": "Interaktives Diagramm mit {{type}}-Daten",
+        "legend_desc": "Diagrammlegende mit Datenkategorien",
+        "data_table": "Tabellenversion des Diagramms"
+      },
+      "loading": {
+        "fetching": "Daten werden abgerufen...",
+        "preparing": "Visualisierung wird vorbereitet...",
+        "error": "Fehler beim Laden der Visualisierung"
+      }
+    },
+    "chart_messages": {
+      "no_data": "Keine Daten für diesen Zeitraum verfügbar",
+      "loading": "Diagrammdaten werden geladen...",
+      "error": "Fehler beim Laden des Diagramms",
+      "retry": "Laden wiederholen"
+    },
+    "units": {
+      "gwh": "Gigawattstunden",
+      "ktoe": "Tausend Tonnen Öleinheiten",
+      "tj": "Terajoule",
+      "mio_m3": "Millionen Kubikmeter",
+      "kt": "Tausend Tonnen"
     }
   }
 }

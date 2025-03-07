@@ -1,105 +1,210 @@
 /**
  * API module for fetching data from Eurostat
  */
+import { 
+  getDatasetForFuelAndActivity, 
+  prepareDatasetParameters, 
+  datasetConfigurations,
+  getActivityTypeFromQuery
+} from '../utils/datasetHandler';
+import { datasetDictionary, validateDatasetParams } from '../data/datasetDictionary';
+import { getTimeParameters, extractTimePeriod } from '../utils/temporalHelper';
 
 // Define the base URL for Eurostat API
 const EUROSTAT_API_BASE_URL = 'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/';
 
 /**
- * Fetch data from Eurostat API
- * @param {string} queryType - Type of data to fetch (e.g. 'energy_production', 'renewable_energy_production')
- * @param {Object} parameters - Additional parameters for the API call including dataset, siec, unit, nrg_bal
- * @returns {Promise<Object>} - The fetched data
+ * Build API URL with parameters
+ * @param {string} dataset - Dataset identifier
+ * @param {Object} params - Query parameters
+ * @returns {string} Constructed API URL
  */
-export const fetchEurostatData = async (queryType, parameters = {}) => {
-  try {
-    // Parse parameters from the energy dictionary
-    const { dataset, siec, unit, nrg_bal, fuelCode, additionalDatasets, geo, latestDataOnly, fixedYear } = parameters;
-    
-    // Use the dataset provided in parameters or fallback to a default dataset
-    let datasetCode = dataset;
-    
-    // If no dataset is provided, try to derive one from the query type
-    if (!datasetCode) {
-      console.warn(`No dataset specified for query type: ${queryType}, using nrg_bal_c as fallback`);
-      datasetCode = 'nrg_bal_c'; // Default dataset as fallback
+export const buildApiUrl = (dataset, params) => {
+    const config = datasetDictionary[dataset];
+    if (!config) {
+        throw new Error(`Unknown dataset: ${dataset}`);
     }
     
-    // Construct the API URL with the correct dataset
-    let apiUrl = `${EUROSTAT_API_BASE_URL}${datasetCode}`;
-    
-    // Add query parameters
-    const queryParams = new URLSearchParams();
-    
-    // Add format parameter first (JSON)
-    queryParams.append('format', 'JSON');
-    
-    // Add dimension parameters in the correct order
-    if (unit) queryParams.append('unit', unit);
-    if (nrg_bal) queryParams.append('nrg_bal', nrg_bal);
-    if (siec) queryParams.append('siec', siec);
-    else if (fuelCode) queryParams.append('siec', fuelCode); // Use fuelCode as fallback for siec
-    
-    // For pie and bar charts, we only need the latest year's data
-    if (latestDataOnly) {
-      // Get last 5 time periods
-      queryParams.append('lastTimePeriod', '5');
-    } else if (fixedYear) {
-      queryParams.append('lastTimePeriod', '1');
-    } else {
-      // Get all time periods
-      // we dont add time parameter
+    // Validate parameters
+    const validation = validateDatasetParams(dataset, params);
+    if (!validation.valid) {
+        throw new Error(`Invalid parameters: ${validation.errors.join(', ')}`);
     }
     
-    // Handle geo parameter
-    if (geo) {
-      queryParams.append('geo', geo);
-    } else if (queryType.includes('_consumption') || queryType.includes('_by_country')) {
-      // For country distribution charts, get data for all countries
-      queryParams.append('geo', '');
-    }
-    
-    // Add language parameter
-    queryParams.append('lang', 'en');
-    
-    // Append query parameters to URL
-    apiUrl += `?${queryParams.toString()}`;
-    
-    console.log(`Fetching Eurostat data: ${apiUrl}`);
-    
-    try {
-      // Make the actual API call
-      const response = await fetch(apiUrl);
-      
-      if (!response.ok) {
-        console.error(`Eurostat API error: ${response.status} ${response.statusText}`);
-        return getMockDataForTopic(queryType);
-      }
-      
-      const data = await response.json();
-      console.log('Raw Eurostat response:', JSON.stringify(data));
-      
-      // Return the raw data directly for the transformation functions to handle
-      // This gives us more flexibility in handling different data structures
-      return data;
-    } catch (fetchError) {
-      console.error(`Error fetching from Eurostat API: ${fetchError.message}`);
-      return getMockDataForTopic(queryType);
-    }
-    
-  } catch (error) {
-    console.error(`Error in fetchEurostatData (${queryType}):`, error);
-    return getMockDataForTopic(queryType);
-  }
+    return config.buildUrl(params);
 };
+
+/**
+ * Fetch data from Eurostat API
+ * @param {string} dataset - Dataset identifier
+ * @param {Object} params - Query parameters
+ * @returns {Promise} Promise resolving to parsed data
+ */
+export const fetchEurostatData = async (dataset, params) => {
+    try {
+        const url = buildApiUrl(dataset, params);
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const config = datasetDictionary[dataset];
+        
+        return config.parseResponse(data);
+    } catch (error) {
+        console.error(`Error fetching Eurostat data for ${dataset}:`, error);
+        throw error;
+    }
+};
+
+/**
+ * Get data based on query parameters and time period
+ * @param {Object} queryParams - Query parameters including fuel type and activity
+ * @param {string} queryText - Original query text for temporal extraction
+ * @returns {Promise} Promise resolving to data with temporal context
+ */
+export const getDataWithTimeContext = async (queryParams, queryText) => {
+    // Extract time period information from query
+    const timePeriod = extractTimePeriod(queryText);
+    
+    // Get appropriate dataset based on fuel type and activity
+    const dataset = getDatasetForFuelAndActivity(
+        queryParams.fuelType,
+        queryParams.activityType,
+        { frequency: timePeriod.frequency }
+    );
+    
+    // Get time parameters based on extracted period
+    const timeParams = getTimeParameters(timePeriod);
+    
+    // Merge all parameters
+    const finalParams = {
+        ...queryParams,
+        ...timeParams
+    };
+    
+    return fetchEurostatData(dataset, finalParams);
+};
+
+/**
+ * Get data for comparing multiple time periods
+ * @param {Object} queryParams - Base query parameters
+ * @param {Array} periods - Array of time periods to compare
+ * @returns {Promise} Promise resolving to array of data for each period
+ */
+export const getComparisonData = async (queryParams, periods) => {
+    const dataset = getDatasetForFuelAndActivity(
+        queryParams.fuelType,
+        queryParams.activityType,
+        { frequency: periods[0].frequency }
+    );
+    
+    const requests = periods.map(period => {
+        const timeParams = getTimeParameters(period);
+        return fetchEurostatData(dataset, {
+            ...queryParams,
+            ...timeParams
+        });
+    });
+    
+    return Promise.all(requests);
+};
+
+/**
+ * Get monthly data series
+ * @param {Object} queryParams - Query parameters
+ * @param {string} startDate - Start date (YYYY-MM)
+ * @param {string} endDate - End date (YYYY-MM)
+ * @returns {Promise} Promise resolving to monthly data series
+ */
+export const getMonthlyData = async (queryParams, startDate, endDate) => {
+    const dataset = getDatasetForFuelAndActivity(
+        queryParams.fuelType,
+        queryParams.activityType,
+        { frequency: 'monthly' }
+    );
+    
+    // Ensure we're using a monthly dataset
+    if (!dataset.endsWith('m')) {
+        throw new Error('Monthly data not available for this query');
+    }
+    
+    const timeParams = getTimeParameters({
+        startDate,
+        endDate,
+        frequency: 'monthly'
+    });
+    
+    return fetchEurostatData(dataset, {
+        ...queryParams,
+        ...timeParams
+    });
+};
+
+/**
+ * Extract fuel type from query string
+ * @param {string} queryType - Query type string
+ * @returns {string} - Extracted fuel type
+ */
+function extractFuelTypeFromQuery(queryType) {
+  if (!queryType) return 'default';
+  
+  // Split by underscore and get the first part which is usually the fuel type
+  const parts = queryType.split('_');
+  if (parts.length > 0) {
+    return parts[0];
+  }
+  return 'default';
+}
 
 // Add simple mock data for testing when API fails
 const getMockDataForTopic = (queryType) => {
   console.log(`Providing mock data for ${queryType}`);
   
-  if (queryType.includes('_consumption') || queryType.includes('_by_country')) {
+  // Special case for specific data queries
+  if (queryType.includes('_specific_data')) {
+    // For specific data queries, we want to return data that can be used to generate a meaningful response
+    return {
+      isMockData: true,
+      value: {"0:0:0": 478.42},
+      dimension: {
+        time: {
+          category: {
+            index: {"2021": 0},
+            label: {"2021": "2021"}
+          },
+          label: "Time"
+        },
+        geo: {
+          category: {
+            index: {"FR": 0},
+            label: {"FR": "France"}
+          },
+          label: "Geopolitical entity (reporting)"
+        },
+        nrg_bal: {
+          category: {
+            index: {"IMP": 0},
+            label: {"IMP": "Imports"}
+          },
+          label: "Energy balance"
+        },
+        unit: {
+          category: {
+            index: {"MIO_M3": 0},
+            label: {"MIO_M3": "Million cubic meters"}
+          },
+          label: "Unit"
+        }
+      },
+      source: "MOCK DATA FOR SPECIFIC QUERY"
+    };
+  } else if (queryType.includes('_consumption') || queryType.includes('_by_country')) {
     // For pie charts: mock with structure similar to Eurostat API response
     return {
+      isMockData: true,
       value: {0: 104.3, 1: 78.6, 2: 65.2, 3: 59.8, 4: 31.4},
       dimension: {
         geo: {
@@ -124,6 +229,7 @@ const getMockDataForTopic = (queryType) => {
   } else if (queryType.includes('_timeline') || queryType.includes('_production_timeline')) {
     // For line charts: mock with structure similar to Eurostat API response
     return {
+      isMockData: true,
       value: {0: 589.7, 1: 578.9, 2: 573.6, 3: 485.2, 4: 523.8},
       dimension: {
         time: {
@@ -148,6 +254,7 @@ const getMockDataForTopic = (queryType) => {
   } else if (queryType.includes('_production_consumption')) {
     // For area charts: mock with structure similar to Eurostat API response
     return {
+      isMockData: true,
       value: {
         "0:0": 589.7, "0:1": 650.2,
         "1:0": 578.9, "1:1": 645.1,
@@ -178,4 +285,12 @@ const getMockDataForTopic = (queryType) => {
   }
   
   return {};
+};
+
+export default {
+  buildApiUrl,
+  fetchEurostatData,
+  getDataWithTimeContext,
+  getComparisonData,
+  getMonthlyData
 };

@@ -51,7 +51,7 @@ import { visualizationConfig } from '../data/visualizationConfig';
 
 // Update the setTopicVisualizations function to actually set the visualizations
 const setTopicVisualizations = (topic, config) => {
-  console.log(`Setting visualizations for topic: ${topic}`, config);
+  // console.log(`Setting visualizations for topic: ${topic}`, config);
   // Store the config in the visualizationConfig object for easy access
   visualizationConfig[topic] = config;
 };
@@ -108,7 +108,7 @@ const ChatBot = () => {
       const storedMessages = sessionManager.getMessages();
 
       if (storedMessages && storedMessages.length > 0) {
-        console.log("Found stored messages:", storedMessages.length);
+        // console.log("Found stored messages:", storedMessages.length);
         setMessages(storedMessages);
 
         // Check for welcome back message
@@ -120,7 +120,7 @@ const ChatBot = () => {
           }, 1000);
         }
       } else {
-        console.log("No stored messages, showing welcome message");
+        //console.log("No stored messages, showing welcome message");
         // Show welcome message for new sessions
         const welcomeMessage = {
           sender: "bot",
@@ -319,12 +319,21 @@ const ChatBot = () => {
     // Start typing animation
     setIsTyping(true);
 
+    await generateBotResponse(trimmedInput);
+  };
+
+  /**
+   * Handle bot response generation
+   * @param {string} trimmedInput - Cleaned user input
+   * @returns {Promise} Promise resolving when response is processed
+   */
+  const generateBotResponse = async (trimmedInput) => {
     try {
       // First, detect intent
       const intentResult = findIntent(trimmedInput, i18n.language);
       let botMessageText;
       let responseTopic = null;
-
+  
       // Handle specific intents
       if (intentResult.intent !== "unknown" && intentResult.confidence > 0.3) {
         // Get appropriate response based on intent from the correct dictionary
@@ -345,56 +354,83 @@ const ChatBot = () => {
             // Try to get domain-specific answer for other intents
             try {
               const response = await getEnergyInfo(trimmedInput, i18n.language);
-
+  
               // Check if we have a valid response with an answer
               if (response && response.answer) {
                 responseTopic = response.key || null;
-                const baseResponse = getContextAwareResponse(
-                  trimmedInput,
-                  contextManager,
-                  response.answer
-                );
-
-                // Use formatResponse to add topic connections and other enhancements
-                botMessageText = formatResponse(baseResponse, {
-                  topic: responseTopic,
-                  addEmpathy: true,
-                  addReassurance: true,
-                  language: i18n.language,
-                });
-
-                // Update context if available
-                if (
-                  contextManager &&
-                  typeof contextManager.updateContext === "function"
-                ) {
-                  contextManager.updateContext(trimmedInput, response);
-                }
-
-                // Get related topics for suggestions
-                const relatedTopics = response.key
-                  ? getRelatedTopics(response.key, i18n.language)
-                  : [];
-
-                if (relatedTopics && relatedTopics.length > 0) {
-                  setSuggestions(relatedTopics);
-                }
-
-                // Add follow-up suggestions if we have a topic
-                if (responseTopic) {
-                  const followUpSuggestions = getFollowUpSuggestionsForTopic(
-                    responseTopic,
-                    i18n.language
+                
+                // IMPORTANT FIX: Check if this is a specific data response
+                // For specific data questions, use the answer directly without additional formatting
+                if (response.source === "eurostat" && response.hasSpecificData && response.specificData) {
+                  botMessageText = response.answer;
+                  
+                  // Update context if available
+                  if (
+                    contextManager &&
+                    typeof contextManager.updateContext === "function"
+                  ) {
+                    contextManager.updateContext(trimmedInput, response);
+                  }
+                  
+                  // Get related topics for suggestions
+                  const relatedTopics = response.key
+                    ? getRelatedTopics(response.key, i18n.language)
+                    : [];
+  
+                  if (relatedTopics && relatedTopics.length > 0) {
+                    setSuggestions(relatedTopics);
+                  }
+                  
+                  // Skip other processing for specific data responses
+                } else {
+                  // For general topic responses, continue with normal processing
+                  const baseResponse = getContextAwareResponse(
+                    trimmedInput,
+                    contextManager,
+                    response.answer
                   );
-
-                  // You can either add these to the bot's message or set them as separate suggestions
-                  // Here we're adding one random follow-up suggestion to the end of the bot message
-                  if (followUpSuggestions.length > 0) {
-                    const randomSuggestion =
-                      followUpSuggestions[
-                        Math.floor(Math.random() * followUpSuggestions.length)
-                      ];
-                    botMessageText = `${botMessageText}\n\n${randomSuggestion}`;
+  
+                  // Use formatResponse to add topic connections and other enhancements
+                  botMessageText = formatResponse(baseResponse, {
+                    topic: responseTopic,
+                    addEmpathy: true,
+                    addReassurance: true,
+                    language: i18n.language,
+                  });
+  
+                  // Update context if available
+                  if (
+                    contextManager &&
+                    typeof contextManager.updateContext === "function"
+                  ) {
+                    contextManager.updateContext(trimmedInput, response);
+                  }
+  
+                  // Get related topics for suggestions
+                  const relatedTopics = response.key
+                    ? getRelatedTopics(response.key, i18n.language)
+                    : [];
+  
+                  if (relatedTopics && relatedTopics.length > 0) {
+                    setSuggestions(relatedTopics);
+                  }
+  
+                  // Add follow-up suggestions if we have a topic
+                  if (responseTopic) {
+                    const followUpSuggestions = getFollowUpSuggestionsForTopic(
+                      responseTopic,
+                      i18n.language
+                    );
+  
+                    // You can either add these to the bot's message or set them as separate suggestions
+                    // Here we're adding one random follow-up suggestion to the end of the bot message
+                    if (followUpSuggestions.length > 0) {
+                      const randomSuggestion =
+                        followUpSuggestions[
+                          Math.floor(Math.random() * followUpSuggestions.length)
+                        ];
+                      botMessageText = `${botMessageText}\n\n${randomSuggestion}`;
+                    }
                   }
                 }
               } else {
@@ -410,61 +446,85 @@ const ChatBot = () => {
         // Try to get domain-specific answer for unclear intent
         try {
           const response = await getEnergyInfo(trimmedInput, i18n.language);
-
+  
           // Only process if we have a valid response
           if (response && response.answer) {
             responseTopic = response.key || null;
-            const baseResponse = getContextAwareResponse(
-              trimmedInput,
-              contextManager,
-              response.answer
-            );
-
-            // Use formatResponse to add topic connections and other enhancements
-            botMessageText = formatResponse(baseResponse, {
-              topic: responseTopic,
-              addEmpathy: true,
-              addReassurance: true,
-              language: i18n.language,
-            });
-
-            // Handle visualization suggestions for fuel topics
-            if (visualizationConfig[responseTopic]) {
-              handleFuelResponse(responseTopic, response);
-            }
-
-            // Update context if available
-            if (
-              contextManager &&
-              typeof contextManager.updateContext === "function"
-            ) {
-              contextManager.updateContext(trimmedInput, response);
-            }
-
-            // Get related topics for suggestions
-            const relatedTopics = response.key
-              ? getRelatedTopics(response.key, i18n.language)
-              : [];
-
-            if (relatedTopics && relatedTopics.length > 0) {
-              setSuggestions(relatedTopics);
-            }
-
-            // Add follow-up suggestions if we have a topic
-            if (responseTopic) {
-              const followUpSuggestions = getFollowUpSuggestionsForTopic(
-                responseTopic,
-                i18n.language
+            
+            // IMPORTANT FIX: Check if this is a specific data response
+            // For specific data questions, use the answer directly without additional formatting
+            if (response.source === "eurostat" && response.hasSpecificData && response.specificData) {
+              botMessageText = response.answer;
+              
+              // Update context if available
+              if (contextManager && typeof contextManager.updateContext === "function") {
+                contextManager.updateContext(trimmedInput, response);
+              }
+              
+              // Get related topics for suggestions
+              const relatedTopics = response.key
+                ? getRelatedTopics(response.key, i18n.language)
+                : [];
+              
+              if (relatedTopics && relatedTopics.length > 0) {
+                setSuggestions(relatedTopics);
+              }
+              
+              // Skip visualization handling for specific data responses
+            } else {
+              // For general topic responses, continue with normal processing
+              const baseResponse = getContextAwareResponse(
+                trimmedInput,
+                contextManager,
+                response.answer
               );
-
-              // You can either add these to the bot's message or set them as separate suggestions
-              // Here we're adding one random follow-up suggestion to the end of the bot message
-              if (followUpSuggestions.length > 0) {
-                const randomSuggestion =
-                  followUpSuggestions[
-                    Math.floor(Math.random() * followUpSuggestions.length)
-                  ];
-                botMessageText = `${botMessageText}\n\n${randomSuggestion}`;
+  
+              // Use formatResponse to add topic connections and other enhancements
+              botMessageText = formatResponse(baseResponse, {
+                topic: responseTopic,
+                addEmpathy: true,
+                addReassurance: true,
+                language: i18n.language,
+              });
+  
+              // Handle visualization suggestions for fuel topics
+              if (visualizationConfig[responseTopic]) {
+                handleFuelResponse(responseTopic, response);
+              }
+  
+              // Update context if available
+              if (
+                contextManager &&
+                typeof contextManager.updateContext === "function"
+              ) {
+                contextManager.updateContext(trimmedInput, response);
+              }
+  
+              // Get related topics for suggestions
+              const relatedTopics = response.key
+                ? getRelatedTopics(response.key, i18n.language)
+                : [];
+  
+              if (relatedTopics && relatedTopics.length > 0) {
+                setSuggestions(relatedTopics);
+              }
+  
+              // Add follow-up suggestions if we have a topic
+              if (responseTopic) {
+                const followUpSuggestions = getFollowUpSuggestionsForTopic(
+                  responseTopic,
+                  i18n.language
+                );
+  
+                // You can either add these to the bot's message or set them as separate suggestions
+                // Here we're adding one random follow-up suggestion to the end of the bot message
+                if (followUpSuggestions.length > 0) {
+                  const randomSuggestion =
+                    followUpSuggestions[
+                      Math.floor(Math.random() * followUpSuggestions.length)
+                    ];
+                  botMessageText = `${botMessageText}\n\n${randomSuggestion}`;
+                }
               }
             }
           } else {
@@ -473,12 +533,12 @@ const ChatBot = () => {
               response && typeof response.confidence !== "undefined"
                 ? response.confidence
                 : 0;
-
+  
             const matchInfo =
               matchScore > 0.3 && response && response.baseTopic
                 ? { score: matchScore, topic: response.baseTopic }
                 : null;
-
+  
             botMessageText = getRandomUnknownResponse(i18n.language, matchInfo);
           }
         } catch (error) {
@@ -486,29 +546,26 @@ const ChatBot = () => {
           botMessageText = getRandomUnknownResponse(i18n.language);
         }
       }
-
+  
       // Calculate typing time
       const typingTime = calculateTypingTime(botMessageText);
       await new Promise((resolve) => setTimeout(resolve, typingTime));
-
+  
       // Create initial bot response
       const botMessage = {
-        text: t('responses.topic_description', {
-          text: botMessageText.split('Let me share the key facts about this:')[0],
-          topic: responseTopic
-        }),
+        text: botMessageText,
         sender: "bot",
         topic: responseTopic,
         timestamp: new Date().toISOString(),
       };
-
+  
       setMessages((prev) => [...prev, botMessage]);
       if (sessionManagerRef.current) {
         sessionManagerRef.current.addMessage(botMessage);
       }
-
+  
       // If this is a fuel topic that has visualizations, add a new message after a delay
-      if (responseTopic) {
+      if (responseTopic && !botMessageText.startsWith("Based on Eurostat data")) {
         // Use getVisualizationConfig function to get visualizations for the topic
         getVisualizationConfig(responseTopic, i18n.language)
           .then(config => {
@@ -542,23 +599,23 @@ const ChatBot = () => {
             console.error("Error getting visualizations:", error);
           });
       }
-
+  
       // Track successful bot response
       analyticsManager.trackBotResponse(botMessage, true);
     } catch (error) {
       console.error("Error processing message:", error);
-
+  
       const errorMessage = {
         sender: "bot",
         text: getRandomErrorMessage(i18n.language),
         timestamp: new Date().toISOString(),
       };
-
+  
       setMessages((prev) => [...prev, errorMessage]);
       if (sessionManagerRef.current) {
         sessionManagerRef.current.addMessage(errorMessage);
       }
-
+  
       // Track failed bot response
       analyticsManager.trackBotResponse(errorMessage, false);
     } finally {
@@ -642,14 +699,14 @@ const ChatBot = () => {
 
   // Handle fuel-related response
   const handleFuelResponse = (fuelType, response) => {
-    console.log('Handling fuel response for:', fuelType);
+    //console.log('Handling fuel response for:', fuelType);
     setCurrentFuel(fuelType);
     setShownVisualizations([]);
   };
 
   // Handle visualization selection
   const handleVisualizationSelect = async (visualization) => {
-    console.log('Selected visualization:', visualization);
+    //console.log('Selected visualization:', visualization);
     setShownVisualizations((prev) => [...prev, visualization.type]);
   
     // Fetch the data for the selected visualization
@@ -745,12 +802,12 @@ const ChatBot = () => {
 
   // Update renderVisualizationButtons to check currentFuel first
   const renderVisualizationButtons = (fuel) => {
-    console.log('Rendering visualization buttons for fuel:', fuel);
-    console.log('Current fuel:', currentFuel);
-    console.log('Visualization config for fuel:', visualizationConfig[fuel]);
+    //console.log('Rendering visualization buttons for fuel:', fuel);
+    //console.log('Current fuel:', currentFuel);
+    //console.log('Visualization config for fuel:', visualizationConfig[fuel]);
     
     if (!fuel || !visualizationConfig[fuel]) {
-      console.log('No visualization config found for fuel:', fuel);
+      //console.log('No visualization config found for fuel:', fuel);
       return null;
     }
     
@@ -759,7 +816,7 @@ const ChatBot = () => {
     );
   
     if (remainingVisualizations.length === 0) {
-      console.log('No remaining visualizations for fuel:', fuel);
+      //console.log('No remaining visualizations for fuel:', fuel);
       return null;
     }
   
@@ -797,7 +854,7 @@ const ChatBot = () => {
 
   // Update renderMessage to check for currentFuel and topic
   const renderMessage = (msg) => {
-    console.log('Rendering message:', msg);
+    // console.log('Rendering message:', msg);
     if (msg.category === 'visualization') {
       return (
         <Visualization

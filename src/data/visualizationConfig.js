@@ -1,7 +1,7 @@
 /**
  * Configuration for fuel-specific visualizations
  */
-import { fetchEurostatData } from '../api/eurostatApi';
+import { fetchEurostatData, getDataWithTimeContext, getMonthlyData } from '../api/eurostatApi';
 import { energyDefinitionsEn } from './energyDefinitionsEn';
 import i18n from '../i18n'; // Import the existing i18n system
 
@@ -394,10 +394,261 @@ export const getVisualizationConfig = async (topic, language = 'en', parameters 
   };
 };
 
-// Export the module's main function for backward compatibility
-export default getVisualizationConfig;
-
-// Also export as a named export
+// Export the module's main function and configuration object
 export const visualizationConfig = {
-  getVisualizationConfig
+    getVisualizationConfig,
+    "natural-gas": {
+        title: "Natural Gas Statistics",
+        description: "Visualizations for natural gas production, trade, and consumption",
+        visualizations: [
+            {
+                type: "line",
+                label: "Monthly Gas Balance",
+                description: "Monthly natural gas balance trends",
+                getData: async () => {
+                    const endDate = new Date();
+                    const startDate = new Date();
+                    startDate.setFullYear(endDate.getFullYear() - 1); // Last 12 months
+                    
+                    return getMonthlyData({
+                        fuelType: "natural gas",
+                        activityType: "balance",
+                        siec: "G3000"
+                    }, startDate, endDate);
+                }
+            },
+            {
+                type: "bar",
+                label: "Gas Imports by Country",
+                description: "Natural gas imports by partner country",
+                getData: async () => getDataWithTimeContext({
+                    fuelType: "natural gas",
+                    activityType: "imports",
+                    siec: "G3000"
+                }, "current year")
+            },
+            {
+                type: "pie",
+                label: "Gas Consumption Distribution",
+                description: "Distribution of natural gas consumption",
+                getData: async () => getDataWithTimeContext({
+                    fuelType: "natural gas",
+                    activityType: "consumption",
+                    siec: "G3000"
+                }, "current year")
+            }
+        ]
+    },
+    "oil": {
+        title: "Oil Statistics",
+        description: "Visualizations for crude oil and petroleum products",
+        visualizations: [
+            {
+                type: "line",
+                label: "Monthly Oil Balance",
+                description: "Monthly crude oil balance trends",
+                getData: async () => {
+                    const endDate = new Date();
+                    const startDate = new Date();
+                    startDate.setFullYear(endDate.getFullYear() - 1); // Last 12 months
+                    
+                    return getMonthlyData({
+                        fuelType: "oil",
+                        activityType: "balance",
+                        siec: "O4100_TOT"
+                    }, startDate, endDate);
+                }
+            },
+            {
+                type: "bar",
+                label: "Oil Imports by Country",
+                description: "Crude oil imports by partner country",
+                getData: async () => getDataWithTimeContext({
+                    fuelType: "oil",
+                    activityType: "imports",
+                    siec: "O4100_TOT"
+                }, "current year")
+            },
+            {
+                type: "pie",
+                label: "Oil Products Consumption",
+                description: "Distribution of oil products consumption",
+                getData: async () => getDataWithTimeContext({
+                    fuelType: "oil",
+                    activityType: "consumption",
+                    siec: "O4000"
+                }, "current year")
+            }
+        ]
+    },
+    "electricity": {
+        title: "Electricity Statistics",
+        description: "Visualizations for electricity production and consumption",
+        visualizations: [
+            {
+                type: "line",
+                label: "Electricity Production by Source",
+                description: "Electricity production trends by source",
+                getData: async () => getDataWithTimeContext({
+                    fuelType: "electricity",
+                    activityType: "production",
+                    nrg_bal: "GEP", // Gross electricity production
+                    unit: "GWH"
+                }, "current year")
+            },
+            {
+                type: "pie",
+                label: "Production Mix",
+                description: "Distribution of electricity production by source",
+                getData: async () => getDataWithTimeContext({
+                    fuelType: "electricity",
+                    activityType: "production",
+                    nrg_bal: "GEP",
+                    unit: "GWH"
+                }, "current year")
+            },
+            {
+                type: "bar",
+                label: "Consumption by Sector",
+                description: "Electricity consumption by sector",
+                getData: async () => getDataWithTimeContext({
+                    fuelType: "electricity",
+                    activityType: "consumption",
+                    unit: "GWH"
+                }, "current year")
+            }
+        ]
+    },
+    "nrg_cb_sff": {
+        defaultChartType: "bar",
+        availableChartTypes: ["bar", "line", "pie"],
+        dimensions: {
+            x: "time",
+            y: "values",
+            groupBy: "nrg_bal"
+        },
+        options: {
+            bar: {
+                stacked: true,
+                title: "Solid Fossil Fuels Balance",
+                xAxisLabel: "Year",
+                yAxisLabel: "Thousand tonnes"
+            },
+            line: {
+                title: "Solid Fossil Fuels Trends",
+                xAxisLabel: "Year",
+                yAxisLabel: "Thousand tonnes"
+            },
+            pie: {
+                title: "Solid Fossil Fuels Distribution",
+                showLegend: true
+            }
+        }
+    },
+
+    "nrg_ind_pehnf": {
+        defaultChartType: "bar",
+        availableChartTypes: ["bar", "line", "pie"],
+        dimensions: {
+            x: "time",
+            y: "values",
+            groupBy: "siec"
+        },
+        options: {
+            bar: {
+                stacked: true,
+                title: "Non-Fossil Heat Production",
+                xAxisLabel: "Year",
+                yAxisLabel: "Unit"
+            },
+            line: {
+                title: "Non-Fossil Heat Production Trends",
+                xAxisLabel: "Year",
+                yAxisLabel: "Unit"
+            },
+            pie: {
+                title: "Non-Fossil Heat Sources Distribution",
+                showLegend: true
+            }
+        },
+        colorScheme: {
+            "RA100": "#4e79a7", // Hydro
+            "RA200": "#f28e2b", // Geothermal
+            "RA300": "#76b7b2", // Wind
+            "RA410": "#edc948", // Solar PV
+            "RA420": "#ff9da7", // Solar thermal
+            "RA500": "#9c755f", // Tide, wave, ocean
+            "RA600": "#bab0ab", // Ambient heat
+            "N9000": "#d37295"  // Nuclear heat
+        }
+    },
+
+    "nrg_ind_ren": {
+        defaultChartType: "line",
+        availableChartTypes: ["line", "bar"],
+        dimensions: {
+            x: "time",
+            y: "values",
+            groupBy: "nrg_bal"
+        },
+        options: {
+            line: {
+                title: "Renewable Energy Share",
+                xAxisLabel: "Year",
+                yAxisLabel: "Percentage",
+                showMarkers: true,
+                includeTarget: true,
+                targetValue: 32 // 2030 target
+            },
+            bar: {
+                title: "Renewable Energy Share by Sector",
+                xAxisLabel: "Year",
+                yAxisLabel: "Percentage",
+                showTarget: true
+            }
+        },
+        colorScheme: {
+            "REN": "#2ecc71", // Total renewables
+            "REN_TRA": "#3498db", // Transport
+            "REN_ELC": "#e67e22", // Electricity
+            "REN_HEAT_CL": "#e74c3c", // Heating and cooling
+            "TARGET": "#95a5a6" // Target line
+        }
+    },
+
+    "nrg_ind_eff": {
+        defaultChartType: "line",
+        availableChartTypes: ["line", "bar"],
+        dimensions: {
+            x: "time",
+            y: "values",
+            groupBy: "nrg_bal"
+        },
+        options: {
+            line: {
+                title: "Energy Efficiency Progress",
+                xAxisLabel: "Year",
+                yAxisLabel: "Million tonnes of oil equivalent",
+                showMarkers: true,
+                includeTarget: true
+            },
+            bar: {
+                title: "Energy Consumption by Type",
+                xAxisLabel: "Year",
+                yAxisLabel: "Million tonnes of oil equivalent",
+                showTarget: true
+            }
+        },
+        colorScheme: {
+            "PEC_EED": "#3498db", // Primary energy consumption
+            "FEC_EED": "#2ecc71", // Final energy consumption
+            "PEC2020-2030": "#95a5a6", // Primary target
+            "FEC2020-2030": "#7f8c8d", // Final target
+            "PEC_DT2030": "#e74c3c", // Distance to primary target
+            "FEC_DT2030": "#c0392b"  // Distance to final target
+        }
+    }
 };
+
+// Export the config as default as well
+export default visualizationConfig;

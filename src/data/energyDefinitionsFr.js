@@ -244,6 +244,108 @@ export const energyDefinitionsFr = {
           keywords: ["données mensuelles", "rapport énergétique", "collecte statistique"],
           synonyms: ["rapport mensuel", "données énergétiques"],
           related: ["statistiques énergétiques", "transmission de données", "normes statistiques"]
+        },
+
+        "renewable energy": {
+          title: "Énergie Renouvelable",
+          text: "Énergie provenant de sources renouvelables, notamment l'éolien, le solaire, l'hydroélectricité, la biomasse et la géothermie.",
+          dataset: "nrg_ind_ren",
+          siec: "TOTAL",
+          unit: "PC",
+          hasVisualization: true,
+          visualizationType: ["line", "pie", "bar"],
+          relatedTopics: ["electricity", "energy efficiency", "natural gas"],
+          balanceCodes: {
+              total: "REN",
+              transport: "REN_TRA",
+              electricity: "REN_ELC",
+              heating: "REN_HEAT_CL"
+          },
+          keywords: ["renouvelable", "éolien", "solaire", "hydroélectrique", "biomasse", "géothermie", "durable", "énergie propre"]
+        },
+    
+        "energy efficiency": {
+          title: "Efficacité Énergétique",
+          text: "Indicateurs mesurant l'efficacité de la consommation d'énergie et les progrès vers les objectifs d'efficacité.",
+          dataset: "nrg_ind_eff",
+          unit: "MTOE",
+          hasVisualization: true,
+          visualizationType: ["line", "bar"],
+          relatedTopics: ["renewable energy", "electricity", "energy consumption"],
+          balanceCodes: {
+              primaryConsumption: "PEC_EED",
+              finalConsumption: "FEC_EED",
+              target2030: "PEC2020-2030"
+          },
+          keywords: ["efficacité", "consommation", "économie d'énergie", "optimisation", "performance énergétique"]
+        },
+    
+        "electricity production": {
+          title: "Production d'Électricité",
+          text: "Statistiques sur la production d'électricité par différents types de centrales et sources d'énergie.",
+          dataset: "nrg_ind_peh",
+          unit: "GWH",
+          hasVisualization: true,
+          visualizationType: ["line", "pie", "bar"],
+          relatedTopics: ["renewable energy", "energy efficiency", "electricity consumption"],
+          balanceCodes: {
+              grossProduction: "GEP",
+              netProduction: "NEP"
+          },
+          keywords: ["production", "centrale électrique", "électricité", "génération", "production d'énergie"]
+        },
+
+        "solid fossil fuels": {
+          title: "Combustibles Fossiles Solides",
+          description: "Les combustibles fossiles solides comprennent la houille, le lignite et leurs dérivés comme le coke et les agglomérés. Ces combustibles sont couramment utilisés dans la production d'électricité, les processus industriels et le chauffage. Les données couvrent les méthodes de production (extraction souterraine et à ciel ouvert), les flux commerciaux et les modes de consommation dans différents secteurs.",
+          key_concepts: [
+              "Technologies d'extraction souterraine et à ciel ouvert",
+              "Qualités et spécifications du charbon",
+              "Modèles commerciaux et pays partenaires",
+              "Répartition de la consommation par secteur",
+              "Impacts environnementaux et mesures d'efficacité"
+          ],
+          dataset: "nrg_cb_sff",
+          additionalDatasets: ["nrg_ti_sff"],
+          visualization: true
+        },
+
+        "nuclear fuel": {
+          title: "Combustible Nucléaire",
+          description: "Le combustible nucléaire désigne les matériaux utilisés dans les centrales nucléaires pour produire de l'électricité par fission nucléaire. Cela comprend les différentes étapes du cycle du combustible, de l'enrichissement de l'uranium à la gestion du combustible usé. Les données couvrent la production, la capacité et la gestion des combustibles nucléaires, y compris le combustible frais, le combustible MOX et la production de chaleur nucléaire.",
+          key_concepts: [
+              "Processus d'enrichissement de l'uranium",
+              "Fabrication et types de combustible",
+              "Gestion des déchets nucléaires",
+              "Métriques de capacité de production",
+              "Aspects de sécurité et de réglementation"
+          ],
+          dataset: "nrg_inf_nuc",
+          visualization: true,
+          related_topics: [
+              "infrastructure nucléaire",
+              "production d'électricité",
+              "capacité énergétique"
+          ]
+        },
+
+        "nuclear infrastructure": {
+          title: "Infrastructure Nucléaire",
+          description: "L'infrastructure nucléaire englobe les installations et systèmes nécessaires à la production d'énergie nucléaire, y compris les usines d'enrichissement, les installations de fabrication de combustible et les centrales. Les données couvrent les capacités de production, les métriques opérationnelles et les installations de gestion du combustible tout au long du cycle du combustible nucléaire.",
+          key_concepts: [
+              "Capacité d'enrichissement",
+              "Installations de fabrication de combustible",
+              "Spécifications des centrales",
+              "Performance opérationnelle",
+              "Maintenance des infrastructures"
+          ],
+          dataset: "nrg_inf_nuc",
+          visualization: true,
+          related_topics: [
+              "combustible nucléaire",
+              "production d'électricité",
+              "capacité énergétique"
+          ]
         }
 };
 

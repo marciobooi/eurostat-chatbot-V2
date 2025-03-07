@@ -134,7 +134,7 @@ export class AnalyticsManager {
     // Matomo, or another analytics service
 
     if (process.env.NODE_ENV === "development") {
-      console.log(`Analytics event: ${eventName}`, eventData);
+      // console.log(`Analytics event: ${eventName}`, eventData);
     }
 
     // Example integration with Google Analytics

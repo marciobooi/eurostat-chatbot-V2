@@ -44,94 +44,182 @@ export const followUpPhrases = {
 
 export const followUpQuestions = {
   en: {
-    // General follow-up questions for any topic
-    general: [
-      "Would you like to know more about this topic?",
-      "Do you have any specific questions about this?",
-      "Is there anything else you'd like to know?",
-      "Would you like me to elaborate on any particular aspect?",
-      "Is there something specific about this that interests you?",
+    // Natural Gas follow-ups
+    "natural gas": [
+      "Would you like to see monthly natural gas balance data?",
+      "How about recent gas import trends?",
+      "Would you like to compare gas consumption across different countries?",
+      "Should we look at monthly gas storage levels?"
     ],
-
-    // Topic-specific follow up questions
-    oil: [
-      "Would you like to know about oil consumption trends in Europe?",
-      "Are you interested in how oil prices have evolved over time?",
-      "Would you like to know about the EU's oil import dependencies?",
-      "Are you interested in the environmental impacts of oil use?",
-      "Would you like to learn about alternatives to oil?",
+    // Oil follow-ups
+    "oil": [
+      "Would you like to see monthly oil balance trends?",
+      "How about crude oil import patterns?",
+      "Should we look at petroleum products consumption?",
+      "Would you like to see monthly refinery data?"
     ],
-
-    "renewable energy": [
-      "Would you like to know which EU country has the highest share of renewables?",
-      "Are you interested in learning about specific renewable technologies?",
-      "Would you like to see data on renewable energy growth in Europe?",
-      "Are you curious about EU policies promoting renewable energy?",
-      "Did you know solar and wind are the fastest growing energy sources?",
+    // Electricity follow-ups
+    "electricity": [
+      "Would you like to see electricity production by source?",
+      "How about consumption patterns by sector?",
+      "Should we look at renewable vs non-renewable generation?",
+      "Would you like to compare production across countries?"
     ],
-
-    "energy efficiency": [
-      "Did you know buildings account for 40% of energy use in the EU?",
-      "Would you like to learn about energy efficiency measures in households?",
-      "Are you interested in the EU's energy efficiency targets?",
-      "Would you like to know how much energy is saved through efficiency measures?",
-      "Are you curious about energy efficiency labels on appliances?",
-    ],
-
-    "energy consumption": [
-      "Would you like to see which sectors consume the most energy in Europe?",
-      "Are you interested in how energy consumption has changed over time?",
-      "Would you like to learn about seasonal variations in energy use?",
-      "Are you curious about how COVID-19 affected energy consumption patterns?",
-      "Would you like to know about per capita energy consumption differences?",
-    ],
-
-    "energy mix": [
-      "Would you like to know how the EU's energy mix has evolved over time?",
-      "Are you interested in how different EU countries have different energy mixes?",
-      "Would you like to learn about plans for changing the energy mix in the future?",
-      "Did you know the share of renewables in the EU's mix has doubled since 2004?",
-      "Would you like to see a comparison with other regions' energy mixes?",
-    ],
+    // General follow-ups
+    "general": [
+      "Would you like to see the data visualized?",
+      "Should we compare with other countries?",
+      "Would you like to see historical trends?",
+      "How about looking at monthly patterns?"
+    ]
   },
-
   fr: {
-    general: [
-      "Voulez-vous en savoir plus sur ce sujet ?",
-      "Avez-vous des questions spécifiques à ce sujet ?",
-      "Y a-t-il autre chose que vous aimeriez savoir ?",
-      "Souhaitez-vous que j'élabore sur un aspect particulier ?",
-      "Y a-t-il quelque chose de spécifique qui vous intéresse ?",
+    "natural gas": [
+      "Voulez-vous voir les données mensuelles du bilan gazier ?",
+      "Que diriez-vous des tendances récentes des importations de gaz ?",
+      "Voulez-vous comparer la consommation de gaz entre différents pays ?",
+      "Devrions-nous examiner les niveaux mensuels de stockage de gaz ?"
     ],
-
-    pétrole: [
-      "Voulez-vous connaître les tendances de consommation de pétrole en Europe ?",
-      "Êtes-vous intéressé par l'évolution des prix du pétrole ?",
-      "Souhaitez-vous en savoir plus sur les dépendances de l'UE en matière d'importation de pétrole ?",
-      "Êtes-vous intéressé par les impacts environnementaux de l'utilisation du pétrole ?",
-      "Voulez-vous en savoir plus sur les alternatives au pétrole ?",
+    "oil": [
+      "Voulez-vous voir les tendances mensuelles du bilan pétrolier ?",
+      "Que diriez-vous des schémas d'importation de pétrole brut ?",
+      "Devrions-nous examiner la consommation de produits pétroliers ?",
+      "Voulez-vous voir les données mensuelles des raffineries ?"
     ],
-    // Add more French topics as needed
+    "electricity": [
+      "Voulez-vous voir la production d'électricité par source ?",
+      "Que diriez-vous des modes de consommation par secteur ?",
+      "Devrions-nous examiner la production renouvelable vs non renouvelable ?",
+      "Voulez-vous comparer la production entre les pays ?"
+    ],
+    "general": [
+      "Voulez-vous voir les données visualisées ?",
+      "Devrions-nous comparer avec d'autres pays ?",
+      "Voulez-vous voir les tendances historiques ?",
+      "Que diriez-vous d'examiner les tendances mensuelles ?"
+    ]
   },
-
   de: {
-    general: [
-      "Möchten Sie mehr über dieses Thema erfahren?",
-      "Haben Sie konkrete Fragen dazu?",
-      "Gibt es etwas anderes, das Sie wissen möchten?",
-      "Möchten Sie, dass ich auf einen bestimmten Aspekt näher eingehe?",
-      "Gibt es etwas Bestimmtes, das Sie interessiert?",
+    "natural gas": [
+      "Möchten Sie monatliche Erdgasbilanzdaten sehen?",
+      "Wie wäre es mit aktuellen Gasimporttrends?",
+      "Möchten Sie den Gasverbrauch verschiedener Länder vergleichen?",
+      "Sollen wir uns die monatlichen Gasspeicherstände ansehen?"
     ],
-
-    öl: [
-      "Möchten Sie mehr über die Trends beim Ölverbrauch in Europa erfahren?",
-      "Interessieren Sie sich für die Entwicklung der Ölpreise?",
-      "Möchten Sie mehr über die Abhängigkeit der EU von Ölimporten erfahren?",
-      "Interessieren Sie sich für die Umweltauswirkungen der Ölnutzung?",
-      "Möchten Sie etwas über Alternativen zu Öl erfahren?",
+    "oil": [
+      "Möchten Sie monatliche Ölbilanztrends sehen?",
+      "Wie wäre es mit Rohölimportmustern?",
+      "Sollen wir uns den Verbrauch von Erdölprodukten ansehen?",
+      "Möchten Sie monatliche Raffinerie-Daten sehen?"
     ],
-    // Add more German topics as needed
+    "electricity": [
+      "Möchten Sie die Stromerzeugung nach Quellen sehen?",
+      "Wie wäre es mit Verbrauchsmustern nach Sektoren?",
+      "Sollen wir die erneuerbare vs. nicht-erneuerbare Erzeugung betrachten?",
+      "Möchten Sie die Produktion zwischen Ländern vergleichen?"
+    ],
+    "general": [
+      "Möchten Sie die Daten visualisiert sehen?",
+      "Sollen wir mit anderen Ländern vergleichen?",
+      "Möchten Sie historische Trends sehen?",
+      "Wie wäre es mit monatlichen Mustern?"
+    ]
   },
+  solidFossilFuels: {
+    en: [
+      "Would you like to see the breakdown between hard coal and lignite production?",
+      "Would you like to see consumption by different sectors?",
+      "Would you like to know about trade patterns in solid fossil fuels?",
+      "Would you like to compare surface mining versus underground mining?",
+      "Would you like to see how solid fuel use has changed over time?"
+    ],
+    fr: [
+      "Voulez-vous voir la répartition entre la production de houille et de lignite ?",
+      "Voulez-vous voir la consommation par différents secteurs ?",
+      "Voulez-vous en savoir plus sur les modèles de commerce des combustibles fossiles solides ?",
+      "Voulez-vous comparer l'extraction à ciel ouvert et souterraine ?",
+      "Voulez-vous voir comment l'utilisation des combustibles solides a évolué dans le temps ?"
+    ],
+    de: [
+      "Möchten Sie die Aufteilung zwischen Steinkohle- und Braunkohleförderung sehen?",
+      "Möchten Sie den Verbrauch nach verschiedenen Sektoren sehen?",
+      "Möchten Sie mehr über die Handelsmuster bei festen fossilen Brennstoffen erfahren?",
+      "Möchten Sie Tagebau und Untertagebau vergleichen?",
+      "Möchten Sie sehen, wie sich die Nutzung fester Brennstoffe im Laufe der Zeit verändert hat?"
+    ]
+  },
+
+  nonFossilHeat: {
+    en: [
+      "Would you like to see the breakdown by heat source (geothermal, solar, etc.)?",
+      "Would you like to know more about district heating networks?",
+      "Would you like to see the efficiency of different heat production methods?",
+      "Would you like to compare heat production between different countries?",
+      "Would you like to see seasonal variations in heat production?"
+    ],
+    fr: [
+      "Voulez-vous voir la répartition par source de chaleur (géothermie, solaire, etc.) ?",
+      "Voulez-vous en savoir plus sur les réseaux de chauffage urbain ?",
+      "Voulez-vous voir l'efficacité des différentes méthodes de production de chaleur ?",
+      "Voulez-vous comparer la production de chaleur entre différents pays ?",
+      "Voulez-vous voir les variations saisonnières de la production de chaleur ?"
+    ],
+    de: [
+      "Möchten Sie die Aufteilung nach Wärmequellen (Geothermie, Solar, etc.) sehen?",
+      "Möchten Sie mehr über Fernwärmenetze erfahren?",
+      "Möchten Sie die Effizienz verschiedener Wärmeerzeugungsmethoden sehen?",
+      "Möchten Sie die Wärmeerzeugung zwischen verschiedenen Ländern vergleichen?",
+      "Möchten Sie die saisonalen Schwankungen in der Wärmeerzeugung sehen?"
+    ]
+  },
+
+  renewableEnergy: {
+    en: [
+      "Would you like to see the breakdown of different renewable sources?",
+      "Would you like to know about renewable energy in transport?",
+      "Would you like to see renewable energy targets and progress?",
+      "Would you like to compare renewable shares between countries?",
+      "Would you like to see trends in renewable heating and cooling?"
+    ],
+    fr: [
+      "Voulez-vous voir la répartition des différentes sources renouvelables ?",
+      "Voulez-vous en savoir plus sur les énergies renouvelables dans les transports ?",
+      "Voulez-vous voir les objectifs et les progrès en matière d'énergies renouvelables ?",
+      "Voulez-vous comparer les parts de renouvelables entre pays ?",
+      "Voulez-vous voir les tendances en matière de chauffage et refroidissement renouvelables ?"
+    ],
+    de: [
+      "Möchten Sie die Aufteilung der verschiedenen erneuerbaren Quellen sehen?",
+      "Möchten Sie mehr über erneuerbare Energien im Verkehr erfahren?",
+      "Möchten Sie die Ziele und Fortschritte bei erneuerbaren Energien sehen?",
+      "Möchten Sie die Anteile erneuerbarer Energien zwischen Ländern vergleichen?",
+      "Möchten Sie die Trends bei erneuerbarem Heizen und Kühlen sehen?"
+    ]
+  },
+
+  energyEfficiency: {
+    en: [
+      "Would you like to see progress towards 2030 efficiency targets?",
+      "Would you like to compare efficiency between sectors?",
+      "Would you like to see energy intensity trends?",
+      "Would you like to know about energy savings in buildings?",
+      "Would you like to see efficiency improvements over time?"
+    ],
+    fr: [
+      "Voulez-vous voir les progrès vers les objectifs d'efficacité 2030 ?",
+      "Voulez-vous comparer l'efficacité entre les secteurs ?",
+      "Voulez-vous voir les tendances de l'intensité énergétique ?",
+      "Voulez-vous en savoir plus sur les économies d'énergie dans les bâtiments ?",
+      "Voulez-vous voir les améliorations d'efficacité au fil du temps ?"
+    ],
+    de: [
+      "Möchten Sie die Fortschritte bei den Effizienzzielen 2030 sehen?",
+      "Möchten Sie die Effizienz zwischen Sektoren vergleichen?",
+      "Möchten Sie die Trends der Energieintensität sehen?",
+      "Möchten Sie mehr über Energieeinsparungen in Gebäuden erfahren?",
+      "Möchten Sie die Effizienzverbesserungen im Laufe der Zeit sehen?"
+    ]
+  }
 };
 
 /**

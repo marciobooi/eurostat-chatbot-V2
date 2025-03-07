@@ -14,7 +14,7 @@ const saveToStorage = (messages) => {
 
   try {
     localStorage.setItem(MESSAGES_STORAGE_KEY, JSON.stringify(messages));
-    console.log(`Saved ${messages.length} messages to localStorage`);
+    // console.log(`Saved ${messages.length} messages to localStorage`);
   } catch (error) {
     console.error("Error saving messages to localStorage:", error);
   }
@@ -30,7 +30,7 @@ const loadFromStorage = () => {
     if (!data) return null;
 
     const messages = JSON.parse(data);
-    console.log(`Loaded ${messages.length} messages from localStorage`);
+    // console.log(`Loaded ${messages.length} messages from localStorage`);
     return messages;
   } catch (error) {
     console.error("Error loading messages from localStorage:", error);
@@ -45,7 +45,7 @@ const clearStorage = () => {
   try {
     localStorage.removeItem(MESSAGES_STORAGE_KEY);
     localStorage.removeItem(LAST_TOPIC_KEY);
-    console.log("Cleared chat history from localStorage");
+    // console.log("Cleared chat history from localStorage");
   } catch (error) {
     console.error("Error clearing localStorage:", error);
   }

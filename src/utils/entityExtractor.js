@@ -8,10 +8,11 @@ import numbers from "compromise-numbers";
 import dates from "compromise-dates";
 import eurostatTerminology from "./plugins/eurostatTerminology";
 import { datePatterns } from "../data/datePatterns";
-import { getCountryCodes } from "../data/countryCodes";
+import { getCountryCodes, countryCodes } from "../data/countryCodes";
 import { getStatisticalConcepts } from "../data/statisticalConcepts";
 import { getEnergyUnits } from "../data/energyUnits";
 import { getTimePeriods } from "../data/timePeriods";
+import { energyDictionary } from "../data/energyDictionary";
 
 // Initialize compromise with all necessary plugins
 nlp.extend(sentences);
@@ -44,7 +45,7 @@ export const extractEntities = (text, language = "en") => {
     // Get terms from dictionaries based on language
     const statisticalConcepts = getStatisticalConcepts(language);
     const energyUnits = getEnergyUnits(language);
-    const countryCodes = getCountryCodes(language);
+    const countryCodesList = getCountryCodes(language);
     const timePeriods = getTimePeriods(language);
     
     // Initialize entities object with empty arrays
@@ -79,55 +80,100 @@ export const extractEntities = (text, language = "en") => {
       entities.dates = extractDateReferences(text, language);
     }
 
-    // Direct pattern matching for each entity type
-    // For statistical concepts
-    if (statisticalConcepts && statisticalConcepts.length > 0) {
-      statisticalConcepts.forEach(concept => {
-        const regex = new RegExp(`\\b${concept}\\b`, 'i');
-        if (regex.test(text.toLowerCase())) {
-          if (!entities.statisticalConcepts.includes(concept)) {
-            entities.statisticalConcepts.push(concept);
-          }
-        }
-      });
-    }
+    // For statistical concepts, add fuel types from the energy dictionary
+    const lowerText = text.toLowerCase();
+    const energyDict = energyDictionary[language] || energyDictionary.en;
     
-    // For countries and country codes
-    if (countryCodes && countryCodes.length > 0) {
-      countryCodes.forEach(country => {
-        const regex = new RegExp(`\\b${country}\\b`, 'i');
-        if (regex.test(text.toLowerCase())) {
-          if (!entities.countries.includes(country)) {
-            entities.countries.push(country);
-          }
+    // Add all fuel types from the energy dictionary
+    Object.keys(energyDict).forEach(key => {
+      // Use a more flexible matching approach for multi-word concepts
+      if (lowerText.includes(key.toLowerCase())) {
+        if (!entities.statisticalConcepts.includes(key)) {
+          entities.statisticalConcepts.push(key);
         }
-      });
-    }
+      }
+    });
+    
+    // Then add other statistical concepts
+    statisticalConcepts.forEach(concept => {
+      const regex = new RegExp(`\\b${concept}\\b`, 'i');
+      if (regex.test(lowerText)) {
+        if (!entities.statisticalConcepts.includes(concept)) {
+          entities.statisticalConcepts.push(concept);
+        }
+      }
+    });
+    
+    // Extract countries - check from country codes list and direct mentions
+    countryCodesList.forEach(country => {
+      const regex = new RegExp(`\\b${country}\\b`, 'i');
+      if (regex.test(lowerText)) {
+        if (!entities.countries.includes(country)) {
+          entities.countries.push(country);
+        }
+      }
+    });
+    
+    // Also check countries from the countryCodes mapping
+    // This includes all country names in all supported languages
+    Object.entries(countryCodes).forEach(([code, names]) => {
+      if (Array.isArray(names)) {
+        names.forEach(name => {
+          // Skip if already detected or too short (to avoid false positives)
+          if (name.length < 2) return;
+          
+          const regex = new RegExp(`\\b${name}\\b`, 'i');
+          if (regex.test(text)) {
+            // Use the first name in the array as the canonical name
+            const countryName = names[0];
+            if (!entities.countries.includes(countryName)) {
+              entities.countries.push(countryName);
+            }
+          }
+        });
+      }
+    });
     
     // For energy units
-    if (energyUnits && energyUnits.length > 0) {
-      energyUnits.forEach(unit => {
-        const regex = new RegExp(`\\b${unit}\\b`, 'i');
-        if (regex.test(text.toLowerCase())) {
-          if (!entities.energyUnits.includes(unit)) {
-            entities.energyUnits.push(unit);
-          }
+    energyUnits.forEach(unit => {
+      const regex = new RegExp(`\\b${unit}\\b`, 'i');
+      if (regex.test(lowerText)) {
+        if (!entities.energyUnits.includes(unit)) {
+          entities.energyUnits.push(unit);
         }
-      });
-    }
+      }
+    });
     
     // For time periods
-    if (timePeriods && timePeriods.length > 0) {
-      timePeriods.forEach(period => {
-        const regex = new RegExp(`\\b${period}\\b`, 'i');
-        if (regex.test(text.toLowerCase())) {
-          if (!entities.timePeriods.includes(period)) {
-            entities.timePeriods.push(period);
-          }
+    timePeriods.forEach(period => {
+      const regex = new RegExp(`\\b${period}\\b`, 'i');
+      if (regex.test(lowerText)) {
+        if (!entities.timePeriods.includes(period)) {
+          entities.timePeriods.push(period);
         }
-      });
+      }
+    });
+
+    // Additional patterns for specific data queries
+    if (lowerText.includes('import') && !entities.statisticalConcepts.includes('imports')) {
+      entities.statisticalConcepts.push('imports');
+    }
+    
+    if (lowerText.includes('export') && !entities.statisticalConcepts.includes('exports')) {
+      entities.statisticalConcepts.push('exports');
+    }
+    
+    if ((lowerText.includes('produce') || lowerText.includes('production')) && 
+        !entities.statisticalConcepts.includes('production')) {
+      entities.statisticalConcepts.push('production');
+    }
+    
+    if ((lowerText.includes('consume') || lowerText.includes('consumption')) && 
+        !entities.statisticalConcepts.includes('consumption')) {
+      entities.statisticalConcepts.push('consumption');
     }
 
+    // console.log("Extracted entities:", entities);
     return entities;
   } catch (error) {
     console.warn("Error in extractEntities:", error);
@@ -155,7 +201,7 @@ export const extractEnergyEntities = (text, language = "en") => {
 
   try {
     const energyUnits = getEnergyUnits(language);
-    const countryCodes = getCountryCodes(language);
+    const countryCodesList = getCountryCodes(language);
     const timePeriods = getTimePeriods(language);
     
     const entities = {
@@ -177,8 +223,8 @@ export const extractEnergyEntities = (text, language = "en") => {
     }
     
     // Direct pattern matching for countries
-    if (countryCodes && countryCodes.length > 0) {
-      countryCodes.forEach(country => {
+    if (countryCodesList && countryCodesList.length > 0) {
+      countryCodesList.forEach(country => {
         const regex = new RegExp(`\\b${country}\\b`, 'i');
         if (regex.test(text.toLowerCase())) {
           if (!entities.countries.includes(country)) {
@@ -187,6 +233,23 @@ export const extractEnergyEntities = (text, language = "en") => {
         }
       });
     }
+    
+    // Also check countries from the countryCodes mapping
+    Object.entries(countryCodes).forEach(([code, names]) => {
+      if (Array.isArray(names)) {
+        names.forEach(name => {
+          if (name.length < 2) return;
+          
+          const regex = new RegExp(`\\b${name}\\b`, 'i');
+          if (regex.test(text)) {
+            const countryName = names[0];
+            if (!entities.countries.includes(countryName)) {
+              entities.countries.push(countryName);
+            }
+          }
+        });
+      }
+    });
     
     // Direct pattern matching for time periods
     if (timePeriods && timePeriods.length > 0) {
@@ -301,12 +364,12 @@ export const extractCountries = (text, language = "en") => {
   if (!text) return [];
 
   try {
-    const countryCodes = getCountryCodes(language);
+    const countryCodesList = getCountryCodes(language);
     const foundCountries = [];
     
-    // Direct pattern matching for countries
-    if (countryCodes && countryCodes.length > 0) {
-      countryCodes.forEach(country => {
+    // Direct pattern matching for countries from the codes list
+    if (countryCodesList && countryCodesList.length > 0) {
+      countryCodesList.forEach(country => {
         const regex = new RegExp(`\\b${country}\\b`, 'i');
         if (regex.test(text.toLowerCase())) {
           if (!foundCountries.includes(country)) {
@@ -315,6 +378,23 @@ export const extractCountries = (text, language = "en") => {
         }
       });
     }
+    
+    // Check countries from the countryCodes mapping
+    Object.entries(countryCodes).forEach(([code, names]) => {
+      if (Array.isArray(names)) {
+        names.forEach(name => {
+          if (name.length < 2) return;
+          
+          const regex = new RegExp(`\\b${name}\\b`, 'i');
+          if (regex.test(text)) {
+            const countryName = names[0];
+            if (!foundCountries.includes(countryName)) {
+              foundCountries.push(countryName);
+            }
+          }
+        });
+      }
+    });
     
     return foundCountries;
   } catch (error) {

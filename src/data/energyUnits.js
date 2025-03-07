@@ -458,7 +458,94 @@ export const getEnergyUnits = (language = "en") => {
   return energyUnitsDictionary[language] || energyUnitsDictionary.en;
 };
 
+export const energyUnits = {
+    // Nuclear fuel units
+    TSWU: {
+        en: {
+            name: "Tonnes of separative work units",
+            shortName: "tSWU",
+            description: "Measure of the effort required for uranium enrichment",
+            conversionFactor: 1
+        },
+        fr: {
+            name: "Tonnes d'unités de travail de séparation",
+            shortName: "tUTS",
+            description: "Mesure de l'effort requis pour l'enrichissement de l'uranium",
+            conversionFactor: 1
+        },
+        de: {
+            name: "Tonnen Trennarbeit",
+            shortName: "tTA",
+            description: "Maß für den Aufwand bei der Urananreicherung",
+            conversionFactor: 1
+        }
+    },
+    THM: {
+        en: {
+            name: "Tonnes of heavy metal",
+            shortName: "tHM",
+            description: "Mass of uranium or other fissile material in nuclear fuel",
+            conversionFactor: 1
+        },
+        fr: {
+            name: "Tonnes de métal lourd",
+            shortName: "tML",
+            description: "Masse d'uranium ou autre matière fissile dans le combustible nucléaire",
+            conversionFactor: 1
+        },
+        de: {
+            name: "Tonnen Schwermetall",
+            shortName: "tSM",
+            description: "Masse an Uran oder anderen spaltbaren Materialien im Kernbrennstoff",
+            conversionFactor: 1
+        }
+    },
+    GWD_THM: {
+        en: {
+            name: "Gigawatt days per tonne of heavy metal",
+            shortName: "GWd/tHM",
+            description: "Measure of nuclear fuel burnup or energy extraction",
+            conversionFactor: 1
+        },
+        fr: {
+            name: "Gigawatt-jours par tonne de métal lourd",
+            shortName: "GWj/tML",
+            description: "Mesure du taux de combustion ou de l'extraction d'énergie du combustible nucléaire",
+            conversionFactor: 1
+        },
+        de: {
+            name: "Gigawatt-Tage pro Tonne Schwermetall",
+            shortName: "GWd/tSM",
+            description: "Maß für den Kernbrennstoffabbrand oder die Energiegewinnung",
+            conversionFactor: 1
+        }
+    },
+
+    // Solid fossil fuels trade units
+    THS_T: {
+        en: {
+            name: "Thousand tonnes",
+            shortName: "kt",
+            description: "Mass unit for solid fossil fuels trade",
+            conversionFactor: 1
+        },
+        fr: {
+            name: "Milliers de tonnes",
+            shortName: "kt",
+            description: "Unité de masse pour le commerce des combustibles fossiles solides",
+            conversionFactor: 1
+        },
+        de: {
+            name: "Tausend Tonnen",
+            shortName: "kt",
+            description: "Masseneinheit für den Handel mit festen fossilen Brennstoffen",
+            conversionFactor: 1
+        }
+    }
+};
+
 export default {
   energyUnitsDictionary,
-  getEnergyUnits
+  getEnergyUnits,
+  energyUnits
 };

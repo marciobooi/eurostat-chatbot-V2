@@ -140,7 +140,53 @@
     "productionConsumptionDesc": "Comparaison des tendances de production et de consommation de {{topic}}",
     "more_to_discover": "Il y a plus à découvrir sur {{topic}}. Je peux vous montrer quelques visualisations. Que souhaitez-vous voir ?",
     "more_options_available": "Souhaitez-vous voir une autre visualisation sur {{topic}} ? J'en ai encore {{count}} à vous montrer :",
-    "suggest_next_topic": "Voulez-vous en savoir plus sur {{nextTopic}} ? Vous pouvez dire 'oui' pour explorer ce sujet."
+    "suggest_next_topic": "Voulez-vous en savoir plus sur {{nextTopic}} ? Vous pouvez dire 'oui' pour explorer ce sujet.",
+    "chart_types": {
+      "pie": "Graphique de distribution",
+      "line": "Graphique chronologique",
+      "bar": "Graphique de comparaison",
+      "area": "Graphique de tendance"
+    },
+    "legends": {
+      "title": "Légende",
+      "year": "Année",
+      "value": "Valeur",
+      "total": "Total",
+      "unit": "Unité"
+    },
+    "tooltips": {
+      "click_to_show": "Cliquez pour afficher la visualisation {{type}}",
+      "hover_info": "Survolez pour plus de détails"
+    },
+    "axis": {
+      "year": "Année",
+      "value": "Valeur",
+      "percentage": "Pourcentage (%)",
+      "quantity": "Quantité"
+    },
+    "accessibility": {
+      "chart_desc": "Graphique interactif montrant les données {{type}}",
+      "legend_desc": "Légende du graphique montrant les catégories de données",
+      "data_table": "Version tableau des données du graphique"
+    },
+    "loading": {
+      "fetching": "Récupération des données...",
+      "preparing": "Préparation de la visualisation...",
+      "error": "Erreur lors du chargement de la visualisation"
+    }
+  },
+  "chart_messages": {
+    "no_data": "Aucune donnée disponible pour cette période",
+    "loading": "Chargement des données du graphique...",
+    "error": "Erreur lors du chargement du graphique",
+    "retry": "Réessayer le chargement"
+  },
+  "units": {
+    "gwh": "Gigawattheures",
+    "ktoe": "Milliers de tonnes d'équivalent pétrole",
+    "tj": "Térajoules",
+    "mio_m3": "Millions de mètres cubes",
+    "kt": "Milliers de tonnes"
   },
   "empathyPrefix": "Je comprends votre préoccupation.",
   "reassurancePrefix": "Permettez-moi de vous aider à mieux comprendre.",

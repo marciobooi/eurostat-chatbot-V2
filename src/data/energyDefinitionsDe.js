@@ -277,6 +277,108 @@ export const energyDefinitionsDe = {
     keywords: ["monatsdaten", "energieberichterstattung", "statistische erfassung"],
     synonyms: ["monatsberichterstattung", "energiedaten"],
     related: ["energiestatistik", "datenberichterstattung", "statistische standards"]
+  },
+
+  "renewable energy": {
+    title: "Erneuerbare Energie",
+    text: "Energie aus erneuerbaren Quellen wie Wind, Solar, Wasserkraft, Biomasse und Geothermie.",
+    dataset: "nrg_ind_ren",
+    siec: "TOTAL",
+    unit: "PC",
+    hasVisualization: true,
+    visualizationType: ["line", "pie", "bar"],
+    relatedTopics: ["electricity", "energy efficiency", "natural gas"],
+    balanceCodes: {
+      total: "REN",
+      transport: "REN_TRA",
+      electricity: "REN_ELC",
+      heating: "REN_HEAT_CL"
+    },
+    keywords: ["erneuerbar", "wind", "solar", "wasserkraft", "biomasse", "geothermie", "nachhaltig", "saubere energie"]
+  },
+
+  "energy efficiency": {
+    title: "Energieeffizienz",
+    text: "Indikatoren zur Messung der Energieverbrauchseffizienz und der Fortschritte bei den Effizienzzielen.",
+    dataset: "nrg_ind_eff",
+    unit: "MTOE",
+    hasVisualization: true,
+    visualizationType: ["line", "bar"],
+    relatedTopics: ["renewable energy", "electricity", "energy consumption"],
+    balanceCodes: {
+      primaryConsumption: "PEC_EED",
+      finalConsumption: "FEC_EED",
+      target2030: "PEC2020-2030"
+    },
+    keywords: ["effizienz", "verbrauch", "energieeinsparung", "optimierung", "energieleistung"]
+  },
+
+  "electricity production": {
+    title: "Stromerzeugung",
+    text: "Statistiken zur Stromerzeugung nach verschiedenen Anlagentypen und Energiequellen.",
+    dataset: "nrg_ind_peh",
+    unit: "GWH",
+    hasVisualization: true,
+    visualizationType: ["line", "pie", "bar"],
+    relatedTopics: ["renewable energy", "energy efficiency", "electricity consumption"],
+    balanceCodes: {
+      grossProduction: "GEP",
+      netProduction: "NEP"
+    },
+    keywords: ["erzeugung", "kraftwerk", "elektrizität", "stromerzeugung", "energieproduktion"]
+  },
+
+  "solid fossil fuels": {
+    title: "Feste Fossile Brennstoffe",
+    description: "Feste fossile Brennstoffe umfassen Steinkohle, Braunkohle und deren Derivate wie Koks und Briketts. Diese Brennstoffe werden häufig in der Stromerzeugung, in industriellen Prozessen und zur Wärmeerzeugung eingesetzt. Die Daten umfassen Produktionsmethoden (Unter- und Übertagebau), Handelsströme und Verbrauchsmuster in verschiedenen Sektoren.",
+    key_concepts: [
+        "Unter- und Übertagebautechnologien",
+        "Kohlequalitäten und -spezifikationen",
+        "Handelsmuster und Partnerländer",
+        "Sektorale Verbrauchsaufteilung",
+        "Umweltauswirkungen und Effizienzmaßnahmen"
+    ],
+    dataset: "nrg_cb_sff",
+    additionalDatasets: ["nrg_ti_sff"],
+    visualization: true
+  },
+
+  "nuclear fuel": {
+    title: "Kernbrennstoff",
+    description: "Kernbrennstoff bezeichnet die in Kernkraftwerken zur Stromerzeugung durch Kernspaltung verwendeten Materialien. Dies umfasst verschiedene Stufen des Brennstoffkreislaufs von der Urananreicherung bis zur Entsorgung abgebrannter Brennelemente. Die Daten umfassen Produktion, Kapazität und Management von Kernbrennstoffen einschließlich Frischbrennstoff, MOX-Brennstoff und Kernwärmeerzeugung.",
+    key_concepts: [
+        "Urananreicherungsprozess",
+        "Brennstoffherstellung und -typen",
+        "Kernbrennstoffentsorgung",
+        "Produktionskapazitätsmetriken",
+        "Sicherheits- und Regulierungsaspekte"
+    ],
+    dataset: "nrg_inf_nuc",
+    visualization: true,
+    related_topics: [
+        "nukleare Infrastruktur",
+        "Stromerzeugung",
+        "Energiekapazität"
+    ]
+  },
+
+  "nuclear infrastructure": {
+    title: "Nukleare Infrastruktur",
+    description: "Die nukleare Infrastruktur umfasst die für die Kernenergieerzeugung erforderlichen Anlagen und Systeme, einschließlich Anreicherungsanlagen, Brennstoffherstellungsanlagen und Kraftwerke. Die Daten umfassen Produktionskapazitäten, betriebliche Kennzahlen und Brennstoffmanagementanlagen entlang des Kernbrennstoffkreislaufs.",
+    key_concepts: [
+        "Anreicherungskapazität",
+        "Brennstoffherstellungsanlagen",
+        "Kraftwerksspezifikationen",
+        "Betriebliche Leistung",
+        "Infrastrukturwartung"
+    ],
+    dataset: "nrg_inf_nuc",
+    visualization: true,
+    related_topics: [
+        "Kernbrennstoff",
+        "Stromerzeugung",
+        "Energiekapazität"
+    ]
   }
 };
 
