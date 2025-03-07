@@ -1,215 +1,45 @@
 {
-  "input_placeholder": "Type your message...",
-  "thinking": "Analyzing your question...",
-  "typing": "Bot is typing...",
-  "show_more": "Show {{count}} more messages",
-  "scroll_to_bottom": "Scroll to bottom of conversation",
-  "clear_chat": "Clear chat history",
-  "send_message": "Send message",
-  "suggestions_title": "You might also be interested in:",
-  "bot_message": "Bot message:",
-  "user_message": "Your message:",
-  "loading": "Loading conversation...",
-  "welcome": "Welcome! How can I help you today?",
-  "chat_cleared": "Chat history has been cleared",
-  "aria_chat_container": "Chat conversation container",
-  "aria_message_list": "Message history",
-  "aria_suggestions": "Suggested topics",
-  "bot_unknown": "I don't have specific information about that, but I can help you with energy-related questions.",
-  "followUp": "Following up on {topic}...",
-  "followUpPhrases": [
-    "what about",
-    "how about",
-    "and",
-    "also",
-    "what else",
-    "tell me more"
-  ],
-  "empathyPrefix": "I understand your concern.",
-  "reassurancePrefix": "Let me help you understand this better.",
-  "gratitudeSuffix": "I'm glad I could help!",
-  "followUpSuggestion": "By the way, would you like to learn more about {topic}?",
-  "translation": {
-    "chatbot": {
-      "title": "Energy Statistics Assistant",
-      "continue": "Continue with {{topic}}",
-      "startNew": "Start a new topic",
-      "newTopic": "a new topic",
-      "inputPlaceholder": "Ask something about energy statistics...",
-      "send": "Send"
-    },
-    "responses": {
-      "thinking": "Thinking...",
-      "unknown": "I don't have information on that topic yet.",
-      "error_processing": "Sorry, I couldn't process that request."
-    },
-    "suggested_topics": "Suggested topics",
-    "click_to_learn_about": "Click to learn about {{topic}}",
-    "continue_topic": "Continue with {{topic}}",
-    "start_new": "Start a new topic",
-    "clear_chat": "Clear chat",
-    "send": "Send",
-    "thinking": "Thinking...",
-    "ask_question": "Ask something about energy statistics...",
-    "error_processing": "Sorry, I couldn't process that request."
-  },
-  "app": {
-    "title": "Eurostat Energy Chatbot",
-    "description": "Ask questions about energy statistics in Europe"
-  },
-  "chatbot": {
-    "thinking": "Thinking...",
+  "common": {
     "send": "Send",
     "clear_chat": "Clear chat",
-    "start_listening": "Start voice input",
-    "stop_listening": "Stop listening",
-    "speech_not_supported": "Voice input not supported in this browser",
-    "scroll_to_bottom": "Scroll to bottom",
+    "loading": "Loading...",
+    "error": "Error",
+    "close": "Close",
+    "search": "Search"
+  },
+  "chat": {
+    "placeholder": "Type your message here...",
+    "thinking": "Thinking...",
+    "typing": "Typing...",
     "ask_question": "Ask something about energy statistics...",
-    "suggested_topics": "Suggested topics",
-    "click_to_learn_about": "Click to learn about {{topic}}",
-    "continue_topic": "Continue with {{topic}}",
-    "start_new": "Start a new topic"
+    "clear_confirm": "Are you sure you want to clear the chat?",
+    "no_messages": "No messages yet"
   },
-  "responses": {
-    "topic_hint": "Are you asking about \"{{topic}}\"?",
-    "default_welcome": "Welcome! How can I help you with energy statistics?",
-    "default_farewell": "Goodbye! Feel free to return if you have more questions.",
-    "default_gratitude": "You're welcome! Happy to help.",
-    "default_prompt": "Is there something specific about energy statistics you'd like to know?",
-    "default_error": "I'm sorry, something went wrong. Could you try again?",
-    "default_thinking": "Let me think about that...",
-    "default_unknown": "I'm not sure I understand. Could you rephrase that?",
-    "default_empathy": "I understand that's important.",
-    "default_reassurance": "I hope this helps.",
-    "topic_description": "{{text}} I can provide more details about {{topic}} if you're interested.",
-    "show_visualizations": "\n\nI can show you some visualizations about {{topic}}. What would you like to see?"
+  "accessibility": {
+    "bot_message": "Bot message",
+    "user_message": "Your message",
+    "send_button": "Send message",
+    "clear_button": "Clear chat history",
+    "scroll_button": "Scroll to bottom",
+    "input_field": "Message input field",
+    "thinking_indicator": "Bot is thinking",
+    "typing_indicator": "Bot is typing"
   },
-  "topics": {
-    "oil": "Oil",
-    "gas": "Natural Gas",
-    "renewable": "Renewable Energy",
-    "consumption": "Energy Consumption",
-    "production": "Energy Production"
+  "suggestions": {
+    "title": "Suggested topics",
+    "related_topics": "Related topics",
+    "click_to_learn": "Click to learn about {{topic}}",
+    "no_suggestions": "No suggestions available"
   },
   "visualization": {
-    "show_options": "I can show you some visualizations about {{topic}}. What would you like to see?",
-    "available_visualizations": "Available visualizations",
-    "viz_button_label": "Show {{type}} visualization",
-    "remaining_visualizations": "More visualizations available",
-    "all_shown": "That's all the visualizations for {{topic}}. Would you like to learn about {{nextTopic}}?",
-    "pie_chart": "Pie Chart",
-    "line_chart": "Timeline",
-    "bar_chart": "Bar Chart",
-    "area_chart": "Area Chart",
-    "top_consumers": "Top Consumers",
-    "consumption_trends": "Consumption Trends",
-    "import_dependency": "Import Dependency",
-    "renewable_mix": "Renewable Energy Mix",
-    "growth_trends": "Growth Trends",
-    "country_comparison": "Country Comparison",
-    "more_to_discover": "There's more to discover about {{topic}} if you're curious. I can show you some visualizations about {{topic}}. What would you like to see?",
-    "more_options_available": "Would you like to see another visualization about {{topic}}? I have {{count}} more to show you:",
-    "suggest_next_topic": "Would you like to learn about {{nextTopic}}? You can say 'yes' to explore this topic.",
-    "topConsumersChart": "Top {{topic}} Consumers in Europe",
-    "consumptionDistributionDesc": "Distribution of {{topic}} consumption across European countries",
-    "consumptionTimelineChart": "{{topic}} Consumption Timeline",
-    "historicalTrendsDesc": "Historical trends of {{topic}} consumption over time",
-    "byCountryChart": "{{topic}} by Country",
-    "countryStatisticsDesc": "Comparison of {{topic}} statistics across countries",
-    "productionConsumptionChart": "{{topic}} Production and Consumption",
-    "productionConsumptionDesc": "Comparison of {{topic}} production and consumption trends",
-    "pie": {
-      "tooltip": {
-        "value": "{{name}}: {{value}}%"
-      },
-      "aria": {
-        "description": "Pie chart visualization",
-        "data": "Interactive pie chart showing data distribution"
-      }
-    },
-    "line": {
-      "label": "Trend Line",
-      "legendTitle": "Historical Data",
-      "legendSubtitle": "Annual values over time",
-      "tooltip": {
-        "value": "{{year}}: {{value}}"
-      },
-      "aria": {
-        "description": "Line chart showing trend over time",
-        "data": "Interactive line chart showing historical data"
-      }
-    },
-    "bar": {
-      "legendTitle": "Country Comparison",
-      "legendSubtitle": "Values by country",
-      "tooltip": {
-        "value": "{{country}}: {{value}}"
-      },
-      "aria": {
-        "description": "Bar chart comparing countries",
-        "data": "Interactive bar chart showing country comparisons"
-      }
-    },
-    "area": {
-      "label": "Stacked Area",
-      "legendTitle": "Supply Sources",
-      "legendSubtitle": "Pipeline vs LNG over time",
-      "tooltip": {
-        "value": "{{year}}: Pipeline {{pipeline}}, LNG {{lng}}"
-      },
-      "aria": {
-        "description": "Area chart showing supply sources over time",
-        "data": "Interactive area chart showing pipeline and LNG supply"
-      }
-    },
-    "chart_types": {
-      "pie": "Distribution Chart",
-      "line": "Timeline Chart", 
-      "bar": "Comparison Chart",
-      "area": "Trend Chart"
-    },
-    "legends": {
-      "title": "Legend",
-      "year": "Year",
-      "value": "Value",
-      "total": "Total",
-      "unit": "Unit"
-    },
-    "tooltips": {
-      "click_to_show": "Click to show {{type}} visualization",
-      "hover_info": "Hover for more details"
-    },
-    "axis": {
-      "year": "Year",
-      "value": "Value",
-      "percentage": "Percentage (%)",
-      "quantity": "Quantity"
-    },
-    "accessibility": {
-      "chart_desc": "Interactive chart showing {{type}} data",
-      "legend_desc": "Chart legend showing data categories",
-      "data_table": "Data table version of chart"
-    },
-    "loading": {
-      "fetching": "Fetching data...",
-      "preparing": "Preparing visualization...",
-      "error": "Error loading visualization"
-    },
-    "source": "Source",
-    "eurostat": "Eurostat"
-  },
-  "chart_messages": {
-    "no_data": "No data available for this period",
-    "loading": "Loading chart data...",
+    "show_chart": "Show {{type}} chart",
+    "view_as": "View as {{type}} chart",
+    "loading": "Loading chart...",
     "error": "Error loading chart",
-    "retry": "Retry loading"
-  },
-  "units": {
-    "gwh": "Gigawatt hours",
-    "ktoe": "Thousand tonnes of oil equivalent",
-    "tj": "Terajoules",
-    "mio_m3": "Million cubic meters",
-    "kt": "Thousand tonnes"
+    "title": "Data Visualization",
+    "description": "Visual representation of {{dataset}} data",
+    "back": "Back to chat",
+    "export": "Export data",
+    "fullscreen": "View fullscreen"
   }
 }

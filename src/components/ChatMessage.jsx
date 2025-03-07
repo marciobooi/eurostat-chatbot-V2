@@ -1,56 +1,43 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faRobot, faSmile, faMeh, faFrown } from '@fortawesome/free-solid-svg-icons';
-import ReactMarkdown from 'react-markdown';
+import { faUser, faRobot } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import { getCurrentLanguage } from '../i18n';
-import { LanguageValidator } from '../utils/languageUtils';
-import './ChatBot.css';
 
 const ChatMessage = ({ message, onSuggestionClick }) => {
   const { t } = useTranslation();
   const currentLang = getCurrentLanguage();
-  const validLang = LanguageValidator.validate(currentLang);
 
   const isBot = message.sender === 'bot';
   const icon = isBot ? faRobot : faUser;
   const messageClass = isBot ? 'bot-message' : 'user-message';
   const wrapperClass = isBot ? 'bot-wrapper' : 'user-wrapper';
 
-  const handleSuggestionClick = (suggestion) => {
-    if (onSuggestionClick) {
-      onSuggestionClick(suggestion);
-    }
-  };
+  const renderRelatedTopics = () => {
+    if (!message.suggestions?.length) return null;
 
-  const renderMoodIndicator = (contextInfo) => {
-    if (!contextInfo?.emotionalState) return null;
-    
-    const { isPositive, isNegative } = contextInfo.emotionalState;
-    const icon = isPositive ? faSmile : (isNegative ? faFrown : faMeh);
-    
     return (
-      <div className="mood-indicator" aria-hidden="true">
-        <FontAwesomeIcon icon={icon} className="mood-icon" />
-      </div>
-    );
-  };
-
-  const renderContextualSuggestions = (contextInfo) => {
-    if (!contextInfo?.shouldFollowUp) return null;
-    
-    return (
-      <div className="contextual-suggestions">
-        {contextInfo.recentTopics.map((topic, index) => (
-          <button
-            key={index}
-            onClick={() => handleSuggestionClick(topic)}
-            className="context-suggestion-link"
-            lang={message.language}
-          >
-            {topic}
-          </button>
-        ))}
+      <div 
+        className="related-topics"
+        role="group"
+        aria-label={t('suggestions.related_topics')}
+      >
+        <p className="related-topics-label">
+          {t('suggestions.related_topics')}:
+        </p>
+        <div className="suggestions-list">
+          {message.suggestions.map((topic, index) => (
+            <button
+              key={index}
+              onClick={() => onSuggestionClick(topic)}
+              className="suggestion-chip"
+              role="button"
+              aria-label={t('suggestions.click_to_learn', { topic })}
+            >
+              {topic}
+            </button>
+          ))}
+        </div>
       </div>
     );
   };
@@ -66,75 +53,17 @@ const ChatMessage = ({ message, onSuggestionClick }) => {
       </div>
       <div 
         className={messageClass}
-        lang={message.language || validLang}
+        lang={message.language}
+        role="article"
+        aria-label={t(isBot ? 'accessibility.bot_message' : 'accessibility.user_message')}
       >
-        <ReactMarkdown
-          components={{
-            a: ({node, ...props}) => (
-              <a 
-                {...props} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                onClick={(e) => {
-                  if (props.href?.startsWith('#')) {
-                    e.preventDefault();
-                    handleSuggestionClick(props.href.slice(1));
-                  }
-                }}
-              />
-            )
-          }}
-        >
-          {message.text}
-        </ReactMarkdown>
-        
-        {isBot && message.suggestions?.length > 0 && (
-          <div 
-            className="message-suggestions"
-            role="group"
-            aria-label={t('related_topics')}
-          >
-            {message.suggestions.map((suggestion, index) => (
-              <button
-                key={index}
-                onClick={() => handleSuggestionClick(suggestion)}
-                className="suggestion-link"
-                role="button"
-                aria-label={t('click_to_learn_about', { topic: suggestion })}
-              >
-                {suggestion}
-              </button>
-            ))}
-          </div>
+        {isBot && message.title && (
+          <h3 className="message-title">{message.title}</h3>
         )}
-        
-        {isBot && message.category === 'unknown' && message.contextInfo?.recentTopics?.length > 0 && (
-          <div 
-            className="recent-topics"
-            role="group"
-            aria-label={t('recent_topics')}
-          >
-            <p className="recent-topics-label">
-              {t('recent_topics_label')}:
-            </p>
-            <div className="recent-topics-list">
-              {message.contextInfo.recentTopics.map((topic, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSuggestionClick(topic)}
-                  className="suggestion-link"
-                  role="button"
-                  aria-label={t('click_to_learn_about', { topic })}
-                >
-                  {topic}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        
-        {isBot && message.contextInfo && renderMoodIndicator(message.contextInfo)}
-        {isBot && message.contextInfo && renderContextualSuggestions(message.contextInfo)}
+        <div className="message-text">
+          {isBot && message.text ? message.text : message.text}
+        </div>
+        {isBot && renderRelatedTopics()}
       </div>
     </div>
   );

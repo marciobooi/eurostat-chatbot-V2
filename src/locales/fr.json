@@ -1,195 +1,45 @@
 {
-  "sendButton": "Envoyer",
-  "input_placeholder": "Tapez votre message...",
-  "thinking": "J'analyse votre question...",
-  "typing": "Le bot écrit...",
-  "show_more": "Afficher {{count}} messages supplémentaires",
-  "scroll_to_bottom": "Défiler jusqu'au bas de la conversation",
-  "clear_chat": "Effacer l'historique",
-  "send_message": "Envoyer le message",
-  "suggestions_title": "Cela pourrait aussi vous intéresser :",
-  "bot_message": "Message du bot :",
-  "user_message": "Votre message :",
-  "loading": "Chargement de la conversation...",
-  "welcome": "Bienvenue ! Comment puis-je vous aider ?",
-  "chat_cleared": "L'historique a été effacé",
-  "aria_chat_container": "Conteneur de conversation",
-  "aria_message_list": "Historique des messages",
-  "aria_suggestions": "Sujets suggérés",
-  "bot_unknown": "Je n'ai pas d'informations spécifiques à ce sujet, mais je peux vous aider avec des questions liées à l'énergie.",
-  "followUp": "Pour faire suite à {topic}...",
-  "followUpPhrases": [
-    "et",
-    "aussi",
-    "quoi d'autre",
-    "dis m'en plus",
-    "qu'en est-il",
-    "et concernant"
-  ],
-  "translation": {
-    "input_placeholder": "Tapez votre message...",
-    "thinking": "Le bot réfléchit...",
-    "typing": "Le bot écrit...",
-    "show_more": "Afficher {{count}} messages supplémentaires",
-    "scroll_to_bottom": "Défiler jusqu'au bas de la conversation",
-    "clear_chat": "Effacer l'historique",
-    "send_message": "Envoyer le message",
-    "suggestions_title": "Cela pourrait aussi vous intéresser :",
-    "bot_message": "Message du bot :",
-    "user_message": "Votre message :",
-    "loading": "Chargement de la conversation...",
-    "welcome": "Bienvenue ! Comment puis-je vous aider ?",
-    "chat_cleared": "L'historique a été effacé",
-    "aria_chat_container": "Conteneur de conversation",
-    "aria_message_list": "Historique des messages",
-    "aria_suggestions": "Sujets suggérés",
-    "chatbot": {
-      "title": "Assistant de statistiques énergétiques",
-      "continue": "Continuer avec {{topic}}",
-      "startNew": "Commencer un nouveau sujet",
-      "newTopic": "un nouveau sujet",
-      "inputPlaceholder": "Posez une question sur les statistiques énergétiques...",
-      "send": "Envoyer"
-    },
-    "responses": {
-      "thinking": "En réflexion...",
-      "unknown": "Je n'ai pas encore d'informations sur ce sujet.",
-      "error_processing": "Désolé, je n'ai pas pu traiter cette demande.",
-      "topic_description": "{{text}} Je peux vous donner plus de détails sur {{topic}} si vous êtes intéressé.",
-      "show_visualizations": "\n\nJe peux vous montrer quelques visualisations sur {{topic}}. Que souhaitez-vous voir ?"
-    },
-    "suggested_topics": "Sujets suggérés",
-    "click_to_learn_about": "Cliquez pour en savoir plus sur {{topic}}",
-    "continue_topic": "Continuer avec {{topic}}",
-    "start_new": "Commencer un nouveau sujet",
-    "clear_chat": "Effacer la conversation",
+  "common": {
     "send": "Envoyer",
-    "thinking": "En réflexion...",
+    "clear_chat": "Effacer la conversation",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "close": "Fermer",
+    "search": "Rechercher"
+  },
+  "chat": {
+    "placeholder": "Tapez votre message ici...",
+    "thinking": "Réflexion...",
+    "typing": "En train d'écrire...",
     "ask_question": "Posez une question sur les statistiques énergétiques...",
-    "error_processing": "Désolé, je n'ai pas pu traiter cette demande."
+    "clear_confirm": "Voulez-vous vraiment effacer la conversation ?",
+    "no_messages": "Pas encore de messages"
+  },
+  "accessibility": {
+    "bot_message": "Message du bot",
+    "user_message": "Votre message",
+    "send_button": "Envoyer le message",
+    "clear_button": "Effacer l'historique",
+    "scroll_button": "Défiler vers le bas",
+    "input_field": "Champ de saisie du message",
+    "thinking_indicator": "Le bot réfléchit",
+    "typing_indicator": "Le bot écrit"
+  },
+  "suggestions": {
+    "title": "Sujets suggérés",
+    "related_topics": "Sujets connexes",
+    "click_to_learn": "Cliquez pour en savoir plus sur {{topic}}",
+    "no_suggestions": "Aucune suggestion disponible"
   },
   "visualization": {
-    "show_options": "Je peux vous montrer quelques visualisations sur {{topic}}. Que souhaitez-vous voir ?",
-    "available_visualizations": "Visualisations disponibles",
-    "viz_button_label": "Afficher la visualisation {{type}}",
-    "remaining_visualizations": "Plus de visualisations disponibles",
-    "all_shown": "C'est tout pour les visualisations de {{topic}}. Voulez-vous en savoir plus sur {{nextTopic}} ?",
-    "pie_chart": "Graphique circulaire",
-    "line_chart": "Chronologie",
-    "bar_chart": "Graphique à barres",
-    "area_chart": "Graphique de zone",
-    "top_consumers": "Principaux consommateurs",
-    "consumption_trends": "Tendances de consommation",
-    "import_dependency": "Dépendance aux importations",
-    "renewable_mix": "Mix d'énergies renouvelables",
-    "growth_trends": "Tendances de croissance",
-    "country_comparison": "Comparaison par pays",
-    "pie": {
-      "tooltip": {
-        "value": "{{name}} : {{value}}%"
-      },
-      "aria": {
-        "description": "Visualisation en graphique circulaire",
-        "data": "Graphique circulaire interactif montrant la distribution des données"
-      }
-    },
-    "line": {
-      "label": "Ligne de tendance",
-      "legendTitle": "Données historiques",
-      "legendSubtitle": "Valeurs annuelles dans le temps",
-      "tooltip": {
-        "value": "{{year}} : {{value}}"
-      },
-      "aria": {
-        "description": "Graphique linéaire montrant la tendance dans le temps",
-        "data": "Graphique linéaire interactif montrant les données historiques"
-      }
-    },
-    "bar": {
-      "legendTitle": "Comparaison par pays",
-      "legendSubtitle": "Valeurs par pays",
-      "tooltip": {
-        "value": "{{country}} : {{value}}"
-      },
-      "aria": {
-        "description": "Graphique à barres comparant les pays",
-        "data": "Graphique à barres interactif montrant les comparaisons par pays"
-      }
-    },
-    "area": {
-      "label": "Zone empilée",
-      "legendTitle": "Sources d'approvisionnement",
-      "legendSubtitle": "Pipeline vs GNL dans le temps",
-      "tooltip": {
-        "value": "{{year}} : Pipeline {{pipeline}}, GNL {{lng}}"
-      },
-      "aria": {
-        "description": "Graphique en aires montrant les sources d'approvisionnement dans le temps",
-        "data": "Graphique en aires interactif montrant l'approvisionnement en pipeline et GNL"
-      }
-    },
-    "source": "Source",
-    "eurostat": "Eurostat",
-    "topConsumersChart": "Principaux consommateurs de {{topic}} en Europe",
-    "consumptionDistributionDesc": "Distribution de la consommation de {{topic}} dans les pays européens",
-    "consumptionTimelineChart": "Évolution de la consommation de {{topic}}",
-    "historicalTrendsDesc": "Tendances historiques de la consommation de {{topic}}",
-    "byCountryChart": "{{topic}} par pays",
-    "countryStatisticsDesc": "Comparaison des statistiques de {{topic}} entre pays",
-    "productionConsumptionChart": "Production et consommation de {{topic}}",
-    "productionConsumptionDesc": "Comparaison des tendances de production et de consommation de {{topic}}",
-    "more_to_discover": "Il y a plus à découvrir sur {{topic}}. Je peux vous montrer quelques visualisations. Que souhaitez-vous voir ?",
-    "more_options_available": "Souhaitez-vous voir une autre visualisation sur {{topic}} ? J'en ai encore {{count}} à vous montrer :",
-    "suggest_next_topic": "Voulez-vous en savoir plus sur {{nextTopic}} ? Vous pouvez dire 'oui' pour explorer ce sujet.",
-    "chart_types": {
-      "pie": "Graphique de distribution",
-      "line": "Graphique chronologique",
-      "bar": "Graphique de comparaison",
-      "area": "Graphique de tendance"
-    },
-    "legends": {
-      "title": "Légende",
-      "year": "Année",
-      "value": "Valeur",
-      "total": "Total",
-      "unit": "Unité"
-    },
-    "tooltips": {
-      "click_to_show": "Cliquez pour afficher la visualisation {{type}}",
-      "hover_info": "Survolez pour plus de détails"
-    },
-    "axis": {
-      "year": "Année",
-      "value": "Valeur",
-      "percentage": "Pourcentage (%)",
-      "quantity": "Quantité"
-    },
-    "accessibility": {
-      "chart_desc": "Graphique interactif montrant les données {{type}}",
-      "legend_desc": "Légende du graphique montrant les catégories de données",
-      "data_table": "Version tableau des données du graphique"
-    },
-    "loading": {
-      "fetching": "Récupération des données...",
-      "preparing": "Préparation de la visualisation...",
-      "error": "Erreur lors du chargement de la visualisation"
-    }
-  },
-  "chart_messages": {
-    "no_data": "Aucune donnée disponible pour cette période",
-    "loading": "Chargement des données du graphique...",
-    "error": "Erreur lors du chargement du graphique",
-    "retry": "Réessayer le chargement"
-  },
-  "units": {
-    "gwh": "Gigawattheures",
-    "ktoe": "Milliers de tonnes d'équivalent pétrole",
-    "tj": "Térajoules",
-    "mio_m3": "Millions de mètres cubes",
-    "kt": "Milliers de tonnes"
-  },
-  "empathyPrefix": "Je comprends votre préoccupation.",
-  "reassurancePrefix": "Permettez-moi de vous aider à mieux comprendre.",
-  "gratitudeSuffix": "Je suis ravi(e) d'avoir pu vous aider !",
-  "followUpSuggestion": "Au fait, souhaitez-vous en savoir plus sur {topic} ?"
+    "show_chart": "Afficher le graphique {{type}}",
+    "view_as": "Voir en graphique {{type}}",
+    "loading": "Chargement du graphique...",
+    "error": "Erreur de chargement du graphique",
+    "title": "Visualisation des données",
+    "description": "Représentation visuelle des données {{dataset}}",
+    "back": "Retour au chat",
+    "export": "Exporter les données",
+    "fullscreen": "Voir en plein écran"
+  }
 }

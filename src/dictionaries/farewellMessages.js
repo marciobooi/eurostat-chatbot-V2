@@ -1,0 +1,40 @@
+export const farewellMessages = {
+  en: [
+    "Goodbye! Feel free to come back if you have more questions.",
+    "Thanks for chatting! Have a great day.",
+    "See you next time! Feel free to return if you need more information.",
+    "Farewell! Don't hesitate to ask more energy questions later.",
+    "Thank you for using our service. Goodbye!",
+    "Take care! I'm here whenever you need assistance.",
+    "Have a great day! Come back anytime.",
+    "It was a pleasure chatting with you. See you soon!",
+    "Goodbye for now! Let me know if you ever need help.",
+    "Wishing you all the best! See you next time.",
+  ],
+  fr: [
+    "Au revoir ! N'hésitez pas à revenir si vous avez d'autres questions.",
+    "Merci pour cette conversation ! Passez une bonne journée.",
+    "À bientôt ! Revenez quand vous voudrez pour plus d'informations.",
+    "Adieu ! N'hésitez pas à poser plus de questions sur l'énergie plus tard.",
+    "Merci d'avoir utilisé notre service. Au revoir !",
+    "Prenez soin de vous ! Revenez quand vous voulez.",
+    "Passez une excellente journée ! Je suis là si besoin.",
+    "C'était un plaisir de discuter avec vous. À bientôt !",
+    "À bientôt ! Revenez me voir si vous avez d'autres questions.",
+    "Bonne continuation ! À la prochaine fois.",
+  ],
+  de: [
+    "Auf Wiedersehen! Kommen Sie gerne wieder, wenn Sie weitere Fragen haben.",
+    "Danke für das Gespräch! Haben Sie einen schönen Tag.",
+    "Bis zum nächsten Mal! Kommen Sie gerne zurück, wenn Sie weitere Informationen benötigen.",
+    "Auf Wiedersehen! Zögern Sie nicht, später weitere Fragen zur Energie zu stellen.",
+    "Vielen Dank für die Nutzung unseres Dienstes. Auf Wiedersehen!",
+    "Passen Sie auf sich auf! Ich bin hier, wenn Sie mich brauchen.",
+    "Einen schönen Tag noch! Kommen Sie jederzeit wieder.",
+    "Es war mir eine Freude, mit Ihnen zu sprechen. Bis bald!",
+    "Tschüss! Lassen Sie es mich wissen, wenn ich helfen kann.",
+    "Alles Gute für Sie! Bis zum nächsten Mal.",
+  ],
+};
+
+export default farewellMessages;

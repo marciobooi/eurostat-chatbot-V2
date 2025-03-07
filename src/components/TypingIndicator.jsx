@@ -1,21 +1,22 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRobot } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
-import './ChatBot.css';
+import '../styles/ChatBot.css';
 
 const TypingIndicator = () => {
-  const { t, i18n } = useTranslation();
-  
+  const { t } = useTranslation();
+
   return (
     <div 
-      className="typing-wrapper" 
-      aria-label={t('typing')}
-      lang={i18n.language}
+      className="message-wrapper bot-wrapper"
+      role="status"
+      aria-label={t('accessibility.typing_indicator')}
     >
-      <div 
-        className="typing-indicator" 
-        role="status"
-        aria-live="polite"
-      >
+      <div className="message-icon bot-icon">
+        <FontAwesomeIcon icon={faRobot} aria-hidden="true" />
+      </div>
+      <div className="typing-indicator">
         <div className="typing-bubble"></div>
         <div className="typing-bubble"></div>
         <div className="typing-bubble"></div>

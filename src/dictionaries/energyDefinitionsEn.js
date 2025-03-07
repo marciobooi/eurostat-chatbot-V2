@@ -1,0 +1,85 @@
+export const energyDefinitionsEn = {
+"solid fossil fuels": {
+  "title": "Solid Fossil Fuels",
+  "description": "Solid fossil fuels, including hard coal, lignite, and their derivatives like coke and patent fuel, are essential for power generation, industrial processes, and heating applications. These fuels are mined through surface and underground methods, and data covers production, consumption, trade flows, and carbon emissions. The information also includes the thermal efficiency of coal and how it's used across different sectors, as well as the energy balance associated with coal mining regions.",
+  "key_concepts": [
+    "Coal production", 
+    "Coal consumption", 
+    "Hard coal", 
+    "Lignite", 
+    "Coke", 
+    "Patent fuel", 
+    "Coal mining", 
+    "Surface mining", 
+    "Underground mining", 
+    "Energy use in industry", 
+    "Energy use in power generation", 
+    "Energy use in heating",
+    "Trade flows of coal",
+    "Coal exports and imports",
+    "Carbon content of coal", 
+    "Thermal efficiency of coal",
+    "Coal reserves",
+    "Coal supply chains"
+  ],
+  "dataset": "nrg_bal_c",
+  "fuelCode": "C0000X0350-0370",
+  "nrg_bal": "PPRD, IMP, EXP, STK_CHG, GAE, GIC, PEC",
+  "siec": "C0000X0350-0370",
+  "unit": "KTOE",
+  "hasVisualization": true,
+  "visualizationType": ["pie", "bar", "line"],
+  "statisticalConcepts": [
+    "Production of coal", 
+    "Coal consumption by sector", 
+    "Imports and exports of coal", 
+    "Energy efficiency in coal power plants", 
+    "Energy balance in coal mining regions", 
+    "Carbon dioxide emissions from coal",
+    "Coal stocks and changes in coal reserves"
+  ],
+  "link": "https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c?lang=en",
+  "isMainFuel": true,
+  "subFuels": [
+    "Hard coal", 
+    "Brown coal", 
+    "Coal products", 
+    "Coke", 
+    "Patent fuel"
+  ],
+  "keywords": [
+    "coal", 
+    "solid fuels", 
+    "fossil fuels", 
+    "black coal", 
+    "brown coal", 
+    "hard coal", 
+    "lignite", 
+    "mining", 
+    "coal mining", 
+    "coal consumption", 
+    "energy generation", 
+    "coal trade", 
+    "coal export", 
+    "coal import", 
+    "thermal coal", 
+    "coal reserves", 
+    "energy efficiency", 
+    "coal combustion", 
+    "coke", 
+    "coke fuel", 
+    "patent fuel", 
+    "industrial fuel", 
+    "energy sector", 
+    "carbon emissions"
+  ],
+}
+
+
+
+
+
+
+};
+
+export default energyDefinitionsEn;

@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import ChatBot from "./components/ChatBot";
-import { getCurrentLanguage } from "./i18n";
-import { LanguageValidator } from "./utils/languageUtils";
+import { getCurrentLanguage, isValidLanguage } from "./i18n";
 import "./App.css";
 
 function App() {
@@ -11,15 +10,13 @@ function App() {
 
   useEffect(() => {
     const initializeLanguage = async () => {
-      // Language is automatically loaded from cookies via i18n configuration
       const currentLang = getCurrentLanguage();
-      const validLang = LanguageValidator.validate(currentLang);
-
-      // Just validate the language but don't change it explicitly
-      // as i18n already handles this from cookies
+      // Validate the current language
+      if (!isValidLanguage(currentLang)) {
+        console.warn(`Invalid language detected: ${currentLang}, falling back to default`);
+      }
       setLoaded(true);
     };
-
     initializeLanguage();
   }, []);
 
