@@ -36,7 +36,7 @@ const ChatBot = () => {
   };
 
   const onClearChat = () => {
-    handleClearChat(setMessages, t('chat.clear_confirm'));
+    handleClearChat(setMessages, t);
   };
 
   const onSuggestionClick = (topic) => {

@@ -44,5 +44,8 @@
     "back": "Back to chat",
     "export": "Export data",
     "fullscreen": "View fullscreen"
+  },
+  "toast": {
+    "clearChat": "Chat history cleared!"    
   }
 }

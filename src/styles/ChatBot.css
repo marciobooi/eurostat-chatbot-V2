@@ -206,30 +206,14 @@
 }
 
 /* Suggestion Chips */
-.suggestions-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-2);
-  margin: var(--spacing-3);
-  justify-content: space-evenly;
-  align-items: center;
-}
-
-.suggestion-chip {
-  padding: var(--spacing-2) var(--spacing-3);
-  background-color: var(--neutral-200);
-  border-radius: var(--border-radius-md);
-  color: var (--primary-blue);
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-  transition: var(--transition-base);
-  border: 1px solid var(--neutral-300);
-}
-
-.suggestion-chip:hover {
-  background-color: var(--primary-blue-light);
-  color: var(--neutral-100);
-  transform: translateY(-2px);
+.suggestions-container,
+.suggestion-section,
+.suggestion-chip,
+.suggestions-list,
+.related-topics,
+.related-topics-label {
+  /* These styles are no longer needed as we use smart-messages-container instead */
+  display: none;
 }
 
 /* Animations */
@@ -327,16 +311,6 @@
   justify-content: center;
   gap: 0.75rem; /* Add space between buttons */
   border-top: 1px solid rgba(229, 231, 235, 0.2);
-}
-
-.suggestions-list {
-  display: grid;
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(100px, 1fr)
-  ); /* Adjust minmax size as needed */
-  gap: 10px;
-  max-width: 400px; /* Adjust based on your needs */
 }
 
 .clear-button {
@@ -656,43 +630,6 @@ button:focus,
 
 /* Add these styles after your existing chat message styles */
 
-.related-topics {
-  margin-top: var(--spacing-3);
-  padding: var(--spacing-2);
-  background-color: var(--neutral-100);
-  border-radius: var(--radius-md);
-}
-
-.related-topics-label {
-  font-size: var(--font-size-sm);
-  color: var(--neutral-600);
-  margin-bottom: var(--spacing-2);
-}
-
-.suggestions-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-2);
-}
-
-.suggestion-chip {
-  padding: var(--spacing-2) var(--spacing-3);
-  background-color: var(--neutral-200);
-  border: 1px solid var(--neutral-300);
-  border-radius: var(--radius-full);
-  color: var(--primary-blue);
-  font-size: var(--font-size-sm);
-  transition: var(--transition-base);
-  cursor: pointer;
-}
-
-.suggestion-chip:hover,
-.suggestion-chip:focus {
-  background-color: var(--primary-blue-light);
-  color: var(--neutral-100);
-  transform: translateY(-1px);
-}
-
 .message-content {
   display: flex;
   flex-direction: column;
@@ -810,5 +747,9 @@ button:focus,
   background: var(--primary-color);
   color: white;
   transform: translateY(-1px);
+}
+
+.smart-message-btn:active {
+  transform: translateY(0);
 }
 

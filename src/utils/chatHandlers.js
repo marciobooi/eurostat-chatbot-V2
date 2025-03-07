@@ -2,6 +2,9 @@ import { findEnergyDefinition } from './energyHandlers';
 import { createBotResponse } from './botResponseHandlers';
 import toast from 'react-hot-toast';
 
+
+
+
 /**
  * Handles sending a message in the chat
  * @param {string} input - The user's input message
@@ -45,9 +48,9 @@ export const handleSendMessage = (input, language, setMessages, setIsTyping, set
  * @param {Function} confirmMessage - Function to show confirmation dialog
  * @returns {void}
  */
-export const handleClearChat = (setMessages) => {
+export const handleClearChat = (setMessages, t) => {
   setMessages([]);
-  toast.success('Chat history cleared!', {
+  toast.success(t('toast.clearChat'), {
     duration: 2000,
     position: 'top-right',
     style: {
