@@ -2,9 +2,6 @@ import { findEnergyDefinition } from './energyHandlers';
 import { createBotResponse } from './botResponseHandlers';
 import toast from 'react-hot-toast';
 
-
-
-
 /**
  * Handles sending a message in the chat
  * @param {string} input - The user's input message
@@ -72,8 +69,25 @@ export const handleClearChat = (setMessages, t) => {
  * @param {boolean} isTyping - Current typing state
  */
 export const handleSuggestionClick = (topic, language, setMessages, setIsTyping, setInput, messages, isTyping) => {
-  setInput(topic);
-  handleSendMessage(topic, language, setMessages, setIsTyping, setInput, messages, isTyping);
+  const userMessage = { 
+    sender: 'user', 
+    text: topic,
+    language 
+  };
+  
+  setMessages(prev => [...prev, userMessage]);
+  
+  // When clicking a suggestion, use an exact match search to find the specific definition
+  const definition = findEnergyDefinition(topic, language, true); // Pass true for exactMatch
+  
+  if (definition) {
+    setIsTyping(true);
+    setTimeout(() => {
+      const botResponse = createBotResponse(definition, language);
+      setMessages(prev => [...prev, botResponse]);
+      setIsTyping(false);
+    }, 1000);
+  }
 };
 
 /**
