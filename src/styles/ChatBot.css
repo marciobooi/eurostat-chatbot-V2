@@ -824,3 +824,81 @@ button:focus,
   }
 }
 
+/* Message visualization icon buttons - new styles */
+.message-visualization-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--neutral-200);
+  border: 1px solid var(--neutral-300);
+  border-radius: 50%;
+  color: var(--primary-blue);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.message-visualization-icon-button:hover,
+.message-visualization-icon-button:focus {
+  background-color: var(--primary-blue);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+}
+
+.message-visualization-icon-button .viz-icon {
+  font-size: 1.1rem;
+}
+
+/* Update message visualization options container for new icon-only layout */
+.message-visualization-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: visualizationOptionsSlide 0.5s ease forwards;
+  animation-delay: 0.3s;
+}
+
+/* Make sure the existing animation styles still work */
+@keyframes visualizationOptionsSlide {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Accessibility focus styles for the new icon buttons */
+.message-visualization-icon-button:focus {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 2px;
+}
+
+/* Dark mode support for the new icon buttons */
+@media (prefers-color-scheme: dark) {
+  .message-visualization-icon-button {
+    background-color: var(--neutral-800);
+    border-color: var(--neutral-700);
+    color: var(--primary-blue-light);
+  }
+
+  .message-visualization-icon-button:hover,
+  .message-visualization-icon-button:focus {
+    background-color: var(--primary-blue);
+    color: var(--neutral-100);
+  }
+}
+
+/* Better touch targets for mobile */
+@media (max-width: 768px) {
+  .message-visualization-icon-button {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+

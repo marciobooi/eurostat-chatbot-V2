@@ -1,8 +1,10 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faRobot } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faRobot, faChartPie, faChartBar, faChartLine, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
+import { Tooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css';
 
 /**
  * ChatMessage component renders a single message in the chat
@@ -18,6 +20,13 @@ const ChatMessage = ({ message }) => {
   const messageClass = isBot ? 'bot-message' : 'user-message';
   const wrapperClass = isBot ? 'bot-wrapper' : 'user-wrapper';
   const iconClass = isBot ? 'bot-icon' : 'user-icon';
+
+  // Map of visualization types to their corresponding icons
+  const vizIconMap = {
+    'pie': faChartPie,
+    'bar': faChartBar,
+    'line': faChartLine
+  };
 
   return (
     <div className={`message-wrapper ${wrapperClass}`}>
@@ -40,6 +49,55 @@ const ChatMessage = ({ message }) => {
         <div className="message-text">
           {message.text}
         </div>
+
+        {/* Display visualization icons and link icon for bot messages */}
+        {isBot && (message.hasVisualization || message.link) && (
+          <div className="message-visualization-options">
+            {/* Visualization type icons */}
+            {message.hasVisualization && message.visualizationType && 
+              message.visualizationType.map((type, index) => (
+                <React.Fragment key={`viz-${type}-${index}`}>
+                  <button
+                    className="message-visualization-icon-button"
+                    aria-label={t('visualization.show_chart', { type })}
+                    type="button"
+                    data-tooltip-id={`viz-tooltip-${type}-${index}`}
+                    data-tooltip-content={t('tooltips.visualization', { type })}
+                  >
+                    <FontAwesomeIcon
+                      icon={vizIconMap[type] || faChartBar}
+                      className="viz-icon"
+                      aria-hidden="true"
+                    />
+                  </button>
+                  <Tooltip id={`viz-tooltip-${type}-${index}`} place="top" effect="solid" />
+                </React.Fragment>
+              ))
+            }
+            
+            {/* External link icon - always display if link exists in message */}
+            {message.link && (
+              <React.Fragment>
+                <a
+                  href={message.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="message-visualization-icon-button"
+                  aria-label={t('common.view_source')}
+                  data-tooltip-id="external-link-tooltip"
+                  data-tooltip-content={t('tooltips.external_link')}
+                >
+                  <FontAwesomeIcon
+                    icon={faExternalLinkAlt}
+                    className="viz-icon"
+                    aria-hidden="true"
+                  />
+                </a>
+                <Tooltip id="external-link-tooltip" place="top" effect="solid" />
+              </React.Fragment>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -51,6 +109,9 @@ ChatMessage.propTypes = {
     text: PropTypes.string.isRequired,
     title: PropTypes.string,
     language: PropTypes.string,
+    hasVisualization: PropTypes.bool,
+    visualizationType: PropTypes.arrayOf(PropTypes.string),
+    link: PropTypes.string
   }).isRequired,
 };
 

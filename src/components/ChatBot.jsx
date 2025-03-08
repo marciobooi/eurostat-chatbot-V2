@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faTrash, faHistory } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
+import { Tooltip } from 'react-tooltip';
 import ScrollButton from './ScrollButton';
 import ChatMessage from './ChatMessage';
 import TypingIndicator from './TypingIndicator';
@@ -224,10 +225,13 @@ const ChatBot = () => {
               className="show-more-button"
               aria-label={t('accessibility.show_more_button')}
               type="button"
+              data-tooltip-id="show-more-tooltip"
+              data-tooltip-content={t('tooltips.show_more')}
             >
               <FontAwesomeIcon icon={faHistory} aria-hidden="true" /> 
               {t('chat.show_more')}
             </button>
+            <Tooltip id="show-more-tooltip" place="bottom" effect="solid" />
           </div>
         )}
         
@@ -314,9 +318,12 @@ const ChatBot = () => {
           aria-label={t('accessibility.clear_button')}
           title={t('common.clear_chat')}
           type="button"
+          data-tooltip-id="clear-chat-tooltip"
+          data-tooltip-content={t('tooltips.clear_button')}
         >
           <FontAwesomeIcon icon={faTrash} aria-hidden="true" />
         </button>
+        <Tooltip id="clear-chat-tooltip" place="top" effect="solid" />
       </div>
     </div>
   );

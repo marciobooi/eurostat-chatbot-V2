@@ -6,7 +6,9 @@
     "error": "Fehler",
     "close": "Schließen",
     "search": "Suchen",
-    "chat": "Chat"
+    "chat": "Chat",
+    "view_source": "Quelldaten anzeigen",
+    "view_data": "In Eurostat öffnen"
   },
   "chat": {
     "placeholder": "Fragen zu Energiestatistiken stellen...",
@@ -49,5 +51,11 @@
   },
   "toast": {
     "clearChat": "Chat-Verlauf gelöscht!"
+  },
+  "tooltips": {
+    "visualization": "Klicken Sie, um diese Daten als {{type}}-Diagramm zu visualisieren",
+    "external_link": "Diese Daten auf der Eurostat-Website in einem neuen Tab öffnen",
+    "show_more": "Ältere Nachrichten aus Ihrem Chat-Verlauf laden",
+    "clear_button": "Alle Chat-Nachrichten und den Verlauf löschen"
   }
 }

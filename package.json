@@ -36,6 +36,7 @@
     "react-hot-toast": "^2.5.2",
     "react-i18next": "^15.4.1",
     "react-markdown": "^10.0.0",
+    "react-tooltip": "^5.28.0",
     "recharts": "^2.15.1",
     "sentiment": "^5.0.2",
     "string-similarity": "^4.0.4",

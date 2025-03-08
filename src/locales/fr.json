@@ -6,7 +6,9 @@
     "error": "Erreur",
     "close": "Fermer",
     "search": "Rechercher",
-    "chat": "Chat"
+    "chat": "Chat",
+    "view_source": "Voir les données source",
+    "view_data": "Ouvrir dans Eurostat"
   },
   "chat": {
     "placeholder": "Posez une question sur les statistiques de l'énergie...",
@@ -49,5 +51,11 @@
   },
   "toast": {
     "clearChat": "Historique de conversation effacé !"
+  },
+  "tooltips": {
+    "visualization": "Cliquer pour voir la visualisation en graphique {{type}} de ces données",
+    "external_link": "Ouvrir ces données sur le site Eurostat dans un nouvel onglet",
+    "show_more": "Charger les messages plus anciens de votre historique de conversation",
+    "clear_button": "Effacer tous les messages et l'historique de conversation"
   }
 }

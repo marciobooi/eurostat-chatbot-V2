@@ -12,7 +12,8 @@ const createDefinitionResult = (definition) => ({
   keywords: definition.keywords || [],
   dataset: definition.dataset,
   hasVisualization: definition.hasVisualization,
-  visualizationType: definition.visualizationType
+  visualizationType: definition.visualizationType,
+  link: definition.link // Added link property
 });
 
 /**
