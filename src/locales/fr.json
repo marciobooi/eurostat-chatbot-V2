@@ -1,7 +1,7 @@
 {
   "common": {
     "send": "Envoyer",
-    "clear_chat": "Effacer la conversation",
+    "clear_chat": "Effacer le chat",
     "loading": "Chargement...",
     "error": "Erreur",
     "close": "Fermer",
@@ -11,28 +11,28 @@
     "view_data": "Ouvrir dans Eurostat"
   },
   "chat": {
-    "placeholder": "Posez une question sur les statistiques de l'énergie...",
+    "placeholder": "Posez une question sur les statistiques énergétiques...",
     "thinking": "Réflexion...",
     "typing": "En train d'écrire...",
-    "ask_question": "Posez une question sur les statistiques de l'énergie...",
-    "clear_confirm": "Êtes-vous sûr de vouloir effacer l'historique de conversation ?",
-    "no_messages": "Pas encore de messages. Commencez une conversation !",
+    "ask_question": "Posez une question sur les statistiques énergétiques...",
+    "clear_confirm": "Êtes-vous sûr de vouloir effacer l'historique du chat ?",
+    "no_messages": "Aucun message pour le moment. Commencez une conversation !",
     "show_more": "Afficher plus d'historique"
   },
   "accessibility": {
     "bot_message": "Message du bot",
     "user_message": "Votre message",
     "send_button": "Envoyer le message",
-    "clear_button": "Effacer l'historique de conversation",
-    "scroll_button": "Défiler jusqu'au bas",
-    "input_field": "Champ de saisie du chat",
+    "clear_button": "Effacer l'historique du chat",
+    "scroll_button": "Faire défiler vers le bas",
+    "input_field": "Saisie du chat",
     "thinking_indicator": "Le bot réfléchit",
-    "typing_indicator": "Le bot écrit",
+    "typing_indicator": "Le bot tape",
     "show_more_button": "Charger plus de messages"
   },
   "suggestions": {
     "title": "Sujets suggérés",
-    "related_topics": "Sujets connexes",
+    "related_topics": "Sujets associés",
     "click_to_learn": "Cliquez pour en savoir plus sur {{topic}}",
     "no_suggestions": "Aucune suggestion disponible",
     "subFuels": "Combustibles associés",
@@ -40,9 +40,9 @@
   },
   "visualization": {
     "show_chart": "Afficher le graphique {{type}}",
-    "view_as": "Voir comme graphique {{type}}",
+    "view_as": "Voir sous forme de graphique {{type}}",
     "loading": "Chargement du graphique...",
-    "error": "Erreur lors du chargement du graphique",
+    "error": "Erreur de chargement du graphique",
     "title": "Visualisation des données",
     "description": "Représentation visuelle des données {{dataset}}",
     "back": "Retour au chat",
@@ -50,12 +50,12 @@
     "fullscreen": "Voir en plein écran"
   },
   "toast": {
-    "clearChat": "Historique de conversation effacé !"
+    "clearChat": "Historique du chat effacé !"
   },
   "tooltips": {
-    "visualization": "Cliquer pour voir la visualisation en graphique {{type}} de ces données",
+    "visualization": "Cliquez pour voir la visualisation du graphique {{type}} de ces données",
     "external_link": "Ouvrir ces données sur le site Eurostat dans un nouvel onglet",
-    "show_more": "Charger les messages plus anciens de votre historique de conversation",
-    "clear_button": "Effacer tous les messages et l'historique de conversation"
+    "show_more": "Charger les messages plus anciens de votre historique de chat",
+    "clear_button": "Effacer tous les messages et l'historique du chat"
   }
 }

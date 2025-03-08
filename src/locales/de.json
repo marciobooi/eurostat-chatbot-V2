@@ -7,16 +7,16 @@
     "close": "Schließen",
     "search": "Suchen",
     "chat": "Chat",
-    "view_source": "Quelldaten anzeigen",
+    "view_source": "Quelle der Daten anzeigen",
     "view_data": "In Eurostat öffnen"
   },
   "chat": {
-    "placeholder": "Fragen zu Energiestatistiken stellen...",
-    "thinking": "Nachdenken...",
+    "placeholder": "Fragen Sie nach Energiestatistiken...",
+    "thinking": "Denke nach...",
     "typing": "Tippen...",
     "ask_question": "Stellen Sie eine Frage zu Energiestatistiken...",
     "clear_confirm": "Möchten Sie den Chat-Verlauf wirklich löschen?",
-    "no_messages": "Noch keine Nachrichten. Beginnen Sie eine Unterhaltung!",
+    "no_messages": "Noch keine Nachrichten. Starten Sie eine Unterhaltung!",
     "show_more": "Mehr Verlauf anzeigen"
   },
   "accessibility": {
@@ -25,37 +25,37 @@
     "send_button": "Nachricht senden",
     "clear_button": "Chat-Verlauf löschen",
     "scroll_button": "Zum Ende scrollen",
-    "input_field": "Chat-Eingabefeld",
+    "input_field": "Chat-Eingabe",
     "thinking_indicator": "Bot denkt nach",
     "typing_indicator": "Bot tippt",
-    "show_more_button": "Weitere Chat-Nachrichten laden"
+    "show_more_button": "Ältere Nachrichten laden"
   },
   "suggestions": {
     "title": "Vorgeschlagene Themen",
     "related_topics": "Verwandte Themen",
-    "click_to_learn": "Klicken Sie, um mehr über {{topic}} zu erfahren",
+    "click_to_learn": "Klicken Sie hier, um mehr über {{topic}} zu erfahren",
     "no_suggestions": "Keine Vorschläge verfügbar",
     "subFuels": "Verwandte Brennstoffe",
     "related": "Siehe auch"
   },
   "visualization": {
-    "show_chart": "{{type}}-Diagramm anzeigen",
-    "view_as": "Als {{type}}-Diagramm anzeigen",
+    "show_chart": "Zeige {{type}} Diagramm",
+    "view_as": "Als {{type}} Diagramm anzeigen",
     "loading": "Diagramm wird geladen...",
     "error": "Fehler beim Laden des Diagramms",
     "title": "Datenvisualisierung",
     "description": "Visuelle Darstellung der {{dataset}}-Daten",
     "back": "Zurück zum Chat",
     "export": "Daten exportieren",
-    "fullscreen": "In Vollbild anzeigen"
+    "fullscreen": "Vollbild anzeigen"
   },
   "toast": {
     "clearChat": "Chat-Verlauf gelöscht!"
   },
   "tooltips": {
-    "visualization": "Klicken Sie, um diese Daten als {{type}}-Diagramm zu visualisieren",
-    "external_link": "Diese Daten auf der Eurostat-Website in einem neuen Tab öffnen",
+    "visualization": "Klicken Sie, um die {{type}} Diagramm-Visualisierung dieser Daten anzuzeigen",
+    "external_link": "Öffnen Sie diese Daten auf der Eurostat-Website in einem neuen Tab",
     "show_more": "Ältere Nachrichten aus Ihrem Chat-Verlauf laden",
-    "clear_button": "Alle Chat-Nachrichten und den Verlauf löschen"
+    "clear_button": "Alle Nachrichten und den Chat-Verlauf löschen"
   }
 }
