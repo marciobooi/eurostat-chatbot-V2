@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
+import { fetchEurostatData } from '../utils/eurostatApi';
 
 /**
  * ChatMessage component renders a single message in the chat
@@ -26,6 +27,27 @@ const ChatMessage = ({ message }) => {
     'pie': faChartPie,
     'bar': faChartBar,
     'line': faChartLine
+  };
+
+  const handleVisualizationClick = async (type) => {
+    try {
+      if (!message.hasVisualization || !message.text) {
+        console.warn('No visualization data available');
+        return;
+      }
+      
+      // Extract the fuel type from the message text or title
+      const fuelType = message.title?.toLowerCase() || message.text.toLowerCase();
+      
+      // Fetch data from Eurostat API with visualization query type
+      const data = await fetchEurostatData(fuelType, 'visualization', type);
+      console.log('Visualization data:', data);
+      
+      // TODO: Process the data and show the appropriate chart component
+      // This will be implemented in the next step
+    } catch (error) {
+      console.error('Error fetching visualization data:', error);
+    }
   };
 
   return (
@@ -63,6 +85,7 @@ const ChatMessage = ({ message }) => {
                     type="button"
                     data-tooltip-id={`viz-tooltip-${type}-${index}`}
                     data-tooltip-content={t('tooltips.visualization', { type })}
+                    onClick={() => handleVisualizationClick(type)}
                   >
                     <FontAwesomeIcon
                       icon={vizIconMap[type] || faChartBar}
