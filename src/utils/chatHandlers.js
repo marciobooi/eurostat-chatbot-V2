@@ -1,6 +1,8 @@
 import { findEnergyDefinition } from './energyHandlers';
 import { createBotResponse, createErrorResponse } from './botResponseHandlers';
 import { clearChatFromCookie } from './storageHandlers';
+import { welcomeMessages } from '../dictionaries/welcomeMessages';
+import { getRandomElement } from './randomUtils';
 import toast from 'react-hot-toast';
 
 /**
@@ -9,6 +11,20 @@ import toast from 'react-hot-toast';
 const CONSTANTS = {
   TYPING_DELAY: 1000, // ms
   TOAST_DURATION: 2000 // ms
+};
+
+/**
+ * Creates a welcome message from the bot
+ * @param {string} language - The current language
+ * @returns {Object} The welcome message object
+ */
+const createWelcomeMessage = (language) => {
+  const messages = welcomeMessages[language] || welcomeMessages.en;
+  return {
+    sender: 'bot',
+    text: getRandomElement(messages),
+    language
+  };
 };
 
 /**
@@ -35,7 +51,13 @@ export const handleSendMessage = (input, language, setMessages, setIsTyping, set
   };
   
   // Add user message to chat
-  setMessages(prev => [...prev, userMessage]);
+  setMessages(prev => {
+    // If this is the first message, add welcome message first
+    if (prev.length === 0) {
+      return [createWelcomeMessage(language), userMessage];
+    }
+    return [...prev, userMessage];
+  });
 
   try {
     // Find definition based on user input
@@ -75,8 +97,11 @@ export const handleSendMessage = (input, language, setMessages, setIsTyping, set
  * @param {Function} t - Translation function
  */
 export const handleClearChat = (setMessages, t) => {
-  // Clear the messages state
-  setMessages([]);
+  // Clear the messages state but add welcome message
+  setMessages(prev => {
+    const language = prev[0]?.language || 'en';
+    return [createWelcomeMessage(language)];
+  });
   
   // Clear the stored chat history from cookies and localStorage
   clearChatFromCookie();

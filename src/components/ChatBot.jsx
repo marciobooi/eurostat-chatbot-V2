@@ -12,6 +12,8 @@ import '../styles/ChatBot.css';
 import PieChart from './PieChart';
 import LineChart from './LineChart';
 import BarChart from './BarChart';
+import { welcomeMessages } from '../dictionaries/welcomeMessages';
+import { getRandomElement } from '../utils/randomUtils';
 
 // Number of messages to display initially and to add when "Show More" is clicked
 const MESSAGES_BATCH_SIZE = 20;
@@ -233,8 +235,16 @@ const ChatBot = () => {
     if (savedChat && savedChat.length > 0) {
       setAllMessages(savedChat);
       setDisplayCount(Math.min(MESSAGES_BATCH_SIZE, savedChat.length));
+    } else {
+      // If no saved chat, initialize with welcome message
+      const welcomeMessage = {
+        sender: 'bot',
+        text: getRandomElement(welcomeMessages[i18n.language] || welcomeMessages.en),
+        language: i18n.language
+      };
+      setAllMessages([welcomeMessage]);
     }
-  }, []);
+  }, [i18n.language]);
 
   // Set up cross-tab synchronization
   useEffect(() => {
