@@ -1,6 +1,6 @@
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Doughnut } from 'react-chartjs-2';
-import { useRef } from 'react';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -8,14 +8,15 @@ import {
   Legend
 } from 'chart.js';
 import { useTranslation } from 'react-i18next';
-import { chartColors } from '../../utils/chartColors';
+import { chartColors } from '../utils/chartColors';
 
-
-// Register ChartJS components
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend
+);
 
 const PieChart = ({ data }) => {
-  const chartRef = useRef(null);
   const { t } = useTranslation();
 
   const chartData = {
@@ -23,17 +24,15 @@ const PieChart = ({ data }) => {
     datasets: [
       {
         data: data.map(item => item.value),
-        backgroundColor: chartColors.blues,
-        hoverBackgroundColor: chartColors.bluesHover,
+        backgroundColor: data.map((_, index) => chartColors.blues[index % chartColors.blues.length]),
+        hoverBackgroundColor: data.map((_, index) => chartColors.bluesHover[index % chartColors.bluesHover.length]),
         borderColor: 'transparent',
         borderWidth: 0,
         borderRadius: 5,
         spacing: 2,
         offset: 0,
-        hoverOffset: 5,
-        width: 250,
-      },
-    ],
+      }
+    ]
   };
 
   const options = {
@@ -89,6 +88,7 @@ const PieChart = ({ data }) => {
     },
   };
 
+
   return (
     <div className="visualization-container">
       <div 
@@ -99,18 +99,17 @@ const PieChart = ({ data }) => {
         {/* Chart */}
         <div className="visualization-chart-container">
           <Doughnut
-            ref={chartRef}
             data={chartData}
             options={options}
-            aria-label={t('visualization.pie.aria.data')}
+            aria-label={t('visualization.pie.aria.chart')}
           />
         </div>
       </div>
       
-      {/* Bottom Legend */}
+      {/* Legend */}
       <div className="visualization-bottom-legend">
         {data.map((item, index) => (
-          <div key={item.name} className="legend-item">
+          <div key={item.code} className="legend-item">
             <div className="legend-indicator">
               <div
                 className="legend-dot"
@@ -118,14 +117,21 @@ const PieChart = ({ data }) => {
               />
               <span className="legend-label">{item.name}</span>
             </div>
+            {/* <div className="legend-value">{Math.round(item.value)}</div> */}
           </div>
         ))}
       </div>
-      
-      <p className="visualization-source">
-        {t('visualization.source')}: {t('visualization.eurostat')}
-      </p>
     </div>
+
+
+
+
+
+
+
+
+
+
   );
 };
 
@@ -134,6 +140,7 @@ PieChart.propTypes = {
     PropTypes.shape({
       name: PropTypes.string.isRequired,
       value: PropTypes.number.isRequired,
+      code: PropTypes.string.isRequired,
     })
   ).isRequired,
 };

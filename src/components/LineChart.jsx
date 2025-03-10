@@ -1,6 +1,6 @@
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Line } from 'react-chartjs-2';
-import { useRef } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,8 +12,7 @@ import {
   Legend
 } from 'chart.js';
 import { useTranslation } from 'react-i18next';
-import { chartColors } from '../../utils/chartColors';
-
+import { chartColors } from '../utils/chartColors';
 
 // Register ChartJS components
 ChartJS.register(
@@ -27,28 +26,24 @@ ChartJS.register(
 );
 
 const LineChart = ({ data }) => {
-  const chartRef = useRef(null);
   const { t } = useTranslation();
 
   const chartData = {
     labels: data.map(item => item.year),
     datasets: [
       {
-        label: t('visualization.line.label'),
         data: data.map(item => item.value),
         borderColor: chartColors.primary,
-        backgroundColor: chartColors.withOpacity(chartColors.primary, 0.1),
-        fill: true,
-        tension: 0.4,
+        backgroundColor: chartColors.primaryLight,
         borderWidth: 2,
         pointRadius: 4,
         pointHoverRadius: 6,
         pointBackgroundColor: chartColors.primary,
-        pointHoverBackgroundColor: chartColors.bluesHover[0],
-        pointBorderColor: '#FFFFFF',
-        pointBorderWidth: 2,
-      },
-    ],
+        pointHoverBackgroundColor: chartColors.primaryDark,
+        tension: 0.4,
+        fill: false
+      }
+    ]
   };
 
   const options = {
@@ -56,20 +51,20 @@ const LineChart = ({ data }) => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: false,
+        display: false
       },
       tooltip: {
         enabled: true,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: chartColors.background,
         titleColor: chartColors.text,
         bodyColor: chartColors.text,
         titleFont: {
           size: 13,
           weight: 'bold',
-          family: 'arial, sans-serif',
+          family: 'Inter, system-ui, sans-serif'
         },
         bodyFont: {
-            family: 'arial, sans-serif',
+          family: 'Inter, system-ui, sans-serif'
         },
         padding: 12,
         cornerRadius: 8,
@@ -77,23 +72,22 @@ const LineChart = ({ data }) => {
         borderColor: chartColors.grid,
         borderWidth: 1,
         callbacks: {
-            label: (context) => t('visualization.pie.tooltip.value', {
-              name: context.label,
-              value: Math.round(context.raw)
-            })
-          },
-      },
+          label: (context) => t('visualization.line.tooltip.value', {
+            year: context.label,
+            value: Math.round(context.raw)
+          })
+        }
+      }
     },
     scales: {
       x: {
         grid: {
-          color: chartColors.grid,
-          drawBorder: false,
+          display: false
         },
         ticks: {
           color: chartColors.text,
           font: {
-            family: 'arial, sans-serif',
+            family: 'Inter, system-ui, sans-serif',
             size: 12
           }
         }
@@ -101,21 +95,23 @@ const LineChart = ({ data }) => {
       y: {
         grid: {
           color: chartColors.grid,
-          drawBorder: false,
+          drawBorder: false
         },
         ticks: {
           color: chartColors.text,
           font: {
-            family: 'arial, sans-serif',
+            family: 'Inter, system-ui, sans-serif',
             size: 12
-          }
+          },
+          callback: (value) => Math.round(value)
         },
         beginAtZero: true
       }
     },
     interaction: {
+      mode: 'nearest',
       intersect: false,
-      mode: 'index'
+      axis: 'x'
     },
     animation: {
       duration: 1000,
@@ -125,25 +121,13 @@ const LineChart = ({ data }) => {
 
   return (
     <div className="visualization-container">
-      <div 
-        className="visualization-chart-wrapper"
-        role="img"
-        aria-label={t('visualization.line.aria.description')}
-      >
-        {/* Chart */}
-        <div className="visualization-chart-container">
-          <Line
-            ref={chartRef}
-            data={chartData}
-            options={options}
-            aria-label={t('visualization.line.aria.data')}
-          />
-        </div>
+      <div className="visualization-chart-wrapper">
+        <Line
+          data={chartData}
+          options={options}
+          aria-label={t('visualization.line.aria.chart')}
+        />
       </div>
-
-      <p className="visualization-source">
-        {t('visualization.source')}: {t('visualization.eurostat')}
-      </p>
     </div>
   );
 };
@@ -153,6 +137,7 @@ LineChart.propTypes = {
     PropTypes.shape({
       year: PropTypes.string.isRequired,
       value: PropTypes.number.isRequired,
+      code: PropTypes.string.isRequired,
     })
   ).isRequired,
 };

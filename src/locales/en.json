@@ -7,7 +7,7 @@
     "close": "Close",
     "search": "Search",
     "chat": "Chat",
-    "view_source": "View source data",
+    "view_source": "View data source",
     "view_data": "Open in Eurostat"
   },
   "chat": {
@@ -47,7 +47,41 @@
     "description": "Visual representation of {{dataset}} data",
     "back": "Back to chat",
     "export": "Export data",
-    "fullscreen": "View fullscreen"
+    "fullscreen": "View fullscreen",
+    "source": "Source",
+    "eurostat": "Eurostat",
+    "pie": {
+      "title": "Distribution by Energy Balance",
+      "aria": {
+        "chart": "Pie chart showing energy balance distribution",
+        "description": "Circular chart showing proportional distribution of energy balance components"
+      },
+      "tooltip": {
+        "value": "{{name}}: {{value}} KTOE"
+      }
+    },
+    "line": {
+      "title": "Historical Trend",
+      "label": "Energy Value",
+      "aria": {
+        "chart": "Line chart showing historical energy trend",
+        "description": "Time series chart showing energy values over years"
+      },
+      "tooltip": {
+        "value": "{{year}}: {{value}} KTOE"
+      }
+    },
+    "bar": {
+      "title": "Annual Comparison",
+      "label": "Energy Value",
+      "aria": {
+        "chart": "Bar chart showing annual energy values",
+        "description": "Bar chart comparing energy values across different years"
+      },
+      "tooltip": {
+        "value": "{{year}}: {{value}} KTOE"
+      }
+    }
   },
   "toast": {
     "clearChat": "Chat history cleared!"    

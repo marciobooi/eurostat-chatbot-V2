@@ -9,6 +9,9 @@ import TypingIndicator from './TypingIndicator';
 import { handleSendMessage, handleClearChat, handleSuggestionClick, handleScroll } from '../utils/chatHandlers';
 import { saveChatToCookie, loadChatFromCookie, setupCrossTabbingSyncListeners } from '../utils/storageHandlers';
 import '../styles/ChatBot.css';
+import PieChart from './PieChart';
+import LineChart from './LineChart';
+import BarChart from './BarChart';
 
 // Number of messages to display initially and to add when "Show More" is clicked
 const MESSAGES_BATCH_SIZE = 20;
@@ -163,6 +166,43 @@ const ChatBot = () => {
            lastMessage.suggestions : [];
   }, [allMessages]);
 
+  /**
+   * Handle visualization selection from a message
+   */
+  const handleVisualizationSelect = useCallback(({ type, data, title, fuelType }) => {
+    // Create a new bot message with the visualization
+    const visualizationMessage = {
+      sender: 'bot',
+      text: t('visualization.description', { dataset: title }),
+      title: t(`visualization.${type.toLowerCase()}.title`),
+      chartType: type,
+      chartData: data,
+      language: i18n.language,
+      isVisualization: true
+    };
+
+    // Add the new message to the chat
+    updateMessages(prev => [...prev, visualizationMessage]);
+    
+    // Always show the latest messages when adding a visualization
+    setDisplayCount(MESSAGES_BATCH_SIZE);
+  }, [t, i18n.language, updateMessages]);
+
+  const renderChartMessage = (message) => {
+    if (!message.isVisualization || !message.chartData) return null;
+
+    switch (message.chartType.toLowerCase()) {
+      case 'pie':
+        return <PieChart data={message.chartData} />;
+      case 'line':
+        return <LineChart data={message.chartData} />;
+      case 'bar':
+        return <BarChart data={message.chartData} />;
+      default:
+        return null;
+    }
+  };
+
   // Load saved chat history on initial render
   useEffect(() => {
     const savedChat = loadChatFromCookie();
@@ -245,7 +285,10 @@ const ChatBot = () => {
           <ChatMessage
             key={`msg-${allMessages.length - visibleMessages.length + index}`}
             message={msg}
-          />
+            onVisualizationSelect={handleVisualizationSelect}
+          >
+            {msg.isVisualization && renderChartMessage(msg)}
+          </ChatMessage>
         ))}
 
         {isTyping && <TypingIndicator />}

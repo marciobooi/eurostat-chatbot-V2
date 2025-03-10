@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faRobot, faChartPie, faChartBar, faChartLine, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
@@ -12,9 +12,10 @@ import { fetchEurostatData } from '../utils/eurostatApi';
  * @param {Object} props - Component props
  * @param {Object} props.message - Message data object
  */
-const ChatMessage = ({ message }) => {
+const ChatMessage = ({ message, onVisualizationSelect, children }) => {
   const { t } = useTranslation();
   const isBot = message.sender === 'bot';
+  const [isLoading, setIsLoading] = useState(false);
 
   // Determine appropriate CSS classes and icon
   const icon = isBot ? faRobot : faUser;
@@ -36,17 +37,24 @@ const ChatMessage = ({ message }) => {
         return;
       }
       
-      // Extract the fuel type from the message text or title
-      const fuelType = message.title?.toLowerCase() || message.text.toLowerCase();
+      setIsLoading(true);
       
-      // Fetch data from Eurostat API with visualization query type
+      // Fetch data from Eurostat API
+      const fuelType = message.title?.toLowerCase() || message.text.toLowerCase();
       const data = await fetchEurostatData(fuelType, 'visualization', type);
       console.log('Visualization data:', data);
       
-      // TODO: Process the data and show the appropriate chart component
-      // This will be implemented in the next step
+      // Send the visualization data to parent
+      onVisualizationSelect({
+        type,
+        data,
+        title: message.title || message.text,
+        fuelType
+      });
     } catch (error) {
       console.error('Error fetching visualization data:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -72,6 +80,9 @@ const ChatMessage = ({ message }) => {
           {message.text}
         </div>
 
+        {/* Render visualization if present */}
+        {children}
+
         {/* Display visualization icons and link icon for bot messages */}
         {isBot && (message.hasVisualization || message.link) && (
           <div className="message-visualization-options">
@@ -86,6 +97,7 @@ const ChatMessage = ({ message }) => {
                     data-tooltip-id={`viz-tooltip-${type}-${index}`}
                     data-tooltip-content={t('tooltips.visualization', { type })}
                     onClick={() => handleVisualizationClick(type)}
+                    disabled={isLoading}
                   >
                     <FontAwesomeIcon
                       icon={vizIconMap[type] || faChartBar}
@@ -121,6 +133,13 @@ const ChatMessage = ({ message }) => {
             )}
           </div>
         )}
+
+        {/* Loading indicator */}
+        {isLoading && (
+          <div className="visualization-loading">
+            {t('visualization.loading')}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -136,6 +155,8 @@ ChatMessage.propTypes = {
     visualizationType: PropTypes.arrayOf(PropTypes.string),
     link: PropTypes.string
   }).isRequired,
+  onVisualizationSelect: PropTypes.func.isRequired,
+  children: PropTypes.node
 };
 
 export default ChatMessage;

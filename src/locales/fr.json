@@ -47,7 +47,41 @@
     "description": "Représentation visuelle des données {{dataset}}",
     "back": "Retour au chat",
     "export": "Exporter les données",
-    "fullscreen": "Voir en plein écran"
+    "fullscreen": "Voir en plein écran",
+    "source": "Source",
+    "eurostat": "Eurostat",
+    "pie": {
+      "title": "Distribution par bilan énergétique",
+      "aria": {
+        "chart": "Diagramme circulaire montrant la distribution du bilan énergétique",
+        "description": "Graphique circulaire montrant la distribution proportionnelle des composants du bilan énergétique"
+      },
+      "tooltip": {
+        "value": "{{name}}: {{value}} KTOE"
+      }
+    },
+    "line": {
+      "title": "Tendance historique",
+      "label": "Valeur énergétique",
+      "aria": {
+        "chart": "Graphique linéaire montrant la tendance énergétique historique",
+        "description": "Graphique chronologique montrant les valeurs énergétiques au fil des ans"
+      },
+      "tooltip": {
+        "value": "{{year}}: {{value}} KTOE"
+      }
+    },
+    "bar": {
+      "title": "Comparaison annuelle",
+      "label": "Valeur énergétique",
+      "aria": {
+        "chart": "Diagramme à barres montrant les valeurs énergétiques annuelles",
+        "description": "Diagramme à barres comparant les valeurs énergétiques entre différentes années"
+      },
+      "tooltip": {
+        "value": "{{year}}: {{value}} KTOE"
+      }
+    }
   },
   "toast": {
     "clearChat": "Historique du chat effacé !"

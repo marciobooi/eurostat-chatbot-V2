@@ -1,6 +1,6 @@
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Bar } from 'react-chartjs-2';
-import { useRef } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,8 +11,7 @@ import {
   Legend
 } from 'chart.js';
 import { useTranslation } from 'react-i18next';
-import { chartColors } from '../../utils/chartColors';
-
+import { chartColors } from '../utils/chartColors';
 
 // Register ChartJS components
 ChartJS.register(
@@ -25,11 +24,10 @@ ChartJS.register(
 );
 
 const BarChart = ({ data }) => {
-  const chartRef = useRef(null);
   const { t } = useTranslation();
 
   const chartData = {
-    labels: data.map(item => item.country),
+    labels: data.map(item => item.year),
     datasets: [
       {
         data: data.map(item => item.value),
@@ -51,7 +49,7 @@ const BarChart = ({ data }) => {
       },
       tooltip: {
         enabled: true,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: chartColors.background,
         titleColor: chartColors.text,
         bodyColor: chartColors.text,
         titleFont: {
@@ -68,12 +66,12 @@ const BarChart = ({ data }) => {
         borderColor: chartColors.grid,
         borderWidth: 1,
         callbacks: {
-            label: (context) => t('visualization.pie.tooltip.value', {
-              name: context.label,
-              value: Math.round(context.raw)
-            })
-          },
-      },
+          label: (context) => t('visualization.bar.tooltip.value', {
+            year: context.label,
+            value: Math.round(context.raw)
+          })
+        }
+      }
     },
     scales: {
       x: {
@@ -96,9 +94,10 @@ const BarChart = ({ data }) => {
         ticks: {
           color: chartColors.text,
           font: {
-            family: 'arial, sans-serif',
+            family: 'Inter, system-ui, sans-serif',
             size: 12
-          }
+          },
+          callback: (value) => Math.round(value)
         },
         beginAtZero: true
       }
@@ -116,25 +115,13 @@ const BarChart = ({ data }) => {
 
   return (
     <div className="visualization-container">
-      <div 
-        className="visualization-chart-wrapper"
-        role="img"
-        aria-label={t('visualization.bar.aria.description')}
-      >
-        {/* Chart */}
-        <div className="visualization-chart-container">
-          <Bar
-            ref={chartRef}
-            data={chartData}
-            options={options}
-            aria-label={t('visualization.bar.aria.data')}
-          />
-        </div>
+      <div className="visualization-chart-wrapper">
+        <Bar 
+          data={chartData} 
+          options={options}
+          aria-label={t('visualization.bar.aria.chart')}
+        />
       </div>
-
-      <p className="visualization-source">
-        {t('visualization.source')}: {t('visualization.eurostat')}
-      </p>
     </div>
   );
 };
@@ -142,8 +129,9 @@ const BarChart = ({ data }) => {
 BarChart.propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({
-      country: PropTypes.string.isRequired,
+      year: PropTypes.string.isRequired,
       value: PropTypes.number.isRequired,
+      code: PropTypes.string.isRequired,
     })
   ).isRequired,
 };

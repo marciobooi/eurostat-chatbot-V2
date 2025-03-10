@@ -47,7 +47,41 @@
     "description": "Visuelle Darstellung der {{dataset}}-Daten",
     "back": "Zurück zum Chat",
     "export": "Daten exportieren",
-    "fullscreen": "Vollbild anzeigen"
+    "fullscreen": "Vollbild anzeigen",
+    "source": "Quelle",
+    "eurostat": "Eurostat",
+    "pie": {
+      "title": "Verteilung nach Energiebilanz",
+      "aria": {
+        "chart": "Kreisdiagramm zeigt die Verteilung der Energiebilanz",
+        "description": "Kreisdiagramm zeigt die proportionale Verteilung der Energiebilanzkomponenten"
+      },
+      "tooltip": {
+        "value": "{{name}}: {{value}} KTOE"
+      }
+    },
+    "line": {
+      "title": "Historischer Trend",
+      "label": "Energiewert",
+      "aria": {
+        "chart": "Liniendiagramm zeigt den historischen Energietrend",
+        "description": "Zeitreihendiagramm zeigt die Energiewerte über die Jahre"
+      },
+      "tooltip": {
+        "value": "{{year}}: {{value}} KTOE"
+      }
+    },
+    "bar": {
+      "title": "Jährlicher Vergleich",
+      "label": "Energiewert",
+      "aria": {
+        "chart": "Balkendiagramm zeigt jährliche Energiewerte",
+        "description": "Balkendiagramm vergleicht Energiewerte zwischen verschiedenen Jahren"
+      },
+      "tooltip": {
+        "value": "{{year}}: {{value}} KTOE"
+      }
+    }
   },
   "toast": {
     "clearChat": "Chat-Verlauf gelöscht!"

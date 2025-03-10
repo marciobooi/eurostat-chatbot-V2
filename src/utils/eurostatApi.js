@@ -1,64 +1,13 @@
 import axios from 'axios';
 import { energyDefinitionsEn } from '../dictionaries/energyDefinitionsEn';
 import { datasetRuller } from '../dictionaries/datasetDictionary';
+import { transformPieChartData, transformLineChartData, transformBarChartData } from './chartDataTransformers';
 
 const BASE_URL = 'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data';
 
 const DEFAULT_PARAMS = {
   geo: 'EU27_2020',
-  lang: 'en',
-  lastTimePeriod: '1'
-};
-
-const transformPieChartData = (data, nrg_bal) => {
-  if (!data?.value || !data?.dimension?.nrg_bal?.category?.index) {
-    console.error('Invalid data structure received:', data);
-    return [];
-  }
-
-  const values = data.value;
-  const indexes = data.dimension.nrg_bal.category.index;
-  const labels = data.dimension.nrg_bal.category.label || {};
-  
-  return nrg_bal.map(bal => ({
-    name: labels[bal] || bal,
-    value: values[indexes[bal]] || 0,
-    code: bal
-  }));
-};
-
-const transformBarChartData = (data, nrg_bal) => {
-  if (!data?.value || !data?.dimension?.nrg_bal?.category?.index) {
-    console.error('Invalid data structure received:', data);
-    return [];
-  }
-
-  const values = data.value;
-  const indexes = data.dimension.nrg_bal.category.index;
-  const labels = data.dimension.nrg_bal.category.label || {};
-  
-  return nrg_bal.map(bal => ({
-    name: labels[bal] || bal,
-    value: values[indexes[bal]] || 0,
-    code: bal
-  }));
-};
-
-const transformLineChartData = (data, nrg_bal) => {
-  if (!data?.value || !data?.dimension?.nrg_bal?.category?.index) {
-    console.error('Invalid data structure received:', data);
-    return [];
-  }
-
-  const values = data.value;
-  const indexes = data.dimension.nrg_bal.category.index;
-  const labels = data.dimension.nrg_bal.category.label || {};
-  
-  return nrg_bal.map(bal => ({
-    name: labels[bal] || bal,
-    value: values[indexes[bal]] || 0,
-    code: bal
-  }));
+  lang: 'en'
 };
 
 export const fetchEurostatData = async (fuelType, queryType, chartType = null) => {
@@ -103,49 +52,54 @@ const fetchVisualizationData = async (fuelDefinition, chartType) => {
   }
 
   // Create URLSearchParams object with format and default params
-  const searchParams = new URLSearchParams({
+  const params = new URLSearchParams({
     format: 'JSON',
     ...DEFAULT_PARAMS
   });
 
-  // Add parameters that exist in fuel definition and are required by dataset
+  // Add parameters based on chart type and dataset dimensions
   datasetConfig.dimensions.forEach(dim => {
     switch(dim) {
       case 'unit':
-        if (unit) searchParams.append('unit', unit);
+        if (unit) params.append('unit', unit);
         break;
       case 'siec':
-        if (siec) searchParams.append('siec', siec);
+        if (siec) params.append('siec', siec);
         break;
       case 'nrg_bal':
-        // Add each nrg_bal value as a separate parameter
-        if (nrg_bal) {
+        if (chartType.toLowerCase() === 'pie' && nrg_bal) {
+          // For pie charts, use energy balances
           nrg_bal.forEach(bal => {
-            searchParams.append('nrg_bal', bal);
+            params.append('nrg_bal', bal);
           });
         }
         break;
     }
   });
 
-  const url = `${BASE_URL}/${dataset}?${searchParams}`;
+  // For line and bar charts, don't set time parameter to get all available years
+  if (chartType.toLowerCase() !== 'pie') {
+    // Remove lastTimePeriod if it was added by default params
+    params.delete('lastTimePeriod');
+  } else {
+    // For pie charts, we only want the latest period
+    params.append('lastTimePeriod', '1');
+  }
+
+  const url = `${BASE_URL}/${dataset}?${params}`;
   console.log('Fetching visualization data from:', url);
 
   const response = await axios.get(url);
   console.log('API Response:', response.data);
-  
-  if (!response.data?.dimension?.nrg_bal?.category?.index) {
-    throw new Error('Invalid response structure from Eurostat API');
-  }
 
   // Transform data based on chart type
   switch (chartType.toLowerCase()) {
     case 'pie':
       return transformPieChartData(response.data, nrg_bal);
     case 'bar':
-      return transformBarChartData(response.data, nrg_bal);
+      return transformBarChartData(response.data);
     case 'line':
-      return transformLineChartData(response.data, nrg_bal);
+      return transformLineChartData(response.data);
     default:
       throw new Error(`Unsupported chart type: ${chartType}`);
   }
