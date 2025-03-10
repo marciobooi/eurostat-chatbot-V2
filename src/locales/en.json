@@ -91,5 +91,11 @@
     "external_link": "Open this data on the Eurostat website in a new tab",
     "show_more": "Load older messages from your chat history",
     "clear_button": "Clear all chat messages and history"
+  },
+  "errors": {
+    "processing": "I'm having trouble understanding that. Could you rephrase?",
+    "visualization": "Sorry, I couldn't generate the visualization right now.",
+    "network": "I'm having trouble connecting to the data service.",
+    "general": "Something went wrong. Please try again."
   }
 }

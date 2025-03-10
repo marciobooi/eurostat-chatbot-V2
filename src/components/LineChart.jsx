@@ -25,7 +25,7 @@ ChartJS.register(
   Legend
 );
 
-const LineChart = ({ data }) => {
+const LineChart = ({ data, type }) => {
   const { t } = useTranslation();
 
   const chartData = {
@@ -139,7 +139,8 @@ LineChart.propTypes = {
       value: PropTypes.number.isRequired,
       code: PropTypes.string.isRequired,
     })
-  ).isRequired
+  ).isRequired,
+  type: PropTypes.string
 };
 
 export default LineChart;

@@ -12,8 +12,13 @@ const DEFAULT_PARAMS = {
 
 export const fetchEurostatData = async (fuelType, queryType, chartType = null) => {
   try {
-    // Get fuel definition from the dictionary
-    const fuelDefinition = energyDefinitionsEn[fuelType.toLowerCase()];
+    // Find fuel definition by looking up in both the key and fuelCode
+    const fuelDefinition = Object.values(energyDefinitionsEn).find(def => 
+      def.fuelCode === fuelType || 
+      def.title?.toLowerCase() === fuelType?.toLowerCase() ||
+      def.fuelCode?.toLowerCase() === fuelType?.toLowerCase()
+    );
+
     if (!fuelDefinition) {
       throw new Error(`Fuel type ${fuelType} not found in energy definitions`);
     }
@@ -95,11 +100,11 @@ const fetchVisualizationData = async (fuelDefinition, chartType) => {
   // Transform data based on chart type
   switch (chartType.toLowerCase()) {
     case 'pie':
-      return transformPieChartData(response.data, nrg_bal);
+      return { data: transformPieChartData(response.data, nrg_bal || []) };
     case 'bar':
-      return transformBarChartData(response.data);
+      return { data: transformBarChartData(response.data) };
     case 'line':
-      return transformLineChartData(response.data);
+      return { data: transformLineChartData(response.data) };
     default:
       throw new Error(`Unsupported chart type: ${chartType}`);
   }

@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
@@ -10,14 +10,16 @@ import LineChart from './LineChart';
 import BarChart from './BarChart';
 import { useChatContext } from '../contexts/ChatContext';
 import { useChatInteractions } from '../hooks/useChatInteractions';
+import { MessageService } from '../services/MessageService';
 import '../styles/ChatBot.css';
+import '../styles/ChatBotMobile.css';
 
 /**
  * ChatBot component provides the main chat interface
  */
 const ChatBot = () => {
   // Hooks
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const {
     input,
     setInput,
@@ -28,7 +30,8 @@ const ChatBot = () => {
     visibleMessages,
     allMessages,
     setShowScrollButton,
-    loadMoreMessages
+    loadMoreMessages,
+    updateMessages
   } = useChatContext();
 
   const {
@@ -58,11 +61,22 @@ const ChatBot = () => {
 
   // Chart rendering
   const renderChartMessage = useCallback((message) => {
-    if (!message.isVisualization || !message.chartData) return null;
+    if (!message.isVisualization) return null;
 
-    const props = { data: message.chartData };
+    const props = {
+      dataset: message.dataset,
+      fuelType: message.fuelType,
+      language: message.language,
+      data: message.chartData || [],
+      type: message.visualizationType // Pass the type to chart components
+    };
 
-    switch (message.chartType.toLowerCase()) {
+    // Handle visualizationType as either string or array
+    const chartType = typeof message.visualizationType === 'string' 
+      ? message.visualizationType.toLowerCase()
+      : null;
+
+    switch (chartType) {
       case 'pie': return <PieChart {...props} />;
       case 'line': return <LineChart {...props} />;
       case 'bar': return <BarChart {...props} />;

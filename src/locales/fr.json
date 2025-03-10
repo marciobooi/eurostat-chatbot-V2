@@ -91,5 +91,11 @@
     "external_link": "Ouvrir ces données sur le site Eurostat dans un nouvel onglet",
     "show_more": "Charger les messages plus anciens de votre historique de chat",
     "clear_button": "Effacer tous les messages et l'historique du chat"
+  },
+  "errors": {
+    "processing": "J'ai du mal à comprendre. Pourriez-vous reformuler ?",
+    "visualization": "Désolé, je ne peux pas générer la visualisation pour le moment.",
+    "network": "J'ai des problèmes de connexion au service de données.",
+    "general": "Une erreur s'est produite. Veuillez réessayer."
   }
 }

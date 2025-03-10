@@ -16,7 +16,7 @@ ChartJS.register(
   Legend
 );
 
-const PieChart = ({ data }) => {
+const PieChart = ({ data, type }) => {
   const { t } = useTranslation();
 
   const chartData = {
@@ -131,7 +131,8 @@ PieChart.propTypes = {
       value: PropTypes.number.isRequired,
       code: PropTypes.string.isRequired,
     })
-  ).isRequired
+  ).isRequired,
+  type: PropTypes.string
 };
 
 export default PieChart;

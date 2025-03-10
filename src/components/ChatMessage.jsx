@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faRobot, faChartPie, faChartBar, faChartLine, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faRobot, faChartPie, faChartBar, faChartLine, faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 import { Tooltip } from 'react-tooltip';
 import { useChatInteractions } from '../hooks/useChatInteractions';
+import PieChart from './PieChart';
+import BarChart from './BarChart';
+import LineChart from './LineChart';
 import 'react-tooltip/dist/react-tooltip.css';
+import '../styles/Visualization.css';
 
 const vizIconMap = {
   'pie': faChartPie,
@@ -16,7 +20,7 @@ const vizIconMap = {
 /**
  * ChatMessage component renders a single message in the chat
  */
-const ChatMessage = ({ message, children, usedVisualizations = [] }) => {
+const ChatMessage = ({ message, children, onVisualizationSelect, usedVisualizations = [] }) => {
   const { t } = useTranslation();
   const { handleVisualizationSelect } = useChatInteractions();
   const [isLoading, setIsLoading] = useState(false);
@@ -25,18 +29,27 @@ const ChatMessage = ({ message, children, usedVisualizations = [] }) => {
   const isBot = message.sender === 'bot';
   const icon = isBot ? faRobot : faUser;
   const messageClass = isBot ? 'bot-message' : 'user-message';
-  const wrapperClass = isBot ? 'bot-wrapper' : 'user-wrapper';
-  const iconClass = isBot ? 'bot-icon' : 'user-icon';
 
-  // Filter out already used visualization types
-  const remainingVisualizations = message.visualizationType?.filter(
-    type => !usedVisualizations.includes(type)
-  ) || [];
+  // Get available visualization types
+  const visualizationTypes = Array.isArray(message.visualizationType) 
+    ? message.visualizationType 
+    : message.visualizationType 
+      ? [message.visualizationType]
+      : [];
+
+  // Filter out used visualization types and current visualization
+  const remainingVisualizations = visualizationTypes.filter(
+    type => !usedVisualizations.includes(type) && type !== message.currentVisualization
+  );
 
   const onVisualizationClick = async (type) => {
     try {
       setIsLoading(true);
-      await handleVisualizationSelect({ type, message, usedType: type });
+      await handleVisualizationSelect({ 
+        type, 
+        message,
+        usedType: type 
+      });
     } catch (error) {
       console.error('Error handling visualization click:', error);
     } finally {
@@ -44,77 +57,94 @@ const ChatMessage = ({ message, children, usedVisualizations = [] }) => {
     }
   };
 
+  // Render chart based on type
+  const renderVisualization = () => {
+    if (!message.chartData || !message.chartType) return null;
+    
+    switch (message.chartType.toLowerCase()) {
+      case 'pie':
+        return <PieChart data={message.chartData} type="pie" />;
+      case 'bar':
+        return <BarChart data={message.chartData} type="bar" />;
+      case 'line':
+        return <LineChart data={message.chartData} type="line" />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className={`message-wrapper ${wrapperClass}`}>
-      <div className={`message-icon ${iconClass}`}>
-        <FontAwesomeIcon 
-          icon={icon} 
-          className="icon" 
-          aria-hidden="true"
-        />
+    <div 
+      className={`message-wrapper ${isBot ? 'bot-wrapper' : 'user-wrapper'}`}
+      role="article"
+      aria-label={t(isBot ? 'accessibility.bot_message' : 'accessibility.user_message')}
+    >
+      <div className={`message-icon ${isBot ? 'bot-icon' : 'user-icon'}`}>
+        <FontAwesomeIcon icon={icon} aria-hidden="true" />
       </div>
-      <div 
-        className={messageClass}
-        lang={message.language}
-        role="article"
-        aria-label={t(isBot ? 'accessibility.bot_message' : 'accessibility.user_message')}
-      >
+      <div className={messageClass}>
         {isBot && message.title && (
           <h3 className="message-title">{message.title}</h3>
         )}
         <div className="message-text">
-          {message.text}
-        </div>
+          {message.text.startsWith('visualization.') ? t(message.text) : message.text}
 
-        {children}
+          {message.isVisualization && (
+            <div>
+              {renderVisualization()}
+            </div>
+          )}
 
-        {isBot && (message.hasVisualization || message.link) && (
-          <div className="message-visualization-options">
-            {message.hasVisualization && remainingVisualizations.length > 0 && 
-              remainingVisualizations.map((type, index) => (
-                <button
-                  key={`viz-${type}-${index}`}
+          {isBot && (message.hasVisualization || message.link || message.isVisualization) && (
+            <div className="message-visualization-options">
+              {/* Show visualization options if we have available types */}
+              {message.hasVisualization && remainingVisualizations.length > 0 && 
+                remainingVisualizations.map((type, index) => (
+                  <button
+                    key={`viz-${type}-${index}`}
+                    className="message-visualization-icon-button"
+                    aria-label={t('visualization.show_chart', { type })}
+                    type="button"
+                    data-tooltip-id={`viz-tooltip-${type}-${index}`}
+                    data-tooltip-content={t('tooltips.visualization', { type })}
+                    onClick={() => onVisualizationClick(type)}
+                    disabled={isLoading}
+                  >
+                    <FontAwesomeIcon
+                      icon={vizIconMap[type] || faChartBar}
+                      className="viz-icon"
+                      aria-hidden="true"
+                    />
+                  </button>
+                ))
+              }
+              {/* Always show external link if available */}
+              {message.link && (
+                <a
+                  href={message.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="message-visualization-icon-button"
-                  aria-label={t('visualization.show_chart', { type })}
-                  type="button"
-                  data-tooltip-id={`viz-tooltip-${type}-${index}`}
-                  data-tooltip-content={t('tooltips.visualization', { type })}
-                  onClick={() => onVisualizationClick(type)}
-                  disabled={isLoading}
+                  aria-label={t('common.view_source')}
+                  data-tooltip-id="external-link-tooltip"
+                  data-tooltip-content={t('tooltips.external_link')}
                 >
                   <FontAwesomeIcon
-                    icon={vizIconMap[type] || faChartBar}
+                    icon={faUpRightFromSquare}
                     className="viz-icon"
                     aria-hidden="true"
                   />
-                </button>
-              ))
-            }
-            {message.link && (
-              <a
-                href={message.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="message-visualization-icon-button"
-                aria-label={t('common.view_source')}
-                data-tooltip-id="external-link-tooltip"
-                data-tooltip-content={t('tooltips.external_link')}
-              >
-                <FontAwesomeIcon
-                  icon={faExternalLinkAlt}
-                  className="viz-icon"
-                  aria-hidden="true"
-                />
-              </a>
-            )}
-          </div>
-        )}
+                </a>
+              )}
+            </div>
+          )}
 
-        {isLoading && (
-          <div className="visualization-loading">
-            {t('visualization.loading')}
-          </div>
-        )}
+          {isLoading && (
+            <div className="visualization-loading">
+              {t('visualization.loading')}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -127,9 +157,13 @@ ChatMessage.propTypes = {
     title: PropTypes.string,
     language: PropTypes.string,
     hasVisualization: PropTypes.bool,
-    visualizationType: PropTypes.arrayOf(PropTypes.string),
+    visualizationType: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.string),
+      PropTypes.string
+    ]), // Allow both array and string since we handle both
     link: PropTypes.string,
-    fuelType: PropTypes.string
+    fuelType: PropTypes.string,
+    chartData: PropTypes.array
   }).isRequired,
   children: PropTypes.node,
   usedVisualizations: PropTypes.arrayOf(PropTypes.string)

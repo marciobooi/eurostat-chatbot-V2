@@ -91,5 +91,11 @@
     "external_link": "Öffnen Sie diese Daten auf der Eurostat-Website in einem neuen Tab",
     "show_more": "Ältere Nachrichten aus Ihrem Chat-Verlauf laden",
     "clear_button": "Alle Nachrichten und den Chat-Verlauf löschen"
+  },
+  "errors": {
+    "processing": "Ich habe Schwierigkeiten das zu verstehen. Könnten Sie es anders formulieren?",
+    "visualization": "Entschuldigung, ich kann die Visualisierung momentan nicht generieren.",
+    "network": "Ich habe Probleme mit der Verbindung zum Datendienst.",
+    "general": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut."
   }
 }

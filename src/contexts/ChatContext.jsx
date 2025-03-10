@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { saveChatToCookie, loadChatFromCookie, setupCrossTabbingSyncListeners } from '../utils/storageHandlers';
-import { welcomeMessages } from '../dictionaries/welcomeMessages';
-import { getRandomElement } from '../utils/randomUtils';
+import { MessageService } from '../services/MessageService';
 
 const MESSAGES_BATCH_SIZE = 20;
 
@@ -31,13 +30,9 @@ export const ChatProvider = ({ children }) => {
   // Update visible messages when total messages or display count changes
   useEffect(() => {
     if (allMessages.length > 0) {
-      if (allMessages.length > displayCount) {
-        setVisibleMessages(allMessages.slice(allMessages.length - displayCount));
-        setShowMoreButton(true);
-      } else {
-        setVisibleMessages(allMessages);
-        setShowMoreButton(false);
-      }
+      const startIndex = Math.max(0, allMessages.length - displayCount);
+      setVisibleMessages(allMessages.slice(startIndex));
+      setShowMoreButton(allMessages.length > displayCount);
     } else {
       setVisibleMessages([]);
       setShowMoreButton(false);
@@ -48,15 +43,18 @@ export const ChatProvider = ({ children }) => {
   useEffect(() => {
     const savedChat = loadChatFromCookie();
     if (savedChat?.length > 0) {
-      setAllMessages(savedChat);
-      setDisplayCount(Math.min(MESSAGES_BATCH_SIZE, savedChat.length));
+      // Ensure any loaded messages have string text values
+      const validatedChat = savedChat.map(msg => ({
+        ...msg,
+        text: typeof msg.text === 'string' ? msg.text : JSON.stringify(msg.text)
+      }));
+      setAllMessages(validatedChat);
+      // Only show last MESSAGES_BATCH_SIZE messages initially
+      setDisplayCount(Math.min(MESSAGES_BATCH_SIZE, validatedChat.length));
     } else {
-      const welcomeMessage = {
-        sender: 'bot',
-        text: getRandomElement(welcomeMessages[i18n.language] || welcomeMessages.en),
-        language: i18n.language
-      };
+      const welcomeMessage = MessageService.createWelcomeMessage(i18n.language);
       setAllMessages([welcomeMessage]);
+      setDisplayCount(MESSAGES_BATCH_SIZE);
     }
   }, [i18n.language]);
 

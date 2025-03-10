@@ -23,7 +23,7 @@ ChartJS.register(
   Legend
 );
 
-const BarChart = ({ data }) => {
+const BarChart = ({ data, type }) => {
   const { t } = useTranslation();
 
   const chartData = {
@@ -133,7 +133,8 @@ BarChart.propTypes = {
       value: PropTypes.number.isRequired,
       code: PropTypes.string.isRequired,
     })
-  ).isRequired
+  ).isRequired,
+  type: PropTypes.string
 };
 
 export default BarChart;

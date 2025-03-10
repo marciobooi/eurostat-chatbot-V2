@@ -1,4 +1,4 @@
-const affirmativePatterns = {
+export const affirmativePatterns = {
   en: [
     /\b(yes|yeah|yep|sure|ok|okay|definitely|absolutely|right|correct|agreed|indeed|yup|confirm|fine|good)\b/i,
     /\b(tell|show|give|share)\s+me\s+(more|about|it)\b/i,
@@ -24,5 +24,3 @@ const affirmativePatterns = {
     /\bbitte\b/i
   ]
 };
-
-export default affirmativePatterns;

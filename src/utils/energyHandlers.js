@@ -1,72 +1,104 @@
-import { energyDefinitionsEn } from '../dictionaries/energyDefinitionsEn';
+import { energyDictionary } from './energyDictionary';
+import { processText, findBestMatch, analyzeSentiment } from './nlpHandlers';
 
 /**
- * Creates a definition result object from a dictionary entry
- * @param {Object} definition - The definition object from the dictionary
- * @param {string} key - The key of the definition in the dictionary
- * @returns {Object} Formatted definition result 
+ * Find an energy definition based on user input
  */
-const createDefinitionResult = (definition, key) => ({
-  title: definition.title,
-  text: definition.text || '',
-  subFuels: definition.subFuels || [],
-  keywords: definition.keywords || [],
-  dataset: definition.dataset,
-  hasVisualization: definition.hasVisualization,
-  visualizationType: definition.visualizationType,
-  link: definition.link,
-  fuelType: key // Store the actual dictionary key as the fuel type
-});
+export const findEnergyDefinition = async (input, language = 'en') => {
+  // Process the input text with NLP
+  const nlpResults = await processText(input, language);
+  const sentiment = analyzeSentiment(input, language);
+
+  // Get all topics and their keywords from the dictionary
+  const dictionary = energyDictionary[language] || energyDictionary.en;
+  const topics = Object.keys(dictionary);
+
+  // Clean and normalize the input
+  const cleanedInput = input.toLowerCase().trim();
+
+  // Direct topic match (case insensitive)
+  const directTopicMatch = topics.find(topic => topic.toLowerCase() === cleanedInput);
+  if (directTopicMatch) {
+    return dictionary[directTopicMatch];
+  }
+
+  // Create an extended topics list that includes keywords
+  const extendedTopics = topics.reduce((acc, topic) => {
+    const def = dictionary[topic];
+    if (def.keywords) {
+      acc.push(...def.keywords.map(keyword => ({ keyword, topic })));
+    }
+    if (def.key_concepts) {
+      acc.push(...def.key_concepts.map(concept => ({ keyword: concept.toLowerCase(), topic })));
+    }
+    return acc;
+  }, []);
+
+  // Find best matches among topics and keywords
+  const directMatch = findBestMatch(cleanedInput, topics);
+  const keywordMatch = findBestMatch(cleanedInput, extendedTopics.map(et => et.keyword));
+
+  // Use a higher threshold for matching
+  const MATCH_THRESHOLD = 0.6;
+
+  // Determine the best overall match
+  let matchedTopic;
+  if (directMatch.rating > MATCH_THRESHOLD) {
+    matchedTopic = topics[directMatch.bestMatchIndex];
+  } else if (keywordMatch.rating > MATCH_THRESHOLD) {
+    matchedTopic = extendedTopics[keywordMatch.bestMatchIndex].topic;
+  }
+
+  return matchedTopic ? dictionary[matchedTopic] : null;
+};
 
 /**
- * Searches for an energy definition based on a query
- * @param {string} query - The search query
- * @param {string} language - The language code (defaults to 'en')
- * @param {boolean} exactMatch - Whether to only look for exact matches
- * @returns {Object|null} The matching energy definition or null if not found
+ * Get related topics based on energy definition
  */
-export const findEnergyDefinition = (query, language = 'en', exactMatch = false) => {
-  // Validate inputs
-  if (!query || !energyDefinitionsEn) {
-    return null;
-  }
+export const getRelatedTopics = (topic, language = 'en') => {
+  const dictionary = energyDictionary[language] || energyDictionary.en;
+  const definition = dictionary[topic];
+  
+  if (!definition) return [];
+  
+  const related = new Set([
+    ...(definition.related || []),
+    ...(definition.subFuels || [])
+  ]);
+  
+  return Array.from(related);
+};
 
-  const dict = energyDefinitionsEn;
-  const searchQuery = query.toLowerCase().trim();
+/**
+ * Check if a topic has visualization support
+ */
+export const hasVisualization = (topic, language = 'en') => {
+  const dictionary = energyDictionary[language] || energyDictionary.en;
+  return dictionary[topic]?.hasVisualization || false;
+};
+
+/**
+ * Get available visualization types for a topic
+ */
+export const getVisualizationTypes = (topic, language = 'en') => {
+  const dictionary = energyDictionary[language] || energyDictionary.en;
+  return dictionary[topic]?.visualizationType || [];
+};
+
+/**
+ * Get dataset information for a topic
+ */
+export const getDatasetInfo = (topic, language = 'en') => {
+  const dictionary = energyDictionary[language] || energyDictionary.en;
+  const definition = dictionary[topic];
   
-  // First check for exact matches on key or title
-  for (const [key, definition] of Object.entries(dict)) {
-    // Try an exact match on the key
-    if (key.toLowerCase() === searchQuery) {
-      return createDefinitionResult(definition, key);
-    }
-    
-    // Try an exact match on the title
-    if (definition.title?.toLowerCase() === searchQuery) {
-      return createDefinitionResult(definition, key);
-    }
-  }
+  if (!definition) return null;
   
-  // If we're doing an exact match only, stop here
-  if (exactMatch) {
-    return null;
-  }
-  
-  // If no exact matches found and we're not requiring exact matches,
-  // continue with the broader search logic
-  for (const [key, definition] of Object.entries(dict)) {
-    // Check if any of the fields include the search query
-    if (
-      key.toLowerCase().includes(searchQuery) ||
-      definition.title?.toLowerCase().includes(searchQuery) ||
-      definition.subFuels?.some(fuel => fuel.toLowerCase().includes(searchQuery)) ||
-      definition.keywords?.some(k => k.toLowerCase().includes(searchQuery)) ||
-      definition.key_concepts?.some(k => k.toLowerCase().includes(searchQuery)) ||
-      definition.fuelCode?.toLowerCase().includes(searchQuery)
-    ) {
-      return createDefinitionResult(definition, key);
-    }
-  }
-  
-  return null;
+  return {
+    dataset: definition.dataset,
+    fuelCode: definition.fuelCode,
+    nrg_bal: definition.nrg_bal,
+    siec: definition.siec,
+    unit: definition.unit
+  };
 };
