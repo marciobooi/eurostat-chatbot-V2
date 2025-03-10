@@ -1,7 +1,11 @@
 .visualization-chart-wrapper {
+  flex: 1;
+  min-height: 300px;
+  width: 100%;
+  position: relative;
   display: flex;
-      align-items: center;
-      position: relative;
+  align-items: center;
+  justify-content: center;
 }
 
 .visualization-legend {
@@ -55,10 +59,9 @@
 }
 
 .visualization-chart-container {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
 .visualization-source {
@@ -74,17 +77,24 @@
 }
 
 .visualization-container {
+  width: 100%;
+  min-height: 400px;
+  max-height: 500px;
   display: flex;
   flex-direction: column;
-  gap: .2rem;
-  padding: .7rem 0;
+  padding: 1rem;
+  background: var(--neutral-100);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .visualization-bottom-legend {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  padding: .5rem;
+  justify-content: center;
+  padding: 0.5rem;
+  margin-top: auto;
   border-top: 1px solid var(--neutral-200);
 }
 
@@ -153,11 +163,55 @@
 .visualization-description {
   font-size: .8rem;
 }
+
+/* Move visualization options inside container */
+.visualization-container .message-visualization-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--neutral-200);
+}
+
+.visualization-container .message-visualization-icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--neutral-200);
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  color: var(--primary-blue);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  min-width: 44px;
+  height: 44px;
+}
+
+.visualization-container .message-visualization-icon-button:hover {
+  background: var(--primary-blue-light);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.visualization-container .viz-icon {
+  font-size: 1.1rem;
+}
+
 /* Responsive adjustments */
 @media (max-width: 640px) {
+  .visualization-container {
+    min-height: 350px;
+    padding: 0.75rem;
+  }
+
   .visualization-chart-wrapper {
-    flex-direction: column-reverse;
-    padding: 1rem;
+    min-height: 250px;
   }
 
   .visualization-legend {
@@ -181,7 +235,7 @@
   }
 
   .visualization-bottom-legend {
-    padding: 1rem;
+    padding: 0.5rem;
   }
 
   .legend-item {
@@ -192,5 +246,16 @@
   .legend-values {
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .visualization-container .message-visualization-options {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .visualization-container .message-visualization-icon-button {
+    padding: 0.5rem;
+    min-width: 38px;
+    height: 38px;
   }
 }

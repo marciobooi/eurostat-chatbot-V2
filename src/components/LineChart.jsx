@@ -139,7 +139,7 @@ LineChart.propTypes = {
       value: PropTypes.number.isRequired,
       code: PropTypes.string.isRequired,
     })
-  ).isRequired,
+  ).isRequired
 };
 
 export default LineChart;

@@ -2,6 +2,7 @@
  * Handlers for creating and managing bot responses
  */
 import { unknownResponses } from '../dictionaries/unknownResponses';
+import { energyDefinitionsEn } from '../dictionaries/energyDefinitionsEn';
 
 /**
  * Get a random response when the bot doesn't understand the query
@@ -35,6 +36,11 @@ export const createBotResponse = (definition, language = 'en') => {
     };
   }
   
+  // Get the fuel type from the definition key
+  const fuelType = Object.entries(energyDefinitionsEn).find(
+    ([_, def]) => def.title === definition.title
+  )?.[0] || definition.title?.toLowerCase();
+  
   // Create structured bot response with all available information
   return {
     sender: 'bot',
@@ -45,7 +51,8 @@ export const createBotResponse = (definition, language = 'en') => {
     hasVisualization: definition.hasVisualization || false,
     visualizationType: definition.visualizationType || [],
     dataset: definition.dataset,
-    link: definition.link
+    link: definition.link,
+    fuelType // Include the fuel type in the response
   };
 };
 

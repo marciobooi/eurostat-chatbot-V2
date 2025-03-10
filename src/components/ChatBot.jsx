@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPaperPlane, faTrash, faHistory } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faTrash, faHistory, faChartPie, faChartBar, faChartLine, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'react-tooltip';
 import ScrollButton from './ScrollButton';
@@ -16,6 +16,13 @@ import BarChart from './BarChart';
 // Number of messages to display initially and to add when "Show More" is clicked
 const MESSAGES_BATCH_SIZE = 20;
 
+// Map of visualization types to their corresponding icons
+const vizIconMap = {
+  'pie': faChartPie,
+  'bar': faChartBar,
+  'line': faChartLine
+};
+
 /**
  * ChatBot component provides the main chat interface
  * Handles message display, user input, and chat controls
@@ -29,6 +36,7 @@ const ChatBot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [showMoreButton, setShowMoreButton] = useState(false);
+  const [usedVisualizations, setUsedVisualizations] = useState([]);
 
   // Refs for DOM elements
   const messagesContainerRef = useRef(null);
@@ -116,6 +124,9 @@ const ChatBot = () => {
     e.preventDefault();
     if (!input.trim() || isTyping) return;
     
+    // Reset visualizations when sending a new message
+    setUsedVisualizations([]);
+    
     handleSendMessage(
       input, 
       i18n.language, 
@@ -142,6 +153,9 @@ const ChatBot = () => {
    * Handle clicking on a suggestion topic
    */
   const onSuggestionClick = useCallback((topic) => {
+    // Reset visualizations when clicking a suggestion
+    setUsedVisualizations([]);
+    
     handleSuggestionClick(
       topic, 
       i18n.language, 
@@ -169,7 +183,10 @@ const ChatBot = () => {
   /**
    * Handle visualization selection from a message
    */
-  const handleVisualizationSelect = useCallback(({ type, data, title, fuelType }) => {
+  const handleVisualizationSelect = useCallback(({ type, data, title, fuelType, usedType, visualizationType, link }) => {
+    // Track used visualization type
+    setUsedVisualizations(prev => [...prev, usedType]);
+
     // Create a new bot message with the visualization
     const visualizationMessage = {
       sender: 'bot',
@@ -178,30 +195,37 @@ const ChatBot = () => {
       chartType: type,
       chartData: data,
       language: i18n.language,
-      isVisualization: true
+      isVisualization: true,
+      hasVisualization: true,
+      visualizationType,
+      suggestions: allMessages[allMessages.length - 1]?.suggestions || [],
+      link,
+      fuelType // Pass through the fuel type
     };
 
     // Add the new message to the chat
     updateMessages(prev => [...prev, visualizationMessage]);
     
-    // Always show the latest messages when adding a visualization
+    // Reset to showing most recent messages
     setDisplayCount(MESSAGES_BATCH_SIZE);
-  }, [t, i18n.language, updateMessages]);
+  }, [t, i18n.language, updateMessages, allMessages]);
 
-  const renderChartMessage = (message) => {
+  const renderChartMessage = useCallback((message) => {
     if (!message.isVisualization || !message.chartData) return null;
+
+    const props = { data: message.chartData };
 
     switch (message.chartType.toLowerCase()) {
       case 'pie':
-        return <PieChart data={message.chartData} />;
+        return <PieChart {...props} />;
       case 'line':
-        return <LineChart data={message.chartData} />;
+        return <LineChart {...props} />;
       case 'bar':
-        return <BarChart data={message.chartData} />;
+        return <BarChart {...props} />;
       default:
         return null;
     }
-  };
+  }, []);
 
   // Load saved chat history on initial render
   useEffect(() => {
@@ -286,6 +310,7 @@ const ChatBot = () => {
             key={`msg-${allMessages.length - visibleMessages.length + index}`}
             message={msg}
             onVisualizationSelect={handleVisualizationSelect}
+            usedVisualizations={usedVisualizations}
           >
             {msg.isVisualization && renderChartMessage(msg)}
           </ChatMessage>

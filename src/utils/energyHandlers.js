@@ -3,9 +3,10 @@ import { energyDefinitionsEn } from '../dictionaries/energyDefinitionsEn';
 /**
  * Creates a definition result object from a dictionary entry
  * @param {Object} definition - The definition object from the dictionary
+ * @param {string} key - The key of the definition in the dictionary
  * @returns {Object} Formatted definition result 
  */
-const createDefinitionResult = (definition) => ({
+const createDefinitionResult = (definition, key) => ({
   title: definition.title,
   text: definition.text || '',
   subFuels: definition.subFuels || [],
@@ -13,7 +14,8 @@ const createDefinitionResult = (definition) => ({
   dataset: definition.dataset,
   hasVisualization: definition.hasVisualization,
   visualizationType: definition.visualizationType,
-  link: definition.link // Added link property
+  link: definition.link,
+  fuelType: key // Store the actual dictionary key as the fuel type
 });
 
 /**
@@ -36,12 +38,12 @@ export const findEnergyDefinition = (query, language = 'en', exactMatch = false)
   for (const [key, definition] of Object.entries(dict)) {
     // Try an exact match on the key
     if (key.toLowerCase() === searchQuery) {
-      return createDefinitionResult(definition);
+      return createDefinitionResult(definition, key);
     }
     
     // Try an exact match on the title
     if (definition.title?.toLowerCase() === searchQuery) {
-      return createDefinitionResult(definition);
+      return createDefinitionResult(definition, key);
     }
   }
   
@@ -62,7 +64,7 @@ export const findEnergyDefinition = (query, language = 'en', exactMatch = false)
       definition.key_concepts?.some(k => k.toLowerCase().includes(searchQuery)) ||
       definition.fuelCode?.toLowerCase().includes(searchQuery)
     ) {
-      return createDefinitionResult(definition);
+      return createDefinitionResult(definition, key);
     }
   }
   

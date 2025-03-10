@@ -117,21 +117,10 @@ const PieChart = ({ data }) => {
               />
               <span className="legend-label">{item.name}</span>
             </div>
-            {/* <div className="legend-value">{Math.round(item.value)}</div> */}
           </div>
         ))}
       </div>
     </div>
-
-
-
-
-
-
-
-
-
-
   );
 };
 
@@ -142,7 +131,7 @@ PieChart.propTypes = {
       value: PropTypes.number.isRequired,
       code: PropTypes.string.isRequired,
     })
-  ).isRequired,
+  ).isRequired
 };
 
 export default PieChart;

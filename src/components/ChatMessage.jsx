@@ -12,7 +12,7 @@ import { fetchEurostatData } from '../utils/eurostatApi';
  * @param {Object} props - Component props
  * @param {Object} props.message - Message data object
  */
-const ChatMessage = ({ message, onVisualizationSelect, children }) => {
+const ChatMessage = ({ message, onVisualizationSelect, children, usedVisualizations = [] }) => {
   const { t } = useTranslation();
   const isBot = message.sender === 'bot';
   const [isLoading, setIsLoading] = useState(false);
@@ -30,26 +30,30 @@ const ChatMessage = ({ message, onVisualizationSelect, children }) => {
     'line': faChartLine
   };
 
+  // Filter out already used visualization types
+  const remainingVisualizations = message.visualizationType?.filter(
+    type => !usedVisualizations.includes(type)
+  ) || [];
+
   const handleVisualizationClick = async (type) => {
     try {
-      if (!message.hasVisualization || !message.text) {
-        console.warn('No visualization data available');
+      if (!message.hasVisualization || !message.fuelType) {
+        console.warn('No visualization data available or missing fuel type');
         return;
       }
       
       setIsLoading(true);
       
-      // Fetch data from Eurostat API
-      const fuelType = message.title?.toLowerCase() || message.text.toLowerCase();
-      const data = await fetchEurostatData(fuelType, 'visualization', type);
-      console.log('Visualization data:', data);
+      const data = await fetchEurostatData(message.fuelType, 'visualization', type);
       
-      // Send the visualization data to parent
       onVisualizationSelect({
         type,
         data,
         title: message.title || message.text,
-        fuelType
+        fuelType: message.fuelType,
+        usedType: type,
+        link: message.link,
+        visualizationType: message.visualizationType
       });
     } catch (error) {
       console.error('Error fetching visualization data:', error);
@@ -57,6 +61,51 @@ const ChatMessage = ({ message, onVisualizationSelect, children }) => {
       setIsLoading(false);
     }
   };
+
+  // Visualization options component
+  const renderVisualizationOptions = () => (
+    <div className="message-visualization-options">
+      {/* Show visualization buttons only if there are remaining visualizations */}
+      {message.hasVisualization && remainingVisualizations.length > 0 && 
+        remainingVisualizations.map((type, index) => (
+          <button
+            key={`viz-${type}-${index}`}
+            className="message-visualization-icon-button"
+            aria-label={t('visualization.show_chart', { type })}
+            type="button"
+            data-tooltip-id={`viz-tooltip-${type}-${index}`}
+            data-tooltip-content={t('tooltips.visualization', { type })}
+            onClick={() => handleVisualizationClick(type)}
+            disabled={isLoading}
+          >
+            <FontAwesomeIcon
+              icon={vizIconMap[type] || faChartBar}
+              className="viz-icon"
+              aria-hidden="true"
+            />
+          </button>
+        ))
+      }
+      {/* Always show link button if link exists */}
+      {message.link && (
+        <a
+          href={message.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="message-visualization-icon-button"
+          aria-label={t('common.view_source')}
+          data-tooltip-id="external-link-tooltip"
+          data-tooltip-content={t('tooltips.external_link')}
+        >
+          <FontAwesomeIcon
+            icon={faExternalLinkAlt}
+            className="viz-icon"
+            aria-hidden="true"
+          />
+        </a>
+      )}
+    </div>
+  );
 
   return (
     <div className={`message-wrapper ${wrapperClass}`}>
@@ -80,59 +129,13 @@ const ChatMessage = ({ message, onVisualizationSelect, children }) => {
           {message.text}
         </div>
 
-        {/* Render visualization if present */}
+        {/* Render chart visualization */}
         {children}
 
-        {/* Display visualization icons and link icon for bot messages */}
-        {isBot && (message.hasVisualization || message.link) && (
-          <div className="message-visualization-options">
-            {/* Visualization type icons */}
-            {message.hasVisualization && message.visualizationType && 
-              message.visualizationType.map((type, index) => (
-                <React.Fragment key={`viz-${type}-${index}`}>
-                  <button
-                    className="message-visualization-icon-button"
-                    aria-label={t('visualization.show_chart', { type })}
-                    type="button"
-                    data-tooltip-id={`viz-tooltip-${type}-${index}`}
-                    data-tooltip-content={t('tooltips.visualization', { type })}
-                    onClick={() => handleVisualizationClick(type)}
-                    disabled={isLoading}
-                  >
-                    <FontAwesomeIcon
-                      icon={vizIconMap[type] || faChartBar}
-                      className="viz-icon"
-                      aria-hidden="true"
-                    />
-                  </button>
-                  <Tooltip id={`viz-tooltip-${type}-${index}`} place="top" effect="solid" />
-                </React.Fragment>
-              ))
-            }
-            
-            {/* External link icon - always display if link exists in message */}
-            {message.link && (
-              <React.Fragment>
-                <a
-                  href={message.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="message-visualization-icon-button"
-                  aria-label={t('common.view_source')}
-                  data-tooltip-id="external-link-tooltip"
-                  data-tooltip-content={t('tooltips.external_link')}
-                >
-                  <FontAwesomeIcon
-                    icon={faExternalLinkAlt}
-                    className="viz-icon"
-                    aria-hidden="true"
-                  />
-                </a>
-                <Tooltip id="external-link-tooltip" place="top" effect="solid" />
-              </React.Fragment>
-            )}
-          </div>
-        )}
+        {/* Show visualization options if the message is from bot and has visualizations or link */}
+        {isBot && (
+          (message.hasVisualization && remainingVisualizations.length > 0) || message.link
+        ) && renderVisualizationOptions()}
 
         {/* Loading indicator */}
         {isLoading && (
@@ -153,10 +156,12 @@ ChatMessage.propTypes = {
     language: PropTypes.string,
     hasVisualization: PropTypes.bool,
     visualizationType: PropTypes.arrayOf(PropTypes.string),
-    link: PropTypes.string
+    link: PropTypes.string,
+    fuelType: PropTypes.string
   }).isRequired,
   onVisualizationSelect: PropTypes.func.isRequired,
-  children: PropTypes.node
+  children: PropTypes.node,
+  usedVisualizations: PropTypes.arrayOf(PropTypes.string)
 };
 
 export default ChatMessage;
