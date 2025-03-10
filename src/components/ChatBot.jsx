@@ -1,281 +1,79 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPaperPlane, faTrash, faHistory, faChartPie, faChartBar, faChartLine, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'react-tooltip';
 import ScrollButton from './ScrollButton';
-import ChatMessage from './ChatMessage';
-import TypingIndicator from './TypingIndicator';
-import { handleSendMessage, handleClearChat, handleSuggestionClick, handleScroll } from '../utils/chatHandlers';
-import { saveChatToCookie, loadChatFromCookie, setupCrossTabbingSyncListeners } from '../utils/storageHandlers';
-import '../styles/ChatBot.css';
+import MessagesContainer from './MessagesContainer';
 import PieChart from './PieChart';
 import LineChart from './LineChart';
 import BarChart from './BarChart';
-import { welcomeMessages } from '../dictionaries/welcomeMessages';
-import { getRandomElement } from '../utils/randomUtils';
-
-// Number of messages to display initially and to add when "Show More" is clicked
-const MESSAGES_BATCH_SIZE = 20;
-
-// Map of visualization types to their corresponding icons
-const vizIconMap = {
-  'pie': faChartPie,
-  'bar': faChartBar,
-  'line': faChartLine
-};
+import { useChatContext } from '../contexts/ChatContext';
+import { useChatInteractions } from '../hooks/useChatInteractions';
+import '../styles/ChatBot.css';
 
 /**
  * ChatBot component provides the main chat interface
- * Handles message display, user input, and chat controls
  */
 const ChatBot = () => {
-  // State management
-  const [allMessages, setAllMessages] = useState([]); // All messages from storage
-  const [visibleMessages, setVisibleMessages] = useState([]); // Messages currently displayed
-  const [displayCount, setDisplayCount] = useState(MESSAGES_BATCH_SIZE); // Number of messages to show
-  const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [showScrollButton, setShowScrollButton] = useState(false);
-  const [showMoreButton, setShowMoreButton] = useState(false);
-  const [usedVisualizations, setUsedVisualizations] = useState([]);
+  // Hooks
+  const { t } = useTranslation();
+  const {
+    input,
+    setInput,
+    isTyping,
+    showScrollButton,
+    showMoreButton,
+    usedVisualizations,
+    visibleMessages,
+    allMessages,
+    setShowScrollButton,
+    loadMoreMessages
+  } = useChatContext();
 
-  // Refs for DOM elements
+  const {
+    handleSendMessage,
+    handleVisualizationSelect,
+    handleClearChat,
+    handleSuggestionClick
+  } = useChatInteractions();
+
+  // Refs
   const messagesContainerRef = useRef(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
-  
-  // Translation hook
-  const { t, i18n } = useTranslation();
 
-  /**
-   * Updates the number of visible messages when displayCount changes
-   */
-  useEffect(() => {
-    if (allMessages.length > 0) {
-      if (allMessages.length > displayCount) {
-        // Show the latest batch of messages (most recent first)
-        setVisibleMessages(allMessages.slice(allMessages.length - displayCount));
-        setShowMoreButton(true);
-      } else {
-        // If we have fewer messages than the display count, just show all of them
-        setVisibleMessages(allMessages);
-        setShowMoreButton(false);
-      }
-    } else {
-      setVisibleMessages([]);
-      setShowMoreButton(false);
-    }
-  }, [allMessages, displayCount]);
-
-  /**
-   * Load more messages when the user clicks "Show More"
-   */
-  const handleShowMore = useCallback(() => {
-    const newDisplayCount = Math.min(displayCount + MESSAGES_BATCH_SIZE, allMessages.length);
-    setDisplayCount(newDisplayCount);
-    
-    // Remember scroll position to prevent jumping
-    const container = messagesContainerRef.current;
-    const scrollPosition = container.scrollHeight - container.scrollTop;
-    
-    // After updating, restore the relative scroll position
-    setTimeout(() => {
-      if (container) {
-        container.scrollTop = container.scrollHeight - scrollPosition;
-      }
-    }, 50);
-  }, [displayCount, allMessages.length]);
-
-  /**
-   * Custom setMessages function that also saves to cookies
-   */
-  const updateMessages = useCallback((newMessages) => {
-    // If newMessages is a function, call it with current messages to get the new value
-    if (typeof newMessages === 'function') {
-      setAllMessages(prevMessages => {
-        const updatedMessages = newMessages(prevMessages);
-        saveChatToCookie(updatedMessages);
-        return updatedMessages;
-      });
-    } else {
-      // Otherwise just set the messages directly
-      setAllMessages(newMessages);
-      saveChatToCookie(newMessages);
-    }
-  }, []);
-
-  /**
-   * Smoothly scroll to the bottom of the messages container
-   */
+  // Scroll handlers
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
-  /**
-   * Handle container scroll to show/hide scroll button
-   */
   const onScroll = useCallback(() => {
-    handleScroll(messagesContainerRef.current, setShowScrollButton);
-  }, []);
-
-  /**
-   * Handle user message submission
-   */
-  const onSend = useCallback((e) => {
-    e.preventDefault();
-    if (!input.trim() || isTyping) return;
+    if (!messagesContainerRef.current) return;
     
-    // Reset visualizations when sending a new message
-    setUsedVisualizations([]);
-    
-    handleSendMessage(
-      input, 
-      i18n.language, 
-      updateMessages, // Use our custom updater 
-      setIsTyping, 
-      setInput, 
-      allMessages, 
-      isTyping
-    );
-    
-    // Always show the latest messages when sending a new message
-    setDisplayCount(MESSAGES_BATCH_SIZE);
-  }, [input, i18n.language, allMessages, isTyping, updateMessages]);
+    const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
+    const scrollThreshold = 100;
+    setShowScrollButton(scrollHeight - scrollTop - clientHeight > scrollThreshold);
+  }, [setShowScrollButton]);
 
-  /**
-   * Handle clearing the chat history
-   */
-  const onClearChat = useCallback(() => {
-    handleClearChat(updateMessages, t); // Use our custom updater
-    setDisplayCount(MESSAGES_BATCH_SIZE);
-  }, [t, updateMessages]);
-
-  /**
-   * Handle clicking on a suggestion topic
-   */
-  const onSuggestionClick = useCallback((topic) => {
-    // Reset visualizations when clicking a suggestion
-    setUsedVisualizations([]);
-    
-    handleSuggestionClick(
-      topic, 
-      i18n.language, 
-      updateMessages, // Use our custom updater
-      setIsTyping, 
-      setInput, 
-      allMessages, 
-      isTyping
-    );
-    
-    // Reset to the most recent messages when clicking a suggestion
-    setDisplayCount(MESSAGES_BATCH_SIZE);
-  }, [i18n.language, allMessages, isTyping, updateMessages]);
-
-  /**
-   * Get smart message suggestions from the last bot message
-   */
-  const getSmartMessages = useCallback(() => {
-    if (!allMessages.length) return [];
-    const lastMessage = allMessages[allMessages.length - 1];
-    return lastMessage.sender === 'bot' && lastMessage.suggestions ? 
-           lastMessage.suggestions : [];
-  }, [allMessages]);
-
-  /**
-   * Handle visualization selection from a message
-   */
-  const handleVisualizationSelect = useCallback(({ type, data, title, fuelType, usedType, visualizationType, link }) => {
-    // Track used visualization type
-    setUsedVisualizations(prev => [...prev, usedType]);
-
-    // Create a new bot message with the visualization
-    const visualizationMessage = {
-      sender: 'bot',
-      text: t('visualization.description', { dataset: title }),
-      title: t(`visualization.${type.toLowerCase()}.title`),
-      chartType: type,
-      chartData: data,
-      language: i18n.language,
-      isVisualization: true,
-      hasVisualization: true,
-      visualizationType,
-      suggestions: allMessages[allMessages.length - 1]?.suggestions || [],
-      link,
-      fuelType // Pass through the fuel type
-    };
-
-    // Add the new message to the chat
-    updateMessages(prev => [...prev, visualizationMessage]);
-    
-    // Reset to showing most recent messages
-    setDisplayCount(MESSAGES_BATCH_SIZE);
-  }, [t, i18n.language, updateMessages, allMessages]);
-
+  // Chart rendering
   const renderChartMessage = useCallback((message) => {
     if (!message.isVisualization || !message.chartData) return null;
 
     const props = { data: message.chartData };
 
     switch (message.chartType.toLowerCase()) {
-      case 'pie':
-        return <PieChart {...props} />;
-      case 'line':
-        return <LineChart {...props} />;
-      case 'bar':
-        return <BarChart {...props} />;
-      default:
-        return null;
+      case 'pie': return <PieChart {...props} />;
+      case 'line': return <LineChart {...props} />;
+      case 'bar': return <BarChart {...props} />;
+      default: return null;
     }
   }, []);
 
-  // Load saved chat history on initial render
-  useEffect(() => {
-    const savedChat = loadChatFromCookie();
-    if (savedChat && savedChat.length > 0) {
-      setAllMessages(savedChat);
-      setDisplayCount(Math.min(MESSAGES_BATCH_SIZE, savedChat.length));
-    } else {
-      // If no saved chat, initialize with welcome message
-      const welcomeMessage = {
-        sender: 'bot',
-        text: getRandomElement(welcomeMessages[i18n.language] || welcomeMessages.en),
-        language: i18n.language
-      };
-      setAllMessages([welcomeMessage]);
-    }
-  }, [i18n.language]);
-
-  // Set up cross-tab synchronization
-  useEffect(() => {
-    const cleanupSync = setupCrossTabbingSyncListeners((syncedMessages) => {
-      if (syncedMessages) {
-        // Only update if we have messages and they're different from current
-        if (JSON.stringify(syncedMessages) !== JSON.stringify(allMessages)) {
-          setAllMessages(syncedMessages);
-          setDisplayCount(Math.min(MESSAGES_BATCH_SIZE, syncedMessages.length));
-        }
-      } else {
-        // If null was sent, clear messages
-        setAllMessages([]);
-        setDisplayCount(MESSAGES_BATCH_SIZE);
-      }
-    });
-    
-    // Cleanup function for the effect
-    return cleanupSync;
-  }, [allMessages]);
-
-  // Scroll to bottom when messages change
-  useEffect(() => {
-    // Only auto-scroll if we're looking at the most recent messages
-    if (allMessages.length <= displayCount) {
-      scrollToBottom();
-    }
-  }, [visibleMessages, scrollToBottom, allMessages.length, displayCount]);
-
-  // Smart messages to display
-  const smartMessages = getSmartMessages();
+  // Get smart message suggestions
+  const smartMessages = allMessages.length > 0 
+    ? (allMessages[allMessages.length - 1]?.suggestions || [])
+    : [];
 
   return (
     <div 
@@ -284,52 +82,20 @@ const ChatBot = () => {
       aria-label={t('common.chat')}
     >
       {/* Messages container */}
-      <div 
-        className="messages" 
-        ref={messagesContainerRef} 
+      <MessagesContainer 
+        messagesContainerRef={messagesContainerRef}
+        messagesEndRef={messagesEndRef}
+        showMoreButton={showMoreButton}
+        handleShowMore={loadMoreMessages}
+        visibleMessages={visibleMessages}
+        isTyping={isTyping}
+        t={t}
+        onVisualizationSelect={handleVisualizationSelect}
+        usedVisualizations={usedVisualizations}
+        allMessages={allMessages}
+        renderChartMessage={renderChartMessage}
         onScroll={onScroll}
-        role="log"
-        aria-live="polite"
-      >
-        {/* Show More button at the top of the messages */}
-        {showMoreButton && (
-          <div className="show-more-container">
-            <button
-              onClick={handleShowMore}
-              className="show-more-button"
-              aria-label={t('accessibility.show_more_button')}
-              type="button"
-              data-tooltip-id="show-more-tooltip"
-              data-tooltip-content={t('tooltips.show_more')}
-            >
-              <FontAwesomeIcon icon={faHistory} aria-hidden="true" /> 
-              {t('chat.show_more')}
-            </button>
-            <Tooltip id="show-more-tooltip" place="bottom" effect="solid" />
-          </div>
-        )}
-        
-        {visibleMessages.length === 0 && (
-          <div className="no-messages" role="status">
-            {t('chat.no_messages')}
-          </div>
-        )}
-        
-        {visibleMessages.map((msg, index) => (
-          <ChatMessage
-            key={`msg-${allMessages.length - visibleMessages.length + index}`}
-            message={msg}
-            onVisualizationSelect={handleVisualizationSelect}
-            usedVisualizations={usedVisualizations}
-          >
-            {msg.isVisualization && renderChartMessage(msg)}
-          </ChatMessage>
-        ))}
-
-        {isTyping && <TypingIndicator />}
-
-        <div ref={messagesEndRef} aria-hidden="true" />
-      </div>
+      />
 
       {/* Scroll button */}
       <ScrollButton 
@@ -349,7 +115,7 @@ const ChatBot = () => {
             <button
               key={`suggestion-${index}`}
               className="smart-message-btn"
-              onClick={() => onSuggestionClick(suggestion)}
+              onClick={() => handleSuggestionClick(suggestion)}
               aria-label={t('suggestions.click_to_learn', { topic: suggestion })}
               type="button"
             >
@@ -361,7 +127,7 @@ const ChatBot = () => {
 
       {/* Input form */}
       <form 
-        onSubmit={onSend} 
+        onSubmit={handleSendMessage} 
         className="input-container"
         role="form"
       >
@@ -375,9 +141,7 @@ const ChatBot = () => {
           className="chat-input"
           aria-label={t('accessibility.input_field')}
           role="textbox"
-          lang={i18n.language}
         />
-
         <button
           type="submit"
           className="send-button"
@@ -391,7 +155,7 @@ const ChatBot = () => {
       {/* Control panel */}
       <div className="control-panel">
         <button
-          onClick={onClearChat}
+          onClick={handleClearChat}
           className="clear-button"
           aria-label={t('accessibility.clear_button')}
           title={t('common.clear_chat')}
