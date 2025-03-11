@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { energyDefinitionsEn } from '../dictionaries/energyDefinitionsEn';
+import { energyDictionary } from './energyDictionary';
+import { CONFIG } from '../i18n';
 import { datasetRuller } from '../dictionaries/datasetDictionary';
 import { transformPieChartData, transformLineChartData, transformBarChartData } from './chartDataTransformers';
 
@@ -7,13 +8,16 @@ const BASE_URL = 'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0
 
 const DEFAULT_PARAMS = {
   geo: 'EU27_2020',
-  lang: 'en'
+  lang: CONFIG.DEFAULT_LANGUAGE
 };
 
-export const fetchEurostatData = async (fuelType, queryType, chartType = null) => {
+export const fetchEurostatData = async (fuelType, queryType, chartType = null, language = CONFIG.DEFAULT_LANGUAGE) => {
   try {
+    // Use language-specific dictionary with fallback
+    const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
+    
     // Find fuel definition by looking up in both the key and fuelCode
-    const fuelDefinition = Object.values(energyDefinitionsEn).find(def => 
+    const fuelDefinition = Object.values(dictionary).find(def => 
       def.fuelCode === fuelType || 
       def.title?.toLowerCase() === fuelType?.toLowerCase() ||
       def.fuelCode?.toLowerCase() === fuelType?.toLowerCase()
@@ -23,16 +27,19 @@ export const fetchEurostatData = async (fuelType, queryType, chartType = null) =
       throw new Error(`Fuel type ${fuelType} not found in energy definitions`);
     }
 
+    // Update default params with requested language
+    const params = {
+      ...DEFAULT_PARAMS,
+      lang: language
+    };
+
     // Handle different query types
     switch (queryType) {
       case 'visualization':
-        return await fetchVisualizationData(fuelDefinition, chartType);
-      // Prepare for future query types
+        return await fetchVisualizationData(fuelDefinition, chartType, params);
       case 'trends':
-        // TODO: Implement trend analysis queries
         throw new Error('Trend analysis not yet implemented');
       case 'comparison':
-        // TODO: Implement comparison queries
         throw new Error('Comparison queries not yet implemented');
       default:
         throw new Error(`Unknown query type: ${queryType}`);
@@ -43,7 +50,7 @@ export const fetchEurostatData = async (fuelType, queryType, chartType = null) =
   }
 };
 
-const fetchVisualizationData = async (fuelDefinition, chartType) => {
+const fetchVisualizationData = async (fuelDefinition, chartType, defaultParams) => {
   if (!chartType) {
     throw new Error('Chart type is required for visualization queries');
   }
@@ -59,7 +66,7 @@ const fetchVisualizationData = async (fuelDefinition, chartType) => {
   // Create URLSearchParams object with format and default params
   const params = new URLSearchParams({
     format: 'JSON',
-    ...DEFAULT_PARAMS
+    ...defaultParams
   });
 
   // Add parameters based on chart type and dataset dimensions

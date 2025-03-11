@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { saveChatToCookie, loadChatFromCookie, setupCrossTabbingSyncListeners } from '../utils/storageHandlers';
 import { MessageService } from '../services/MessageService';
@@ -26,6 +26,12 @@ export const ChatProvider = ({ children }) => {
   const [usedVisualizations, setUsedVisualizations] = useState([]);
 
   const { i18n } = useTranslation();
+  const messagesEndRef = useRef(null);
+
+  // Scroll handler function
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
 
   // Update visible messages when total messages or display count changes
   useEffect(() => {
@@ -33,11 +39,12 @@ export const ChatProvider = ({ children }) => {
       const startIndex = Math.max(0, allMessages.length - displayCount);
       setVisibleMessages(allMessages.slice(startIndex));
       setShowMoreButton(allMessages.length > displayCount);
+      scrollToBottom(); // Auto-scroll when messages update
     } else {
       setVisibleMessages([]);
       setShowMoreButton(false);
     }
-  }, [allMessages, displayCount]);
+  }, [allMessages, displayCount, scrollToBottom]);
 
   // Initialize with welcome message or load saved chat
   useEffect(() => {
@@ -104,6 +111,7 @@ export const ChatProvider = ({ children }) => {
     showScrollButton,
     showMoreButton,
     usedVisualizations,
+    messagesEndRef,
 
     // Updaters
     setInput,
@@ -112,7 +120,8 @@ export const ChatProvider = ({ children }) => {
     setUsedVisualizations,
     updateMessages,
     loadMoreMessages,
-    resetToRecentMessages
+    resetToRecentMessages,
+    scrollToBottom
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

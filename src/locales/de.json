@@ -2,20 +2,20 @@
   "common": {
     "send": "Senden",
     "clear_chat": "Chat löschen",
-    "loading": "Lädt...",
+    "loading": "Laden...",
     "error": "Fehler",
     "close": "Schließen",
     "search": "Suchen",
     "chat": "Chat",
-    "view_source": "Quelle der Daten anzeigen",
+    "view_source": "Datenquelle anzeigen",
     "view_data": "In Eurostat öffnen"
   },
   "chat": {
     "placeholder": "Fragen Sie nach Energiestatistiken...",
-    "thinking": "Denke nach...",
+    "thinking": "Nachdenken...",
     "typing": "Tippen...",
     "ask_question": "Stellen Sie eine Frage zu Energiestatistiken...",
-    "clear_confirm": "Möchten Sie den Chat-Verlauf wirklich löschen?",
+    "clear_confirm": "Sind Sie sicher, dass Sie den Chatverlauf löschen möchten?",
     "no_messages": "Noch keine Nachrichten. Starten Sie eine Unterhaltung!",
     "show_more": "Mehr Verlauf anzeigen"
   },
@@ -23,28 +23,28 @@
     "bot_message": "Bot-Nachricht",
     "user_message": "Ihre Nachricht",
     "send_button": "Nachricht senden",
-    "clear_button": "Chat-Verlauf löschen",
+    "clear_button": "Chatverlauf löschen",
     "scroll_button": "Zum Ende scrollen",
-    "input_field": "Chat-Eingabe",
+    "input_field": "Chateingabe",
     "thinking_indicator": "Bot denkt nach",
     "typing_indicator": "Bot tippt",
-    "show_more_button": "Ältere Nachrichten laden"
+    "show_more_button": "Weitere Chatnachrichten laden"
   },
   "suggestions": {
     "title": "Vorgeschlagene Themen",
     "related_topics": "Verwandte Themen",
-    "click_to_learn": "Klicken Sie hier, um mehr über {{topic}} zu erfahren",
+    "click_to_learn": "Klicken Sie, um mehr über {{topic}} zu erfahren",
     "no_suggestions": "Keine Vorschläge verfügbar",
     "subFuels": "Verwandte Brennstoffe",
     "related": "Siehe auch"
   },
   "visualization": {
-    "show_chart": "Zeige {{type}} Diagramm",
-    "view_as": "Als {{type}} Diagramm anzeigen",
+    "show_chart": "{{type}}-Diagramm anzeigen",
+    "view_as": "Als {{type}}-Diagramm anzeigen",
     "loading": "Diagramm wird geladen...",
     "error": "Fehler beim Laden des Diagramms",
     "title": "Datenvisualisierung",
-    "description": "Visuelle Darstellung der {{dataset}}-Daten",
+    "description": "Visuelle Darstellung der Daten von {{dataset}}",
     "back": "Zurück zum Chat",
     "export": "Daten exportieren",
     "fullscreen": "Vollbild anzeigen",
@@ -53,8 +53,8 @@
     "pie": {
       "title": "Verteilung nach Energiebilanz",
       "aria": {
-        "chart": "Kreisdiagramm zeigt die Verteilung der Energiebilanz",
-        "description": "Kreisdiagramm zeigt die proportionale Verteilung der Energiebilanzkomponenten"
+        "chart": "Kreisdiagramm zur Verteilung der Energiebilanz",
+        "description": "Rundes Diagramm, das die proportionale Verteilung der Energiebilanzkomponenten zeigt"
       },
       "tooltip": {
         "value": "{{name}}: {{value}} KTOE"
@@ -64,8 +64,8 @@
       "title": "Historischer Trend",
       "label": "Energiewert",
       "aria": {
-        "chart": "Liniendiagramm zeigt den historischen Energietrend",
-        "description": "Zeitreihendiagramm zeigt die Energiewerte über die Jahre"
+        "chart": "Liniendiagramm mit historischem Energietrend",
+        "description": "Zeitreihendiagramm, das Energiewerte über Jahre hinweg zeigt"
       },
       "tooltip": {
         "value": "{{year}}: {{value}} KTOE"
@@ -75,8 +75,8 @@
       "title": "Jährlicher Vergleich",
       "label": "Energiewert",
       "aria": {
-        "chart": "Balkendiagramm zeigt jährliche Energiewerte",
-        "description": "Balkendiagramm vergleicht Energiewerte zwischen verschiedenen Jahren"
+        "chart": "Balkendiagramm mit jährlichen Energiewerten",
+        "description": "Balkendiagramm, das Energiewerte über verschiedene Jahre hinweg vergleicht"
       },
       "tooltip": {
         "value": "{{year}}: {{value}} KTOE"
@@ -84,18 +84,18 @@
     }
   },
   "toast": {
-    "clearChat": "Chat-Verlauf gelöscht!"
+    "clearChat": "Chatverlauf gelöscht!"
   },
   "tooltips": {
-    "visualization": "Klicken Sie, um die {{type}} Diagramm-Visualisierung dieser Daten anzuzeigen",
-    "external_link": "Öffnen Sie diese Daten auf der Eurostat-Website in einem neuen Tab",
-    "show_more": "Ältere Nachrichten aus Ihrem Chat-Verlauf laden",
-    "clear_button": "Alle Nachrichten und den Chat-Verlauf löschen"
+    "visualization": "Klicken Sie, um die {{type}}-Diagrammvisualisierung dieser Daten anzuzeigen",
+    "external_link": "Diese Daten auf der Eurostat-Website in einem neuen Tab öffnen",
+    "show_more": "Ältere Nachrichten aus Ihrem Chatverlauf laden",
+    "clear_button": "Alle Chatnachrichten und den Verlauf löschen"
   },
   "errors": {
-    "processing": "Ich habe Schwierigkeiten das zu verstehen. Könnten Sie es anders formulieren?",
-    "visualization": "Entschuldigung, ich kann die Visualisierung momentan nicht generieren.",
-    "network": "Ich habe Probleme mit der Verbindung zum Datendienst.",
-    "general": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut."
+    "processing": "Ich habe Schwierigkeiten, das zu verstehen. Können Sie es umformulieren?",
+    "visualization": "Entschuldigung, ich konnte die Visualisierung momentan nicht erstellen.",
+    "network": "Ich habe Probleme, mich mit dem Datendienst zu verbinden.",
+    "general": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
   }
 }

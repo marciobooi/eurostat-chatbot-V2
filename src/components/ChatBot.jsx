@@ -31,7 +31,9 @@ const ChatBot = () => {
     allMessages,
     setShowScrollButton,
     loadMoreMessages,
-    updateMessages
+    updateMessages,
+    messagesEndRef,
+    scrollToBottom
   } = useChatContext();
 
   const {
@@ -43,14 +45,9 @@ const ChatBot = () => {
 
   // Refs
   const messagesContainerRef = useRef(null);
-  const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
   // Scroll handlers
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
-
   const onScroll = useCallback(() => {
     if (!messagesContainerRef.current) return;
     

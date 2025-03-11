@@ -1,6 +1,6 @@
 import { welcomeMessages } from '../dictionaries/welcomeMessages';
 import { unknownResponses } from '../dictionaries/unknownResponses';
-import { energyDefinitionsEn } from '../dictionaries/energyDefinitionsEn';
+import { energyDefinitionsEn } from '../dictionaries/energyDefinitions/en';
 import { findEnergyDefinition } from '../utils/energyHandlers';
 import { getRandomElement } from '../utils/randomUtils';
 import { processText, analyzeSentiment, findBestMatch, extractEntities } from '../utils/nlpHandlers';
@@ -14,6 +14,10 @@ import { gratitudeMessages } from '../dictionaries/gratitudeMessages';
 import { errorMessages } from '../dictionaries/errorMessages';
 import { empathyPhrases } from '../dictionaries/empathyPhrases';
 import { followUpPhrases } from '../dictionaries/followUpQuestions';
+import { goodbyeWords } from '../dictionaries/farewellWords';
+import { gratitudeWords } from '../dictionaries/gratitudeWords';
+import greetingPhrases from '../dictionaries/greetingPhrases';
+import { CONFIG } from '../i18n';
 
 export class MessageService {
   static instance = null;
@@ -25,8 +29,9 @@ export class MessageService {
     return MessageService.instance;
   }
 
-  static getRandomMessage(dictionary, language = 'en') {
-    const messages = dictionary[language] || dictionary.en;
+  static getRandomMessage(dictionary, language) {
+    // Always use language fallback to default if needed
+    const messages = dictionary[language] || dictionary[CONFIG.DEFAULT_LANGUAGE];
     return getRandomElement(messages);
   }
 
@@ -51,6 +56,7 @@ export class MessageService {
       return this.createUnknownResponse(language);
     }
 
+    // Use structured definition with language support
     const response = {
       sender: 'bot',
       title: definition.title,
@@ -58,7 +64,7 @@ export class MessageService {
       language,
       suggestions: definition.subFuels || [],
       hasVisualization: definition.hasVisualization || false,
-      visualizationType: definition.visualizationType || [], // Keep as array for available types
+      visualizationType: definition.visualizationType || [],
       dataset: definition.dataset,
       link: definition.link,
       fuelType: definition.fuelCode
@@ -71,8 +77,9 @@ export class MessageService {
     const unknownResponse = this.getRandomMessage(unknownResponses, language);
     const empathyPhrase = this.getRandomMessage(empathyPhrases, language);
     
-    // Get main energy topics for suggestions
-    const mainTopics = Object.entries(energyDictionary[language] || energyDictionary.en)
+    // Get main energy topics for suggestions using proper language fallback
+    const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
+    const mainTopics = Object.entries(dictionary)
       .filter(([_, def]) => def.isMainFuel)
       .map(([key]) => key)
       .slice(0, 3);
@@ -87,7 +94,6 @@ export class MessageService {
   }
 
   static createVisualizationMessage(originalMessage, chartType, data, language) {
-    // Get the array of visualization types from the original message
     const visualizationTypes = Array.isArray(originalMessage.visualizationType) 
       ? originalMessage.visualizationType 
       : originalMessage.visualizationType 
@@ -98,11 +104,11 @@ export class MessageService {
       ...originalMessage,
       sender: 'bot',
       isVisualization: true,
-      visualizationType: visualizationTypes, // Keep all available visualization types
-      currentVisualization: chartType, // Add current visualization type
+      visualizationType: visualizationTypes,
+      currentVisualization: chartType,
       dataset: originalMessage.dataset,
-      chartType: chartType, // Add explicit chart type for visualization components
-      chartData: data || [], // Keep the transformed chart data
+      chartType: chartType,
+      chartData: data || [],
       fuelType: originalMessage.fuelType,
       text: data?.length ? 
         `visualization.${chartType}.title` : 
@@ -138,38 +144,50 @@ export class MessageService {
     };
   }
 
-  static isGratitudeMessage(text) {
-    return text.toLowerCase().includes('thank') || 
-           text.toLowerCase().includes('thanks') || 
-           text.toLowerCase().includes('appreciate');
+  static isGratitudeMessage(text, language) {
+    const words = gratitudeWords[language] || gratitudeWords[CONFIG.DEFAULT_LANGUAGE];
+    return words.some(word => 
+      text.toLowerCase().includes(word.toLowerCase())
+    );
   }
 
-  static isFarewellMessage(text) {
-    return text.toLowerCase().includes('bye') || 
-           text.toLowerCase().includes('goodbye') || 
-           text.toLowerCase().includes('see you');
+  static isFarewellMessage(text, language) {
+    const words = goodbyeWords[language] || goodbyeWords[CONFIG.DEFAULT_LANGUAGE];
+    return words.some(word => 
+      text.toLowerCase().includes(word.toLowerCase())
+    );
+  }
+
+  static isGreetingMessage(text, language) {
+    const phrases = greetingPhrases[language] || greetingPhrases[CONFIG.DEFAULT_LANGUAGE];
+    return phrases.some(phrase => 
+      text.toLowerCase().includes(phrase.toLowerCase())
+    );
   }
 
   static async processUserInput(input, language) {
-    const nlpResults = await processText(input, language);
-    const sentiment = analyzeSentiment(input, language);
-    const definition = await findEnergyDefinition(input.trim(), language);
+    // Always ensure valid language
+    const processLanguage = CONFIG.SUPPORTED_LANGUAGES.includes(language) 
+      ? language 
+      : CONFIG.DEFAULT_LANGUAGE;
 
-    const userMessage = this.createUserMessage(input, language);
+    const nlpResults = await processText(input, processLanguage);
+    const sentiment = analyzeSentiment(input, processLanguage);
+    const definition = await findEnergyDefinition(input.trim(), processLanguage);
 
-    // Handle special message types
-    if (this.isFarewellMessage(input)) {
-      return [userMessage, this.createFarewellResponse(language)];
+    const userMessage = this.createUserMessage(input, processLanguage);
+
+    if (this.isFarewellMessage(input, processLanguage)) {
+      return [userMessage, this.createFarewellResponse(processLanguage)];
     }
 
-    if (this.isGratitudeMessage(input)) {
-      return [userMessage, this.createGratitudeResponse(language)];
+    if (this.isGratitudeMessage(input, processLanguage)) {
+      return [userMessage, this.createGratitudeResponse(processLanguage)];
     }
 
-    // Handle normal responses
     const botResponse = definition ? 
-      this.createBotResponse(definition, language) : 
-      this.createUnknownResponse(language);
+      this.createBotResponse(definition, processLanguage) : 
+      this.createUnknownResponse(processLanguage);
 
     return [userMessage, botResponse];
   }
@@ -177,15 +195,16 @@ export class MessageService {
   /**
    * Process and analyze an incoming message
    */
-  async analyzeMessage(message) {
+  static async analyzeMessage(message, language = CONFIG.DEFAULT_LANGUAGE) {
     const nlpResults = await Promise.all([
-      processText(message, this.language),
-      analyzeSentiment(message, this.language),
+      processText(message, language),
+      analyzeSentiment(message, language),
       extractEntities(message)
     ]);
 
     const [textAnalysis, sentiment, entities] = nlpResults;
-    const topics = Object.keys(energyDictionary[this.language] || energyDictionary.en);
+    const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
+    const topics = Object.keys(dictionary);
     const topicMatch = findBestMatch(message, topics);
 
     return {
@@ -193,17 +212,17 @@ export class MessageService {
       sentiment,
       entities,
       topicMatch,
-      isQuestion: this.isQuestion(message),
-      dates: this.extractDates(message),
-      affirmative: this.isAffirmative(message)
+      isQuestion: this.isQuestion(message, language),
+      dates: this.extractDates(message, language),
+      affirmative: this.isAffirmative(message, language)
     };
   }
 
   /**
    * Check if message contains a question
    */
-  isQuestion(message) {
-    const questionPatterns = questionWords[this.language] || questionWords.en;
+  isQuestion(message, language) {
+    const questionPatterns = questionWords[language] || questionWords.en;
     return questionPatterns.some(pattern => 
       message.toLowerCase().includes(pattern.toLowerCase())
     );
@@ -212,8 +231,8 @@ export class MessageService {
   /**
    * Extract dates from message using language-specific patterns
    */
-  extractDates(message) {
-    const patterns = datePatterns[this.language] || datePatterns.en;
+  extractDates(message, language) {
+    const patterns = datePatterns[language] || datePatterns.en;
     const matches = message.match(patterns.regex);
     return matches || [];
   }
@@ -221,17 +240,17 @@ export class MessageService {
   /**
    * Check if message is affirmative
    */
-  isAffirmative(message) {
-    const patterns = affirmativePatterns[this.language] || affirmativePatterns.en;
+  isAffirmative(message, language) {
+    const patterns = affirmativePatterns[language] || affirmativePatterns.en;
     return patterns.some(pattern => pattern.test(message));
   }
 
   /**
    * Filter common/stop words from message
    */
-  filterCommonWords(message) {
+  filterCommonWords(message, language) {
     const words = message.toLowerCase().split(/\s+/);
-    const stopWords = filteredWords[this.language] || filteredWords.en;
+    const stopWords = filteredWords[language] || filteredWords.en;
     return words.filter(word => !stopWords.includes(word)).join(' ');
   }
 

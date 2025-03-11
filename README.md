@@ -85,59 +85,70 @@ Visualization labels and descriptions are available in:
    - Main component handling conversation flow
    - Manages message history and user interactions
    - Implements typing indicators and thinking states
-   - Handles scrolling behavior and message visibility
+   - Handles dynamic scrolling and message visibility
+   - Smart scrolling behavior for new messages, suggestions, and visualizations
+   - Context-aware message positioning
 
 2. **Natural Language Processing (utils/)**
-   - `nlpHelper.js`: Topic extraction from user queries
-   - `tokenMatcher.js`: Calculates match scores for topic identification
-   - `contextManager.js`: Maintains conversation context
-   - `analyticsManager.js`: Tracks user interactions and topic popularity
+   - `nlpHandler.js`: Topic extraction and sentiment analysis
+   - `energyHandlers.js`: Energy topic matching and processing
+   - `botResponseHandlers.js`: Response generation and formatting
+   - `chatHandlers.js`: Chat interaction management
+   - `storageHandlers.js`: Chat history persistence
 
 3. **Data Management**
    - `energyDictionary.js`: Multilingual knowledge base with:
-     - Topic definitions
-     - Keywords and synonyms
-     - Related topics
-     - External reference links
-   - `chatHistory.js`: Persistent chat storage
-   - `cookies.js`: Language preference management
+     - Topic definitions and hierarchies
+     - Keywords and synonyms mapping
+     - Related topics and suggestions
+     - Visualization type mappings
+     - Dataset connections
+   - `MessageService.js`: Centralized message processing
+   - `ChatContext.jsx`: State management and chat synchronization
 
 4. **UI Components**
-   - ChatMessage: Individual message rendering
-   - TypingIndicator: Simulates bot typing
-   - SmartSuggestions: Related topic suggestions
-   - ScrollButton: Navigation aid
-   - ShowMoreHistory: Chat history loading
+   - ChatMessage: Smart message rendering with animations
+   - TypingIndicator: Natural typing simulation
+   - SmartSuggestions: Context-aware topic suggestions
+   - ScrollButton: Intelligent scroll management
+   - MessagesContainer: Optimized message rendering
 
 ### Intelligent Features
 
 1. **Smart Response System**
-   - Minimum match score threshold (20%)
-   - Keyword and synonym matching
-   - Base topic extraction
-   - Related topics suggestions
+   - Advanced language detection and fallback
+   - Multi-language topic matching
+   - Cross-reference suggestion system
+   - Progressive visualization options
+   - Contextual follow-up handling
 
 2. **User Experience**
-   - Dynamic typing simulation based on message length
-   - Thinking time simulation for natural interactions
-   - Persistent chat history
-   - Progressive message loading
-   - Smooth scrolling behavior
+   - Automatic scrolling for new messages
+   - Smart suggestion positioning
+   - Dynamic visualization loading
+   - Cross-tab synchronization
+   - Persistent language preferences
+   - Smooth animations and transitions
 
 3. **Internationalization**
-   - i18next integration
-   - Automatic language detection
-   - Language-specific responses
-   - Multilingual topic matching
+   - Comprehensive i18n integration
+   - Language-specific energy definitions
+   - Automatic fallback handling
+   - Smart language detection
+   - Cookie-based preferences
 
 ### Project Structure
 ```
 src/
 ├── components/     # React UI components
-├── data/          # Knowledge base and responses
-├── utils/         # Helper functions and managers
-├── locales/       # Translation files
-└── hooks/         # Custom React hooks
+├── contexts/      # React context providers
+├── dictionaries/  # Language-specific dictionaries
+├── hooks/         # Custom React hooks
+├── locales/       # i18n translation files
+├── services/      # Core services
+├── styles/        # CSS modules and themes
+├── types/         # TypeScript definitions
+└── utils/         # Helper functions and utilities
 ```
 
 ## Setup and Development

@@ -7,6 +7,8 @@ import winkNLP from 'wink-nlp';
 import model from 'wink-eng-lite-web-model';
 import multilangSentiment from 'multilang-sentiment';
 import Sentiment from 'sentiment';
+import { energyDictionary } from './energyDictionary';
+import { CONFIG } from '../i18n';
 
 // Initialize NLP libraries
 nlp.extend(dates);
@@ -16,112 +18,158 @@ const winkNlp = winkNLP(model);
 const sentiment = new Sentiment();
 
 /**
- * Process text using compromise for basic NLP tasks
+ * Process and analyze text input
  */
-export const processText = (text, language = 'en') => {
-  const doc = nlp(text);
+export const processText = async (text, language = CONFIG.DEFAULT_LANGUAGE) => {
+  try {
+    // Clean and normalize input
+    const cleanedText = text.toLowerCase().trim();
+    const words = cleanedText.split(/\s+/);
+    
+    // Get composite terms (2-word combinations) for better matching
+    const compositeTerms = [];
+    for (let i = 0; i < words.length - 1; i++) {
+      compositeTerms.push(`${words[i]} ${words[i + 1]}`);
+    }
 
-  // Handle composite words better (e.g., "hard coal", "brown coal")
-  const words = text.toLowerCase().split(' ');
-  const compositeTerms = [];
-  for (let i = 0; i < words.length - 1; i++) {
-    compositeTerms.push(`${words[i]} ${words[i + 1]}`);
+    // Get both single words and composite terms
+    const allTerms = [...words, ...compositeTerms];
+    
+    // Get language-specific dictionary
+    const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
+    
+    // Extract topics using language-specific keywords and concepts
+    const topics = Object.entries(dictionary).reduce((acc, [topic, def]) => {
+      const keywordMatch = def.keywords?.some(kw => 
+        allTerms.some(term => term.includes(kw.toLowerCase()))
+      );
+      const conceptMatch = def.key_concepts?.some(concept =>
+        allTerms.some(term => term.includes(concept.toLowerCase()))
+      );
+      
+      if (keywordMatch || conceptMatch) {
+        acc.push({
+          topic,
+          text: def.text,
+          title: def.title,
+          confidence: (keywordMatch ? 0.6 : 0) + (conceptMatch ? 0.4 : 0)
+        });
+      }
+      return acc;
+    }, []);
+
+    return {
+      topics: topics.sort((a, b) => b.confidence - a.confidence),
+      terms: allTerms,
+      language
+    };
+  } catch (error) {
+    console.error('Error processing text:', error);
+    return {
+      topics: [],
+      terms: [],
+      language
+    };
   }
+};
 
-  // Get both single words and composite terms
-  const allTerms = [...words, ...compositeTerms];
+/**
+ * Find best match among topics
+ */
+export const findBestMatch = (input, topics, language = CONFIG.DEFAULT_LANGUAGE) => {
+  const cleanInput = input.toLowerCase().trim();
   
-  // Extract topics and ensure text values are strings
-  const topics = doc.topics().json().map(topic => ({
-    ...topic,
-    text: typeof topic.text === 'object' ? JSON.stringify(topic.text) : topic.text,
-    terms: allTerms
-  }));
+  // Get dictionary for current language
+  const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
   
+  // Calculate match scores
+  const matches = topics.map(topic => {
+    const def = dictionary[topic];
+    if (!def) return { topic, score: 0 };
+    
+    let score = 0;
+    
+    // Check direct topic match
+    if (cleanInput.includes(topic.toLowerCase())) {
+      score += 1;
+    }
+    
+    // Check keyword matches
+    if (def.keywords) {
+      const keywordMatches = def.keywords.filter(kw => 
+        cleanInput.includes(kw.toLowerCase())
+      ).length;
+      score += keywordMatches * 0.5;
+    }
+    
+    // Check concept matches
+    if (def.key_concepts) {
+      const conceptMatches = def.key_concepts.filter(concept =>
+        cleanInput.includes(concept.toLowerCase())
+      ).length;
+      score += conceptMatches * 0.3;
+    }
+    
+    return { topic, score };
+  });
+  
+  // Sort by score and get best match
+  matches.sort((a, b) => b.score - a.score);
+  return matches[0] || { topic: null, score: 0 };
+};
+
+/**
+ * Extract named entities from text
+ */
+export const extractEntities = (text) => {
+  // For now, just return basic structure
+  // Could be enhanced with language-specific NER in future
   return {
-    dates: doc.dates().json(),
-    numbers: doc.numbers().json(),
-    topics,
-    sentences: doc.sentences().json(),
-    questions: doc.questions().json(),
-    terms: allTerms
+    organizations: [],
+    locations: [],
+    dates: [],
+    numbers: []
   };
 };
 
 /**
  * Analyze sentiment in multiple languages
  */
-export const analyzeSentiment = (text, language = 'en') => {
+export const analyzeSentiment = (text, language = CONFIG.DEFAULT_LANGUAGE) => {
   try {
-    if (language === 'en') {
-      return sentiment.analyze(text);
+    // Use appropriate sentiment analyzer based on language
+    switch(language) {
+      case 'en':
+        const englishSentiment = sentiment.analyze(text);
+        return {
+          score: englishSentiment.score,
+          comparative: englishSentiment.comparative,
+          language
+        };
+      case 'fr':
+      case 'de':
+        const multilingualSentiment = multilangSentiment(text, language);
+        return {
+          score: multilingualSentiment.score,
+          comparative: multilingualSentiment.comparative || (multilingualSentiment.score / text.split(/\s+/).length),
+          language
+        };
+      default:
+        // Fallback to English for unsupported languages
+        console.warn(`Language ${language} not supported for sentiment analysis, falling back to English`);
+        const fallbackSentiment = sentiment.analyze(text);
+        return {
+          score: fallbackSentiment.score,
+          comparative: fallbackSentiment.comparative,
+          language: CONFIG.DEFAULT_LANGUAGE
+        };
     }
-    return multilangSentiment(text, language);
   } catch (error) {
     console.error('Error analyzing sentiment:', error);
-    return { score: 0, comparative: 0 }; // Neutral sentiment as fallback
-  }
-};
-
-/**
- * Find best matching topic from dictionaries
- */
-export const findBestMatch = (query, topics) => {
-  if (!topics || topics.length === 0) return { rating: 0, target: '' };
-  
-  // Handle both single word and composite word matching
-  const queryTerms = query.toLowerCase().split(' ');
-  const compositeQuery = queryTerms.join(' ');
-  
-  // Try exact match first
-  const exactMatch = topics.find(t => t.toLowerCase() === compositeQuery);
-  if (exactMatch) {
-    return { rating: 1, target: exactMatch, bestMatchIndex: topics.indexOf(exactMatch) };
-  }
-  
-  // Then try string similarity
-  const matches = stringSimilarity.findBestMatch(compositeQuery, topics.map(t => t.toLowerCase()));
-  return matches.bestMatch;
-};
-
-/**
- * Extract entities and keywords using WinkNLP
- */
-export const extractEntities = (text) => {
-  const doc = winkNlp.readDoc(text);
-  return {
-    entities: doc.entities().out(),
-    keywords: doc.tokens().out(),
-  };
-};
-
-/**
- * Process questions for enhanced understanding
- */
-export const processQuestion = (text, language = 'en') => {
-  try {
-    const doc = nlp(text);
-    const questionType = doc.questions().json()[0]?.type || 'statement';
-    const topics = doc.topics().json().map(topic => ({
-      ...topic,
-      text: typeof topic.text === 'object' ? JSON.stringify(topic.text) : topic.text
-    }));
-    const dates = doc.dates().json();
-    const sentimentResult = analyzeSentiment(text, language);
-    
     return {
-      questionType,
-      topics,
-      dates,
-      sentiment: sentimentResult
-    };
-  } catch (error) {
-    console.error('Error processing question:', error);
-    return {
-      questionType: 'statement',
-      topics: [],
-      dates: [],
-      sentiment: { score: 0, comparative: 0 }
+      score: 0,
+      comparative: 0,
+      language
     };
   }
 };

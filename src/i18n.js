@@ -7,7 +7,7 @@ import frTranslation from "./locales/fr.json";
 import deTranslation from "./locales/de.json";
 
 // Constants
-const CONFIG = {
+export const CONFIG = {
   COOKIE_NAME: "preferred_language",
   DEFAULT_LANGUAGE: "en",
   SUPPORTED_LANGUAGES: ["en", "fr", "de"],

@@ -7,16 +7,16 @@
     "close": "Fermer",
     "search": "Rechercher",
     "chat": "Chat",
-    "view_source": "Voir les données source",
+    "view_source": "Voir la source des données",
     "view_data": "Ouvrir dans Eurostat"
   },
   "chat": {
     "placeholder": "Posez une question sur les statistiques énergétiques...",
     "thinking": "Réflexion...",
-    "typing": "En train d'écrire...",
+    "typing": "Écriture...",
     "ask_question": "Posez une question sur les statistiques énergétiques...",
     "clear_confirm": "Êtes-vous sûr de vouloir effacer l'historique du chat ?",
-    "no_messages": "Aucun message pour le moment. Commencez une conversation !",
+    "no_messages": "Aucun message pour l'instant. Commencez une conversation !",
     "show_more": "Afficher plus d'historique"
   },
   "accessibility": {
@@ -24,62 +24,62 @@
     "user_message": "Votre message",
     "send_button": "Envoyer le message",
     "clear_button": "Effacer l'historique du chat",
-    "scroll_button": "Faire défiler vers le bas",
-    "input_field": "Saisie du chat",
+    "scroll_button": "Défiler vers le bas",
+    "input_field": "Entrée du chat",
     "thinking_indicator": "Le bot réfléchit",
-    "typing_indicator": "Le bot tape",
-    "show_more_button": "Charger plus de messages"
+    "typing_indicator": "Le bot écrit",
+    "show_more_button": "Charger plus de messages du chat"
   },
   "suggestions": {
     "title": "Sujets suggérés",
-    "related_topics": "Sujets associés",
+    "related_topics": "Sujets connexes",
     "click_to_learn": "Cliquez pour en savoir plus sur {{topic}}",
     "no_suggestions": "Aucune suggestion disponible",
-    "subFuels": "Combustibles associés",
+    "subFuels": "Carburants liés",
     "related": "Voir aussi"
   },
   "visualization": {
     "show_chart": "Afficher le graphique {{type}}",
-    "view_as": "Voir sous forme de graphique {{type}}",
+    "view_as": "Voir en tant que graphique {{type}}",
     "loading": "Chargement du graphique...",
-    "error": "Erreur de chargement du graphique",
+    "error": "Erreur lors du chargement du graphique",
     "title": "Visualisation des données",
-    "description": "Représentation visuelle des données {{dataset}}",
+    "description": "Représentation visuelle des données de {{dataset}}",
     "back": "Retour au chat",
     "export": "Exporter les données",
     "fullscreen": "Voir en plein écran",
     "source": "Source",
     "eurostat": "Eurostat",
     "pie": {
-      "title": "Distribution par bilan énergétique",
+      "title": "Répartition par bilan énergétique",
       "aria": {
-        "chart": "Diagramme circulaire montrant la distribution du bilan énergétique",
-        "description": "Graphique circulaire montrant la distribution proportionnelle des composants du bilan énergétique"
+        "chart": "Graphique en secteurs montrant la répartition du bilan énergétique",
+        "description": "Graphique circulaire montrant la répartition proportionnelle des composantes du bilan énergétique"
       },
       "tooltip": {
-        "value": "{{name}}: {{value}} KTOE"
+        "value": "{{name}} : {{value}} KTOE"
       }
     },
     "line": {
       "title": "Tendance historique",
       "label": "Valeur énergétique",
       "aria": {
-        "chart": "Graphique linéaire montrant la tendance énergétique historique",
+        "chart": "Graphique en courbes montrant la tendance énergétique historique",
         "description": "Graphique chronologique montrant les valeurs énergétiques au fil des ans"
       },
       "tooltip": {
-        "value": "{{year}}: {{value}} KTOE"
+        "value": "{{year}} : {{value}} KTOE"
       }
     },
     "bar": {
       "title": "Comparaison annuelle",
       "label": "Valeur énergétique",
       "aria": {
-        "chart": "Diagramme à barres montrant les valeurs énergétiques annuelles",
-        "description": "Diagramme à barres comparant les valeurs énergétiques entre différentes années"
+        "chart": "Graphique en barres montrant les valeurs énergétiques annuelles",
+        "description": "Graphique en barres comparant les valeurs énergétiques sur différentes années"
       },
       "tooltip": {
-        "value": "{{year}}: {{value}} KTOE"
+        "value": "{{year}} : {{value}} KTOE"
       }
     }
   },
@@ -88,14 +88,14 @@
   },
   "tooltips": {
     "visualization": "Cliquez pour voir la visualisation du graphique {{type}} de ces données",
-    "external_link": "Ouvrir ces données sur le site Eurostat dans un nouvel onglet",
+    "external_link": "Ouvrir ces données sur le site d'Eurostat dans un nouvel onglet",
     "show_more": "Charger les messages plus anciens de votre historique de chat",
     "clear_button": "Effacer tous les messages et l'historique du chat"
   },
   "errors": {
-    "processing": "J'ai du mal à comprendre. Pourriez-vous reformuler ?",
-    "visualization": "Désolé, je ne peux pas générer la visualisation pour le moment.",
-    "network": "J'ai des problèmes de connexion au service de données.",
-    "general": "Une erreur s'est produite. Veuillez réessayer."
+    "processing": "J'ai du mal à comprendre cela. Pouvez-vous reformuler ?",
+    "visualization": "Désolé, je n'ai pas pu générer la visualisation pour le moment.",
+    "network": "J'ai des difficultés à me connecter au service de données.",
+    "general": "Quelque chose s'est mal passé. Veuillez réessayer."
   }
 }

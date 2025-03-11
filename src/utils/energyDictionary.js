@@ -3,12 +3,22 @@
  * Contains information about energy topics across multiple languages
  */
 
-import { energyDefinitionsEn } from '../dictionaries/energyDefinitionsEn.js';
-
+import { energyDefinitionsEn } from '../dictionaries/energyDefinitions/en.js';
+import { energyDefinitionsFr } from '../dictionaries/energyDefinitions/fr.js';
+import { energyDefinitionsDe } from '../dictionaries/energyDefinitions/de.js';
+import { CONFIG } from '../i18n.js';
 
 export const energyDictionary = {
   en: energyDefinitionsEn,
+  fr: energyDefinitionsFr,
+  de: energyDefinitionsDe
+};
 
+/**
+ * Get dictionary for specific language with fallback
+ */
+export const getDictionary = (language = CONFIG.DEFAULT_LANGUAGE) => {
+  return energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
 };
 
 /**
@@ -17,8 +27,8 @@ export const energyDictionary = {
  * @param {string} language - The language code
  * @returns {string[]} - Array of related topics
  */
-export const getRelatedTopics = (topic, language = 'en') => {
-  const dict = energyDictionary[language] || energyDictionary.en;
+export const getRelatedTopics = (topic, language = CONFIG.DEFAULT_LANGUAGE) => {
+  const dict = getDictionary(language);
   return dict[topic.toLowerCase()]?.related || [];
 };
 
@@ -28,8 +38,8 @@ export const getRelatedTopics = (topic, language = 'en') => {
  * @param {string} language - The language code
  * @returns {string[]} - Array of keywords
  */
-export const getKeywords = (topic, language = 'en') => {
-  const dict = energyDictionary[language] || energyDictionary.en;
+export const getKeywords = (topic, language = CONFIG.DEFAULT_LANGUAGE) => {
+  const dict = getDictionary(language);
   return dict[topic.toLowerCase()]?.keywords || [];
 };
 
@@ -39,7 +49,51 @@ export const getKeywords = (topic, language = 'en') => {
  * @param {string} language - The language code
  * @returns {string[]} - Array of synonyms
  */
-export const getSynonyms = (topic, language = 'en') => {
-  const dict = energyDictionary[language] || energyDictionary.en;
+export const getSynonyms = (topic, language = CONFIG.DEFAULT_LANGUAGE) => {
+  const dict = getDictionary(language);
   return dict[topic.toLowerCase()]?.synonyms || [];
+};
+
+/**
+ * Get statistical concepts for a topic
+ * @param {string} topic - The topic to find statistical concepts for
+ * @param {string} language - The language code
+ * @returns {string[]} - Array of statistical concepts
+ */
+export const getStatisticalConcepts = (topic, language = CONFIG.DEFAULT_LANGUAGE) => {
+  const dict = getDictionary(language);
+  return dict[topic.toLowerCase()]?.statisticalConcepts || [];
+};
+
+/**
+ * Get key concepts for a topic
+ * @param {string} topic - The topic to find key concepts for
+ * @param {string} language - The language code
+ * @returns {string[]} - Array of key concepts
+ */
+export const getKeyConcepts = (topic, language = CONFIG.DEFAULT_LANGUAGE) => {
+  const dict = getDictionary(language);
+  return dict[topic.toLowerCase()]?.key_concepts || [];
+};
+
+/**
+ * Check if a topic exists in a specific language
+ * @param {string} topic - The topic to check
+ * @param {string} language - The language code
+ * @returns {boolean} - True if the topic exists, false otherwise
+ */
+export const topicExists = (topic, language = CONFIG.DEFAULT_LANGUAGE) => {
+  const dict = getDictionary(language);
+  return !!dict[topic.toLowerCase()];
+};
+
+/**
+ * Get available languages for a topic
+ * @param {string} topic - The topic to find available languages for
+ * @returns {string[]} - Array of available languages
+ */
+export const getAvailableLanguages = (topic) => {
+  return Object.keys(energyDictionary).filter(lang => 
+    !!energyDictionary[lang][topic.toLowerCase()]
+  );
 };
