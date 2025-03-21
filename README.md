@@ -286,6 +286,8 @@ bot knows:
 greetings 
 definitions
 relationships
+farewells
+death ends
 
 Bot Capabilities:
 

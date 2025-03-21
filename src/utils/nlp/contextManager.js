@@ -213,6 +213,51 @@ class ContextManager {
     return 'stable';
   }
 
+  extractTermsFromMessage(input, dictionary) {
+    const words = input.toLowerCase().split(/\s+/);
+    const terms = new Set();
+    const partialMatches = new Set();
+
+    // First pass: try to find exact energy terms
+    Object.entries(dictionary).forEach(([term, def]) => {
+      const termLower = term.toLowerCase();
+      if (words.includes(termLower) || input.includes(termLower)) {
+        terms.add(term);
+      }
+    });
+
+    // Second pass: try alternative names and partial matches
+    if (terms.size === 0) {
+      Object.entries(dictionary).forEach(([term, def]) => {
+        const termLower = term.toLowerCase();
+        const title = def.title?.toLowerCase() || '';
+        
+        // Check for partial matches in the term or title
+        if (words.some(word => {
+          const isPartialMatch = termLower.includes(word) || title.includes(word);
+          if (isPartialMatch) partialMatches.add(term);
+          return isPartialMatch;
+        })) {
+          terms.add(term);
+        }
+        
+        // Check in text content
+        if (def.text?.toLowerCase().includes(input)) {
+          terms.add(term);
+          // Store all related fuels as partial matches
+          if (def.subFuels) partialMatches.add(...def.subFuels);
+          if (def.related) partialMatches.add(...def.related);
+        }
+      });
+    }
+
+    const result = Array.from(terms);
+    return {
+      exactMatches: result,
+      partialMatches: Array.from(partialMatches).filter(match => !result.includes(match))
+    };
+  }
+
   checkRelationship(message, language = CONFIG.DEFAULT_LANGUAGE) {
     if (!message) return null;
 
@@ -225,28 +270,50 @@ class ContextManager {
 
     if (!isRelationshipQuestion) return null;
 
-    // Extract terms from the input
-    const terms = this.extractTermsFromMessage(lowercaseInput, dictionary);
+    // Extract terms from the input with partial matches
+    const { exactMatches: terms, partialMatches } = this.extractTermsFromMessage(lowercaseInput, dictionary);
     
-    // If we have no energy terms at all, return null to allow fallback to definition search
-    if (terms.length === 0) return null;
+    // If we have no energy terms at all but have partial matches, suggest the main category
+    if (terms.length === 0 && partialMatches.length > 0) {
+      const mainTerm = partialMatches[0];
+      const def = dictionary[mainTerm];
+      
+      if (!def) return null;
 
-    // Update context with relationship query intent
-    const contextUpdate = {
-      intent: 'relationship_query',
-      entities: {
-        energyDomain: {
-          energyTypes: terms.map(term => ({ text: term, canonical: term }))
-        }
-      }
-    };
-    this.updateContext('default', message, contextUpdate, language);
+      // Get related terms for suggestions
+      const suggestions = [
+        ...(def.subFuels || []),
+        ...(def.related || [])
+      ].filter(term => term !== mainTerm);
+
+      return {
+        isRelationshipQuestion: true,
+        isRelated: false,
+        relationshipType: 'suggestion',
+        terms: [{
+          term: mainTerm,
+          definition: def
+        }],
+        suggestions,
+        response: getRandomElement(relationshipDict.responses.suggestion || relationshipDict.responses.single_term)
+          .replace('{term1}', def.title || mainTerm)
+      };
+    }
+
+    // If we have no exact matches at all, return null
+    if (terms.length === 0) return null;
 
     // If we found only one energy term
     if (terms.length === 1) {
       const [energyTerm] = terms;
       const def = dictionary[energyTerm];
       
+      // Get related terms for suggestions
+      const suggestions = [
+        ...(def.subFuels || []),
+        ...(def.related || [])
+      ].filter(term => term !== energyTerm);
+
       return {
         isRelationshipQuestion: true,
         isRelated: false,
@@ -255,6 +322,7 @@ class ContextManager {
           term: energyTerm,
           definition: def
         }],
+        suggestions,
         response: getRandomElement(relationshipDict.responses.single_term)
           .replace('{term1}', def.title || energyTerm)
       };
@@ -288,37 +356,40 @@ class ContextManager {
     const isRelated = this.checkTermRelationship(def1, def2, term1, term2);
     const relationshipType = this.determineRelationshipType(def1, def2, term1, term2);
     
-    return this.createRelationshipResponse(isRelated, relationshipType, def1, def2, term1, term2, language);
+    const response = this.createRelationshipResponse(isRelated, relationshipType, def1, def2, term1, term2, language);
+
+    // Add relationship details to context without recursion
+    this.addRelationshipToHistory('default', message, {
+      intent: 'relationship_query',
+      energyTypes: [term1, term2]
+    }, language);
+
+    return response;
   }
 
-  extractTermsFromMessage(input, dictionary) {
-    const words = input.toLowerCase().split(/\s+/);
-    const terms = new Set();
+  // New helper method to safely add relationship to history
+  addRelationshipToHistory(userId, message, details, language) {
+    const key = this.getConversationKey(userId, language);
+    let history = this.conversationHistory.get(key) || [];
 
-    // First pass: try to find exact energy terms
-    Object.entries(dictionary).forEach(([term, def]) => {
-      const termLower = term.toLowerCase();
-      if (words.includes(termLower) || input.includes(termLower)) {
-        terms.add(term);
-      }
+    history.push({
+      message,
+      timestamp: Date.now(),
+      entities: { 
+        standardEntities: {}, 
+        energyDomain: { 
+          energyTypes: details.energyTypes.map(term => ({ text: term, canonical: term }))
+        }
+      },
+      intent: details.intent
     });
 
-    // Second pass: try alternative names and partial matches, but only if we haven't found exact matches
-    if (terms.size === 0) {
-      Object.entries(dictionary).forEach(([term, def]) => {
-        const termLower = term.toLowerCase();
-        const title = def.title?.toLowerCase() || '';
-        
-        if (!terms.has(term) && (
-          words.some(word => termLower.includes(word) || title.includes(word)) ||
-          def.text?.toLowerCase().includes(input)
-        )) {
-          terms.add(term);
-        }
-      });
+    // Maintain context window size
+    if (history.length > NLP_CONFIG.questionProcessing.contextRetentionLimit) {
+      history = history.slice(-NLP_CONFIG.questionProcessing.contextRetentionLimit);
     }
 
-    return Array.from(terms);
+    this.conversationHistory.set(key, history);
   }
 
   findTermsInDefinitions(input, dictionary, terms) {

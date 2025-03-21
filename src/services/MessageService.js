@@ -1,19 +1,15 @@
 import { welcomeMessages } from '../dictionaries/welcomeMessages';
 import { unknownResponses } from '../dictionaries/unknownResponses';
-import { energyDefinitionsEn } from '../dictionaries/energyDefinitions/en';
 import { findEnergyDefinition } from '../utils/energyHandlers';
 import { getRandomElement } from '../utils/randomUtils';
 import { processText, clearContext, analyzeSentiment, extractEntities, findBestMatch } from '../utils/nlpHandlers';
 import { energyDictionary } from '../utils/energyDictionary';
-import { affirmativePatterns } from '../dictionaries/affirmativeResponses';
-import { datePatterns } from '../dictionaries/datePatterns';
 import { empathyPhrases } from '../dictionaries/empathyPhrases';
 import { followUpPhrases } from '../dictionaries/followUpQuestions';
 import { goodbyeWords } from '../dictionaries/farewellWords';
 import { gratitudeWords } from '../dictionaries/gratitudeWords';
 import { gratitudeMessages } from '../dictionaries/gratitudeMessages';
 import { questionWords } from '../dictionaries/questionWords';
-import { filteredWords } from '../dictionaries/filteredWords';
 import greetingPhrases from '../dictionaries/greetingPhrases';
 import { CONFIG } from '../i18n';
 import { NLP_CONFIG } from '../config/nlpConfig';
@@ -22,6 +18,9 @@ import { relationshipPatterns } from '../dictionaries/relationshipPatterns';
 import { errorMessages } from '../dictionaries/errorMessages';
 import { farewellMessages } from '../dictionaries/farewellMessages';
 import { saveChatToCookie } from '../utils/storageHandlers';
+import { affirmativePatterns } from '../dictionaries/affirmativeResponses';
+import { datePatterns } from '../dictionaries/datePatterns';
+import { filteredWords } from '../dictionaries/filteredWords';
 
 export class MessageService {
   static instance = null;
@@ -56,16 +55,19 @@ export class MessageService {
   }
 
   static createBotResponse(definition, language, context = null) {
-    // First check for relationship questions
+    // Remove greeting check from here since it's already handled in processUserInput
+    
+    // Check for relationship questions
     let relationshipInfo = null;
     if (context?.input) {
       relationshipInfo = contextManager.checkRelationship(context.input, language);
       if (relationshipInfo?.isRelationshipQuestion) {
         // If it's a relationship question with only one valid term or invalid terms
         if (relationshipInfo.relationshipType === 'single_term') {
+          const followUp = getRandomElement(followUpPhrases[language] || followUpPhrases[CONFIG.DEFAULT_LANGUAGE]);
           return {
             sender: 'bot',
-            text: relationshipInfo.response,
+            text: relationshipInfo.response + ' ' + followUp,
             language,
             suggestions: relationshipInfo.terms.map(t => t.term),
             hasVisualization: relationshipInfo.terms[0].definition.hasVisualization || false,
@@ -141,6 +143,7 @@ export class MessageService {
   static createUnknownResponse(language, context = null) {
     const unknownResponse = this.getRandomMessage(unknownResponses, language);
     const empathyPhrase = this.getRandomMessage(empathyPhrases, language);
+    const followUpPhrase = this.getRandomMessage(followUpPhrases[language] || followUpPhrases[CONFIG.DEFAULT_LANGUAGE]);
     
     // Get suggestions based on context if available
     let suggestions = [];
@@ -180,7 +183,7 @@ export class MessageService {
       text: unknownResponse,
       language,
       suggestions: [...new Set(suggestions)],
-      followUp: empathyPhrase
+      followUp: `${empathyPhrase} ${followUpPhrase}`
     };
   }
 
@@ -261,40 +264,51 @@ export class MessageService {
       ? language 
       : CONFIG.DEFAULT_LANGUAGE;
 
-    // Process text with enhanced NLP first
-    const nlpResult = await processText(input, processLanguage);
+    // Create user message first
     const userMessage = this.createUserMessage(input, processLanguage);
 
-    // Add input to context for relationship checking
-    if (nlpResult.context) {
-      nlpResult.context.input = input;
+    // Check special message types first before NLP processing
+    if (this.isGreetingMessage(input, processLanguage)) {
+      const messages = [userMessage, this.createWelcomeMessage(processLanguage)];
+      saveChatToCookie(messages);
+      return messages;
     }
 
-    // Handle special message types first
     if (this.isGratitudeMessage(input, processLanguage)) {
       const messages = [userMessage, this.createGratitudeResponse(processLanguage)];
-      saveChatToCookie(messages); // Ensure messages are saved
+      saveChatToCookie(messages);
       return messages;
     }
 
     if (this.isFarewellMessage(input, processLanguage)) {
       clearContext('default', processLanguage);
       const messages = [userMessage, this.createFarewellResponse(processLanguage)];
-      saveChatToCookie(messages); // Ensure messages are saved
+      saveChatToCookie(messages);
       return messages;
     }
 
-    // Check for relationship questions before any other processing
+    // Process text with enhanced NLP for regular messages
+    const nlpResult = await processText(input, processLanguage);
+
+    // Check for relationship questions without updating context
     const relationshipDict = relationshipPatterns[processLanguage] || relationshipPatterns[CONFIG.DEFAULT_LANGUAGE];
     const isRelationshipQuestion = relationshipDict.patterns.some(pattern => pattern.test(input.toLowerCase()));
     
     if (isRelationshipQuestion) {
       const relationshipInfo = contextManager.checkRelationship(input, processLanguage);
       if (relationshipInfo?.isRelationshipQuestion) {
-        // Create bot response with relationship info
-        const botResponse = this.createBotResponse(null, processLanguage, { ...nlpResult.context, relationshipInfo });
+        const botResponse = {
+          sender: 'bot',
+          text: relationshipInfo.response,
+          language: processLanguage,
+          suggestions: relationshipInfo.suggestions || [],
+          isRelationship: true,
+          relationshipType: relationshipInfo.relationshipType,
+          terms: relationshipInfo.terms
+        };
+
         const messages = [userMessage, botResponse];
-        saveChatToCookie(messages); // Ensure messages are saved
+        saveChatToCookie(messages);
         return messages;
       }
     }
@@ -305,13 +319,12 @@ export class MessageService {
       this.createBotResponse(definition, processLanguage, nlpResult.context) : 
       this.createUnknownResponse(processLanguage, nlpResult.context);
 
-    // Add intent information for better follow-up handling
     if (nlpResult.intent) {
       botResponse.intent = nlpResult.intent;
     }
 
     const messages = [userMessage, botResponse];
-    saveChatToCookie(messages); // Ensure messages are saved
+    saveChatToCookie(messages);
     return messages;
   }
 

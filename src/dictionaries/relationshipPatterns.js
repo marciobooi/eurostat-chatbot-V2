@@ -91,6 +91,13 @@ export const relationshipPatterns = {
         "I specialize in energy topics. I can tell you about {term1} if you're interested.",
         "My knowledge is focused on energy topics. I can explain about {term1} if you'd like.",
         "I'm specialized in energy information. Would you like to learn about {term1}?"
+      ],
+      suggestion: [
+        "While I don't have specific information about that exact term, {term1} includes several related fuels that might interest you. Would you like to learn about any of them?",
+        "That specific term is part of the broader category of {term1}. I can tell you about {term1} or its related fuels.",
+        "This term is related to {term1}. I can provide information about {term1} or suggest some specific types within this category.",
+        "That's connected to {term1}. Would you like to learn about {term1} or explore some of its specific subtypes?",
+        "This is related to the {term1} category. I can explain about {term1} or tell you about more specific fuel types in this category."
       ]
     }
   },
@@ -182,6 +189,13 @@ export const relationshipPatterns = {
         "Je suis spécialisé dans les sujets énergétiques. Je peux vous parler de {term1} si cela vous intéresse.",
         "Mes connaissances sont axées sur l'énergie. Je peux vous expliquer {term1} si vous le souhaitez.",
         "Je suis spécialisé dans l'information énergétique. Souhaitez-vous en savoir plus sur {term1} ?"
+      ],
+      suggestion: [
+        "Bien que je n'aie pas d'informations spécifiques sur ce terme exact, {term1} comprend plusieurs combustibles connexes qui pourraient vous intéresser. Souhaitez-vous en savoir plus sur l'un d'entre eux ?",
+        "Ce terme spécifique fait partie de la catégorie plus large de {term1}. Je peux vous parler de {term1} ou de ses combustibles associés.",
+        "Ce terme est lié à {term1}. Je peux vous fournir des informations sur {term1} ou vous suggérer des types spécifiques dans cette catégorie.",
+        "C'est lié à {term1}. Voulez-vous en savoir plus sur {term1} ou explorer certains de ses sous-types spécifiques ?",
+        "Cela est lié à la catégorie {term1}. Je peux vous expliquer {term1} ou vous parler de types de combustibles plus spécifiques dans cette catégorie."
       ]
     }
   },
@@ -273,6 +287,13 @@ export const relationshipPatterns = {
         "Ich bin auf Energiethemen spezialisiert. Ich kann Ihnen von {term1} erzählen, wenn Sie interessiert sind.",
         "Mein Wissen konzentriert sich auf Energiethemen. Ich kann Ihnen {term1} erklären, wenn Sie möchten.",
         "Ich bin auf Energieinformationen spezialisiert. Möchten Sie mehr über {term1} erfahren?"
+      ],
+      suggestion: [
+        "Während ich keine spezifischen Informationen zu diesem genauen Begriff habe, umfasst {term1} mehrere verwandte Brennstoffe, die Sie interessieren könnten. Möchten Sie mehr über einen davon erfahren?",
+        "Dieser spezifische Begriff ist Teil der übergeordneten Kategorie {term1}. Ich kann Ihnen etwas über {term1} oder seine verwandten Brennstoffe erzählen.",
+        "Dieser Begriff ist mit {term1} verwandt. Ich kann Ihnen Informationen über {term1} geben oder einige spezifische Typen in dieser Kategorie vorschlagen.",
+        "Das ist mit {term1} verbunden. Möchten Sie mehr über {term1} erfahren oder einige seiner spezifischen Untertypen erkunden?",
+        "Dies ist mit der Kategorie {term1} verbunden. Ich kann Ihnen {term1} erklären oder Ihnen von spezifischeren Brennstofftypen in dieser Kategorie erzählen."
       ]
     }
   }
