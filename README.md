@@ -142,7 +142,7 @@ Visualization labels and descriptions are available in:
 src/
 ├── components/     # React UI components
 ├── contexts/      # React context providers
-├── dictionaries/  # Language-specific dictionaries
+├── dictionaries/  # dictionaries models
 ├── hooks/         # Custom React hooks
 ├── locales/       # i18n translation files
 ├── services/      # Core services
@@ -241,6 +241,10 @@ Each chart type is implemented as a standalone component with dedicated styling:
 - **i18n**: Full translation support for all chart elements
 
 
+all models that we are going to use are inside dictionaries folde
+including the energy dictionary
+
+all translations used in the tool is stored in the locales
 
 
 NLP Processing Pipeline:

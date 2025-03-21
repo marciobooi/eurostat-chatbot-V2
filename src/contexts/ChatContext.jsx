@@ -3,7 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { saveChatToCookie, loadChatFromCookie, setupCrossTabbingSyncListeners } from '../utils/storageHandlers';
 import { MessageService } from '../services/MessageService';
 
-const MESSAGES_BATCH_SIZE = 20;
+// Changing from 20 to 15 messages per batch
+const MESSAGES_BATCH_SIZE = 15;
+// Minimum number of messages before showing the "Show More" button
+const MIN_MESSAGES_FOR_BUTTON = 15;
 
 const ChatContext = createContext();
 
@@ -38,7 +41,10 @@ export const ChatProvider = ({ children }) => {
     if (allMessages.length > 0) {
       const startIndex = Math.max(0, allMessages.length - displayCount);
       setVisibleMessages(allMessages.slice(startIndex));
-      setShowMoreButton(allMessages.length > displayCount);
+      
+      // Only show the "Show More" button if we have enough messages AND there are more to load
+      setShowMoreButton(allMessages.length > MIN_MESSAGES_FOR_BUTTON && allMessages.length > displayCount);
+      
       scrollToBottom(); // Auto-scroll when messages update
     } else {
       setVisibleMessages([]);
@@ -49,6 +55,7 @@ export const ChatProvider = ({ children }) => {
   // Initialize with welcome message or load saved chat
   useEffect(() => {
     const savedChat = loadChatFromCookie();
+    
     if (savedChat?.length > 0) {
       // Ensure any loaded messages have string text values
       const validatedChat = savedChat.map(msg => ({
