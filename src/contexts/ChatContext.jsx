@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { saveChatToCookie, loadChatFromCookie, setupCrossTabbingSyncListeners } from '../utils/storageHandlers';
 import { MessageService } from '../services/MessageService';
 
-// Changing from 20 to 15 messages per batch
+// Messages per batch when loading more
 const MESSAGES_BATCH_SIZE = 15;
 // Minimum number of messages before showing the "Show More" button
 const MIN_MESSAGES_FOR_BUTTON = 15;
@@ -39,13 +39,19 @@ export const ChatProvider = ({ children }) => {
   // Update visible messages when total messages or display count changes
   useEffect(() => {
     if (allMessages.length > 0) {
+      // Always show at least the most recent messages
       const startIndex = Math.max(0, allMessages.length - displayCount);
       setVisibleMessages(allMessages.slice(startIndex));
       
-      // Only show the "Show More" button if we have enough messages AND there are more to load
-      setShowMoreButton(allMessages.length > MIN_MESSAGES_FOR_BUTTON && allMessages.length > displayCount);
+      // Only show the "Show More" button if:
+      // 1. We have at least MIN_MESSAGES_FOR_BUTTON messages total
+      // 2. There are more messages available than what we're currently displaying
+      setShowMoreButton(
+        allMessages.length >= MIN_MESSAGES_FOR_BUTTON && 
+        allMessages.length > displayCount
+      );
       
-      scrollToBottom(); // Auto-scroll when messages update
+      scrollToBottom();
     } else {
       setVisibleMessages([]);
       setShowMoreButton(false);
@@ -62,8 +68,11 @@ export const ChatProvider = ({ children }) => {
         ...msg,
         text: typeof msg.text === 'string' ? msg.text : JSON.stringify(msg.text)
       }));
+      
       setAllMessages(validatedChat);
-      // Only show last MESSAGES_BATCH_SIZE messages initially
+      
+      // Important: Always show at least the most recent MESSAGES_BATCH_SIZE messages
+      // even if there are more in history
       setDisplayCount(Math.min(MESSAGES_BATCH_SIZE, validatedChat.length));
     } else {
       const welcomeMessage = MessageService.createWelcomeMessage(i18n.language);
@@ -78,6 +87,9 @@ export const ChatProvider = ({ children }) => {
       if (syncedMessages) {
         if (JSON.stringify(syncedMessages) !== JSON.stringify(allMessages)) {
           setAllMessages(syncedMessages);
+          
+          // Always show at least the most recent MESSAGES_BATCH_SIZE messages
+          // when syncing from another tab
           setDisplayCount(Math.min(MESSAGES_BATCH_SIZE, syncedMessages.length));
         }
       } else {
@@ -92,13 +104,27 @@ export const ChatProvider = ({ children }) => {
       setAllMessages(prevMessages => {
         const updatedMessages = newMessages(prevMessages);
         saveChatToCookie(updatedMessages);
+        
+        // When adding new messages, make sure we update the display count
+        // to always show the most recent messages
+        const newCount = Math.max(displayCount, Math.min(MESSAGES_BATCH_SIZE, updatedMessages.length));
+        if (updatedMessages.length > prevMessages.length) {
+          setDisplayCount(newCount);
+        }
+        
         return updatedMessages;
       });
     } else {
       setAllMessages(newMessages);
       saveChatToCookie(newMessages);
+      
+      // Also update display count for direct array assignments
+      if (newMessages.length > 0) {
+        const newCount = Math.min(MESSAGES_BATCH_SIZE, newMessages.length);
+        setDisplayCount(newCount);
+      }
     }
-  }, []);
+  }, [displayCount]);
 
   const loadMoreMessages = useCallback(() => {
     setDisplayCount(prev => Math.min(prev + MESSAGES_BATCH_SIZE, allMessages.length));

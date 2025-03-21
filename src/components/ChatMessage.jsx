@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 import { Tooltip } from 'react-tooltip';
 import { useChatInteractions } from '../hooks/useChatInteractions';
+import Spinner from './Spinner';
 import PieChart from './PieChart';
 import BarChart from './BarChart';
 import LineChart from './LineChart';
@@ -139,11 +140,7 @@ const ChatMessage = ({ message, children, onVisualizationSelect, usedVisualizati
             </div>
           )}
 
-          {isLoading && (
-            <div className="visualization-loading">
-              {t('visualization.loading')}
-            </div>
-          )}
+          {isLoading && <Spinner size="1.5rem" />}
         </div>
       </div>
     </div>
