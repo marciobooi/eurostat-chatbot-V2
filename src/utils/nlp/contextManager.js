@@ -218,36 +218,17 @@ class ContextManager {
 
     const lowercaseInput = message.toLowerCase();
     const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
-    const patterns = relationshipPatterns[language]?.patterns || relationshipPatterns[CONFIG.DEFAULT_LANGUAGE].patterns;
+    const relationshipDict = relationshipPatterns[language] || relationshipPatterns[CONFIG.DEFAULT_LANGUAGE];
     
-    // Enhanced relationship question detection
-    const isRelationshipQuestion = patterns.some(pattern => pattern.test(lowercaseInput)) ||
-      /\bis\s+.*\brelated\b|\brelation\b.*\bbetween\b|\bare\b.*\band\b.*\brelated\b/i.test(lowercaseInput);
+    // Check if the message matches any relationship pattern
+    const isRelationshipQuestion = relationshipDict.patterns.some(pattern => pattern.test(lowercaseInput));
 
-    // Extract terms with improved matching
-    const terms = Object.keys(dictionary).filter(term => {
-      const termLower = term.toLowerCase();
-      return lowercaseInput.includes(termLower) || 
-             lowercaseInput.split(/\s+/).some(word => word.includes(termLower)) ||
-             (dictionary[term].text && lowercaseInput.includes(term.toLowerCase()));
-    });
+    // Extract terms from the input
+    const terms = this.extractTermsFromMessage(lowercaseInput, dictionary);
 
-    // Special handling for coke and coal products relationship
-    if (terms.includes('coke') && terms.includes('coal_products')) {
-      const def1 = dictionary['coke'];
-      const def2 = dictionary['coal_products'];
-      return this.createRelationshipResponse(true, 'child-parent', def1, def2, 'coke', 'coal_products', language);
-    }
-
-    // If we have less than 2 terms but the question is a relationship question,
-    // try to find terms in definitions
+    // If we have less than 2 terms but it's a relationship question, search in definitions
     if (terms.length < 2 && isRelationshipQuestion) {
-      const allTerms = Object.entries(dictionary);
-      for (const [term, def] of allTerms) {
-        if (def.text && def.text.toLowerCase().includes(lowercaseInput)) {
-          terms.push(term);
-        }
-      }
+      this.findTermsInDefinitions(lowercaseInput, dictionary, terms);
     }
 
     if (terms.length < 2) return null;
@@ -258,80 +239,91 @@ class ContextManager {
 
     if (!def1 || !def2) return null;
 
-    // Enhanced relationship checking
-    const isRelated = (
-      // Direct relationships
-      def1.related?.includes(term2) ||
-      def2.related?.includes(term1) ||
-      // Hierarchical relationships
+    const isRelated = this.checkTermRelationship(def1, def2, term1, term2);
+    const relationshipType = this.determineRelationshipType(def1, def2, term1, term2);
+
+    return this.createRelationshipResponse(isRelated, relationshipType, def1, def2, term1, term2, language);
+  }
+
+  extractTermsFromMessage(input, dictionary) {
+    return Object.keys(dictionary).filter(term => {
+      const termLower = term.toLowerCase();
+      const def = dictionary[term];
+      return input.includes(termLower) || 
+             input.split(/\s+/).some(word => word.includes(termLower)) ||
+             (def.text && input.includes(termLower));
+    });
+  }
+
+  findTermsInDefinitions(input, dictionary, terms) {
+    Object.entries(dictionary).forEach(([term, def]) => {
+      if (def.text && def.text.toLowerCase().includes(input)) {
+        terms.push(term);
+      }
+    });
+  }
+
+  checkTermRelationship(def1, def2, term1, term2) {
+    return (
+      this.hasDirectRelationship(def1, def2, term1, term2) ||
+      this.hasHierarchicalRelationship(def1, def2, term1, term2) ||
+      this.hasCategoryRelationship(def1, def2) ||
+      this.hasTextualRelationship(def1, def2)
+    );
+  }
+
+  hasDirectRelationship(def1, def2, term1, term2) {
+    return def1.related?.includes(term2) || def2.related?.includes(term1);
+  }
+
+  hasHierarchicalRelationship(def1, def2, term1, term2) {
+    return (
       def1.subFuels?.includes(term2) ||
       def2.subFuels?.includes(term1) ||
       def1.parentFuel === term2 ||
       def2.parentFuel === term1 ||
-      // Category relationships
-      def1.category === def2.category ||
-      def1.family === def2.family ||
-      def1.subFamily === def2.subFamily ||
-      // Text-based relationship detection
-      (def1.text && (
-        def1.text.toLowerCase().includes(term2.toLowerCase()) ||
-        def1.text.toLowerCase().includes(def2.title?.toLowerCase() || '')
-      )) ||
-      (def2.text && (
-        def2.text.toLowerCase().includes(term1.toLowerCase()) ||
-        def2.text.toLowerCase().includes(def1.title?.toLowerCase() || '')
-      )) ||
-      // Production/derivation relationships
       def1.derivedFrom?.includes(term2) ||
-      def2.derivedFrom?.includes(term1) ||
-      // Check if one is mentioned in the other's definition
-      this.checkTextualRelationship(def1, def2)
+      def2.derivedFrom?.includes(term1)
     );
-
-    return this.createRelationshipResponse(isRelated, this.determineRelationshipType(def1, def2, term1, term2), def1, def2, term1, term2, language);
   }
 
-  checkTextualRelationship(def1, def2) {
+  hasCategoryRelationship(def1, def2) {
+    return (
+      def1.category === def2.category ||
+      def1.family === def2.family ||
+      def1.subFamily === def2.subFamily
+    );
+  }
+
+  hasTextualRelationship(def1, def2) {
     const text1 = def1.text?.toLowerCase() || '';
     const text2 = def2.text?.toLowerCase() || '';
     const title1 = def1.title?.toLowerCase() || '';
     const title2 = def2.title?.toLowerCase() || '';
 
-    // Enhanced text relationship checking
-    const relationshipTerms = [
-      'include', 'includes', 'including',
-      'derive', 'derives', 'derived',
-      'produce', 'produces', 'produced',
-      'made from', 'processed from',
-      'refined from', 'based on'
-    ];
+    // Get relationship terms from dictionary
+    const allTerms = Object.values(relationshipPatterns[CONFIG.DEFAULT_LANGUAGE].terms).flat();
 
-    // Check for direct mention
+    // Direct mention check
     const hasDirectMention = text1.includes(title2) || text2.includes(title1);
 
-    // Check for relationship terms
-    const hasRelationshipTerm = relationshipTerms.some(term => 
+    // Term relationship check
+    const hasTermRelation = allTerms.some(term => 
       (text1.includes(term) && text1.includes(title2)) ||
       (text2.includes(term) && text2.includes(title1))
     );
 
-    // Check for co-occurrence of terms in the same sentence
+    // Sentence level check
     const sentences1 = text1.split(/[.!?]+/);
     const sentences2 = text2.split(/[.!?]+/);
-    
+
     const hasSentenceRelation = sentences1.some(sentence => 
-      sentence.includes(title2) && relationshipTerms.some(term => sentence.includes(term))
+      sentence.includes(title2) && allTerms.some(term => sentence.includes(term))
     ) || sentences2.some(sentence => 
-      sentence.includes(title1) && relationshipTerms.some(term => sentence.includes(term))
+      sentence.includes(title1) && allTerms.some(term => sentence.includes(term))
     );
 
-    return hasDirectMention || hasRelationshipTerm || hasSentenceRelation;
-  }
-
-  hasCommonTerms(text1, text2) {
-    // List of significant terms that indicate relationship
-    const significantTerms = ['derived', 'produced', 'made', 'processed', 'refined', 'extracted', 'source'];
-    return significantTerms.some(term => text1.includes(term) && text2.includes(term));
+    return hasDirectMention || hasTermRelation || hasSentenceRelation;
   }
 
   determineRelationshipType(def1, def2, term1, term2) {
@@ -345,7 +337,7 @@ class ContextManager {
       return 'same-category';
     } else if (def1.derivedFrom?.includes(term2) || def2.derivedFrom?.includes(term1)) {
       return 'derived';
-    } else if (this.checkTextualRelationship(def1, def2)) {
+    } else if (this.hasTextualRelationship(def1, def2)) {
       return 'textual';
     }
     return '';

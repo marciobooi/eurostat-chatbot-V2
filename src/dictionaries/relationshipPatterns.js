@@ -43,6 +43,27 @@ export const relationshipPatterns = {
       /(?:belong|part|component|element) of/i,
       /(?:used|processed|refined|produced) (?:in|from|by|with)/i
     ],
+    terms: {
+      inclusion: [
+        'include', 'includes', 'including',
+        'part of', 'contains', 'containing',
+        'consists of'
+      ],
+      derivation: [
+        'derive', 'derives', 'derived',
+        'originate', 'originates', 'originated'
+      ],
+      production: [
+        'produce', 'produces', 'produced',
+        'manufacture', 'manufactures', 'manufactured'
+      ],
+      processing: [
+        'made from', 'processed from',
+        'refined from', 'based on',
+        'extracted from', 'obtained from',
+        'created from'
+      ]
+    },
     responses: {
       positive: [
         "Yes, they are related. {term1} and {term2} belong to the same energy family. Would you like to learn more about either of them?",
@@ -100,6 +121,27 @@ export const relationshipPatterns = {
       /(?:appartient|partie|composant|élément) de/i,
       /(?:utilisé|transformé|raffiné|produit) (?:dans|de|par|avec)/i
     ],
+    terms: {
+      inclusion: [
+        'inclure', 'inclut', 'incluant',
+        'fait partie de', 'contient', 'contenant',
+        'composé de'
+      ],
+      derivation: [
+        'dériver', 'dérive', 'dérivé',
+        'provenir', 'provient', 'provenu'
+      ],
+      production: [
+        'produire', 'produit', 'produite',
+        'fabriquer', 'fabrique', 'fabriqué'
+      ],
+      processing: [
+        'fait à partir de', 'traité à partir de',
+        'raffiné à partir de', 'basé sur',
+        'extrait de', 'obtenu à partir de',
+        'créé à partir de'
+      ]
+    },
     responses: {
       positive: [
         "Oui, ils sont liés. {term1} et {term2} appartiennent à la même famille d'énergie. Souhaitez-vous en savoir plus sur l'un d'eux ?",
@@ -157,6 +199,27 @@ export const relationshipPatterns = {
       /(?:gehört|teil|komponente|element) von/i,
       /(?:verwendet|verarbeitet|raffiniert|produziert) (?:in|aus|von|mit)/i
     ],
+    terms: {
+      inclusion: [
+        'enthalten', 'enthält', 'einschließlich',
+        'teil von', 'beinhaltet', 'beinhaltend',
+        'besteht aus'
+      ],
+      derivation: [
+        'ableiten', 'leitet ab', 'abgeleitet',
+        'stammen', 'stammt', 'gestammt'
+      ],
+      production: [
+        'produzieren', 'produziert', 'hergestellt',
+        'herstellen', 'stellt her', 'hergestellt'
+      ],
+      processing: [
+        'hergestellt aus', 'verarbeitet aus',
+        'raffiniert aus', 'basierend auf',
+        'gewonnen aus', 'erhalten aus',
+        'erstellt aus'
+      ]
+    },
     responses: {
       positive: [
         "Ja, sie sind verwandt. {term1} und {term2} gehören zur selben Energiefamilie. Möchten Sie mehr über eines davon erfahren?",

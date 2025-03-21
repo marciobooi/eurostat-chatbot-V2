@@ -279,3 +279,10 @@ Understand user intents related to energy data
 Track conversation context for coherent multi-turn interactions
 Extract relevant entities for data retrieval
 Gauge user sentiment to adjust responses accordingly
+
+
+
+bot knows:
+greetings 
+definitions
+relationships
