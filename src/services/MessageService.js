@@ -3,7 +3,7 @@ import { unknownResponses } from '../dictionaries/unknownResponses';
 import { energyDefinitionsEn } from '../dictionaries/energyDefinitions/en';
 import { findEnergyDefinition } from '../utils/energyHandlers';
 import { getRandomElement } from '../utils/randomUtils';
-import { processText, clearContext } from '../utils/nlpHandlers';
+import { processText, clearContext, analyzeSentiment, extractEntities, findBestMatch } from '../utils/nlpHandlers';
 import { energyDictionary } from '../utils/energyDictionary';
 import { affirmativePatterns } from '../dictionaries/affirmativeResponses';
 import { datePatterns } from '../dictionaries/datePatterns';
@@ -11,9 +11,16 @@ import { empathyPhrases } from '../dictionaries/empathyPhrases';
 import { followUpPhrases } from '../dictionaries/followUpQuestions';
 import { goodbyeWords } from '../dictionaries/farewellWords';
 import { gratitudeWords } from '../dictionaries/gratitudeWords';
+import { gratitudeMessages } from '../dictionaries/gratitudeMessages';
+import { questionWords } from '../dictionaries/questionWords';
+import { filteredWords } from '../dictionaries/filteredWords';
 import greetingPhrases from '../dictionaries/greetingPhrases';
 import { CONFIG } from '../i18n';
 import { NLP_CONFIG } from '../config/nlpConfig';
+import { contextManager } from '../utils/nlp/contextManager';
+import { relationshipPatterns } from '../dictionaries/relationshipPatterns';
+import { errorMessages } from '../dictionaries/errorMessages';
+import { farewellMessages } from '../dictionaries/farewellMessages';
 
 export class MessageService {
   static instance = null;
@@ -48,17 +55,43 @@ export class MessageService {
   }
 
   static createBotResponse(definition, language, context = null) {
+    // Check for relationship questions first, before anything else
+    if (context?.input) {
+      const relationshipInfo = contextManager.checkRelationship(context.input, language);
+      if (relationshipInfo?.isRelationshipQuestion) {
+        return {
+          sender: 'bot',
+          text: relationshipInfo.response,
+          language,
+          suggestions: relationshipInfo.terms.map(t => t.term),
+          isRelationship: true,
+          relationshipType: relationshipInfo.relationshipType,
+          terms: relationshipInfo.terms,
+          // Add follow-up flag to help with conversation flow
+          isFollowUpNeeded: true
+        };
+      }
+    }
+
+    // Continue with normal response handling if no relationship is detected
     if (!definition) {
       return this.createUnknownResponse(language, context);
     }
 
-    // Enhance response with context awareness
+    // Rest of existing response handling...
+    const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
+    const terms = context?.input ? 
+      Object.keys(dictionary).filter(term => 
+        context.input.toLowerCase().includes(term.toLowerCase())
+      ) : [];
+
+    // Create base response without relationshipInfo reference
     const baseResponse = {
       sender: 'bot',
       title: definition.title,
       text: typeof definition.text === 'string' ? definition.text : JSON.stringify(definition.text),
       language,
-      suggestions: definition.subFuels || [],
+      suggestions: terms.length >= 2 ? terms.slice(0, 2) : (definition.subFuels || []),
       hasVisualization: definition.hasVisualization || false,
       visualizationType: definition.visualizationType || [],
       dataset: definition.dataset,
@@ -67,7 +100,7 @@ export class MessageService {
     };
 
     // Add contextual enhancements if available
-    if (context) {
+    if (context && !relationshipInfo) { // Only add extra suggestions if not a relationship question
       const { topicChain, entities } = context;
       
       // Add related topics from conversation history
@@ -75,7 +108,7 @@ export class MessageService {
         baseResponse.relatedTopics = topicChain
           .map(topic => topic.mainTopic)
           .filter(topic => topic !== definition.fuelCode)
-          .slice(0, 3);
+          .slice(0, NLP_CONFIG.questionProcessing.maxRelatedTopics);
       }
 
       // Add most referenced energy types as suggestions
@@ -83,7 +116,7 @@ export class MessageService {
         const energyTypes = entities.energyDomain.energyTypes
           .map(entity => entity.text)
           .filter(text => text !== definition.fuelCode)
-          .slice(0, 2);
+          .slice(0, NLP_CONFIG.questionProcessing.maxSuggestions);
 
         baseResponse.suggestions = [
           ...new Set([...baseResponse.suggestions, ...energyTypes])
@@ -220,6 +253,11 @@ export class MessageService {
     // Process text with enhanced NLP
     const nlpResult = await processText(input, processLanguage);
     const userMessage = this.createUserMessage(input, processLanguage);
+
+    // Add input to context for relationship checking
+    if (nlpResult.context) {
+      nlpResult.context.input = input;
+    }
 
     // Handle special message types
     if (this.isGratitudeMessage(input, processLanguage)) {

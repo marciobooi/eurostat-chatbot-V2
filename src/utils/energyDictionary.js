@@ -3,15 +3,12 @@
  * Contains information about energy topics across multiple languages
  */
 
-import { energyDefinitionsEn } from '../dictionaries/energyDefinitions/en.js';
-import { energyDefinitionsFr } from '../dictionaries/energyDefinitions/fr.js';
-import { energyDefinitionsDe } from '../dictionaries/energyDefinitions/de.js';
+import { energyDefinitionsEn } from '../dictionaries/energyDefinitionsEn.js';
 import { CONFIG } from '../i18n.js';
 
 export const energyDictionary = {
   en: energyDefinitionsEn,
-  fr: energyDefinitionsFr,
-  de: energyDefinitionsDe
+  // Add other languages here
 };
 
 /**
