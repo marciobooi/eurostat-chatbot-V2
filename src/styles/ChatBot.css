@@ -39,6 +39,8 @@
   gap: var(--spacing-4);
   background-color: var(--neutral-200);
   scroll-behavior: smooth;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
 }
 
 .messages::-webkit-scrollbar {
@@ -279,13 +281,12 @@
 }
 
 .smart-messages-container {
-  display: flex;
-  align-content: center;
-  align-items: center;
-  /* gap: 1rem; */
-  justify-content: space-evenly;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
   padding: .5rem;
   box-shadow: -1px -1px 11px 0 rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
 .smart-message-btn {

@@ -30,46 +30,33 @@ const contextStore = new Map();
  */
 export const processText = async (text, language = NLP_CONFIG.languages.default) => {
   try {
-    // Extract entities first
+    // Extract entities first to get canonical forms
     const entities = await entityExtractor.extractEntities(text, language);
     
-    // Get intent and sentiment
-    const [intentResult, sentimentResult] = await Promise.all([
-      intentClassifier.classifyIntent(text, entities, language),
-      sentimentAnalyzer.analyzeSentiment(text, language)
-    ]);
-
-    // Create consolidated NLP result with proper structure
-    const nlpResult = {
-      entities: {
-        standardEntities: entities.standardEntities || {},
-        energyDomain: entities.energyDomain || {
-          energyTypes: [],
-          metrics: [],
-          timeframes: []
-        }
-      },
+    // Get intent using extracted entities
+    const intentResult = await intentClassifier.classifyIntent(text, entities, language);
+    
+    // Analyze sentiment
+    const sentiment = await sentimentAnalyzer.analyzeSentiment(text, language);
+    
+    // Update and get context using the conversation manager
+    const context = contextManager.updateContext('default', text, {
+      entities,
       intent: intentResult.primaryIntent,
-      intentDetails: intentResult,
-      sentiment: sentimentResult,
-      language
-    };
-
-    // Update context with properly structured data
-    const context = contextManager.updateContext(
-      'default',
-      text,
-      nlpResult,
-      language
-    );
+      sentiment
+    }, language);
 
     return {
-      ...nlpResult,
-      context
+      entities,
+      intent: intentResult.primaryIntent,
+      allIntents: intentResult.allIntents,
+      confidence: intentResult.confidence,
+      sentiment,
+      context,
+      language
     };
   } catch (error) {
     console.error('Error in NLP processing:', error);
-    // Return safe defaults on error
     return {
       entities: {
         standardEntities: {},
@@ -107,71 +94,89 @@ export const extractEntities = async (text, language = NLP_CONFIG.languages.defa
 export const findBestMatch = async (text, candidates, language = NLP_CONFIG.languages.default) => {
   try {
     const nlpResult = await processText(text, language);
-    const intent = await intentClassifier.classifyIntent(text, nlpResult.entities, language);
+    const matches = [];
+
+    // First try canonical forms from extracted entities
+    if (nlpResult.entities?.energyDomain?.energyTypes) {
+      for (const entity of nlpResult.entities.energyDomain.energyTypes) {
+        if (entity.canonical && candidates.includes(entity.canonical)) {
+          matches.push({
+            candidate: entity.canonical,
+            score: 1.0,
+            confidence: entity.confidence || 1.0
+          });
+        }
+      }
+    }
+
+    // If no matches through canonical forms, try fuzzy matching
+    if (matches.length === 0) {
+      for (const candidate of candidates) {
+        const score = calculateSimilarity(text.toLowerCase(), candidate.toLowerCase());
+        if (score >= NLP_CONFIG.questionProcessing.minSimilarity) {
+          matches.push({
+            candidate,
+            score,
+            confidence: score
+          });
+        }
+      }
+    }
+
+    // Sort matches by score
+    matches.sort((a, b) => b.score - a.score);
 
     return {
-      text,
-      matches: candidates.map(candidate => ({
-        candidate,
-        score: calculateMatchScore(text, candidate, nlpResult, intent)
-      })).sort((a, b) => b.score - a.score),
-      intent: intent.primaryIntent,
-      confidence: intent.confidence
+      matches,
+      intent: nlpResult.intent,
+      entities: nlpResult.entities,
+      confidence: matches[0]?.score || 0
     };
   } catch (error) {
     console.error('Error finding best match:', error);
     return {
-      text,
       matches: [],
-      error: true
+      intent: null,
+      entities: null,
+      confidence: 0
     };
   }
 };
 
 /**
- * Calculate match score between text and candidate
+ * Calculate similarity between two strings
  */
-const calculateMatchScore = (text, candidate, nlpResult, intent) => {
-  let score = 0;
-
-  // Add intent confidence
-  if (intent?.confidence) {
-    score += intent.confidence * 0.3;
-  }
-
-  // Add entity matches
-  const energyDomain = nlpResult?.entities?.energyDomain || {};
-  if (energyDomain) {
-    // Check energy types
-    const energyTypes = energyDomain.energyTypes || [];
-    if (energyTypes.some(entity => candidate.toLowerCase().includes(entity.text.toLowerCase()))) {
-      score += 0.4;
-    }
-
-    // Check metrics
-    const metrics = energyDomain.metrics || [];
-    if (metrics.some(entity => candidate.toLowerCase().includes(entity.text.toLowerCase()))) {
-      score += 0.3;
-    }
-  }
-
-  // Add text similarity (basic for now)
-  const textSimilarity = calculateTextSimilarity(text.toLowerCase(), candidate.toLowerCase());
-  score += textSimilarity * 0.2;
-
-  return score;
-};
+function calculateSimilarity(str1, str2) {
+  // Simple Levenshtein distance-based similarity
+  const distance = levenshteinDistance(str1, str2);
+  const maxLength = Math.max(str1.length, str2.length);
+  return 1 - (distance / maxLength);
+}
 
 /**
- * Calculate basic text similarity
+ * Calculate Levenshtein distance between two strings
  */
-const calculateTextSimilarity = (text1, text2) => {
-  const words1 = new Set(text1.split(/\s+/));
-  const words2 = new Set(text2.split(/\s+/));
-  const intersection = new Set([...words1].filter(x => words2.has(x)));
-  const union = new Set([...words1, ...words2]);
-  return intersection.size / union.size;
-};
+function levenshteinDistance(str1, str2) {
+  const m = str1.length;
+  const n = str2.length;
+  const dp = Array(m + 1).fill().map(() => Array(n + 1).fill(0));
+
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+      dp[i][j] = Math.min(
+        dp[i - 1][j] + 1,
+        dp[i][j - 1] + 1,
+        dp[i - 1][j - 1] + cost
+      );
+    }
+  }
+
+  return dp[m][n];
+}
 
 /**
  * Clear context for a session

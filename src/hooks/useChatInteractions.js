@@ -15,7 +15,7 @@ export const useChatInteractions = () => {
     updateMessages,
     setUsedVisualizations,
     allMessages,
-    scrollToBottom // Add scrollToBottom from context
+    scrollToBottom
   } = useChatContext();
 
   const handleSendMessage = useCallback(async (e) => {
@@ -28,12 +28,16 @@ export const useChatInteractions = () => {
     setIsTyping(true);
 
     try {
-      // Process the input and get responses using MessageService
+      // Process the input and get responses
       const [userMessageObj, botResponse] = await MessageService.processUserInput(userMessage, i18n.language);
       
       // Add messages to chat
       updateMessages(prev => [...prev, userMessageObj, botResponse]);
-      scrollToBottom(); // Scroll after adding messages
+      
+      // Only scroll after bot response is complete
+      setTimeout(() => {
+        scrollToBottom(true);
+      }, 100);
     } catch (error) {
       console.error('Error in chat interaction:', error);
       updateMessages(prev => [
@@ -41,7 +45,9 @@ export const useChatInteractions = () => {
         { sender: 'user', text: userMessage },
         MessageService.createErrorResponse(i18n.language)
       ]);
-      scrollToBottom(); // Scroll even if there's an error
+      setTimeout(() => {
+        scrollToBottom(true);
+      }, 100);
     } finally {
       setIsTyping(false);
     }
@@ -51,6 +57,7 @@ export const useChatInteractions = () => {
     try {
       setUsedVisualizations(prev => [...prev, usedType]);
       const { data } = await fetchEurostatData(message.fuelType, 'visualization', type);
+      
       const visualizationMessage = MessageService.createVisualizationMessage(
         message,
         type,
@@ -58,11 +65,15 @@ export const useChatInteractions = () => {
         message.language
       );
       updateMessages(prev => [...prev, visualizationMessage]);
-      scrollToBottom(); // Scroll after adding visualization
+      setTimeout(() => {
+        scrollToBottom(true);
+      }, 100);
     } catch (error) {
       console.error('Error handling visualization:', error);
       updateMessages(prev => [...prev, MessageService.createErrorResponse(i18n.language)]);
-      scrollToBottom(); // Scroll even if there's an error
+      setTimeout(() => {
+        scrollToBottom(true);
+      }, 100);
     }
   }, [setUsedVisualizations, updateMessages, i18n.language, scrollToBottom]);
 
@@ -78,11 +89,15 @@ export const useChatInteractions = () => {
       const userMessage = MessageService.createUserMessage(suggestion, i18n.language);
       const botResponse = MessageService.createBotResponse(definition, i18n.language);
       updateMessages(prev => [...prev, userMessage, botResponse]);
-      scrollToBottom(); // Scroll after adding suggestion messages
+      setTimeout(() => {
+        scrollToBottom(true);
+      }, 100);
     } catch (error) {
       console.error('Error handling suggestion:', error);
       updateMessages(prev => [...prev, MessageService.createErrorResponse(i18n.language)]);
-      scrollToBottom(); // Scroll even if there's an error
+      setTimeout(() => {
+        scrollToBottom(true);
+      }, 100);
     }
   }, [updateMessages, i18n.language, scrollToBottom]);
 

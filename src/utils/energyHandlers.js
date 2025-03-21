@@ -1,7 +1,10 @@
-import { energyDictionary } from './energyDictionary';
+/**
+ * Energy data handlers
+ */
+import { energyDictionary, getDictionary } from './energyDictionary';
 import { findBestMatch } from './nlpHandlers';
-import { CONFIG } from '../i18n';
 import { NLP_CONFIG } from '../config/nlpConfig';
+import { CONFIG } from '../i18n';
 
 // Unit conversion constants
 const UNIT_CONVERSIONS = {
@@ -10,9 +13,9 @@ const UNIT_CONVERSIONS = {
 };
 
 /**
- * Convert between energy units
+ * Convert input value to different units
  */
-const convertUnits = (value, fromUnit, toUnit) => {
+export const convertUnits = (value, fromUnit, toUnit) => {
   if (fromUnit === toUnit) return value;
   
   switch(`${fromUnit}_TO_${toUnit}`) {
@@ -35,30 +38,67 @@ export const findEnergyDefinition = async (text, language = CONFIG.DEFAULT_LANGU
     const candidates = Object.keys(dictionary);
 
     // Find best match using NLP
-    const { matches, intent } = await findBestMatch(text, candidates, language);
+    const { matches, intent, entities } = await findBestMatch(text, candidates, language);
     
-    if (matches.length === 0) {
+    if (matches.length === 0 && !entities?.energyDomain?.energyTypes) {
       return null;
     }
 
-    // Get top match with sufficient score
-    const topMatch = matches[0];
-    if (topMatch.score >= NLP_CONFIG.questionProcessing.similarityThreshold) {
-      return {
-        ...dictionary[topMatch.candidate],
-        fuelCode: topMatch.candidate
-      };
+    let mainDefinition = null;
+    let suggestions = [];
+
+    // First try to find a match using detected energy types
+    if (entities?.energyDomain?.energyTypes) {
+      for (const entity of entities.energyDomain.energyTypes) {
+        if (entity.canonical && dictionary[entity.canonical]) {
+          mainDefinition = {
+            ...dictionary[entity.canonical],
+            fuelCode: entity.canonical
+          };
+          // Only include subFuels if this is a main fuel
+          if (mainDefinition.isMainFuel && mainDefinition.subFuels) {
+            suggestions = mainDefinition.subFuels;
+          }
+          break;
+        }
+      }
     }
 
-    // Try to find a match based on intent if direct match fails
-    if (intent) {
+    // If no match found through entities, try direct matches
+    if (!mainDefinition && matches.length > 0) {
+      const topMatch = matches[0];
+      if (topMatch.score >= NLP_CONFIG.questionProcessing.similarityThreshold) {
+        mainDefinition = {
+          ...dictionary[topMatch.candidate],
+          fuelCode: topMatch.candidate
+        };
+        // Only include subFuels if this is a main fuel
+        if (mainDefinition.isMainFuel && mainDefinition.subFuels) {
+          suggestions = mainDefinition.subFuels;
+        }
+      }
+    }
+
+    // Try to find a match based on intent if other methods fail
+    if (!mainDefinition && intent) {
       const intentBasedMatch = findMatchByIntent(intent, dictionary, matches);
       if (intentBasedMatch) {
-        return {
+        mainDefinition = {
           ...dictionary[intentBasedMatch],
           fuelCode: intentBasedMatch
         };
+        // Only include subFuels if this is a main fuel
+        if (mainDefinition.isMainFuel && mainDefinition.subFuels) {
+          suggestions = mainDefinition.subFuels;
+        }
       }
+    }
+
+    if (mainDefinition) {
+      return {
+        ...mainDefinition,
+        suggestions: suggestions
+      };
     }
 
     return null;
@@ -79,7 +119,8 @@ const findMatchByIntent = (intent, dictionary, matches) => {
     'query_trade': (def) => def.isMainFuel && (def.hasImports || def.hasExports),
     'query_comparison': (def) => def.isMainFuel,
     'query_trend': (def) => def.hasHistoricalData,
-    'request_visualization': (def) => def.hasVisualization
+    'request_visualization': (def) => def.hasVisualization,
+    'topic_request': (def) => true // Always consider the definition for direct topic requests
   };
 
   const filter = intentMappings[intent];
@@ -89,6 +130,7 @@ const findMatchByIntent = (intent, dictionary, matches) => {
 
   // First try matches that have a decent score
   const goodMatches = matches.filter(m => m.score >= 0.3);
+  
   for (const match of goodMatches) {
     const def = dictionary[match.candidate];
     if (def && filter(def)) {

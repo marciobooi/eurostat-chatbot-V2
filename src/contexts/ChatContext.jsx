@@ -31,9 +31,14 @@ export const ChatProvider = ({ children }) => {
   const { i18n } = useTranslation();
   const messagesEndRef = useRef(null);
 
-  // Scroll handler function
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  // Enhanced scroll handler function with immediate option
+  const scrollToBottom = useCallback((immediate = false) => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ 
+        behavior: immediate ? 'auto' : 'smooth',
+        block: 'end'
+      });
+    }
   }, []);
 
   // Update visible messages when total messages or display count changes
@@ -51,7 +56,8 @@ export const ChatProvider = ({ children }) => {
         allMessages.length > displayCount
       );
       
-      scrollToBottom();
+      // Scroll immediately for new messages
+      scrollToBottom(true);
     } else {
       setVisibleMessages([]);
       setShowMoreButton(false);
@@ -105,11 +111,17 @@ export const ChatProvider = ({ children }) => {
         const updatedMessages = newMessages(prevMessages);
         saveChatToCookie(updatedMessages);
         
-        // When adding new messages, make sure we update the display count
-        // to always show the most recent messages
-        const newCount = Math.max(displayCount, Math.min(MESSAGES_BATCH_SIZE, updatedMessages.length));
+        // When adding new messages, ensure we're showing them
+        const newCount = Math.max(
+          displayCount,
+          Math.min(MESSAGES_BATCH_SIZE, updatedMessages.length)
+        );
+        
+        // If we have new messages, update the display count
         if (updatedMessages.length > prevMessages.length) {
           setDisplayCount(newCount);
+          // Schedule an immediate scroll after the state updates
+          setTimeout(() => scrollToBottom(true), 0);
         }
         
         return updatedMessages;
@@ -118,13 +130,14 @@ export const ChatProvider = ({ children }) => {
       setAllMessages(newMessages);
       saveChatToCookie(newMessages);
       
-      // Also update display count for direct array assignments
       if (newMessages.length > 0) {
         const newCount = Math.min(MESSAGES_BATCH_SIZE, newMessages.length);
         setDisplayCount(newCount);
+        // Schedule an immediate scroll after the state updates
+        setTimeout(() => scrollToBottom(true), 0);
       }
     }
-  }, [displayCount]);
+  }, [displayCount, scrollToBottom]);
 
   const loadMoreMessages = useCallback(() => {
     setDisplayCount(prev => Math.min(prev + MESSAGES_BATCH_SIZE, allMessages.length));
