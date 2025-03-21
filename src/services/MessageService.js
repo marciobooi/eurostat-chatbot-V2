@@ -21,6 +21,7 @@ import { contextManager } from '../utils/nlp/contextManager';
 import { relationshipPatterns } from '../dictionaries/relationshipPatterns';
 import { errorMessages } from '../dictionaries/errorMessages';
 import { farewellMessages } from '../dictionaries/farewellMessages';
+import { saveChatToCookie } from '../utils/storageHandlers';
 
 export class MessageService {
   static instance = null;
@@ -55,10 +56,26 @@ export class MessageService {
   }
 
   static createBotResponse(definition, language, context = null) {
-    // Check for relationship questions first, before anything else
+    // First check for relationship questions
+    let relationshipInfo = null;
     if (context?.input) {
-      const relationshipInfo = contextManager.checkRelationship(context.input, language);
+      relationshipInfo = contextManager.checkRelationship(context.input, language);
       if (relationshipInfo?.isRelationshipQuestion) {
+        // If it's a relationship question with only one valid term or invalid terms
+        if (relationshipInfo.relationshipType === 'single_term') {
+          return {
+            sender: 'bot',
+            text: relationshipInfo.response,
+            language,
+            suggestions: relationshipInfo.terms.map(t => t.term),
+            hasVisualization: relationshipInfo.terms[0].definition.hasVisualization || false,
+            visualizationType: relationshipInfo.terms[0].definition.visualizationType || [],
+            dataset: relationshipInfo.terms[0].definition.dataset,
+            fuelType: relationshipInfo.terms[0].term
+          };
+        }
+
+        // For valid relationship questions
         return {
           sender: 'bot',
           text: relationshipInfo.response,
@@ -67,25 +84,21 @@ export class MessageService {
           isRelationship: true,
           relationshipType: relationshipInfo.relationshipType,
           terms: relationshipInfo.terms,
-          // Add follow-up flag to help with conversation flow
           isFollowUpNeeded: true
         };
       }
     }
 
-    // Continue with normal response handling if no relationship is detected
     if (!definition) {
       return this.createUnknownResponse(language, context);
     }
 
-    // Rest of existing response handling...
     const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
     const terms = context?.input ? 
       Object.keys(dictionary).filter(term => 
         context.input.toLowerCase().includes(term.toLowerCase())
       ) : [];
 
-    // Create base response without relationshipInfo reference
     const baseResponse = {
       sender: 'bot',
       title: definition.title,
@@ -100,10 +113,9 @@ export class MessageService {
     };
 
     // Add contextual enhancements if available
-    if (context && !relationshipInfo) { // Only add extra suggestions if not a relationship question
+    if (context) {
       const { topicChain, entities } = context;
       
-      // Add related topics from conversation history
       if (topicChain?.length > 0) {
         baseResponse.relatedTopics = topicChain
           .map(topic => topic.mainTopic)
@@ -111,7 +123,6 @@ export class MessageService {
           .slice(0, NLP_CONFIG.questionProcessing.maxRelatedTopics);
       }
 
-      // Add most referenced energy types as suggestions
       if (entities?.energyDomain?.energyTypes) {
         const energyTypes = entities.energyDomain.energyTypes
           .map(entity => entity.text)
@@ -250,7 +261,7 @@ export class MessageService {
       ? language 
       : CONFIG.DEFAULT_LANGUAGE;
 
-    // Process text with enhanced NLP
+    // Process text with enhanced NLP first
     const nlpResult = await processText(input, processLanguage);
     const userMessage = this.createUserMessage(input, processLanguage);
 
@@ -259,28 +270,36 @@ export class MessageService {
       nlpResult.context.input = input;
     }
 
-    // Handle special message types
+    // Handle special message types first
     if (this.isGratitudeMessage(input, processLanguage)) {
-      return [userMessage, this.createGratitudeResponse(processLanguage)];
+      const messages = [userMessage, this.createGratitudeResponse(processLanguage)];
+      saveChatToCookie(messages); // Ensure messages are saved
+      return messages;
     }
 
     if (this.isFarewellMessage(input, processLanguage)) {
       clearContext('default', processLanguage);
-      return [userMessage, this.createFarewellResponse(processLanguage)];
+      const messages = [userMessage, this.createFarewellResponse(processLanguage)];
+      saveChatToCookie(messages); // Ensure messages are saved
+      return messages;
     }
 
-    // Direct topic request detection - if the message is very short and the intent is topic_request
-    if (nlpResult.intent && 
-        nlpResult.intent.primaryIntent === 'topic_request' && 
-        input.trim().split(/\s+/).length <= 3) {
-      // Try to find an exact match for the topic
-      const definition = await findEnergyDefinition(input.trim(), processLanguage);
-      if (definition) {
-        return [userMessage, this.createBotResponse(definition, processLanguage, nlpResult.context)];
+    // Check for relationship questions before any other processing
+    const relationshipDict = relationshipPatterns[processLanguage] || relationshipPatterns[CONFIG.DEFAULT_LANGUAGE];
+    const isRelationshipQuestion = relationshipDict.patterns.some(pattern => pattern.test(input.toLowerCase()));
+    
+    if (isRelationshipQuestion) {
+      const relationshipInfo = contextManager.checkRelationship(input, processLanguage);
+      if (relationshipInfo?.isRelationshipQuestion) {
+        // Create bot response with relationship info
+        const botResponse = this.createBotResponse(null, processLanguage, { ...nlpResult.context, relationshipInfo });
+        const messages = [userMessage, botResponse];
+        saveChatToCookie(messages); // Ensure messages are saved
+        return messages;
       }
     }
 
-    // Get energy definition for normal processing
+    // Handle regular messages
     const definition = await findEnergyDefinition(input.trim(), processLanguage);
     const botResponse = definition ? 
       this.createBotResponse(definition, processLanguage, nlpResult.context) : 
@@ -291,7 +310,9 @@ export class MessageService {
       botResponse.intent = nlpResult.intent;
     }
 
-    return [userMessage, botResponse];
+    const messages = [userMessage, botResponse];
+    saveChatToCookie(messages); // Ensure messages are saved
+    return messages;
   }
 
   /**

@@ -286,3 +286,56 @@ bot knows:
 greetings 
 definitions
 relationships
+
+Bot Capabilities:
+
+1. Conversation Skills:
+   - Greetings and farewells
+   - Gratitude recognition
+   - Question understanding
+   - Follow-up questions
+   - Empathy and reassurance phrases
+   - Contextual responses
+   - Multi-turn conversations
+
+2. Knowledge Base:
+   - Energy definitions and terminology
+   - Relationships between energy types
+   - Energy production and consumption data
+   - Trade-related information (imports/exports)
+   - Historical trends and patterns
+   - Country-specific energy data
+   - Dataset mappings and units
+
+3. Language Processing:
+   - Intent recognition
+   - Entity extraction
+   - Sentiment analysis
+   - Context management
+   - Multi-language support (en, fr, de)
+   - Affirmative/negative response detection
+   - Question pattern recognition
+
+4. Data Analysis:
+   - Energy type classification
+   - Unit conversions (KTOE, THS_T)
+   - Trend analysis
+   - Comparative analysis
+   - Visualization suggestions
+   - Dataset information retrieval
+
+5. Response Generation:
+   - Dynamic message formatting
+   - Smart suggestions
+   - Progressive information disclosure
+   - Error handling and recovery
+   - Unknown topic handling
+   - Welcome messages
+   - Prompt suggestions
+
+6. Visualization Capabilities:
+   - Chart type selection
+   - Data transformation
+   - Multi-format visualization
+   - Interactive elements
+   - Responsive layouts

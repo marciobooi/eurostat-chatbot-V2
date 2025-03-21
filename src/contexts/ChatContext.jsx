@@ -8,7 +8,7 @@ const MESSAGES_BATCH_SIZE = 15;
 // Minimum number of messages before showing the "Show More" button
 const MIN_MESSAGES_FOR_BUTTON = 15;
 
-const ChatContext = createContext();
+export const ChatContext = createContext();
 
 export const useChatContext = () => {
   const context = useContext(ChatContext);
@@ -172,5 +172,3 @@ export const ChatProvider = ({ children }) => {
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 };
-
-export default ChatContext;

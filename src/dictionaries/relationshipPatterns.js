@@ -78,6 +78,19 @@ export const relationshipPatterns = {
         "They belong to separate energy categories. I can explain more about {term1} or {term2} separately.",
         "There is no direct relationship between them in the energy classification system. Would you like to explore {term1} or {term2}?",
         "They are separate categories in the energy family. Would you like to know more about {term1} or {term2}?"
+      ],
+      single_term: [
+        "I can tell you about {term1}. What would you like to know?",
+        "Let me help you learn about {term1}. What specific aspects interest you?",
+        "I have information about {term1}. What aspects would you like to explore?",
+        "I can provide details about {term1}. What would you like to learn?",
+        "I'd be happy to tell you about {term1}. What information are you looking for?"
+      ],
+      invalid_comparison: [
+        "I can only provide information about energy-related terms. Would you like to learn about {term1}?",
+        "I specialize in energy topics. I can tell you about {term1} if you're interested.",
+        "My knowledge is focused on energy topics. I can explain about {term1} if you'd like.",
+        "I'm specialized in energy information. Would you like to learn about {term1}?"
       ]
     }
   },
@@ -156,6 +169,19 @@ export const relationshipPatterns = {
         "Ils appartiennent à des catégories énergétiques distinctes. Je peux vous expliquer {term1} ou {term2} séparément.",
         "Il n'y a pas de relation directe entre eux dans le système de classification énergétique. Voulez-vous explorer {term1} ou {term2} ?",
         "Ce sont des catégories distinctes dans la famille énergétique. Voulez-vous en savoir plus sur {term1} ou {term2} ?"
+      ],
+      single_term: [
+        "Je peux vous parler de {term1}. Que souhaitez-vous savoir ?",
+        "Permettez-moi de vous informer sur {term1}. Quels aspects vous intéressent ?",
+        "J'ai des informations sur {term1}. Quels aspects souhaitez-vous explorer ?",
+        "Je peux vous donner des détails sur {term1}. Qu'aimeriez-vous apprendre ?",
+        "Je serai ravi de vous parler de {term1}. Quelles informations recherchez-vous ?"
+      ],
+      invalid_comparison: [
+        "Je ne peux fournir que des informations sur les termes liés à l'énergie. Voulez-vous en savoir plus sur {term1} ?",
+        "Je suis spécialisé dans les sujets énergétiques. Je peux vous parler de {term1} si cela vous intéresse.",
+        "Mes connaissances sont axées sur l'énergie. Je peux vous expliquer {term1} si vous le souhaitez.",
+        "Je suis spécialisé dans l'information énergétique. Souhaitez-vous en savoir plus sur {term1} ?"
       ]
     }
   },
@@ -234,6 +260,19 @@ export const relationshipPatterns = {
         "Sie gehören zu unterschiedlichen Energiekategorien. Ich kann Ihnen {term1} oder {term2} separat erklären.",
         "Es gibt keine direkte Beziehung zwischen ihnen im Energieklassifikationssystem. Möchten Sie {term1} oder {term2} erkunden?",
         "Es sind separate Kategorien in der Energiefamilie. Möchten Sie mehr über {term1} oder {term2} wissen?"
+      ],
+      single_term: [
+        "Ich kann Ihnen über {term1} erzählen. Was möchten Sie wissen?",
+        "Lassen Sie mich Ihnen etwas über {term1} erklären. Welche Aspekte interessieren Sie?",
+        "Ich habe Informationen über {term1}. Welche Aspekte möchten Sie erkunden?",
+        "Ich kann Ihnen Details über {term1} geben. Was möchten Sie erfahren?",
+        "Ich erzähle Ihnen gerne etwas über {term1}. Welche Informationen suchen Sie?"
+      ],
+      invalid_comparison: [
+        "Ich kann nur Informationen über energiebezogene Begriffe liefern. Möchten Sie mehr über {term1} erfahren?",
+        "Ich bin auf Energiethemen spezialisiert. Ich kann Ihnen von {term1} erzählen, wenn Sie interessiert sind.",
+        "Mein Wissen konzentriert sich auf Energiethemen. Ich kann Ihnen {term1} erklären, wenn Sie möchten.",
+        "Ich bin auf Energieinformationen spezialisiert. Möchten Sie mehr über {term1} erfahren?"
       ]
     }
   }

@@ -223,36 +223,102 @@ class ContextManager {
     // Check if the message matches any relationship pattern
     const isRelationshipQuestion = relationshipDict.patterns.some(pattern => pattern.test(lowercaseInput));
 
+    if (!isRelationshipQuestion) return null;
+
     // Extract terms from the input
     const terms = this.extractTermsFromMessage(lowercaseInput, dictionary);
+    
+    // If we have no energy terms at all, return null to allow fallback to definition search
+    if (terms.length === 0) return null;
 
-    // If we have less than 2 terms but it's a relationship question, search in definitions
-    if (terms.length < 2 && isRelationshipQuestion) {
-      this.findTermsInDefinitions(lowercaseInput, dictionary, terms);
+    // Update context with relationship query intent
+    const contextUpdate = {
+      intent: 'relationship_query',
+      entities: {
+        energyDomain: {
+          energyTypes: terms.map(term => ({ text: term, canonical: term }))
+        }
+      }
+    };
+    this.updateContext('default', message, contextUpdate, language);
+
+    // If we found only one energy term
+    if (terms.length === 1) {
+      const [energyTerm] = terms;
+      const def = dictionary[energyTerm];
+      
+      return {
+        isRelationshipQuestion: true,
+        isRelated: false,
+        relationshipType: 'single_term',
+        terms: [{
+          term: energyTerm,
+          definition: def
+        }],
+        response: getRandomElement(relationshipDict.responses.single_term)
+          .replace('{term1}', def.title || energyTerm)
+      };
     }
 
-    if (terms.length < 2) return null;
-
+    // For multiple terms, we'll only consider the first two valid energy terms
     const [term1, term2] = terms;
     const def1 = dictionary[term1];
     const def2 = dictionary[term2];
 
-    if (!def1 || !def2) return null;
+    // Both terms must be valid energy terms
+    if (!def1 || !def2) {
+      const validTerm = def1 ? term1 : (def2 ? term2 : null);
+      if (validTerm) {
+        const def = dictionary[validTerm];
+        return {
+          isRelationshipQuestion: true,
+          isRelated: false,
+          relationshipType: 'single_term',
+          terms: [{
+            term: validTerm,
+            definition: def
+          }],
+          response: getRandomElement(relationshipDict.responses.invalid_comparison)
+            .replace('{term1}', def.title || validTerm)
+        };
+      }
+      return null;
+    }
 
     const isRelated = this.checkTermRelationship(def1, def2, term1, term2);
     const relationshipType = this.determineRelationshipType(def1, def2, term1, term2);
-
+    
     return this.createRelationshipResponse(isRelated, relationshipType, def1, def2, term1, term2, language);
   }
 
   extractTermsFromMessage(input, dictionary) {
-    return Object.keys(dictionary).filter(term => {
+    const words = input.toLowerCase().split(/\s+/);
+    const terms = new Set();
+
+    // First pass: try to find exact energy terms
+    Object.entries(dictionary).forEach(([term, def]) => {
       const termLower = term.toLowerCase();
-      const def = dictionary[term];
-      return input.includes(termLower) || 
-             input.split(/\s+/).some(word => word.includes(termLower)) ||
-             (def.text && input.includes(termLower));
+      if (words.includes(termLower) || input.includes(termLower)) {
+        terms.add(term);
+      }
     });
+
+    // Second pass: try alternative names and partial matches, but only if we haven't found exact matches
+    if (terms.size === 0) {
+      Object.entries(dictionary).forEach(([term, def]) => {
+        const termLower = term.toLowerCase();
+        const title = def.title?.toLowerCase() || '';
+        
+        if (!terms.has(term) && (
+          words.some(word => termLower.includes(word) || title.includes(word)) ||
+          def.text?.toLowerCase().includes(input)
+        )) {
+          terms.add(term);
+        }
+      });
+    }
+
+    return Array.from(terms);
   }
 
   findTermsInDefinitions(input, dictionary, terms) {
