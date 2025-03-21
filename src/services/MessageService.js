@@ -3,21 +3,17 @@ import { unknownResponses } from '../dictionaries/unknownResponses';
 import { energyDefinitionsEn } from '../dictionaries/energyDefinitions/en';
 import { findEnergyDefinition } from '../utils/energyHandlers';
 import { getRandomElement } from '../utils/randomUtils';
-import { processText, analyzeSentiment, findBestMatch, extractEntities } from '../utils/nlpHandlers';
+import { processText, clearContext } from '../utils/nlpHandlers';
 import { energyDictionary } from '../utils/energyDictionary';
 import { affirmativePatterns } from '../dictionaries/affirmativeResponses';
 import { datePatterns } from '../dictionaries/datePatterns';
-import { questionWords } from '../dictionaries/questionWords';
-import { filteredWords } from '../dictionaries/filteredWords';
-import { farewellMessages } from '../dictionaries/farewellMessages';
-import { gratitudeMessages } from '../dictionaries/gratitudeMessages';
-import { errorMessages } from '../dictionaries/errorMessages';
 import { empathyPhrases } from '../dictionaries/empathyPhrases';
 import { followUpPhrases } from '../dictionaries/followUpQuestions';
 import { goodbyeWords } from '../dictionaries/farewellWords';
 import { gratitudeWords } from '../dictionaries/gratitudeWords';
 import greetingPhrases from '../dictionaries/greetingPhrases';
 import { CONFIG } from '../i18n';
+import { NLP_CONFIG } from '../config/nlpConfig';
 
 export class MessageService {
   static instance = null;
@@ -30,12 +26,12 @@ export class MessageService {
   }
 
   static getRandomMessage(dictionary, language) {
-    // Always use language fallback to default if needed
     const messages = dictionary[language] || dictionary[CONFIG.DEFAULT_LANGUAGE];
     return getRandomElement(messages);
   }
 
   static createWelcomeMessage(language) {
+    clearContext('default', language); // Reset context for new conversation
     return {
       sender: 'bot',
       text: this.getRandomMessage(welcomeMessages, language),
@@ -51,13 +47,13 @@ export class MessageService {
     };
   }
 
-  static createBotResponse(definition, language) {
+  static createBotResponse(definition, language, context = null) {
     if (!definition) {
-      return this.createUnknownResponse(language);
+      return this.createUnknownResponse(language, context);
     }
 
-    // Use structured definition with language support
-    const response = {
+    // Enhance response with context awareness
+    const baseResponse = {
       sender: 'bot',
       title: definition.title,
       text: typeof definition.text === 'string' ? definition.text : JSON.stringify(definition.text),
@@ -70,25 +66,76 @@ export class MessageService {
       fuelType: definition.fuelCode
     };
 
-    return response;
+    // Add contextual enhancements if available
+    if (context) {
+      const { topicChain, entities } = context;
+      
+      // Add related topics from conversation history
+      if (topicChain?.length > 0) {
+        baseResponse.relatedTopics = topicChain
+          .map(topic => topic.mainTopic)
+          .filter(topic => topic !== definition.fuelCode)
+          .slice(0, 3);
+      }
+
+      // Add most referenced energy types as suggestions
+      if (entities?.energyDomain?.energyTypes) {
+        const energyTypes = entities.energyDomain.energyTypes
+          .map(entity => entity.text)
+          .filter(text => text !== definition.fuelCode)
+          .slice(0, 2);
+
+        baseResponse.suggestions = [
+          ...new Set([...baseResponse.suggestions, ...energyTypes])
+        ];
+      }
+    }
+
+    return baseResponse;
   }
 
-  static createUnknownResponse(language) {
+  static createUnknownResponse(language, context = null) {
     const unknownResponse = this.getRandomMessage(unknownResponses, language);
     const empathyPhrase = this.getRandomMessage(empathyPhrases, language);
     
-    // Get main energy topics for suggestions using proper language fallback
-    const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
-    const mainTopics = Object.entries(dictionary)
-      .filter(([_, def]) => def.isMainFuel)
-      .map(([key]) => key)
-      .slice(0, 3);
+    // Get suggestions based on context if available
+    let suggestions = [];
+    if (context) {
+      const { entities, currentTopic } = context;
+      
+      if (currentTopic?.mainTopic) {
+        // Add related topics from the energy dictionary
+        const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
+        const topic = dictionary[currentTopic.mainTopic];
+        if (topic?.related) {
+          suggestions.push(...topic.related);
+        }
+      }
+
+      // Add energy types from entities
+      if (entities?.energyDomain?.energyTypes) {
+        suggestions.push(
+          ...entities.energyDomain.energyTypes
+            .map(entity => entity.text)
+            .slice(0, 2)
+        );
+      }
+    }
+
+    // Fallback to main topics if no contextual suggestions
+    if (suggestions.length === 0) {
+      const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
+      suggestions = Object.entries(dictionary)
+        .filter(([_, def]) => def.isMainFuel)
+        .map(([key]) => key)
+        .slice(0, 3);
+    }
 
     return {
       sender: 'bot',
       text: unknownResponse,
       language,
-      suggestions: mainTopics,
+      suggestions: [...new Set(suggestions)],
       followUp: empathyPhrase
     };
   }
@@ -166,28 +213,45 @@ export class MessageService {
   }
 
   static async processUserInput(input, language) {
-    // Always ensure valid language
     const processLanguage = CONFIG.SUPPORTED_LANGUAGES.includes(language) 
       ? language 
       : CONFIG.DEFAULT_LANGUAGE;
 
-    const nlpResults = await processText(input, processLanguage);
-    const sentiment = analyzeSentiment(input, processLanguage);
-    const definition = await findEnergyDefinition(input.trim(), processLanguage);
-
+    // Process text with enhanced NLP
+    const nlpResult = await processText(input, processLanguage);
     const userMessage = this.createUserMessage(input, processLanguage);
 
-    if (this.isFarewellMessage(input, processLanguage)) {
-      return [userMessage, this.createFarewellResponse(processLanguage)];
-    }
-
+    // Handle special message types
     if (this.isGratitudeMessage(input, processLanguage)) {
       return [userMessage, this.createGratitudeResponse(processLanguage)];
     }
 
+    if (this.isFarewellMessage(input, processLanguage)) {
+      clearContext('default', processLanguage);
+      return [userMessage, this.createFarewellResponse(processLanguage)];
+    }
+
+    // Direct topic request detection - if the message is very short and the intent is topic_request
+    if (nlpResult.intent && 
+        nlpResult.intent.primaryIntent === 'topic_request' && 
+        input.trim().split(/\s+/).length <= 3) {
+      // Try to find an exact match for the topic
+      const definition = await findEnergyDefinition(input.trim(), processLanguage);
+      if (definition) {
+        return [userMessage, this.createBotResponse(definition, processLanguage, nlpResult.context)];
+      }
+    }
+
+    // Get energy definition for normal processing
+    const definition = await findEnergyDefinition(input.trim(), processLanguage);
     const botResponse = definition ? 
-      this.createBotResponse(definition, processLanguage) : 
-      this.createUnknownResponse(processLanguage);
+      this.createBotResponse(definition, processLanguage, nlpResult.context) : 
+      this.createUnknownResponse(processLanguage, nlpResult.context);
+
+    // Add intent information for better follow-up handling
+    if (nlpResult.intent) {
+      botResponse.intent = nlpResult.intent;
+    }
 
     return [userMessage, botResponse];
   }

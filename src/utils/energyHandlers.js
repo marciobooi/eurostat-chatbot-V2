@@ -1,6 +1,7 @@
 import { energyDictionary } from './energyDictionary';
-import { processText, findBestMatch, analyzeSentiment } from './nlpHandlers';
+import { findBestMatch } from './nlpHandlers';
 import { CONFIG } from '../i18n';
+import { NLP_CONFIG } from '../config/nlpConfig';
 
 // Unit conversion constants
 const UNIT_CONVERSIONS = {
@@ -26,70 +27,103 @@ const convertUnits = (value, fromUnit, toUnit) => {
 };
 
 /**
- * Find an energy definition based on user input
+ * Find energy definition based on text input and language
  */
-export const findEnergyDefinition = async (input, language = CONFIG.DEFAULT_LANGUAGE) => {
-  // Process the input text with NLP
-  const nlpResults = await processText(input, language);
+export const findEnergyDefinition = async (text, language = CONFIG.DEFAULT_LANGUAGE) => {
+  try {
+    const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
+    const candidates = Object.keys(dictionary);
 
-  // Get language-specific dictionary with fallback
-  const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
-  const topics = Object.keys(dictionary);
-
-  // Clean and normalize the input
-  const cleanedInput = input.toLowerCase().trim();
-
-  // Direct topic match (case insensitive)
-  const directTopicMatch = topics.find(topic => topic.toLowerCase() === cleanedInput);
-  if (directTopicMatch) {
-    return dictionary[directTopicMatch];
-  }
-
-  // Create an extended topics list that includes keywords and concepts
-  const extendedTopics = topics.reduce((acc, topic) => {
-    const def = dictionary[topic];
-    if (def.keywords) {
-      acc.push(...def.keywords.map(keyword => ({ keyword: keyword.toLowerCase(), topic })));
+    // Find best match using NLP
+    const { matches, intent } = await findBestMatch(text, candidates, language);
+    
+    if (matches.length === 0) {
+      return null;
     }
-    if (def.key_concepts) {
-      acc.push(...def.key_concepts.map(concept => ({ keyword: concept.toLowerCase(), topic })));
+
+    // Get top match with sufficient score
+    const topMatch = matches[0];
+    if (topMatch.score >= NLP_CONFIG.questionProcessing.similarityThreshold) {
+      return {
+        ...dictionary[topMatch.candidate],
+        fuelCode: topMatch.candidate
+      };
     }
-    return acc;
-  }, []);
 
-  // Find best matches among topics and keywords
-  const directMatch = findBestMatch(cleanedInput, topics, language);
-  const keywordMatch = findBestMatch(cleanedInput, extendedTopics.map(et => et.keyword), language);
+    // Try to find a match based on intent if direct match fails
+    if (intent) {
+      const intentBasedMatch = findMatchByIntent(intent, dictionary, matches);
+      if (intentBasedMatch) {
+        return {
+          ...dictionary[intentBasedMatch],
+          fuelCode: intentBasedMatch
+        };
+      }
+    }
 
-  // Use a higher threshold for matching
-  const MATCH_THRESHOLD = 0.6;
-
-  // Determine the best overall match
-  let matchedTopic;
-  if (directMatch.score > MATCH_THRESHOLD) {
-    matchedTopic = topics[directMatch.topic];
-  } else if (keywordMatch.score > MATCH_THRESHOLD) {
-    matchedTopic = extendedTopics[keywordMatch.topic]?.topic;
+    return null;
+  } catch (error) {
+    console.error('Error finding energy definition:', error);
+    return null;
   }
-
-  return matchedTopic ? dictionary[matchedTopic] : null;
 };
 
 /**
- * Get related topics based on energy definition
+ * Find a match based on intent and available matches
  */
-export const getRelatedTopics = (topic, language = CONFIG.DEFAULT_LANGUAGE) => {
+const findMatchByIntent = (intent, dictionary, matches) => {
+  // Map intents to relevant dictionary sections
+  const intentMappings = {
+    'query_production': (def) => def.isMainFuel && def.hasProduction,
+    'query_consumption': (def) => def.isMainFuel && def.hasConsumption,
+    'query_trade': (def) => def.isMainFuel && (def.hasImports || def.hasExports),
+    'query_comparison': (def) => def.isMainFuel,
+    'query_trend': (def) => def.hasHistoricalData,
+    'request_visualization': (def) => def.hasVisualization
+  };
+
+  const filter = intentMappings[intent];
+  if (!filter) {
+    return null;
+  }
+
+  // First try matches that have a decent score
+  const goodMatches = matches.filter(m => m.score >= 0.3);
+  for (const match of goodMatches) {
+    const def = dictionary[match.candidate];
+    if (def && filter(def)) {
+      return match.candidate;
+    }
+  }
+
+  // If no good matches, try all dictionary entries
+  for (const [key, def] of Object.entries(dictionary)) {
+    if (filter(def)) {
+      return key;
+    }
+  }
+
+  return null;
+};
+
+/**
+ * Get definition by fuel code
+ */
+export const getDefinitionByFuelCode = (fuelCode, language = CONFIG.DEFAULT_LANGUAGE) => {
   const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
-  const definition = dictionary[topic];
-  
-  if (!definition) return [];
-  
-  const related = new Set([
-    ...(definition.related || []),
-    ...(definition.subFuels || [])
-  ]);
-  
-  return Array.from(related);
+  return dictionary[fuelCode] || null;
+};
+
+/**
+ * Get related topics for a fuel code
+ */
+export const getRelatedTopics = (fuelCode, language = CONFIG.DEFAULT_LANGUAGE) => {
+  const definition = getDefinitionByFuelCode(fuelCode, language);
+  if (!definition) {
+    return [];
+  }
+
+  return definition.related || [];
 };
 
 /**

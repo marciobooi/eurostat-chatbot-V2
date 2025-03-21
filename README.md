@@ -239,3 +239,39 @@ Each chart type is implemented as a standalone component with dedicated styling:
 - **Accessibility**: ARIA labels and keyboard navigation
 - **Performance**: Optimized rendering and animations
 - **i18n**: Full translation support for all chart elements
+
+
+
+
+NLP Processing Pipeline:
+
+The system first processes raw text through nlpHandlers.js
+Entity extraction is performed using entityExtractor.js, which identifies both standard entities (like dates, organizations) and custom domain-specific entities (energy types)
+Intent classification occurs in intentClassifier.js using pattern matching against predefined intent patterns
+Sentiment analysis is performed by sentimentAnalyzer.js using a combination of sentiment libraries
+Context management in contextManager.js tracks conversation history and analyzes context
+Intent Classification:
+
+The system uses pattern matching for intent recognition
+It has a special direct topic matcher for short queries about energy types
+Intents are ranked by confidence scores and priority calculations
+Context from previous interactions influences intent classification
+Context Management:
+
+Maintains conversation history for each user
+Tracks entities, intents, and sentiment across the conversation
+Identifies follow-up questions based on time proximity, shared entities, and related intents
+Builds topic chains to understand how the conversation evolves
+Tracks sentiment trends throughout the conversation
+Sentiment Analysis:
+
+Uses multiple sentiment libraries including sentiment.js and multilang-sentiment
+Performs fuzzy pattern matching for sentiment words
+Caches results for performance optimization
+Classifies sentiment as positive, negative, or neutral based on configurable thresholds
+This sophisticated NLP pipeline allows the chatbot to:
+
+Understand user intents related to energy data
+Track conversation context for coherent multi-turn interactions
+Extract relevant entities for data retrieval
+Gauge user sentiment to adjust responses accordingly

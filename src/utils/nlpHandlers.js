@@ -9,6 +9,11 @@ import multilangSentiment from 'multilang-sentiment';
 import Sentiment from 'sentiment';
 import { energyDictionary } from './energyDictionary';
 import { CONFIG } from '../i18n';
+import { NLP_CONFIG } from '../config/nlpConfig';
+import { sentimentAnalyzer } from './nlp/sentimentAnalyzer';
+import { entityExtractor } from './nlp/entityExtractor';
+import { intentClassifier } from './nlp/intentClassifier';
+import { contextManager } from './nlp/contextManager';
 
 // Initialize NLP libraries
 nlp.extend(dates);
@@ -17,159 +22,160 @@ nlp.extend(sentences);
 const winkNlp = winkNLP(model);
 const sentiment = new Sentiment();
 
+// Store context for each session
+const contextStore = new Map();
+
 /**
- * Process and analyze text input
+ * Process text through NLP pipeline
  */
-export const processText = async (text, language = CONFIG.DEFAULT_LANGUAGE) => {
+export const processText = async (text, language = NLP_CONFIG.languages.default) => {
   try {
-    // Clean and normalize input
-    const cleanedText = text.toLowerCase().trim();
-    const words = cleanedText.split(/\s+/);
+    // Extract entities first
+    const entities = await entityExtractor.extractEntities(text, language);
     
-    // Get composite terms (2-word combinations) for better matching
-    const compositeTerms = [];
-    for (let i = 0; i < words.length - 1; i++) {
-      compositeTerms.push(`${words[i]} ${words[i + 1]}`);
-    }
+    // Get intent and sentiment
+    const [intentResult, sentimentResult] = await Promise.all([
+      intentClassifier.classifyIntent(text, entities, language),
+      sentimentAnalyzer.analyzeSentiment(text, language)
+    ]);
 
-    // Get both single words and composite terms
-    const allTerms = [...words, ...compositeTerms];
-    
-    // Get language-specific dictionary
-    const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
-    
-    // Extract topics using language-specific keywords and concepts
-    const topics = Object.entries(dictionary).reduce((acc, [topic, def]) => {
-      const keywordMatch = def.keywords?.some(kw => 
-        allTerms.some(term => term.includes(kw.toLowerCase()))
-      );
-      const conceptMatch = def.key_concepts?.some(concept =>
-        allTerms.some(term => term.includes(concept.toLowerCase()))
-      );
-      
-      if (keywordMatch || conceptMatch) {
-        acc.push({
-          topic,
-          text: def.text,
-          title: def.title,
-          confidence: (keywordMatch ? 0.6 : 0) + (conceptMatch ? 0.4 : 0)
-        });
-      }
-      return acc;
-    }, []);
-
-    return {
-      topics: topics.sort((a, b) => b.confidence - a.confidence),
-      terms: allTerms,
+    // Create consolidated NLP result with proper structure
+    const nlpResult = {
+      entities: {
+        standardEntities: entities.standardEntities || {},
+        energyDomain: entities.energyDomain || {
+          energyTypes: [],
+          metrics: [],
+          timeframes: []
+        }
+      },
+      intent: intentResult.primaryIntent,
+      intentDetails: intentResult,
+      sentiment: sentimentResult,
       language
     };
-  } catch (error) {
-    console.error('Error processing text:', error);
+
+    // Update context with properly structured data
+    const context = contextManager.updateContext(
+      'default',
+      text,
+      nlpResult,
+      language
+    );
+
     return {
-      topics: [],
-      terms: [],
+      ...nlpResult,
+      context
+    };
+  } catch (error) {
+    console.error('Error in NLP processing:', error);
+    // Return safe defaults on error
+    return {
+      entities: {
+        standardEntities: {},
+        energyDomain: {
+          energyTypes: [],
+          metrics: [],
+          timeframes: []
+        }
+      },
+      intent: 'general_info',
+      sentiment: { score: 0, comparative: 0 },
+      context: null,
       language
     };
   }
 };
 
 /**
- * Find best match among topics
+ * Extract sentiment from text
  */
-export const findBestMatch = (input, topics, language = CONFIG.DEFAULT_LANGUAGE) => {
-  const cleanInput = input.toLowerCase().trim();
-  
-  // Get dictionary for current language
-  const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
-  
-  // Calculate match scores
-  const matches = topics.map(topic => {
-    const def = dictionary[topic];
-    if (!def) return { topic, score: 0 };
-    
-    let score = 0;
-    
-    // Check direct topic match
-    if (cleanInput.includes(topic.toLowerCase())) {
-      score += 1;
-    }
-    
-    // Check keyword matches
-    if (def.keywords) {
-      const keywordMatches = def.keywords.filter(kw => 
-        cleanInput.includes(kw.toLowerCase())
-      ).length;
-      score += keywordMatches * 0.5;
-    }
-    
-    // Check concept matches
-    if (def.key_concepts) {
-      const conceptMatches = def.key_concepts.filter(concept =>
-        cleanInput.includes(concept.toLowerCase())
-      ).length;
-      score += conceptMatches * 0.3;
-    }
-    
-    return { topic, score };
-  });
-  
-  // Sort by score and get best match
-  matches.sort((a, b) => b.score - a.score);
-  return matches[0] || { topic: null, score: 0 };
+export const analyzeSentiment = async (text, language = NLP_CONFIG.languages.default) => {
+  return sentimentAnalyzer.analyzeSentiment(text, language);
 };
 
 /**
- * Extract named entities from text
+ * Extract entities from text
  */
-export const extractEntities = (text) => {
-  // For now, just return basic structure
-  // Could be enhanced with language-specific NER in future
-  return {
-    organizations: [],
-    locations: [],
-    dates: [],
-    numbers: []
-  };
+export const extractEntities = async (text, language = NLP_CONFIG.languages.default) => {
+  return entityExtractor.extractEntities(text, language);
 };
 
 /**
- * Analyze sentiment in multiple languages
+ * Find best matching topic or intent
  */
-export const analyzeSentiment = (text, language = CONFIG.DEFAULT_LANGUAGE) => {
+export const findBestMatch = async (text, candidates, language = NLP_CONFIG.languages.default) => {
   try {
-    // Use appropriate sentiment analyzer based on language
-    switch(language) {
-      case 'en':
-        const englishSentiment = sentiment.analyze(text);
-        return {
-          score: englishSentiment.score,
-          comparative: englishSentiment.comparative,
-          language
-        };
-      case 'fr':
-      case 'de':
-        const multilingualSentiment = multilangSentiment(text, language);
-        return {
-          score: multilingualSentiment.score,
-          comparative: multilingualSentiment.comparative || (multilingualSentiment.score / text.split(/\s+/).length),
-          language
-        };
-      default:
-        // Fallback to English for unsupported languages
-        console.warn(`Language ${language} not supported for sentiment analysis, falling back to English`);
-        const fallbackSentiment = sentiment.analyze(text);
-        return {
-          score: fallbackSentiment.score,
-          comparative: fallbackSentiment.comparative,
-          language: CONFIG.DEFAULT_LANGUAGE
-        };
-    }
-  } catch (error) {
-    console.error('Error analyzing sentiment:', error);
+    const nlpResult = await processText(text, language);
+    const intent = await intentClassifier.classifyIntent(text, nlpResult.entities, language);
+
     return {
-      score: 0,
-      comparative: 0,
-      language
+      text,
+      matches: candidates.map(candidate => ({
+        candidate,
+        score: calculateMatchScore(text, candidate, nlpResult, intent)
+      })).sort((a, b) => b.score - a.score),
+      intent: intent.primaryIntent,
+      confidence: intent.confidence
+    };
+  } catch (error) {
+    console.error('Error finding best match:', error);
+    return {
+      text,
+      matches: [],
+      error: true
     };
   }
+};
+
+/**
+ * Calculate match score between text and candidate
+ */
+const calculateMatchScore = (text, candidate, nlpResult, intent) => {
+  let score = 0;
+
+  // Add intent confidence
+  if (intent?.confidence) {
+    score += intent.confidence * 0.3;
+  }
+
+  // Add entity matches
+  const energyDomain = nlpResult?.entities?.energyDomain || {};
+  if (energyDomain) {
+    // Check energy types
+    const energyTypes = energyDomain.energyTypes || [];
+    if (energyTypes.some(entity => candidate.toLowerCase().includes(entity.text.toLowerCase()))) {
+      score += 0.4;
+    }
+
+    // Check metrics
+    const metrics = energyDomain.metrics || [];
+    if (metrics.some(entity => candidate.toLowerCase().includes(entity.text.toLowerCase()))) {
+      score += 0.3;
+    }
+  }
+
+  // Add text similarity (basic for now)
+  const textSimilarity = calculateTextSimilarity(text.toLowerCase(), candidate.toLowerCase());
+  score += textSimilarity * 0.2;
+
+  return score;
+};
+
+/**
+ * Calculate basic text similarity
+ */
+const calculateTextSimilarity = (text1, text2) => {
+  const words1 = new Set(text1.split(/\s+/));
+  const words2 = new Set(text2.split(/\s+/));
+  const intersection = new Set([...words1].filter(x => words2.has(x)));
+  const union = new Set([...words1, ...words2]);
+  return intersection.size / union.size;
+};
+
+/**
+ * Clear context for a session
+ */
+export const clearContext = (sessionId = 'default', language = NLP_CONFIG.languages.default) => {
+  contextManager.clearContext(sessionId);
 };
