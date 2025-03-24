@@ -1,14 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Toaster } from 'react-hot-toast';
 import ChatBot from "./components/ChatBot";
 import { getCurrentLanguage, isValidLanguage } from "./i18n";
 import { ChatProvider } from "./contexts/ChatContext";
+import { runTests } from "./utils/test";
 import "./App.css";
 
 function App() {
   const { t, i18n } = useTranslation();
   const [loaded, setLoaded] = useState(false);
+  const testsRunRef = useRef(false);
 
   useEffect(() => {
     const initializeLanguage = async () => {
@@ -17,6 +19,12 @@ function App() {
         console.warn(`Invalid language detected: ${currentLang}, falling back to default`);
       }
       setLoaded(true);
+
+      // Run automated tests after app is loaded (only once)
+      if (process.env.NODE_ENV === 'development' && !testsRunRef.current) {
+        testsRunRef.current = true;
+        await runTests();
+      }
     };
     initializeLanguage();
   }, []);

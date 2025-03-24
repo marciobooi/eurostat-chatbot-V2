@@ -120,7 +120,7 @@ class EntityExtractor {
       // Get the energy definitions for the specified language
       let energyDefs;
       try {
-        const module = await import(`../../dictionaries/energyDefinitions/${language}.js`);
+        const module = await import(`../../dictionaries/energyDefinitions${language}.js`);
         energyDefs = module.energyDefinitionsEn;
       } catch {
         // Fallback to English if language-specific file doesn't exist
