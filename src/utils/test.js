@@ -2,18 +2,19 @@ import chalk from "chalk";
 import { MessageService } from "../services/MessageService";
 
 const defaultUserInputs = [
-    // "hello",
-    // "solid fossil fuels",
-    // "what is hard coal?",
+    "hello",
+    "solid fossil fuels",
+    "what is hard coal?",
     "is hard coal a solid fossil fuels?",
     "is Coking Coal a car?",
     "is Coking Coal belongs to car?",
     "Is coke related to coal products?",
     "What’s the connection between solar and wind?",
     "Is anthracite a thing?",
-    // "is coke related to coal products?",
-    // "mars is a great planet",
-    // "bye"
+    "is coke related to coal products?",
+    "mars is a great planet",
+    "xy z",
+    "bye"
 ];
 
 export const runTests = async (userInputs = defaultUserInputs) => {

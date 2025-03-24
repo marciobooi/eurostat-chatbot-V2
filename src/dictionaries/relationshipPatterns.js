@@ -45,70 +45,124 @@ export const relationshipPatterns = {
       // Add specific 'is a' patterns
       /^is\s+[\w\s]+a\s+[\w\s]+/i,  // This catches "is hard coal a fossil fuel?"
       /^is\s+[\w\s]+an\s+[\w\s]+/i,
-      /^are\s+[\w\s]+[\w\s]+/i
+      /^are\s+[\w\s]+[\w\s]+/i,
+        // New patterns
+      /is.*a kind of/i,
+      /is.*a type of/i,
+      /belongs within/i,
+      /can be classified as/i,
+      /categorized under/i,
+      /is.*a form of/i,
+      /is derived through/i,
+      /is an example of/i,
+      /is included under/i,
+      /is.*part of the family/i,
+      /is.*classified as/i,
+      /is.*grouped under/i,
+      /originates from/i,
+      /is.*a subcategory of/i,
+      /has a relation to/i,
+      /falls into the category of/i,
+      /is.*a member of/i,
+      /is a subclass of/i,
+      /can be grouped as/i
     ],
     terms: {
       inclusion: [
         'include', 'includes', 'including',
         'part of', 'contains', 'containing',
-        'consists of'
+        'consists of', 'comprises', 'encompasses',
+        'made up of', 'incorporates', 'features',
+        'holds', 'involves', 'embraces',
+        'entails', 'covers', 'incorporates',
+        'composed of', 'contains parts of', 'is composed of'
       ],
       derivation: [
         'derive', 'derives', 'derived',
-        'originate', 'originates', 'originated'
+        'originate', 'originates', 'originated',
+        'result from', 'is derived from', 'comes from',
+        'emanates from', 'is sourced from', 'has its origin in'
       ],
       production: [
         'produce', 'produces', 'produced',
-        'manufacture', 'manufactures', 'manufactured'
+        'manufacture', 'manufactures', 'manufactured',
+        'create', 'creates', 'created',
+        'fabricate', 'fabricates', 'fabricated',
+        'generate', 'generates', 'generated',
+        'form', 'forms', 'formed',
+        'assemble', 'assembles', 'assembled'
       ],
       processing: [
         'made from', 'processed from',
         'refined from', 'based on',
         'extracted from', 'obtained from',
-        'created from'
+        'created from', 'converted from',
+        'synthesized from', 'processed into',
+        'formed from', 'developed from',
+        'treated with', 'transformed from'
       ]
-    },
+    }
+    
     responses: {
-      // when 2 terms exists in the energy dictionary and they are related
+      // when 2 terms exist in the energy dictionary and they are related
       positive: [
         "Yes, they are related. {term1} and {term2} belong to the same energy family. Would you like to learn more about either of them?",
         "Yes, they are connected. {term1} is actually derived from {term2}. I can tell you more about either one.",
         "Indeed, they are related. {term1} and {term2} share the same energy classification. Would you like to explore either in detail?",
         "Yes, there is a hierarchical relationship. {term1} is a sub-type of {term2}. I can explain more about either one.",
-        "They are definitely related within the energy classification system. Would you like to know more about {term1} or {term2}?"
+        "They are definitely related within the energy classification system. Would you like to know more about {term1} or {term2}?",
+        "Yes, {term1} and {term2} are linked in the energy sector. They share a close relationship. Would you like to dive deeper into either?",
+        "They are indeed connected. {term1} is a direct descendant of {term2} within the energy hierarchy. Let me know if you want more details about them.",
+        "Absolutely, {term1} and {term2} are part of the same family. Interested in learning about their differences or similarities?"
       ],
-            // when 2 terms exists in the energy dictionary and they are NOT related
+    
+      // when 2 terms exist in the energy dictionary and they are NOT related
       negative: [
         "No, they are not directly related. {term1} and {term2} belong to different energy classifications. However, I can tell you about either one.",
         "While both are energy sources, {term1} and {term2} are not directly related. Would you like to learn about one of them?",
         "They belong to separate energy categories. I can explain more about {term1} or {term2} separately.",
         "There is no direct relationship between them in the energy classification system. Would you like to explore {term1} or {term2}?",
-        "They are separate categories in the energy family. Would you like to know more about {term1} or {term2}?"
+        "They are separate categories in the energy family. Would you like to know more about {term1} or {term2}?",
+        "Although {term1} and {term2} are energy terms, they are from different categories. Let me know if you want more information on either of them.",
+        "No direct connection between {term1} and {term2}. Would you like to learn more about either one in their respective contexts?",
+        "These two terms do not fall under the same energy category. I can provide you with details on either term separately."
       ],
-            // when 1 terms exists in the energy dictionary
+    
+      // when 1 term exists in the energy dictionary
       single_term: [
         "I can tell you about {term1}. What would you like to know?",
         "Let me help you learn about {term1}. What specific aspects interest you?",
         "I have information about {term1}. What aspects would you like to explore?",
         "I can provide details about {term1}. What would you like to learn?",
-        "I'd be happy to tell you about {term1}. What information are you looking for?"
+        "I'd be happy to tell you about {term1}. What information are you looking for?",
+        "I can offer insights into {term1}. Is there a particular area you'd like to focus on?",
+        "I'm happy to provide details about {term1}. What would you like to dive into?",
+        "Would you like more information on {term1}? Let me know what you're curious about."
       ],
-            // when the 2 terms does NOT exist in the energy dictionary
+    
+      // when the 2 terms do NOT exist in the energy dictionary
       invalid_comparison: [
         "I can only provide information about energy-related terms. Would you like to learn about {term1}?",
         "I specialize in energy topics. I can tell you about {term1} if you're interested.",
         "My knowledge is focused on energy topics. I can explain about {term1} if you'd like.",
-        "I'm specialized in energy information. Would you like to learn about {term1}?"
+        "I'm specialized in energy information. Would you like to learn about {term1}?",
+        "I focus on energy-related information. Would you like to know about {term1} specifically?",
+        "I’m afraid I don’t have information on that specific comparison. However, I can help with {term1}. Would you like to explore that?",
+        "I don’t have a direct match for those terms, but I can tell you about {term1}. Interested?"
       ],
-            // when the 2 terms does NOT exist in the energy dictionary and dont make sence
+    
+      // when the 2 terms do NOT exist in the energy dictionary and don’t make sense
       suggestion: [
         "While I don't have specific information about that exact term, {term1} includes several related fuels that might interest you. Would you like to learn about any of them?",
         "That specific term is part of the broader category of {term1}. I can tell you about {term1} or its related fuels.",
         "This term is related to {term1}. I can provide information about {term1} or suggest some specific types within this category.",
         "That's connected to {term1}. Would you like to learn about {term1} or explore some of its specific subtypes?",
-        "This is related to the {term1} category. I can explain about {term1} or tell you about more specific fuel types in this category."
+        "This is related to the {term1} category. I can explain about {term1} or tell you about more specific fuel types in this category.",
+        "Although I don't have information on that exact term, {term1} might give you useful context. Would you like to dive into it?",
+        "I'm not familiar with that exact term, but I can offer insights into {term1}. Let me know if you'd like more details."
       ]
     }
+    
   },
   fr: {
     patterns: [
@@ -152,65 +206,124 @@ export const relationshipPatterns = {
       // Add French is-a patterns
       /^est\s+[\w\s]+un\s+[\w\s]+/i,
       /^est\s+[\w\s]+une\s+[\w\s]+/i,
-      /^sont\s+[\w\s]+[\w\s]+/i
+      /^sont\s+[\w\s]+[\w\s]+/i,
+      /est.*un type de/i,  
+      /est.*une sorte de/i,  
+      /appartient à/i,  
+      /peut être classé comme/i,  
+      /catégorisé sous/i,  
+      /est.*une forme de/i,  
+      /est dérivé à travers/i,  
+      /est un exemple de/i,  
+      /est inclus sous/i,  
+      /fait.*partie de la famille/i,  
+      /est.*classé comme/i,  
+      /est.*regroupé sous/i,  
+      /provient de/i,  
+      /est.*une sous-catégorie de/i,  
+      /a une relation avec/i,  
+      /tombe dans la catégorie de/i,  
+      /est.*un membre de/i,  
+      /est une sous-classe de/i,  
+      /peut être regroupé comme/i  
+    
     ],
     terms: {
       inclusion: [
-        'inclure', 'inclut', 'incluant',
+        'inclure', 'inclut', 'y compris',
         'fait partie de', 'contient', 'contenant',
-        'composé de'
+        'se compose de', 'comprend', 'englobe',
+        'composé de', 'intègre', 'présente',
+        'contient', 'implique', 'englobe',
+        'entraine', 'couvre', 'incorpore',
+        'composé de', 'contient des parties de', 'est composé de'
       ],
       derivation: [
         'dériver', 'dérive', 'dérivé',
-        'provenir', 'provient', 'provenu'
+        'provenir de', 'provient de', 'provenait de',
+        'résulter de', 'est dérivé de', 'vient de',
+        'émaner de', 'provient de la source', 'a pour origine'
       ],
       production: [
-        'produire', 'produit', 'produite',
-        'fabriquer', 'fabrique', 'fabriqué'
+        'produire', 'produit', 'produit',
+        'fabriquer', 'fabrique', 'fabriqué',
+        'créer', 'crée', 'créé',
+        'fabriquer', 'fabrique', 'fabriqué',
+        'générer', 'génère', 'généré',
+        'former', 'forme', 'formé',
+        'assembler', 'assemble', 'assemblé'
       ],
       processing: [
-        'fait à partir de', 'traité à partir de',
-        'raffiné à partir de', 'basé sur',
-        'extrait de', 'obtenu à partir de',
-        'créé à partir de'
-      ]
-    },
-    responses: {
-      positive: [
-        "Oui, ils sont liés. {term1} et {term2} appartiennent à la même famille d'énergie. Souhaitez-vous en savoir plus sur l'un d'eux ?",
-        "Oui, ils sont connectés. {term1} est en fait dérivé de {term2}. Je peux vous parler de l'un ou l'autre.",
-        "En effet, ils sont liés. {term1} et {term2} partagent la même classification énergétique. Voulez-vous explorer l'un des deux en détail ?",
-        "Oui, il existe une relation hiérarchique. {term1} est un sous-type de {term2}. Je peux vous expliquer l'un ou l'autre.",
-        "Ils sont définitivement liés dans le système de classification énergétique. Voulez-vous en savoir plus sur {term1} ou {term2} ?"
-      ],
-      negative: [
-        "Non, ils ne sont pas directement liés. {term1} et {term2} appartiennent à des classifications énergétiques différentes. Cependant, je peux vous parler de l'un ou l'autre.",
-        "Bien que ce soient des sources d'énergie, {term1} et {term2} ne sont pas directement liés. Souhaitez-vous en savoir plus sur l'un d'eux ?",
-        "Ils appartiennent à des catégories énergétiques distinctes. Je peux vous expliquer {term1} ou {term2} séparément.",
-        "Il n'y a pas de relation directe entre eux dans le système de classification énergétique. Voulez-vous explorer {term1} ou {term2} ?",
-        "Ce sont des catégories distinctes dans la famille énergétique. Voulez-vous en savoir plus sur {term1} ou {term2} ?"
-      ],
-      single_term: [
-        "Je peux vous parler de {term1}. Que souhaitez-vous savoir ?",
-        "Permettez-moi de vous informer sur {term1}. Quels aspects vous intéressent ?",
-        "J'ai des informations sur {term1}. Quels aspects souhaitez-vous explorer ?",
-        "Je peux vous donner des détails sur {term1}. Qu'aimeriez-vous apprendre ?",
-        "Je serai ravi de vous parler de {term1}. Quelles informations recherchez-vous ?"
-      ],
-      invalid_comparison: [
-        "Je ne peux fournir que des informations sur les termes liés à l'énergie. Voulez-vous en savoir plus sur {term1} ?",
-        "Je suis spécialisé dans les sujets énergétiques. Je peux vous parler de {term1} si cela vous intéresse.",
-        "Mes connaissances sont axées sur l'énergie. Je peux vous expliquer {term1} si vous le souhaitez.",
-        "Je suis spécialisé dans l'information énergétique. Souhaitez-vous en savoir plus sur {term1} ?"
-      ],
-      suggestion: [
-        "Bien que je n'aie pas d'informations spécifiques sur ce terme exact, {term1} comprend plusieurs combustibles connexes qui pourraient vous intéresser. Souhaitez-vous en savoir plus sur l'un d'entre eux ?",
-        "Ce terme spécifique fait partie de la catégorie plus large de {term1}. Je peux vous parler de {term1} ou de ses combustibles associés.",
-        "Ce terme est lié à {term1}. Je peux vous fournir des informations sur {term1} ou vous suggérer des types spécifiques dans cette catégorie.",
-        "C'est lié à {term1}. Voulez-vous en savoir plus sur {term1} ou explorer certains de ses sous-types spécifiques ?",
-        "Cela est lié à la catégorie {term1}. Je peux vous expliquer {term1} ou vous parler de types de combustibles plus spécifiques dans cette catégorie."
+        'fait de', 'traité de',
+        'raffiné de', 'basé sur',
+        'extrait de', 'obtenu de',
+        'créé à partir de', 'converti à partir de',
+        'synthétisé à partir de', 'transformé en',
+        'formé de', 'développé à partir de',
+        'traité avec', 'transformé à partir de'
       ]
     }
+    
+    responses: {
+      // when 2 terms exist in the energy dictionary and they are related
+      positive: [
+        "Oui, ils sont liés. {term1} et {term2} appartiennent à la même famille énergétique. Souhaitez-vous en savoir plus sur l'un d'eux ?",
+        "Oui, ils sont connectés. {term1} est en réalité dérivé de {term2}. Je peux vous en dire plus sur l'un d'eux.",
+        "En effet, ils sont liés. {term1} et {term2} partagent la même classification énergétique. Souhaitez-vous explorer l'un d'eux en détail ?",
+        "Oui, il existe une relation hiérarchique. {term1} est un sous-type de {term2}. Je peux vous expliquer plus sur l'un d'eux.",
+        "Ils sont définitivement liés dans le système de classification énergétique. Souhaitez-vous en savoir plus sur {term1} ou {term2} ?",
+        "Oui, {term1} et {term2} sont liés dans le secteur de l'énergie. Ils partagent une relation étroite. Souhaitez-vous en savoir plus sur l'un d'eux ?",
+        "Ils sont effectivement connectés. {term1} est un descendant direct de {term2} dans la hiérarchie énergétique. Dites-moi si vous souhaitez plus de détails.",
+        "Absolument, {term1} et {term2} font partie de la même famille. Souhaitez-vous en savoir plus sur leurs différences ou similitudes ?"
+      ],
+    
+      // when 2 terms exist in the energy dictionary and they are NOT related
+      negative: [
+        "Non, ils ne sont pas directement liés. {term1} et {term2} appartiennent à des classifications énergétiques différentes. Cependant, je peux vous parler de l'un d'eux.",
+        "Bien que les deux soient des sources d'énergie, {term1} et {term2} ne sont pas directement liés. Souhaitez-vous en savoir plus sur l'un d'eux ?",
+        "Ils appartiennent à des catégories énergétiques distinctes. Je peux vous expliquer plus sur {term1} ou {term2} séparément.",
+        "Il n'y a pas de relation directe entre eux dans le système de classification énergétique. Souhaitez-vous explorer {term1} ou {term2} ?",
+        "Ils font partie de catégories distinctes dans la famille énergétique. Souhaitez-vous en savoir plus sur {term1} ou {term2} ?",
+        "Bien que {term1} et {term2} soient des termes énergétiques, ils proviennent de catégories différentes. Faites-moi savoir si vous souhaitez plus d'informations sur l'un d'eux.",
+        "Aucune connexion directe entre {term1} et {term2}. Souhaitez-vous en savoir plus sur l'un d'eux dans leur contexte respectif ?",
+        "Ces deux termes ne font pas partie de la même catégorie énergétique. Je peux vous fournir des détails sur l'un d'eux séparément."
+      ],
+    
+      // when 1 term exists in the energy dictionary
+      single_term: [
+        "Je peux vous parler de {term1}. Que souhaitez-vous savoir ?",
+        "Laissez-moi vous aider à en apprendre davantage sur {term1}. Quels aspects vous intéressent ?",
+        "J'ai des informations sur {term1}. Quels aspects aimeriez-vous explorer ?",
+        "Je peux fournir des détails sur {term1}. Que souhaitez-vous apprendre ?",
+        "Je serais heureux de vous parler de {term1}. Quelle information recherchez-vous ?",
+        "Je peux vous donner des informations sur {term1}. Y a-t-il un domaine particulier sur lequel vous souhaitez vous concentrer ?",
+        "Je suis heureux de vous fournir des détails sur {term1}. Qu'aimeriez-vous explorer ?",
+        "Souhaitez-vous plus d'informations sur {term1} ? Faites-moi savoir ce qui vous intéresse."
+      ],
+    
+      // when the 2 terms do NOT exist in the energy dictionary
+      invalid_comparison: [
+        "Je ne peux fournir des informations que sur des termes liés à l'énergie. Souhaitez-vous en savoir plus sur {term1} ?",
+        "Je me spécialise dans les sujets énergétiques. Je peux vous parler de {term1} si cela vous intéresse.",
+        "Mes connaissances sont axées sur les sujets énergétiques. Je peux vous expliquer {term1} si vous le souhaitez.",
+        "Je suis spécialisé dans les informations énergétiques. Souhaitez-vous en savoir plus sur {term1} ?",
+        "Je me concentre sur les informations liées à l'énergie. Souhaitez-vous en savoir plus sur {term1} spécifiquement ?",
+        "Je crains de ne pas avoir d'informations sur cette comparaison spécifique. Cependant, je peux vous aider avec {term1}. Souhaitez-vous l'explorer ?",
+        "Je n'ai pas de correspondance directe pour ces termes, mais je peux vous parler de {term1}. Vous êtes intéressé ?"
+      ],
+    
+      // when the 2 terms do NOT exist in the energy dictionary and don’t make sense
+      suggestion: [
+        "Bien que je n'aie pas d'informations spécifiques sur ce terme exact, {term1} inclut plusieurs carburants associés qui pourraient vous intéresser. Souhaitez-vous en savoir plus sur l'un d'eux ?",
+        "Ce terme spécifique fait partie de la catégorie plus large de {term1}. Je peux vous parler de {term1} ou de ses carburants associés.",
+        "Ce terme est lié à {term1}. Je peux vous fournir des informations sur {term1} ou vous suggérer certains types spécifiques dans cette catégorie.",
+        "C'est lié à {term1}. Souhaitez-vous en savoir plus sur {term1} ou explorer certains de ses sous-types spécifiques ?",
+        "Cela est lié à la catégorie {term1}. Je peux vous expliquer {term1} ou vous parler de types de carburants plus spécifiques dans cette catégorie.",
+        "Bien que je ne dispose pas d'informations sur ce terme exact, {term1} pourrait vous donner un contexte utile. Souhaitez-vous l'explorer ?",
+        "Je ne connais pas ce terme exact, mais je peux vous donner un aperçu de {term1}. Faites-moi savoir si vous souhaitez plus de détails."
+      ]
+    }
+    
   },
   de: {
     patterns: [
@@ -254,64 +367,123 @@ export const relationshipPatterns = {
       // Add German is-a patterns
       /^ist\s+[\w\s]+ein\s+[\w\s]+/i,
       /^ist\s+[\w\s]+eine\s+[\w\s]+/i,
-      /^sind\s+[\w\s]+[\w\s]+/i
+      /^sind\s+[\w\s]+[\w\s]+/i,
+      /ist.*eine Art von/i,  
+      /ist.*eine Art/i,  
+      /gehört zu/i,  
+      /kann klassifiziert werden als/i,  
+      /kategorisiert unter/i,  
+      /ist.*eine Form von/i,  
+      /wird durch.*abgeleitet/i,  
+      /ist ein Beispiel für/i,  
+      /ist enthalten unter/i,  
+      /ist.*Teil der Familie/i,  
+      /ist.*klassifiziert als/i,  
+      /ist.*gruppiert unter/i,  
+      /stammt aus/i,  
+      /ist.*eine Unterkategorie von/i,  
+      /hat eine Beziehung zu/i,  
+      /fällt in die Kategorie von/i,  
+      /ist.*ein Mitglied von/i,  
+      /ist eine Unterklasse von/i,  
+      /kann gruppiert werden als/i  
+    
     ],
     terms: {
       inclusion: [
-        'enthalten', 'enthält', 'einschließlich',
-        'teil von', 'beinhaltet', 'beinhaltend',
-        'besteht aus'
+        'einschließen', 'beinhaltet', 'einschließlich',
+        'Teil von', 'enthält', 'beinhaltend',
+        'besteht aus', 'umfasst', 'umfasst',
+        'besteht aus', 'integriert', 'zeigt',
+        'enthält', 'impliziert', 'umfasst',
+        'verursacht', 'deckt ab', 'umfasst',
+        'besteht aus', 'enthält Teile von', 'ist zusammengesetzt aus'
       ],
       derivation: [
         'ableiten', 'leitet ab', 'abgeleitet',
-        'stammen', 'stammt', 'gestammt'
+        'stammen von', 'stammt von', 'stammte von',
+        'resultiert aus', 'ist abgeleitet von', 'kommt von',
+        'geht aus von', 'stammt aus der Quelle', 'hat seinen Ursprung in'
       ],
       production: [
-        'produzieren', 'produziert', 'hergestellt',
-        'herstellen', 'stellt her', 'hergestellt'
+        'produzieren', 'produziert', 'produziert',
+        'herstellen', 'stellt her', 'hergestellt',
+        'erschaffen', 'erschafft', 'erschaffen',
+        'fertigen', 'fertigt', 'gefertigt',
+        'erzeugen', 'erzeugt', 'erzeugt',
+        'formen', 'formt', 'geformt',
+        'zusammenbauen', 'baut zusammen', 'zusammengebaut'
       ],
       processing: [
-        'hergestellt aus', 'verarbeitet aus',
+        'aus gemacht', 'verarbeitet aus',
         'raffiniert aus', 'basierend auf',
-        'gewonnen aus', 'erhalten aus',
-        'erstellt aus'
-      ]
-    },
-    responses: {
-      positive: [
-        "Ja, sie sind verwandt. {term1} und {term2} gehören zur selben Energiefamilie. Möchten Sie mehr über eines davon erfahren?",
-        "Ja, sie sind verbunden. {term1} ist tatsächlich von {term2} abgeleitet. Ich kann Ihnen mehr über beides erzählen.",
-        "In der Tat, sie sind verwandt. {term1} und {term2} teilen die gleiche Energieklassifikation. Möchten Sie eines davon näher kennenlernen?",
-        "Ja, es besteht eine hierarchische Beziehung. {term1} ist eine Unterart von {term2}. Ich kann Ihnen beides erklären.",
-        "Sie sind definitiv im Energieklassifikationssystem verwandt. Möchten Sie mehr über {term1} oder {term2} wissen?"
-      ],
-      negative: [
-        "Nein, sie sind nicht direkt verwandt. {term1} und {term2} gehören zu verschiedenen Energieklassifikationen. Ich kann Ihnen aber über beides erzählen.",
-        "Obwohl beides Energiequellen sind, sind {term1} und {term2} nicht direkt verwandt. Möchten Sie mehr über eines davon erfahren?",
-        "Sie gehören zu unterschiedlichen Energiekategorien. Ich kann Ihnen {term1} oder {term2} separat erklären.",
-        "Es gibt keine direkte Beziehung zwischen ihnen im Energieklassifikationssystem. Möchten Sie {term1} oder {term2} erkunden?",
-        "Es sind separate Kategorien in der Energiefamilie. Möchten Sie mehr über {term1} oder {term2} wissen?"
-      ],
-      single_term: [
-        "Ich kann Ihnen über {term1} erzählen. Was möchten Sie wissen?",
-        "Lassen Sie mich Ihnen etwas über {term1} erklären. Welche Aspekte interessieren Sie?",
-        "Ich habe Informationen über {term1}. Welche Aspekte möchten Sie erkunden?",
-        "Ich kann Ihnen Details über {term1} geben. Was möchten Sie erfahren?",
-        "Ich erzähle Ihnen gerne etwas über {term1}. Welche Informationen suchen Sie?"
-      ],
-      invalid_comparison: [
-        "Ich kann nur Informationen über energiebezogene Begriffe liefern. Möchten Sie mehr über {term1} erfahren?",
-        "Ich bin auf Energiethemen spezialisiert. Ich kann Ihnen von {term1} erzählen, wenn Sie interessiert sind.",
-        "Mein Wissen konzentriert sich auf Energiethemen. Ich kann Ihnen {term1} erklären, wenn Sie möchten.",
-        "Ich bin auf Energieinformationen spezialisiert. Möchten Sie mehr über {term1} erfahren?"
-      ],
-      suggestion: [
-        "Während ich keine spezifischen Informationen zu diesem genauen Begriff habe, umfasst {term1} mehrere verwandte Brennstoffe, die Sie interessieren könnten. Möchten Sie mehr über einen davon erfahren?",
-        "Dieser spezifische Begriff ist Teil der übergeordneten Kategorie {term1}. Ich kann Ihnen etwas über {term1} oder seine verwandten Brennstoffe erzählen.",
-        "Dieser Begriff ist mit {term1} verwandt. Ich kann Ihnen Informationen über {term1} geben oder einige spezifische Typen in dieser Kategorie vorschlagen.",
-        "Das ist mit {term1} verbunden. Möchten Sie mehr über {term1} erfahren oder einige seiner spezifischen Untertypen erkunden?",
-        "Dies ist mit der Kategorie {term1} verbunden. Ich kann Ihnen {term1} erklären oder Ihnen von spezifischeren Brennstofftypen in dieser Kategorie erzählen."
+        'extrahiert aus', 'gewonnen aus',
+        'erstellt aus', 'umgewandelt aus',
+        'synthetisiert aus', 'verarbeitet zu',
+        'gebildet aus', 'entwickelt aus',
+        'behandelt mit', 'umgewandelt aus'
       ]
     }
+    
+    responses_de: {
+      // when 2 terms exist in the energy dictionary and they are related
+      positive: [
+        "Ja, sie sind miteinander verbunden. {term1} und {term2} gehören zur gleichen Energiefamilie. Möchten Sie mehr über einen von ihnen erfahren?",
+        "Ja, sie sind verbunden. {term1} ist tatsächlich von {term2} abgeleitet. Ich kann Ihnen mehr über einen von ihnen erzählen.",
+        "In der Tat, sie sind miteinander verbunden. {term1} und {term2} teilen die gleiche Energieklassifikation. Möchten Sie einen von ihnen im Detail erkunden?",
+        "Ja, es gibt eine hierarchische Beziehung. {term1} ist ein Untertyp von {term2}. Ich kann Ihnen mehr über einen von ihnen erklären.",
+        "Sie sind definitiv miteinander verbunden im Energiesystem. Möchten Sie mehr über {term1} oder {term2} erfahren?",
+        "Ja, {term1} und {term2} sind im Energiesektor miteinander verbunden. Sie teilen eine enge Beziehung. Möchten Sie mehr über einen von ihnen erfahren?",
+        "Sie sind tatsächlich miteinander verbunden. {term1} ist ein direkter Nachkomme von {term2} in der Energiehierarchie. Lassen Sie mich wissen, ob Sie mehr Details möchten.",
+        "Absolut, {term1} und {term2} gehören zur gleichen Familie. Möchten Sie mehr über ihre Unterschiede oder Ähnlichkeiten erfahren?"
+      ],
+    
+      // when 2 terms exist in the energy dictionary and they are NOT related
+      negative: [
+        "Nein, sie sind nicht direkt miteinander verbunden. {term1} und {term2} gehören zu verschiedenen Energieklassifikationen. Ich kann Ihnen jedoch über einen von ihnen berichten.",
+        "Obwohl beide Energiequellen sind, sind {term1} und {term2} nicht direkt miteinander verbunden. Möchten Sie mehr über einen von ihnen erfahren?",
+        "Sie gehören zu unterschiedlichen Energiekategorien. Ich kann Ihnen mehr über {term1} oder {term2} separat erklären.",
+        "Es gibt keine direkte Beziehung zwischen ihnen im Energiesystem. Möchten Sie {term1} oder {term2} erkunden?",
+        "Sie gehören zu getrennten Kategorien innerhalb der Energiefamilie. Möchten Sie mehr über {term1} oder {term2} erfahren?",
+        "Obwohl {term1} und {term2} Energietermine sind, stammen sie aus unterschiedlichen Kategorien. Lassen Sie mich wissen, ob Sie mehr Informationen über einen von ihnen möchten.",
+        "Keine direkte Verbindung zwischen {term1} und {term2}. Möchten Sie mehr über einen von ihnen im jeweiligen Kontext erfahren?",
+        "Diese beiden Begriffe gehören nicht zur gleichen Energieklasse. Ich kann Ihnen jedoch separat mehr über einen von ihnen erzählen."
+      ],
+    
+      // when 1 term exists in the energy dictionary
+      single_term: [
+        "Ich kann Ihnen etwas über {term1} erzählen. Was möchten Sie wissen?",
+        "Lassen Sie mich Ihnen helfen, mehr über {term1} zu erfahren. Welche Aspekte interessieren Sie?",
+        "Ich habe Informationen zu {term1}. Welche Aspekte möchten Sie erkunden?",
+        "Ich kann Ihnen Details zu {term1} bereitstellen. Was möchten Sie lernen?",
+        "Ich würde mich freuen, Ihnen mehr über {term1} zu erzählen. Welche Informationen suchen Sie?",
+        "Ich kann Ihnen Einblicke in {term1} geben. Gibt es einen bestimmten Bereich, auf den Sie sich konzentrieren möchten?",
+        "Ich freue mich, Ihnen mehr über {term1} zu erzählen. Was möchten Sie untersuchen?",
+        "Möchten Sie mehr Informationen über {term1}? Lassen Sie mich wissen, was Sie interessiert."
+      ],
+    
+      // when the 2 terms do NOT exist in the energy dictionary
+      invalid_comparison: [
+        "Ich kann nur Informationen zu energierelevanten Begriffen bereitstellen. Möchten Sie mehr über {term1} erfahren?",
+        "Ich bin auf Energiethemen spezialisiert. Ich kann Ihnen mehr über {term1} erzählen, wenn es Sie interessiert.",
+        "Mein Wissen konzentriert sich auf Energiethemen. Ich kann Ihnen {term1} erklären, wenn Sie möchten.",
+        "Ich bin auf Energieinformationen spezialisiert. Möchten Sie mehr über {term1} erfahren?",
+        "Ich konzentriere mich auf energierelevante Informationen. Möchten Sie mehr über {term1} erfahren?",
+        "Ich befürchte, dass ich keine Informationen zu diesem spezifischen Vergleich habe. Ich kann Ihnen jedoch mit {term1} helfen. Möchten Sie es erkunden?",
+        "Ich habe keine direkte Übereinstimmung für diese Begriffe, aber ich kann Ihnen mehr über {term1} erzählen. Sind Sie interessiert?"
+      ],
+    
+      // when the 2 terms do NOT exist in the energy dictionary and don’t make sense
+      suggestion: [
+        "Obwohl ich keine spezifischen Informationen zu diesem genauen Begriff habe, umfasst {term1} mehrere verwandte Brennstoffe, die Sie interessieren könnten. Möchten Sie mehr über einen von ihnen erfahren?",
+        "Dieser spezifische Begriff gehört zur breiteren Kategorie von {term1}. Ich kann Ihnen mehr über {term1} oder seine verwandten Brennstoffe erzählen.",
+        "Dieser Begriff ist mit {term1} verbunden. Ich kann Ihnen Informationen über {term1} geben oder einige spezifische Typen in dieser Kategorie vorschlagen.",
+        "Das ist mit {term1} verbunden. Möchten Sie mehr über {term1} erfahren oder einige seiner spezifischen Untertypen erkunden?",
+        "Dies gehört zur Kategorie von {term1}. Ich kann Ihnen mehr über {term1} erzählen oder Ihnen spezifischere Brennstoffarten in dieser Kategorie näherbringen.",
+        "Obwohl ich keine Informationen zu diesem genauen Begriff habe, könnte {term1} Ihnen nützlichen Kontext bieten. Möchten Sie es erkunden?",
+        "Ich kenne diesen Begriff nicht genau, aber ich kann Ihnen einen Überblick über {term1} geben. Lassen Sie mich wissen, ob Sie mehr Details wünschen."
+      ]
+    }
+    
   }
 };
