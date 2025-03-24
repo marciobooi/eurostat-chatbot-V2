@@ -1,10 +1,12 @@
 import { NLP_CONFIG } from '../../config/nlpConfig';
 import { comparisonModule } from './comparisonModule';
 import { CONFIG } from '../../i18n';
+import EurostatQueryModule from './eurostatQueryModule';
 
 class ContextManager {
   constructor() {
     this.conversationHistory = new Map();
+    this.eurostatModule = new EurostatQueryModule(this);
   }
 
   getConversationKey(userId, language) {
@@ -48,7 +50,8 @@ class ContextManager {
       contextualIntent: this.getContextualIntent(currentContext, previousContext),
       topicChain: this.buildTopicChain(history),
       sentiment: this.getOverallSentiment(history),
-      entities: currentContext.entities
+      entities: currentContext.entities,
+      eurostat: this.getEurostatContext(history)
     };
   }
 
@@ -239,6 +242,22 @@ class ContextManager {
   clearContext(userId, language) {
     const key = this.getConversationKey(userId, language);
     this.conversationHistory.delete(key);
+  }
+
+  getEurostatContext(history) {
+    if (!history || history.length === 0) return null;
+
+    const currentMessage = history[history.length - 1];
+    return {
+      lastQuery: currentMessage.message,
+      intent: currentMessage.intent,
+      entities: currentMessage.entities
+    };
+  }
+
+  async processEurostatQuery(query, language = CONFIG.DEFAULT_LANGUAGE) {
+    this.eurostatModule.setLanguage(language);
+    return await this.eurostatModule.processQuery(query);
   }
 }
 

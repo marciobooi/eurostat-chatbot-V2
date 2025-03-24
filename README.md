@@ -288,6 +288,7 @@ definitions
 relationships
 farewells
 death ends
+fetch data to anwser users with stats
 
 Bot Capabilities:
 

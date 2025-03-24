@@ -97,5 +97,38 @@
     "visualization": "Sorry, I couldn't generate the visualization right now.",
     "network": "I'm having trouble connecting to the data service.",
     "general": "Something went wrong. Please try again."
+  },
+  "eurostat": {
+    "response": {
+      "base": "Here's the {{type}} data",
+      "for_fuel": "for {{fuel}}",
+      "in_country": "in {{country}}",
+      "for_year": "for {{year}}",
+      "value": "{{value}} {{unit}}",
+      "no_data": "No data available",
+      "unit_full": "({{label}})",
+      "metadata": {
+        "source": "Source: {{source}}",
+        "updated": "Last updated: {{date}}",
+        "frequency": "Frequency: {{freq}}",
+        "more_info": "More information: {{url}}"
+      },
+      "query_types": {
+        "trade": "trade",
+        "production": "production",
+        "consumption": "consumption",
+        "comparison": "comparison",
+        "trends": "trends",
+        "general": "energy"
+      },
+      "indicators": {
+        "IMP": "IMPORT",
+        "EXP": "EXPORT",
+        "STK_CHG": "STOCK CHANGE",
+        "GAE": "GROSS AVAILABLE ENERGY",
+        "GIC": "GROSS INLAND CONSUMPTION",
+        "FC": "FINAL CONSUMPTION"
+      }
+    }
   }
 }
