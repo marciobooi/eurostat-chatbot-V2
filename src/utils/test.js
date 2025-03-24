@@ -2,9 +2,20 @@ import chalk from "chalk";
 import { MessageService } from "../services/MessageService";
 
 const defaultUserInputs = [
+  // testing greetings
     "hello",
+
+    // testing definitions
     "solid fossil fuels",
+    "hard coal?",
+    "coking coal?",
+
+    // testing questions definitions
     "what is hard coal?",
+    "tell me more about coking coal",
+    "what is coking coal?",
+
+    // testing comparissons relationships
     "is hard coal a solid fossil fuels?",
     "is Coking Coal a car?",
     "is Coking Coal belongs to car?",
@@ -12,9 +23,18 @@ const defaultUserInputs = [
     "What’s the connection between solar and wind?",
     "Is anthracite a thing?",
     "is coke related to coal products?",
-    "mars is a great planet",
+
+    // intent detection
+    "Show me consumption data for natural gas from 2015 to 2020",
+    "What are the carbon emissions for solid fossil fuels in 2019?",
+    "Can you show me the latest statistics on coal production in EU?",
+
+    // testing rubish
     "xy z",
-    "bye"
+    "mars is a great planet",
+    
+    // testing farewell
+    "bye",
 ];
 
 export const runTests = async (userInputs = defaultUserInputs) => {

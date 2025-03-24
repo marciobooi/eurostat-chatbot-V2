@@ -101,7 +101,7 @@ export const relationshipPatterns = {
         'formed from', 'developed from',
         'treated with', 'transformed from'
       ]
-    }
+    },
     
     responses: {
       // when 2 terms exist in the energy dictionary and they are related
@@ -262,7 +262,7 @@ export const relationshipPatterns = {
         'formé de', 'développé à partir de',
         'traité avec', 'transformé à partir de'
       ]
-    }
+    },
     
     responses: {
       // when 2 terms exist in the energy dictionary and they are related
@@ -423,9 +423,9 @@ export const relationshipPatterns = {
         'gebildet aus', 'entwickelt aus',
         'behandelt mit', 'umgewandelt aus'
       ]
-    }
+    },
     
-    responses_de: {
+    responses: {
       // when 2 terms exist in the energy dictionary and they are related
       positive: [
         "Ja, sie sind miteinander verbunden. {term1} und {term2} gehören zur gleichen Energiefamilie. Möchten Sie mehr über einen von ihnen erfahren?",
