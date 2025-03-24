@@ -279,88 +279,16 @@ export class MessageService {
         // Use the actual dimension labels from the response
         const dimensions = data?.dimensions || {};
         const metadata = data?.metadata || {};
-        
-        // Get the indicator label from the response or fallback to our translation
-        const indicatorLabel = dimensions.nrg_bal?.label || 
-          (energyBalance?.indicator ? i18n.t(`eurostat.response.indicators.${energyBalance.indicator}`) : '');
 
-        // Get the fuel type label from the response or fallback to our mapping
-        const fuelLabel = dimensions.siec?.label || queryType.fuelType;
-        
-        // Get the country label from the response or fallback to our mapping
-        const countryLabel = dimensions.geo?.label || COUNTRY_MAP[country]?.[0] || country;
-
-        // Construct response parts with accurate labels
-        let responseParts = [
-          i18n.t('eurostat.response.base', { 
-            type: indicatorLabel || i18n.t(`eurostat.response.query_types.${queryType.type}`) 
-          })
-        ];
-
-        // Add fuel type
-        if (fuelLabel) {
-          responseParts.push(i18n.t('eurostat.response.for_fuel', {
-            fuel: fuelLabel.toUpperCase()
-          }));
-        }
-
-        // Add country
-        if (countryLabel) {
-          responseParts.push(i18n.t('eurostat.response.in_country', { 
-            country: countryLabel
-          }));
-        }
-
-        // Add year from the response or dateInfo
-        const year = dimensions.time?.value || dateInfo?.value;
-        if (year) {
-          responseParts.push(i18n.t('eurostat.response.for_year', { 
-            year 
-          }));
-        }
-
-        let responseText = responseParts.join(' ') + ': ';
-        
-        // Add the actual data value with unit label
-        if (data?.value !== 'N/A') {
-          responseText += i18n.t('eurostat.response.value', {
-            value: data.value,
-            unit: dimensions.unit?.label || data.unit
-          });
-        } else {
-          responseText += i18n.t('eurostat.response.no_data');
-        }
-
-        // Add metadata footer if available
-        if (metadata.source || metadata.updated || metadata.frequency || metadata.url) {
-          responseText += '\n\n';
-          if (metadata.source) {
-            responseText += i18n.t('eurostat.response.metadata.source', { 
-              source: metadata.source 
-            }) + '\n';
-          }
-          if (metadata.updated) {
-            responseText += i18n.t('eurostat.response.metadata.updated', { 
-              date: new Date(metadata.updated).toLocaleDateString() 
-            }) + '\n';
-          }
-          if (metadata.frequency) {
-            responseText += i18n.t('eurostat.response.metadata.frequency', { 
-              freq: metadata.frequency 
-            }) + '\n';
-          }
-          if (metadata.url) {
-            responseText += i18n.t('eurostat.response.metadata.more_info', { 
-              url: metadata.url 
-            });
-          }
-        }
+        // Format the message text with source in brackets
+        const text = `Here's the ${data.bal.toLowerCase()} data for ${data.siec.toLowerCase()} in ${data.country} for ${data.year}: ${data.value} ${data.unit} [Source: Eurostat]`;
 
         const botResponse = {
           sender: 'bot',
-          text: responseText,
+          text: text,
           language: processLanguage,
           isEurostatQuery: true,
+          link: data.metadata?.url || 'https://ec.europa.eu/eurostat/databrowser/view/nrg_cb_sff/default/table?lang=en',
           queryInfo: {
             ...eurostatResponse.queryInfo,
             dimensions,

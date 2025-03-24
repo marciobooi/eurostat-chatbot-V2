@@ -53,45 +53,24 @@ class EurostatQueryModule {
 
   async processQuery(query) {
     try {
-      console.log('Processing query:', query);
-      
-      // Extract basic information from the query
       const energyBalanceInfo = this.extractEnergyBalanceIndicator(query);
-      console.log('Energy Balance Info:', energyBalanceInfo);
-      
       const intent = this.extractIntent(query, energyBalanceInfo);
-      console.log('Extracted Intent:', intent);
-      
       const country = this.extractCountry(query);
-      console.log('Extracted Country:', country);
-      
       const dateInfo = this.extractDateInfo(query);
-      console.log('Extracted Date Info:', dateInfo);
-      
       const fuelType = this.extractFuelType(query);
-      console.log('Extracted Fuel Type:', fuelType);
       
-      // If no relevant intents found, this might not be a Eurostat query
       if (intent.length === 0) {
-        console.log('No relevant intents found');
         return null;
       }
 
-      // Get database parameters based on the query context
       const dbParams = this.extractDatabaseParams(fuelType, energyBalanceInfo?.indicator);
-      console.log('Database Parameters:', dbParams);
 
       if (!dbParams) {
-        console.warn('Could not determine database parameters');
         return null;
       }
       
       const queryType = this.determineQueryType(intent, energyBalanceInfo, query);
-      console.log('Query Type:', queryType);
-
-      // Fetch data from Eurostat API
       const eurostatData = await this.fetchEurostatData(dbParams, country, dateInfo);
-      console.log('Eurostat Data:', eurostatData);
 
       return {
         isEurostatQuery: true,
@@ -106,7 +85,6 @@ class EurostatQueryModule {
         data: eurostatData
       };
     } catch (error) {
-      console.error('Error processing Eurostat query:', error);
       return null;
     }
   }
@@ -180,7 +158,6 @@ class EurostatQueryModule {
   }
 
   extractDateInfo(query) {
-    console.log('Extracting date from query:', query);
     const patterns = datePatterns[this.currentLanguage];
     const dateInfo = {
       type: null,
@@ -192,7 +169,6 @@ class EurostatQueryModule {
     const years = query.match(yearPattern);
     
     if (years && years.length > 0) {
-      console.log('Found years:', years);
       if (years.length === 1) {
         dateInfo.type = 'year';
         dateInfo.value = years[0];
@@ -208,15 +184,12 @@ class EurostatQueryModule {
     for (const [timeType, pattern] of Object.entries(relativePatterns)) {
       const match = query.match(pattern);
       if (match) {
-        console.log('Found relative time:', timeType);
         dateInfo.type = 'relative';
         dateInfo.value = timeType;
         return dateInfo;
       }
     }
 
-    // If no date found, default to latest
-    console.log('No specific date found, defaulting to latest');
     dateInfo.type = 'relative';
     dateInfo.value = 'latest';
     return dateInfo;
@@ -257,7 +230,6 @@ class EurostatQueryModule {
 
   extractFuelType(query) {
     const queryLower = query.toLowerCase();
-    console.log('Extracting fuel type from query:', queryLower);
     
     // Specific fuel types to check first (ordered by specificity)
     const specificFuels = [
@@ -279,7 +251,6 @@ class EurostatQueryModule {
     // First try exact matches with specific fuels
     for (const specificFuel of specificFuels) {
       if (queryLower.includes(specificFuel)) {
-        console.log('Found specific fuel type match:', specificFuel);
         return specificFuel;
       }
     }
@@ -288,7 +259,6 @@ class EurostatQueryModule {
     for (const [key] of Object.entries(this.energyDefinitions)) {
       const normalizedKey = key.toLowerCase().replace(/[_\s]+/g, ' ');
       if (queryLower.includes(normalizedKey)) {
-        console.log('Found exact fuel type match:', key);
         return key;
       }
     }
@@ -310,19 +280,15 @@ class EurostatQueryModule {
     }
 
     if (bestMatch) {
-      console.log('Found best keyword match:', bestMatch);
       return bestMatch;
     }
 
-    console.log('No fuel type found in query');
     return null;
   }
 
   getDefaultDatabaseParams() {
-    // Get the most general fuel type (solid fossil fuels) as default
     const defaultFuel = this.energyDefinitions['solid fossil fuels'];
     if (!defaultFuel) {
-      console.error('Default fuel type not found in energy definitions');
       return null;
     }
 
@@ -330,38 +296,29 @@ class EurostatQueryModule {
       dataset: defaultFuel.dataset,
       siec: defaultFuel.siec || defaultFuel.fuelCode,
       unit: defaultFuel.unit,
-      nrg_bal: defaultFuel.nrg_bal[0], // Use first available indicator
+      nrg_bal: defaultFuel.nrg_bal[0],
       fuelCode: defaultFuel.fuelCode || defaultFuel.siec
     };
   }
 
   extractDatabaseParams(fuelType, indicator) {
     try {
-      console.log('Extracting DB params for fuel:', fuelType, 'indicator:', indicator);
-
-      // If no fuel type is provided, use default
       if (!fuelType) {
-        console.log('No fuel type provided, using default params');
         return this.getDefaultDatabaseParams();
       }
 
-      // First try to get the fuel definition directly
       let fuelDefinition = this.energyDefinitions[fuelType];
       
       if (!fuelDefinition) {
-        // Try matching with normalized keys
         const normalizedKey = fuelType.toLowerCase().replace(/[_\s]+/g, ' ');
         
-        // Try exact match with the key
         const exactMatch = Object.entries(this.energyDefinitions).find(
           ([key]) => key.toLowerCase() === normalizedKey
         );
 
         if (exactMatch) {
-          console.log('Found exact fuel type match:', exactMatch[0]);
           fuelDefinition = exactMatch[1];
         } else {
-          // Try to find by keywords
           const keywordMatch = Object.entries(this.energyDefinitions).find(
             ([_, def]) => def.keywords && def.keywords.some(keyword =>
               keyword.toLowerCase() === normalizedKey ||
@@ -370,42 +327,32 @@ class EurostatQueryModule {
           );
 
           if (keywordMatch) {
-            console.log('Found fuel type by keyword:', keywordMatch[0]);
             fuelDefinition = keywordMatch[1];
           }
         }
       }
 
       if (!fuelDefinition) {
-        console.log('No fuel definition found, using defaults');
         return this.getDefaultDatabaseParams();
       }
 
-      console.log('Using fuel definition:', fuelDefinition.title);
-
-      // Check if the indicator is valid for this fuel type
       const validIndicator = indicator && fuelDefinition.nrg_bal.includes(indicator) ?
         indicator : fuelDefinition.nrg_bal[0];
 
-      const params = {
+      return {
         dataset: fuelDefinition.dataset,
         siec: fuelDefinition.siec,
         unit: fuelDefinition.unit,
         nrg_bal: indicator || validIndicator,
-        fuelCode: fuelDefinition.siec // Use SIEC as the fuel code
+        fuelCode: fuelDefinition.siec
       };
-
-      console.log('Generated database parameters:', params);
-      return params;
     } catch (error) {
-      console.error('Error extracting database parameters:', error);
       return this.getDefaultDatabaseParams();
     }
   }
 
   async fetchEurostatData(dbParams, country, dateInfo) {
     if (!dbParams) {
-      console.error('Missing database parameters');
       return {
         value: 'N/A',
         unit: 'Unknown',
@@ -419,52 +366,61 @@ class EurostatQueryModule {
 
     const BASE_URL = 'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data';
     
-    // Construct the API query parameters
     const params = new URLSearchParams();
     params.append('format', 'JSON');
 
-    // Add dimension filters
     if (dbParams.nrg_bal) params.append('nrg_bal', dbParams.nrg_bal);
     if (dbParams.siec) params.append('siec', dbParams.siec);
     if (dbParams.unit) params.append('unit', dbParams.unit);
     params.append('geo', country || 'EU27_2020');
 
-    // Add time parameter based on dateInfo
     if (dateInfo?.value && dateInfo.type === 'year') {
       params.append('time', dateInfo.value);
     } else if (dateInfo?.value && dateInfo.type === 'yearRange') {
-      // Handle year range by getting all years in the range
       const [startYear, endYear] = dateInfo.value.split('-');
       params.append('time', `${startYear}-${endYear}`);
     } else {
-      // If no specific time is requested, get the latest period
       params.append('lastTimePeriod', '1');
     }
 
     try {
       const url = `${BASE_URL}/${dbParams.dataset}`;
-      console.log('Fetching Eurostat data from:', url, 'with params:', params.toString());
-      
       const response = await axios.get(url, { params });
-      console.log('API Response:', response.data);
       
-      // Process the response data
+      const dimension = response.data.dimension;
+      const labels = {
+        dataset: response.data.label,
+        nrg_bal: dimension.nrg_bal?.label || {},
+        siec: dimension.siec?.label || {},
+        unit: dimension.unit?.label || {},
+        geo: dimension.geo?.label || {},
+        time: dimension.time?.label || {}
+      };
+
+      const selectedLabels = {
+        nrg_bal: dimension.nrg_bal?.category?.label?.[dbParams.nrg_bal] || '',
+        siec: dimension.siec?.category?.label?.[dbParams.siec] || '',
+        unit: dimension.unit?.category?.label?.[dbParams.unit] || '',
+        geo: dimension.geo?.category?.label?.[country] || ''
+      };
+      
       const processedData = this.processEurostatResponse(response.data, dbParams.unit);
-      
       return {
         value: processedData.value,
         unit: dbParams.unit,
         year: dateInfo?.value || processedData.year,
+        country: selectedLabels.geo || country,
+        siec: selectedLabels.siec,
+        bal: selectedLabels.nrg_bal,
         metadata: {
           source: 'Eurostat',
-          dataset: dbParams.dataset,
-          indicator: dbParams.nrg_bal,
-          lastUpdate: response.data.metadata?.update || new Date().toISOString(),
-          url: `${url}?${params.toString()}`
+          url: `https://ec.europa.eu/eurostat/databrowser/product/view/${dbParams.dataset}?lang=${this.currentLanguage}`,
+          datasetLabel: labels.dataset,
+          dimensions: selectedLabels,
+          updated: response.data.updated
         }
       };
     } catch (error) {
-      console.error('Error fetching Eurostat data:', error);
       return {
         value: 'N/A',
         unit: dbParams.unit || 'KTOE',
@@ -478,8 +434,6 @@ class EurostatQueryModule {
   }
 
   processEurostatResponse(data, unit) {
-    // Extract the actual value from the Eurostat response structure
-    // The structure can be complex, so we need to navigate it carefully
     try {
       const values = data.value || {};
       const firstValue = Object.values(values)[0];
@@ -490,7 +444,6 @@ class EurostatQueryModule {
         year: year
       };
     } catch (error) {
-      console.error('Error processing Eurostat response:', error);
       return {
         value: 'N/A',
         year: 'latest'

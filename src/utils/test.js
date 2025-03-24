@@ -30,7 +30,7 @@ const defaultUserInputs = [
     // "What are the carbon emissions for solid fossil fuels in 2019?",
     // "Can you show me the latest statistics on hard coal production in EU?",
     // "Can you show me the imports of solid fossil fuels for spain for the 2019?",
-    "What is the imports of solid fossil fuels for france for the 2021?",
+    // "What is the imports of solid fossil fuels for france for the 2021?",
     "What was the exports of hard coal for germany in the year 2016?",
 
     // testing rubish
