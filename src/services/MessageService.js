@@ -287,33 +287,26 @@ export class MessageService {
       return messages;
     }
 
-    // Process text with enhanced NLP for regular messages
-    const nlpResult = await processText(input, processLanguage);
+    // First check if it's a relationship question, before doing any other processing
+    const relationshipInfo = contextManager.checkRelationship(input, processLanguage);
+    if (relationshipInfo?.isRelationshipQuestion) {
+      const botResponse = {
+        sender: 'bot',
+        text: relationshipInfo.response,
+        language: processLanguage,
+        suggestions: relationshipInfo.suggestions || (relationshipInfo.terms ? relationshipInfo.terms.map(t => t.term) : []),
+        isRelationship: true,
+        relationshipType: relationshipInfo.relationshipType,
+        terms: relationshipInfo.terms
+      };
 
-    // Check for relationship questions without updating context
-    const relationshipDict = relationshipPatterns[processLanguage] || relationshipPatterns[CONFIG.DEFAULT_LANGUAGE];
-    const isRelationshipQuestion = relationshipDict.patterns.some(pattern => pattern.test(input.toLowerCase()));
-    
-    if (isRelationshipQuestion) {
-      const relationshipInfo = contextManager.checkRelationship(input, processLanguage);
-      if (relationshipInfo?.isRelationshipQuestion) {
-        const botResponse = {
-          sender: 'bot',
-          text: relationshipInfo.response,
-          language: processLanguage,
-          suggestions: relationshipInfo.suggestions || [],
-          isRelationship: true,
-          relationshipType: relationshipInfo.relationshipType,
-          terms: relationshipInfo.terms
-        };
-
-        const messages = [userMessage, botResponse];
-        saveChatToCookie(messages);
-        return messages;
-      }
+      const messages = [userMessage, botResponse];
+      saveChatToCookie(messages);
+      return messages;
     }
 
-    // Handle regular messages
+    // If not a relationship question, continue with NLP processing and definition lookup
+    const nlpResult = await processText(input, processLanguage);
     const definition = await findEnergyDefinition(input.trim(), processLanguage);
     const botResponse = definition ? 
       this.createBotResponse(definition, processLanguage, nlpResult.context) : 

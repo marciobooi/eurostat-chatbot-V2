@@ -1,8 +1,6 @@
 import { NLP_CONFIG } from '../../config/nlpConfig';
-import { relationshipPatterns } from '../../dictionaries/relationshipPatterns';
-import { energyDictionary } from '../energyDictionary';
+import { comparisonModule } from './comparisonModule';
 import { CONFIG } from '../../i18n';
-import { getRandomElement } from '../randomUtils';
 
 class ContextManager {
   constructor() {
@@ -43,9 +41,6 @@ class ContextManager {
     const currentContext = history[history.length - 1];
     const previousContext = history.length > 1 ? history[history.length - 2] : null;
 
-    // Check for relationship question
-    const relationshipInfo = this.checkRelationship(currentContext.message);
-
     return {
       currentTopic: this.extractCurrentTopic(currentContext),
       isFollowUp: this.isFollowUpQuestion(currentContext, previousContext),
@@ -53,8 +48,7 @@ class ContextManager {
       contextualIntent: this.getContextualIntent(currentContext, previousContext),
       topicChain: this.buildTopicChain(history),
       sentiment: this.getOverallSentiment(history),
-      entities: currentContext.entities,
-      relationship: relationshipInfo
+      entities: currentContext.entities
     };
   }
 
@@ -213,161 +207,11 @@ class ContextManager {
     return 'stable';
   }
 
-  extractTermsFromMessage(input, dictionary) {
-    const words = input.toLowerCase().split(/\s+/);
-    const terms = new Set();
-    const partialMatches = new Set();
-
-    // First pass: try to find exact energy terms
-    Object.entries(dictionary).forEach(([term, def]) => {
-      const termLower = term.toLowerCase();
-      if (words.includes(termLower) || input.includes(termLower)) {
-        terms.add(term);
-      }
-    });
-
-    // Second pass: try alternative names and partial matches
-    if (terms.size === 0) {
-      Object.entries(dictionary).forEach(([term, def]) => {
-        const termLower = term.toLowerCase();
-        const title = def.title?.toLowerCase() || '';
-        
-        // Check for partial matches in the term or title
-        if (words.some(word => {
-          const isPartialMatch = termLower.includes(word) || title.includes(word);
-          if (isPartialMatch) partialMatches.add(term);
-          return isPartialMatch;
-        })) {
-          terms.add(term);
-        }
-        
-        // Check in text content
-        if (def.text?.toLowerCase().includes(input)) {
-          terms.add(term);
-          // Store all related fuels as partial matches
-          if (def.subFuels) partialMatches.add(...def.subFuels);
-          if (def.related) partialMatches.add(...def.related);
-        }
-      });
-    }
-
-    const result = Array.from(terms);
-    return {
-      exactMatches: result,
-      partialMatches: Array.from(partialMatches).filter(match => !result.includes(match))
-    };
-  }
-
   checkRelationship(message, language = CONFIG.DEFAULT_LANGUAGE) {
-    if (!message) return null;
-
-    const lowercaseInput = message.toLowerCase();
-    const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
-    const relationshipDict = relationshipPatterns[language] || relationshipPatterns[CONFIG.DEFAULT_LANGUAGE];
-    
-    // Check if the message matches any relationship pattern
-    const isRelationshipQuestion = relationshipDict.patterns.some(pattern => pattern.test(lowercaseInput));
-
-    if (!isRelationshipQuestion) return null;
-
-    // Extract terms from the input with partial matches
-    const { exactMatches: terms, partialMatches } = this.extractTermsFromMessage(lowercaseInput, dictionary);
-    
-    // If we have no energy terms at all but have partial matches, suggest the main category
-    if (terms.length === 0 && partialMatches.length > 0) {
-      const mainTerm = partialMatches[0];
-      const def = dictionary[mainTerm];
-      
-      if (!def) return null;
-
-      // Get related terms for suggestions
-      const suggestions = [
-        ...(def.subFuels || []),
-        ...(def.related || [])
-      ].filter(term => term !== mainTerm);
-
-      return {
-        isRelationshipQuestion: true,
-        isRelated: false,
-        relationshipType: 'suggestion',
-        terms: [{
-          term: mainTerm,
-          definition: def
-        }],
-        suggestions,
-        response: getRandomElement(relationshipDict.responses.suggestion || relationshipDict.responses.single_term)
-          .replace('{term1}', def.title || mainTerm)
-      };
-    }
-
-    // If we have no exact matches at all, return null
-    if (terms.length === 0) return null;
-
-    // If we found only one energy term
-    if (terms.length === 1) {
-      const [energyTerm] = terms;
-      const def = dictionary[energyTerm];
-      
-      // Get related terms for suggestions
-      const suggestions = [
-        ...(def.subFuels || []),
-        ...(def.related || [])
-      ].filter(term => term !== energyTerm);
-
-      return {
-        isRelationshipQuestion: true,
-        isRelated: false,
-        relationshipType: 'single_term',
-        terms: [{
-          term: energyTerm,
-          definition: def
-        }],
-        suggestions,
-        response: getRandomElement(relationshipDict.responses.single_term)
-          .replace('{term1}', def.title || energyTerm)
-      };
-    }
-
-    // For multiple terms, we'll only consider the first two valid energy terms
-    const [term1, term2] = terms;
-    const def1 = dictionary[term1];
-    const def2 = dictionary[term2];
-
-    // Both terms must be valid energy terms
-    if (!def1 || !def2) {
-      const validTerm = def1 ? term1 : (def2 ? term2 : null);
-      if (validTerm) {
-        const def = dictionary[validTerm];
-        return {
-          isRelationshipQuestion: true,
-          isRelated: false,
-          relationshipType: 'single_term',
-          terms: [{
-            term: validTerm,
-            definition: def
-          }],
-          response: getRandomElement(relationshipDict.responses.invalid_comparison)
-            .replace('{term1}', def.title || validTerm)
-        };
-      }
-      return null;
-    }
-
-    const isRelated = this.checkTermRelationship(def1, def2, term1, term2);
-    const relationshipType = this.determineRelationshipType(def1, def2, term1, term2);
-    
-    const response = this.createRelationshipResponse(isRelated, relationshipType, def1, def2, term1, term2, language);
-
-    // Add relationship details to context without recursion
-    this.addRelationshipToHistory('default', message, {
-      intent: 'relationship_query',
-      energyTypes: [term1, term2]
-    }, language);
-
-    return response;
+    return comparisonModule.checkRelationship(message, language);
   }
 
-  // New helper method to safely add relationship to history
+  // Helper method to safely add relationship to history
   addRelationshipToHistory(userId, message, details, language) {
     const key = this.getConversationKey(userId, language);
     let history = this.conversationHistory.get(key) || [];
@@ -390,114 +234,6 @@ class ContextManager {
     }
 
     this.conversationHistory.set(key, history);
-  }
-
-  findTermsInDefinitions(input, dictionary, terms) {
-    Object.entries(dictionary).forEach(([term, def]) => {
-      if (def.text && def.text.toLowerCase().includes(input)) {
-        terms.push(term);
-      }
-    });
-  }
-
-  checkTermRelationship(def1, def2, term1, term2) {
-    return (
-      this.hasDirectRelationship(def1, def2, term1, term2) ||
-      this.hasHierarchicalRelationship(def1, def2, term1, term2) ||
-      this.hasCategoryRelationship(def1, def2) ||
-      this.hasTextualRelationship(def1, def2)
-    );
-  }
-
-  hasDirectRelationship(def1, def2, term1, term2) {
-    return def1.related?.includes(term2) || def2.related?.includes(term1);
-  }
-
-  hasHierarchicalRelationship(def1, def2, term1, term2) {
-    return (
-      def1.subFuels?.includes(term2) ||
-      def2.subFuels?.includes(term1) ||
-      def1.parentFuel === term2 ||
-      def2.parentFuel === term1 ||
-      def1.derivedFrom?.includes(term2) ||
-      def2.derivedFrom?.includes(term1)
-    );
-  }
-
-  hasCategoryRelationship(def1, def2) {
-    return (
-      def1.category === def2.category ||
-      def1.family === def2.family ||
-      def1.subFamily === def2.subFamily
-    );
-  }
-
-  hasTextualRelationship(def1, def2) {
-    const text1 = def1.text?.toLowerCase() || '';
-    const text2 = def2.text?.toLowerCase() || '';
-    const title1 = def1.title?.toLowerCase() || '';
-    const title2 = def2.title?.toLowerCase() || '';
-
-    // Get relationship terms from dictionary
-    const allTerms = Object.values(relationshipPatterns[CONFIG.DEFAULT_LANGUAGE].terms).flat();
-
-    // Direct mention check
-    const hasDirectMention = text1.includes(title2) || text2.includes(title1);
-
-    // Term relationship check
-    const hasTermRelation = allTerms.some(term => 
-      (text1.includes(term) && text1.includes(title2)) ||
-      (text2.includes(term) && text2.includes(title1))
-    );
-
-    // Sentence level check
-    const sentences1 = text1.split(/[.!?]+/);
-    const sentences2 = text2.split(/[.!?]+/);
-
-    const hasSentenceRelation = sentences1.some(sentence => 
-      sentence.includes(title2) && allTerms.some(term => sentence.includes(term))
-    ) || sentences2.some(sentence => 
-      sentence.includes(title1) && allTerms.some(term => sentence.includes(term))
-    );
-
-    return hasDirectMention || hasTermRelation || hasSentenceRelation;
-  }
-
-  determineRelationshipType(def1, def2, term1, term2) {
-    if (def1.subFuels?.includes(term2) || def2.parentFuel === term1) {
-      return 'parent-child';
-    } else if (def2.subFuels?.includes(term1) || def1.parentFuel === term2) {
-      return 'child-parent';
-    } else if (def1.family === def2.family) {
-      return 'same-family';
-    } else if (def1.category === def2.category) {
-      return 'same-category';
-    } else if (def1.derivedFrom?.includes(term2) || def2.derivedFrom?.includes(term1)) {
-      return 'derived';
-    } else if (this.hasTextualRelationship(def1, def2)) {
-      return 'textual';
-    }
-    return '';
-  }
-
-  createRelationshipResponse(isRelated, relationshipType, def1, def2, term1, term2, language) {
-    const responses = relationshipPatterns[language]?.responses || relationshipPatterns[CONFIG.DEFAULT_LANGUAGE].responses;
-    const responseList = isRelated ? responses.positive : responses.negative;
-    
-    const response = getRandomElement(responseList)
-      .replace('{term1}', def1.title || term1)
-      .replace('{term2}', def2.title || term2);
-
-    return {
-      isRelated,
-      relationshipType,
-      terms: [
-        {term: term1, definition: def1},
-        {term: term2, definition: def2}
-      ],
-      response,
-      isRelationshipQuestion: true
-    };
   }
 
   clearContext(userId, language) {

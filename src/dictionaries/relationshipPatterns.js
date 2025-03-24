@@ -41,7 +41,11 @@ export const relationshipPatterns = {
       /^(?:how|what).*(?:relation|connection)/i,
       /(?:include|contain|made from|derived from)/i,
       /(?:belong|part|component|element) of/i,
-      /(?:used|processed|refined|produced) (?:in|from|by|with)/i
+      /(?:used|processed|refined|produced) (?:in|from|by|with)/i,
+      // Add specific 'is a' patterns
+      /^is\s+[\w\s]+a\s+[\w\s]+/i,  // This catches "is hard coal a fossil fuel?"
+      /^is\s+[\w\s]+an\s+[\w\s]+/i,
+      /^are\s+[\w\s]+[\w\s]+/i
     ],
     terms: {
       inclusion: [
@@ -139,7 +143,11 @@ export const relationshipPatterns = {
       /^est\s+\w+.*(?:à|avec|de)\s+\w+/i,
       /(?:inclut|contient|fait de|dérivé de)/i,
       /(?:appartient|partie|composant|élément) de/i,
-      /(?:utilisé|transformé|raffiné|produit) (?:dans|de|par|avec)/i
+      /(?:utilisé|transformé|raffiné|produit) (?:dans|de|par|avec)/i,
+      // Add French is-a patterns
+      /^est\s+[\w\s]+un\s+[\w\s]+/i,
+      /^est\s+[\w\s]+une\s+[\w\s]+/i,
+      /^sont\s+[\w\s]+[\w\s]+/i
     ],
     terms: {
       inclusion: [
@@ -237,7 +245,11 @@ export const relationshipPatterns = {
       /^ist\s+\w+.*(?:zu|mit|von)\s+\w+/i,
       /(?:enthält|beinhaltet|hergestellt aus|abgeleitet von)/i,
       /(?:gehört|teil|komponente|element) von/i,
-      /(?:verwendet|verarbeitet|raffiniert|produziert) (?:in|aus|von|mit)/i
+      /(?:verwendet|verarbeitet|raffiniert|produziert) (?:in|aus|von|mit)/i,
+      // Add German is-a patterns
+      /^ist\s+[\w\s]+ein\s+[\w\s]+/i,
+      /^ist\s+[\w\s]+eine\s+[\w\s]+/i,
+      /^sind\s+[\w\s]+[\w\s]+/i
     ],
     terms: {
       inclusion: [
