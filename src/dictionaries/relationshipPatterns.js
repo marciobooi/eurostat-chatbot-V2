@@ -69,6 +69,7 @@ export const relationshipPatterns = {
       ]
     },
     responses: {
+      // when 2 terms exists in the energy dictionary and they are related
       positive: [
         "Yes, they are related. {term1} and {term2} belong to the same energy family. Would you like to learn more about either of them?",
         "Yes, they are connected. {term1} is actually derived from {term2}. I can tell you more about either one.",
@@ -76,6 +77,7 @@ export const relationshipPatterns = {
         "Yes, there is a hierarchical relationship. {term1} is a sub-type of {term2}. I can explain more about either one.",
         "They are definitely related within the energy classification system. Would you like to know more about {term1} or {term2}?"
       ],
+            // when 2 terms exists in the energy dictionary and they are NOT related
       negative: [
         "No, they are not directly related. {term1} and {term2} belong to different energy classifications. However, I can tell you about either one.",
         "While both are energy sources, {term1} and {term2} are not directly related. Would you like to learn about one of them?",
@@ -83,6 +85,7 @@ export const relationshipPatterns = {
         "There is no direct relationship between them in the energy classification system. Would you like to explore {term1} or {term2}?",
         "They are separate categories in the energy family. Would you like to know more about {term1} or {term2}?"
       ],
+            // when 1 terms exists in the energy dictionary
       single_term: [
         "I can tell you about {term1}. What would you like to know?",
         "Let me help you learn about {term1}. What specific aspects interest you?",
@@ -90,12 +93,14 @@ export const relationshipPatterns = {
         "I can provide details about {term1}. What would you like to learn?",
         "I'd be happy to tell you about {term1}. What information are you looking for?"
       ],
+            // when the 2 terms does NOT exist in the energy dictionary
       invalid_comparison: [
         "I can only provide information about energy-related terms. Would you like to learn about {term1}?",
         "I specialize in energy topics. I can tell you about {term1} if you're interested.",
         "My knowledge is focused on energy topics. I can explain about {term1} if you'd like.",
         "I'm specialized in energy information. Would you like to learn about {term1}?"
       ],
+            // when the 2 terms does NOT exist in the energy dictionary and dont make sence
       suggestion: [
         "While I don't have specific information about that exact term, {term1} includes several related fuels that might interest you. Would you like to learn about any of them?",
         "That specific term is part of the broader category of {term1}. I can tell you about {term1} or its related fuels.",

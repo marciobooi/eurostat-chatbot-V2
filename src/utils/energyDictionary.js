@@ -15,7 +15,10 @@ export const energyDictionary = {
  * Get dictionary for specific language with fallback
  */
 export const getDictionary = (language = CONFIG.DEFAULT_LANGUAGE) => {
-  return energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
+  console.log('Getting dictionary for language:', language);
+  const dict = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
+  console.log('Dictionary entries:', Object.keys(dict));
+  return dict;
 };
 
 /**
@@ -36,8 +39,11 @@ export const getRelatedTopics = (topic, language = CONFIG.DEFAULT_LANGUAGE) => {
  * @returns {string[]} - Array of keywords
  */
 export const getKeywords = (topic, language = CONFIG.DEFAULT_LANGUAGE) => {
+  console.log('Looking up keywords for topic:', topic);
   const dict = getDictionary(language);
-  return dict[topic.toLowerCase()]?.keywords || [];
+  const entry = dict[topic.toLowerCase()];
+  console.log('Found entry:', entry);
+  return entry?.keywords || [];
 };
 
 /**
