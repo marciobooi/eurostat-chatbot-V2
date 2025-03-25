@@ -2,6 +2,7 @@ import { intentPatterns } from '../../dictionaries/intentPatterns';
 import { datePatterns } from '../../dictionaries/datePatterns';
 import COUNTRY_MAP from '../../dictionaries/countries';
 import { energyDefinitionsEn } from '../../dictionaries/energyDefinitionsEn';
+import { energyBalanceIndicators } from '../../dictionaries/energyBalanceIndicators';
 import axios from 'axios';
 
 class EurostatQueryModule {
@@ -9,34 +10,7 @@ class EurostatQueryModule {
     this.contextManager = contextManager;
     this.currentLanguage = 'en'; // Default language
     this.energyDefinitions = energyDefinitionsEn; // Use the imported definitions
-    
-    // Keep only the indicator patterns, rest comes from energyDefinitionsEn
-    this.energyBalanceIndicators = {
-      IMP: {
-        patterns: ['import', 'imports', 'importing', 'imported'],
-        intent: 'query_trade'
-      },
-      EXP: {
-        patterns: ['export', 'exports', 'exporting', 'exported'],
-        intent: 'query_trade'
-      },
-      STK_CHG: {
-        patterns: ['stock', 'stocks', 'stock change', 'stock changes', 'inventory', 'reserves'],
-        intent: 'query_production'
-      },
-      GAE: {
-        patterns: ['gross available energy', 'available energy', 'energy availability', 'available'],
-        intent: 'query_production'
-      },
-      GIC: {
-        patterns: ['gross inland consumption', 'inland consumption', 'domestic consumption', 'internal consumption'],
-        intent: 'query_consumption'
-      },
-      FC: {
-        patterns: ['final consumption', 'end use', 'end-use consumption', 'final energy consumption'],
-        intent: 'query_consumption'
-      }
-    };
+    this.energyBalanceIndicators = energyBalanceIndicators;
 
     // Build fuel types dynamically from energyDefinitionsEn
     this.fuelTypes = {};

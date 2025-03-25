@@ -2,21 +2,21 @@ import chalk from "chalk";
 import { MessageService } from "../services/MessageService";
 
 const defaultUserInputs = [
-  // testing greetings
-    // "hello",
-    // hi,
+  // // testing greetings
+  //   "hello",
+  //   "hi",
 
     // testing definitions
-    // "solid fossil fuels",
-    // "hard coal?",
-    // "coking coal?",
+    "solid fossil fuels",
+    "hard coal?",
+    "coking coal?",
 
     // testing questions definitions
-    // "what is hard coal?",
-    // "tell me more about coking coal",
-    // "what is coking coal?",
+    "what is hard coal?",
+    "tell me more about brown coal briquettes",
+    "what is patent fuel?",
 
-    // testing comparissons relationships
+    // // testing comparissons relationships
     // "is hard coal a solid fossil fuels?",
     // "is Coking Coal a car?",
     // "is Coking Coal belongs to car?",
@@ -25,7 +25,7 @@ const defaultUserInputs = [
     // "Is anthracite a thing?",
     // "is coke related to coal products?",
 
-    // intent detection
+    // // intent detection
     // "Show me consumption data for natural gas from 2015 to 2020",
     // "What are the carbon emissions for solid fossil fuels in 2019?",
     // "Can you show me the latest statistics on hard coal production in EU?",
@@ -33,11 +33,11 @@ const defaultUserInputs = [
     // "What is the imports of solid fossil fuels for france for the 2021?",
     // "What was the exports of hard coal for germany in the year 2016?",
 
-    // testing rubish
+    // // testing rubish
     // "xy z",
     // "mars is a great planet",
     
-    // testing farewell
+    // // testing farewell
     // "bye",
 ];
 

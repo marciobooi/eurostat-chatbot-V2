@@ -234,53 +234,7 @@ export const energyDefinitionsEn = {
       "carbonization"
     ],
     "link": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_cb_sff?format=JSON"
-  },
-  "anthracite": {
-  "title": "Anthracite",
-  "text": "Anthracite is a high-rank, hard coal with high carbon content and low volatile matter. It has the highest energy density among coal types and burns with little smoke, making it suitable for residential heating, industrial applications, and carbon-intensive processes.",
-  "related": ["hard coal", "solid fossil fuels"],
-  "dataset": "nrg_cb_sff",
-  "fuelCode": "C0110",
-  "nrg_bal": ["IMP", "EXP", "STK_CHG", "GAE", "GIC", "FC"],
-  "unit": "THS_T",
-  "hasVisualization": true,
-  "visualizationType": ["pie", "bar", "line"],
-  "isMainFuel": false,
-  "subFuels": [],
-  "key_concepts": [
-    "High-carbon coal",
-    "Hard coal",
-    "Low volatile coal",
-    "Anthracite mining",
-    "Residential heating coal",
-    "Industrial fuel",
-    "Carbon-rich coal",
-    "Coal combustion efficiency",
-    "Coal briquettes from anthracite",
-    "Anthracite imports and exports"
-  ],
-  "statisticalConcepts": [
-    "Anthracite production",
-    "Anthracite consumption by sector",
-    "Imports and exports of anthracite",
-    "Anthracite for power generation",
-    "CO₂ emissions from anthracite combustion",
-    "Efficiency of anthracite-fired boilers"
-  ],
-  "keywords": [
-    "anthracite",
-    "high-rank coal",
-    "hard coal",
-    "carbon-rich coal",
-    "clean-burning coal",
-    "low-volatile coal",
-    "high-energy coal",
-    "smokeless coal",
-    "industrial coal",
-    "residential heating coal"
-  ],
-  "link": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_cb_sff?format=JSON"
-},
+  },  
 "coking_coal": {
   "title": "Coking Coal",
   "text": "Coking coal, also known as metallurgical coal, is a type of hard coal used in the production of coke, which is essential for steelmaking. It has low sulfur and phosphorus content and is primarily used in blast furnaces and industrial applications.",
@@ -670,7 +624,53 @@ export const energyDefinitionsEn = {
     "domestic heating coal"
   ],
   "link": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_cb_sff?format=JSON"
-}
+},
+"anthracite": {
+  "title": "Anthracite",
+  "text": "Anthracite is a high-rank, hard coal with high carbon content and low volatile matter. It has the highest energy density among coal types and burns with little smoke, making it suitable for residential heating, industrial applications, and carbon-intensive processes.",
+  "related": ["hard coal", "solid fossil fuels"],
+  "dataset": "nrg_cb_sff",
+  "fuelCode": "C0110",
+  "nrg_bal": ["IMP", "EXP", "STK_CHG", "GAE", "GIC", "FC"],
+  "unit": "THS_T",
+  "hasVisualization": true,
+  "visualizationType": ["pie", "bar", "line"],
+  "isMainFuel": false,
+  "subFuels": [],
+  "key_concepts": [
+    "High-carbon coal",
+    "Hard coal",
+    "Low volatile coal",
+    "Anthracite mining",
+    "Residential heating coal",
+    "Industrial fuel",
+    "Carbon-rich coal",
+    "Coal combustion efficiency",
+    "Coal briquettes from anthracite",
+    "Anthracite imports and exports"
+  ],
+  "statisticalConcepts": [
+    "Anthracite production",
+    "Anthracite consumption by sector",
+    "Imports and exports of anthracite",
+    "Anthracite for power generation",
+    "CO₂ emissions from anthracite combustion",
+    "Efficiency of anthracite-fired boilers"
+  ],
+  "keywords": [
+    "anthracite",
+    "high-rank coal",
+    "hard coal",
+    "carbon-rich coal",
+    "clean-burning coal",
+    "low-volatile coal",
+    "high-energy coal",
+    "smokeless coal",
+    "industrial coal",
+    "residential heating coal"
+  ],
+  "link": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_cb_sff?format=JSON"
+},
 
 
 
