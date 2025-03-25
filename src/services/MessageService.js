@@ -23,6 +23,7 @@ import { datePatterns } from '../dictionaries/datePatterns';
 import { filteredWords } from '../dictionaries/filteredWords';
 import i18n from 'i18next';
 import COUNTRY_MAP from '../dictionaries/countries';
+import { commonQuestionPhrases } from '../dictionaries/questionPhrases';
 
 export class MessageService {
   static instance = null;
@@ -388,11 +389,18 @@ export class MessageService {
   /**
    * Check if message contains a question
    */
-  isQuestion(message, language) {
+  static isQuestion(message, language) {
+    // First check question word patterns
     const questionPatterns = questionWords[language] || questionWords.en;
-    return questionPatterns.some(pattern => 
+    const hasQuestionWord = questionPatterns.some(pattern => 
       message.toLowerCase().includes(pattern.toLowerCase())
     );
+
+    if (hasQuestionWord) return true;
+
+    // Then check complex question phrase patterns
+    const phrasePatterns = commonQuestionPhrases[language] || commonQuestionPhrases.en;
+    return phrasePatterns.some(pattern => pattern.test(message));
   }
 
   /**

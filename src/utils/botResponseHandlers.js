@@ -8,18 +8,25 @@ import { errorMessages } from '../dictionaries/errorMessages';
 import { empathyPhrases } from '../dictionaries/empathyPhrases';
 import { energyDictionary } from './energyDictionary';
 import { CONFIG } from '../i18n';
+import { commonQuestionPhrases } from '../dictionaries/questionPhrases';
+import { questionWords } from '../dictionaries/questionWords';
 
 export const processUserMessage = async (message, language = 'en') => {
   try {
     const result = await MessageService.analyzeMessage(message, language);
+    
+    // Enhanced question detection
+    const isQuestion = checkIsQuestion(message, language);
+    
     const [userMessage, botResponse] = await MessageService.processUserInput(message, language);
     const matchedTopic = botResponse.title ? botResponse : null;
 
     return {
-      isQuestion: result.isQuestion,
+      isQuestion,
       topic: matchedTopic,
       nlpData: {
-        ...result
+        ...result,
+        isQuestion  // Override with enhanced detection
       }
     };
   } catch (error) {
@@ -32,6 +39,23 @@ export const processUserMessage = async (message, language = 'en') => {
       }
     };
   }
+};
+
+/**
+ * Enhanced question detection using both word patterns and phrase patterns
+ */
+const checkIsQuestion = (message, language) => {
+  // First check simple question words
+  const words = questionWords[language] || questionWords[CONFIG.DEFAULT_LANGUAGE];
+  const hasQuestionWord = words.some(word => 
+    message.toLowerCase().includes(word.toLowerCase())
+  );
+
+  if (hasQuestionWord) return true;
+
+  // Then check complex question phrases
+  const phrasePatterns = commonQuestionPhrases[language] || commonQuestionPhrases[CONFIG.DEFAULT_LANGUAGE];
+  return phrasePatterns.some(pattern => pattern.test(message));
 };
 
 export const generateBotResponse = async (processedMessage, language = 'en') => {
