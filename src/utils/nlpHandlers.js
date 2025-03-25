@@ -14,13 +14,13 @@ import { sentimentAnalyzer } from './nlp/sentimentAnalyzer';
 import { entityExtractor } from './nlp/entityExtractor';
 import { intentClassifier } from './nlp/intentClassifier';
 import { contextManager } from './nlp/contextManager';
+import energyTermsPlugin from './nlp/plugins/energyTerms';
 
 // Initialize NLP libraries
 nlp.extend(dates);
 nlp.extend(numbers);
 nlp.extend(sentences);
-const winkNlp = winkNLP(model);
-const sentiment = new Sentiment();
+nlp.extend(energyTermsPlugin);
 
 // Store context for each session
 const contextStore = new Map();
@@ -30,8 +30,16 @@ const contextStore = new Map();
  */
 export const processText = async (text, language = NLP_CONFIG.languages.default) => {
   try {
+    // Use compromise to pre-process and extract energy-specific entities
+    const doc = nlp(text);
+    const energyEntities = {
+      types: doc.energyTypes().out('array'),
+      terms: doc.energyTerms().out('array'),
+      indicators: doc.energyIndicators().out('array')
+    };
+
     // Extract entities first to get canonical forms
-    const entities = await entityExtractor.extractEntities(text, language);
+    const entities = await entityExtractor.extractEntities(text, language, energyEntities);
     
     // Get intent using extracted entities
     const intentResult = await intentClassifier.classifyIntent(text, entities, language);

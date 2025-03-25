@@ -2,6 +2,7 @@ import winkNLP from 'wink-nlp';
 import model from 'wink-eng-lite-web-model';
 import { NLP_CONFIG } from '../../config/nlpConfig';
 import { customEntities } from '../../dictionaries/customEntities';
+import nlp from 'compromise';
 
 class EntityExtractor {
   constructor() {
@@ -13,7 +14,7 @@ class EntityExtractor {
     return `${language}:${text}`;
   }
 
-  async extractEntities(text, language = NLP_CONFIG.languages.default) {
+  async extractEntities(text, language = NLP_CONFIG.languages.default, compromiseEntities = null) {
     const cacheKey = this.getCacheKey(text, language);
     
     if (this.cache.has(cacheKey)) {
@@ -25,8 +26,8 @@ class EntityExtractor {
     // Extract standard entities
     const standardEntities = this.extractStandardEntities(doc);
     
-    // Extract custom energy domain entities
-    const customEntitiesResult = await this.extractCustomEntities(text.toLowerCase(), language);
+    // Extract custom energy domain entities, now enhanced with Compromise results
+    const customEntitiesResult = await this.extractCustomEntities(text.toLowerCase(), language, compromiseEntities);
 
     const result = {
       standardEntities,
@@ -83,12 +84,43 @@ class EntityExtractor {
     }
   }
 
-  async extractCustomEntities(text, language) {
+  async extractCustomEntities(text, language, compromiseEntities = null) {
     const entityDictionary = customEntities[language] || customEntities[NLP_CONFIG.languages.default];
     const results = {};
     
+    // First, process any pre-extracted Compromise.js entities
+    if (compromiseEntities) {
+      results.energyTypes = await Promise.all(compromiseEntities.types.map(async term => ({
+        text: term,
+        type: 'energyType',
+        confidence: 1,
+        canonical: await this.findCanonicalForm(term, language)
+      })));
+
+      results.energyTerms = await Promise.all(compromiseEntities.terms.map(async term => ({
+        text: term,
+        type: 'energyTerm',
+        confidence: 1,
+        canonical: await this.findCanonicalForm(term, language)
+      })));
+
+      results.indicators = await Promise.all(compromiseEntities.indicators.map(async term => ({
+        text: term,
+        type: 'indicator',
+        confidence: 1,
+        canonical: await this.findCanonicalForm(term, language)
+      })));
+    }
+    
+    // Then process dictionary-based entities for any terms not caught by Compromise
     for (const [category, terms] of Object.entries(entityDictionary)) {
       const found = terms.filter(term => {
+        // Skip if already found by Compromise
+        if (compromiseEntities?.types.includes(term) || 
+            compromiseEntities?.terms.includes(term) ||
+            compromiseEntities?.indicators.includes(term)) {
+          return false;
+        }
         // Create word boundary aware regex
         const regex = new RegExp(`\\b${term.toLowerCase()}\\b`, 'i');
         return regex.test(text);
@@ -106,7 +138,7 @@ class EntityExtractor {
           canonical: await this.findCanonicalForm(term, language)
         })));
         
-        results[category] = mappedTerms;
+        results[category] = (results[category] || []).concat(mappedTerms);
       }
     }
 
@@ -116,70 +148,28 @@ class EntityExtractor {
   }
 
   async findCanonicalForm(term, language) {
-    try {
-      // Get the energy definitions for the specified language
-      let energyDefs;
-      try {
-        const module = await import(`../../dictionaries/energyDefinitions${language}.js`);
-        energyDefs = module.energyDefinitionsEn;
-      } catch {
-        // Fallback to English if language-specific file doesn't exist
-        const module = await import('../../dictionaries/energyDefinitionsEn.js');
-        energyDefs = module.energyDefinitionsEn;
+    const entityDictionary = customEntities[language] || customEntities[NLP_CONFIG.languages.default];
+    
+    // Look for exact matches first
+    for (const [category, terms] of Object.entries(entityDictionary)) {
+      const exactMatch = terms.find(t => t.toLowerCase() === term.toLowerCase());
+      if (exactMatch) {
+        return exactMatch;
       }
-
-      // Convert term to lowercase and replace underscores with spaces for comparison
-      const normalizedTerm = term.toLowerCase().replace(/_/g, ' ');
-
-      // First check if the term is an exact match with a main term
-      for (const [key, def] of Object.entries(energyDefs)) {
-        if (key.toLowerCase() === normalizedTerm) {
-          return key;
-        }
-      }
-
-      let bestMatch = null;
-      let bestScore = 0;
-
-      // Look through all energy definitions
-      for (const [mainTerm, definition] of Object.entries(energyDefs)) {
-        let score = 0;
-
-        // Exact keyword match gets highest priority
-        if (definition.keywords?.includes(normalizedTerm)) {
-          score = 1.0;
-        }
-        // Related term match gets next priority
-        else if (definition.related?.includes(normalizedTerm)) {
-          score = 0.9;
-        }
-        // SubFuel match gets lowest priority
-        else if (definition.subFuels?.map(f => f.toLowerCase()).includes(normalizedTerm)) {
-          score = 0.8;
-        }
-        // Check if the normalized term matches when underscores are replaced with spaces
-        else if (mainTerm.toLowerCase().replace(/_/g, ' ') === normalizedTerm) {
-          score = 1.0;
-        }
-
-        // Prefer main fuels over derivatives
-        if (definition.isMainFuel) {
-          score *= 1.2;
-        }
-
-        // Update best match if this score is higher
-        if (score > bestScore) {
-          bestScore = score;
-          bestMatch = mainTerm;
-        }
-      }
-
-      // Return the best match if found, otherwise return original term
-      return bestMatch || term;
-    } catch (error) {
-      console.error('Error in findCanonicalForm:', error);
-      return term;
     }
+    
+    // If no exact match, try partial matches
+    for (const [category, terms] of Object.entries(entityDictionary)) {
+      const partialMatch = terms.find(t => 
+        t.toLowerCase().includes(term.toLowerCase()) || 
+        term.toLowerCase().includes(t.toLowerCase())
+      );
+      if (partialMatch) {
+        return partialMatch;
+      }
+    }
+    
+    return term;
   }
 
   calculateConfidence(standardEntities, customEntities) {
@@ -195,8 +185,10 @@ class EntityExtractor {
     // Count custom entities
     if (customEntities.energyDomain) {
       Object.values(customEntities.energyDomain).forEach(entities => {
-        totalEntities += entities.length;
-        validEntities += entities.length; // Custom entities are pre-validated
+        if (Array.isArray(entities)) {
+          totalEntities += entities.length;
+          validEntities += entities.length; // Custom entities are pre-validated
+        }
       });
     }
 
