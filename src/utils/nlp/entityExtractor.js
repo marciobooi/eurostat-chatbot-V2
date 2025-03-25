@@ -128,12 +128,14 @@ class EntityExtractor {
         energyDefs = module.energyDefinitionsEn;
       }
 
-      // Convert term to lowercase for comparison
-      const normalizedTerm = term.toLowerCase();
+      // Convert term to lowercase and replace underscores with spaces for comparison
+      const normalizedTerm = term.toLowerCase().replace(/_/g, ' ');
 
       // First check if the term is an exact match with a main term
-      if (energyDefs[normalizedTerm]) {
-        return normalizedTerm;
+      for (const [key, def] of Object.entries(energyDefs)) {
+        if (key.toLowerCase() === normalizedTerm) {
+          return key;
+        }
       }
 
       let bestMatch = null;
@@ -154,6 +156,10 @@ class EntityExtractor {
         // SubFuel match gets lowest priority
         else if (definition.subFuels?.map(f => f.toLowerCase()).includes(normalizedTerm)) {
           score = 0.8;
+        }
+        // Check if the normalized term matches when underscores are replaced with spaces
+        else if (mainTerm.toLowerCase().replace(/_/g, ' ') === normalizedTerm) {
+          score = 1.0;
         }
 
         // Prefer main fuels over derivatives
