@@ -21,7 +21,26 @@ export const questionWords = {
     'in which', 'by which', 'through which', 'from which', 'to which',
     'of which', 'for which', 'at which', 'on which', 'in what',
     'by what', 'through what', 'from what', 'to what', 'of what',
-    'for what', 'at what', 'on what'
+    'for what', 'at what', 'on what',
+    
+    // Energy domain specific
+    'how efficient', 'how sustainable', 'how renewable',
+    'what percentage', 'what proportion', 'what share',
+    'what capacity', 'what output', 'what consumption',
+    'which source', 'which fuel', 'which energy',
+    'where produced', 'where consumed', 'where stored',
+    'when peak', 'when highest', 'when lowest',
+    'why increase', 'why decrease', 'why change',
+    
+    // Energy balance specific indicators
+    'what imports', 'what exports', 'what production',
+    'what stock', 'what stocks', 'what inventory',
+    'what consumption', 'what usage', 'what use',
+    'what transformation', 'what input', 'what output',
+    'what balance', 'what availability', 'what losses',
+    'how much imported', 'how much exported', 'how much produced',
+    'how much stored', 'how much consumed', 'how much used',
+    'how much transformed', 'how much available', 'how much lost'
   ],
   
   fr: [
@@ -47,7 +66,27 @@ export const questionWords = {
     'qu\'est-ce que', 'qu\'est-ce qui', 'qu\'y a-t-il',
     'de quoi', 'à quoi', 'en quoi', 'pour quoi',
     'depuis quand', 'jusqu\'à quand', 'à partir de quand',
-    'combien', 'combien de', 'à combien'
+    'combien', 'combien de', 'à combien',
+    
+    // Energy domain specific
+    'quelle efficacité', 'quelle durabilité', 'quelle renouvelabilité',
+    'quel pourcentage', 'quelle proportion', 'quelle part',
+    'quelle capacité', 'quelle production', 'quelle consommation',
+    'quelle source', 'quel combustible', 'quelle énergie',
+    'où produit', 'où consommé', 'où stocké',
+    'quand pic', 'quand maximum', 'quand minimum',
+    'pourquoi augmente', 'pourquoi diminue', 'pourquoi change',
+    'comment évolue', 'comment varie', 'comment progresse',
+    
+    // Energy balance specific indicators
+    'quelles importations', 'quelles exportations', 'quelle production',
+    'quel stock', 'quels stocks', 'quel inventaire',
+    'quelle consommation', 'quelle utilisation', 'quel usage',
+    'quelle transformation', 'quelle entrée', 'quelle sortie',
+    'quel bilan', 'quelle disponibilité', 'quelles pertes',
+    'combien importé', 'combien exporté', 'combien produit',
+    'combien stocké', 'combien consommé', 'combien utilisé',
+    'combien transformé', 'combien disponible', 'combien perdu'
   ],
   
   de: [
@@ -73,7 +112,27 @@ export const questionWords = {
     'wie weit', 'wie sehr', 'in wiefern', 'inwiefern',
     'auf welche weise', 'aus welchem grund',
     'seit wann', 'bis wann', 'ab wann',
-    'was für', 'was für ein', 'was für eine'
+    'was für', 'was für ein', 'was für eine',
+    
+    // Energy domain specific
+    'wie effizient', 'wie nachhaltig', 'wie erneuerbar',
+    'welcher prozentsatz', 'welcher anteil', 'welche quote',
+    'welche kapazität', 'welche leistung', 'welcher verbrauch',
+    'welche quelle', 'welcher brennstoff', 'welche energie',
+    'wo erzeugt', 'wo verbraucht', 'wo gespeichert',
+    'wann spitze', 'wann höchste', 'wann niedrigste',
+    'warum steigt', 'warum sinkt', 'warum ändert',
+    'wie entwickelt', 'wie verändert', 'wie verläuft',
+    
+    // Energy balance specific indicators
+    'welche importe', 'welche exporte', 'welche produktion',
+    'welcher bestand', 'welche bestände', 'welches inventar',
+    'welcher verbrauch', 'welche nutzung', 'welche verwendung',
+    'welche umwandlung', 'welcher input', 'welcher output',
+    'welche bilanz', 'welche verfügbarkeit', 'welche verluste',
+    'wieviel importiert', 'wieviel exportiert', 'wieviel produziert',
+    'wieviel gelagert', 'wieviel verbraucht', 'wieviel genutzt',
+    'wieviel umgewandelt', 'wieviel verfügbar', 'wieviel verloren'
   ]
 };
 

@@ -125,6 +125,63 @@ export const filteredWords = {
     "yours",
     "yourself",
     "yourselves",
+    // Additional prepositions
+    'aboard', 'across', 'along', 'amid', 'among', 'around', 'beside', 'besides',
+    'beyond', 'concerning', 'considering', 'despite', 'except', 'excluding',
+    'following', 'including', 'inside', 'like', 'minus', 'near', 'onto', 'opposite',
+    'outside', 'past', 'per', 'plus', 'regarding', 'round', 'since', 'towards',
+    'unlike', 'upon', 'versus', 'via', 'within', 'without',
+
+    // Auxiliary verbs (when not part of questions)
+    'could', 'may', 'might', 'must', 'shall', 'ought',
+
+    // Common adjectives (when not part of key phrases)
+    'able', 'available', 'basic', 'certain', 'current', 'different', 'earlier',
+    'early', 'easy', 'final', 'first', 'former', 'general', 'great', 'late',
+    'later', 'least', 'less', 'little', 'main', 'many', 'much', 'multiple',
+    'new', 'next', 'old', 'other', 'overall', 'particular', 'past', 'present',
+    'previous', 'recent', 'second', 'several', 'simple', 'single', 'small',
+    'specific', 'sure', 'total', 'whole',
+
+    // Common adverbs (when not part of key phrases)
+    'ago', 'almost', 'already', 'also', 'always', 'anywhere', 'back',
+    'else', 'ever', 'everywhere', 'forward', 'hence', 'here', 'hereby',
+    'maybe', 'nowhere', 'often', 'otherwise', 'sometimes', 'somewhere',
+    'therefore', 'thereby', 'thus', 'usually',
+
+    // Conjunctions and transitions
+    'accordingly', 'additionally', 'although', 'however', 'indeed',
+    'meanwhile', 'moreover', 'nevertheless', 'nonetheless', 'whereas',
+    'wherever', 'whether', 'while', 'yet',
+
+    // Common verbs (when not part of key phrases)
+    'appear', 'becomes', 'became', 'begin', 'began', 'begun', 'comes',
+    'came', 'consider', 'continue', 'end', 'feel', 'find', 'found',
+    'get', 'got', 'give', 'gave', 'given', 'go', 'went', 'gone',
+    'know', 'knew', 'known', 'let', 'look', 'looked', 'make', 'made',
+    'mean', 'meant', 'need', 'needed', 'put', 'run', 'ran', 'say',
+    'said', 'see', 'saw', 'seen', 'seem', 'seemed', 'take', 'took',
+    'taken', 'think', 'thought', 'want', 'wanted',
+
+    // Energy domain common words (when not part of key phrases)
+    'energy', 'energies', 'power', 'powered', 'powers',
+    'fuel', 'fuels', 'fueled', 'fuelling',
+    'resource', 'resources', 'supply', 'supplies', 'supplied',
+    'source', 'sources', 'sourced', 'sourcing',
+    'unit', 'units', 'measure', 'measures', 'measured',
+    'rate', 'rates', 'level', 'levels', 'amount', 'amounts',
+    'value', 'values', 'figure', 'figures', 'number', 'numbers',
+    'sector', 'sectors', 'industry', 'industrial', 'industries',
+    'market', 'markets', 'price', 'prices', 'pricing',
+    'period', 'periods', 'time', 'times', 'timing',
+    'area', 'areas', 'region', 'regions', 'regional',
+    'country', 'countries', 'national', 'international',
+    'system', 'systems', 'network', 'networks', 'grid', 'grids',
+    'process', 'processes', 'processing', 'processed',
+    'report', 'reports', 'reporting', 'reported',
+    'data', 'datum', 'dataset', 'datasets',
+    'year', 'years', 'yearly', 'annual', 'annually',
+    'month', 'months', 'monthly', 'day', 'days', 'daily'
   ],
   fr: [
     "à",
@@ -191,6 +248,54 @@ export const filteredWords = {
     "m",
     "t",
     "y",
+    // Additional prepositions
+    'après', 'avant', 'chez', 'contre', 'depuis', 'derrière', 'devant',
+    'durant', 'envers', 'hormis', 'jusque', 'malgré', 'parmi', 'pendant',
+    'selon', 'sous', 'suivant', 'vers',
+
+    // Auxiliary verbs (when not part of questions)
+    'ai', 'as', 'avons', 'aviez', 'avaient', 'aura', 'aurons', 'aurez',
+    'auront', 'être', 'suis', 'es', 'est', 'sommes', 'êtes', 'sont',
+    'étais', 'était', 'étions', 'étiez', 'étaient',
+
+    // Common adjectives (when not part of key phrases)
+    'actuel', 'actuelle', 'ancien', 'ancienne', 'bas', 'basse', 'bon',
+    'bonne', 'court', 'courte', 'dernier', 'dernière', 'différent',
+    'différente', 'grand', 'grande', 'haut', 'haute', 'jeune', 'long',
+    'longue', 'meilleur', 'meilleure', 'nouveau', 'nouvelle', 'petit',
+    'petite', 'premier', 'première', 'prochain', 'prochaine', 'seul', 'seule',
+
+    // Common adverbs (when not part of key phrases)
+    'ailleurs', 'alors', 'ainsi', 'aujourd\'hui', 'auparavant', 'aussitôt',
+    'autant', 'autrefois', 'beaucoup', 'bientôt', 'cependant', 'certainement',
+    'certes', 'désormais', 'dorénavant', 'davantage', 'ensemble', 'ensuite',
+    'environ', 'évidemment', 'facilement', 'parfois', 'partout', 'plutôt',
+    'presque', 'rapidement', 'rarement', 'souvent', 'toujours', 'trop',
+    'vraiment',
+
+    // Common verbs (when not part of key phrases)
+    'aller', 'vais', 'vas', 'va', 'allons', 'allez', 'vont',
+    'faire', 'fais', 'fait', 'faisons', 'faites', 'font',
+    'prendre', 'prends', 'prend', 'prenons', 'prenez', 'prennent',
+    'voir', 'vois', 'voit', 'voyons', 'voyez', 'voient',
+
+    // Energy domain common words (when not part of key phrases)
+    'énergie', 'énergies', 'puissance', 'puissances',
+    'carburant', 'carburants', 'combustible', 'combustibles',
+    'ressource', 'ressources', 'approvisionnement', 'approvisionnements',
+    'source', 'sources', 'unité', 'unités',
+    'mesure', 'mesures', 'taux', 'niveau', 'niveaux',
+    'quantité', 'quantités', 'valeur', 'valeurs',
+    'chiffre', 'chiffres', 'nombre', 'nombres',
+    'secteur', 'secteurs', 'industrie', 'industries',
+    'marché', 'marchés', 'prix', 'période', 'périodes',
+    'temps', 'zone', 'zones', 'région', 'régions',
+    'pays', 'national', 'internationale', 'internationaux',
+    'système', 'systèmes', 'réseau', 'réseaux',
+    'processus', 'traitement', 'traitements',
+    'rapport', 'rapports', 'donnée', 'données',
+    'année', 'années', 'annuel', 'annuelle',
+    'mois', 'mensuel', 'mensuelle', 'jour', 'jours'
   ],
   de: [
     "aber",
@@ -322,6 +427,57 @@ export const filteredWords = {
     "zum",
     "zur",
     "über",
+    // Additional prepositions
+    'ausser', 'ausserhalb', 'binnen', 'entgegen', 'entlang', 'gegenüber',
+    'gemäss', 'innerhalb', 'längs', 'mangels', 'mittels', 'namens',
+    'oberhalb', 'seitens', 'statt', 'trotz', 'unweit', 'zufolge',
+    'zwecks', 'zwischen',
+
+    // Auxiliary verbs (when not part of questions)
+    'habe', 'habest', 'habet', 'hätte', 'würde', 'sei', 'seiest',
+    'seien', 'wäre', 'wären', 'warest', 'gewesen',
+
+    // Common adjectives (when not part of key phrases)
+    'alt', 'älter', 'andere', 'anderes', 'bestimmt', 'deutlich', 'eigen',
+    'einfach', 'einzeln', 'erst', 'früh', 'ganz', 'gleich', 'gut',
+    'häufig', 'hoch', 'jung', 'klar', 'klein', 'kurz', 'lang', 'letzte',
+    'möglich', 'nah', 'neu', 'niedrig', 'schnell', 'spät', 'stark',
+    'voll', 'weit', 'wichtig',
+
+    // Common adverbs (when not part of key phrases)
+    'allerdings', 'anderswo', 'bald', 'besonders', 'bisher', 'dabei',
+    'dadurch', 'dafür', 'dagegen', 'damals', 'danach', 'dann', 'daran',
+    'darauf', 'durchaus', 'eben', 'eher', 'eigentlich', 'erst', 'etwa',
+    'fast', 'ganz', 'gar', 'gelegentlich', 'gemeinsam', 'gleich',
+    'gleichwohl', 'immer', 'inzwischen', 'jedenfalls', 'jedoch',
+    'manchmal', 'mithin', 'nämlich', 'natürlich', 'niemals', 'offenbar',
+    'sicherlich', 'soeben', 'sonst', 'stets', 'überhaupt', 'übrigens',
+    'vorher', 'wieder', 'wohl', 'zudem', 'zuletzt', 'zunächst', 'zwar',
+
+    // Common verbs (when not part of key phrases)
+    'bekommen', 'bleiben', 'bringen', 'denken', 'dürfen', 'finden',
+    'geben', 'gehen', 'glauben', 'halten', 'heissen', 'helfen',
+    'kommen', 'lassen', 'leben', 'liegen', 'mögen', 'nehmen',
+    'sagen', 'sehen', 'stehen', 'tun', 'verstehen', 'wissen',
+
+    // Energy domain common words (when not part of key phrases)
+    'energie', 'energien', 'kraft', 'kräfte',
+    'brennstoff', 'brennstoffe', 'kraftstoff', 'kraftstoffe',
+    'ressource', 'ressourcen', 'versorgung', 'versorgungen',
+    'quelle', 'quellen', 'einheit', 'einheiten',
+    'messung', 'messungen', 'rate', 'raten',
+    'niveau', 'niveaus', 'menge', 'mengen',
+    'wert', 'werte', 'zahl', 'zahlen',
+    'sektor', 'sektoren', 'industrie', 'industrien',
+    'markt', 'märkte', 'preis', 'preise',
+    'zeitraum', 'zeiträume', 'zeit', 'zeiten',
+    'bereich', 'bereiche', 'region', 'regionen',
+    'land', 'länder', 'national', 'international',
+    'system', 'systeme', 'netz', 'netze',
+    'prozess', 'prozesse', 'verarbeitung',
+    'bericht', 'berichte', 'daten', 'datensatz',
+    'jahr', 'jahre', 'jährlich', 'monat',
+    'monate', 'monatlich', 'tag', 'tage'
   ],
 };
 
