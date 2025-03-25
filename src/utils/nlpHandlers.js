@@ -14,28 +14,52 @@ import { sentimentAnalyzer } from './nlp/sentimentAnalyzer';
 import { entityExtractor } from './nlp/entityExtractor';
 import { intentClassifier } from './nlp/intentClassifier';
 import { contextManager } from './nlp/contextManager';
-import energyTermsPlugin from './nlp/plugins/energyTerms';
+import { energyTermsEn, energyTermsFr, energyTermsDe } from './nlp/plugins/energyTerms';
 
-// Initialize NLP libraries
+// Initialize base NLP library with common plugins
 nlp.extend(dates);
 nlp.extend(numbers);
 nlp.extend(sentences);
-nlp.extend(energyTermsPlugin);
+
+// Map of language plugins
+const languagePlugins = {
+  en: energyTermsEn,
+  fr: energyTermsFr,
+  de: energyTermsDe
+};
 
 // Store context for each session
 const contextStore = new Map();
+
+/**
+ * Process text with language-specific plugin
+ */
+const processWithLanguage = (text, language) => {
+  const plugin = languagePlugins[language] || languagePlugins[NLP_CONFIG.languages.default];
+  const instance = nlp.extend(plugin);
+  return instance(text);
+};
 
 /**
  * Process text through NLP pipeline
  */
 export const processText = async (text, language = NLP_CONFIG.languages.default) => {
   try {
-    // Use compromise to pre-process and extract energy-specific entities
-    const doc = nlp(text);
+    // First extract any question terms
+    const questionTerms = extractQuestionTerms(text) || [];
+    
+    // Process with language-specific plugin
+    const doc = processWithLanguage(text, language);
+    
+    // Extract energy-specific entities
+    const energyTypes = doc.energyTypes().out('array') || [];
+    const energyTerms = doc.energyTerms().out('array') || [];
+    const energyIndicators = doc.energyIndicators().out('array') || [];
+
     const energyEntities = {
-      types: doc.energyTypes().out('array'),
-      terms: doc.energyTerms().out('array'),
-      indicators: doc.energyIndicators().out('array')
+      types: Array.isArray(energyTypes) ? energyTypes : [],
+      terms: [...(Array.isArray(energyTerms) ? energyTerms : []), ...questionTerms],
+      indicators: Array.isArray(energyIndicators) ? energyIndicators : []
     };
 
     // Extract entities first to get canonical forms
@@ -81,6 +105,35 @@ export const processText = async (text, language = NLP_CONFIG.languages.default)
     };
   }
 };
+
+function extractQuestionTerms(text) {
+  const normalizedText = text.toLowerCase().trim();
+  
+  // Common question patterns
+  const patterns = [
+    /(?:what|tell me about|what are|describe|explain) (?:is|about|are) (.+?)(?:\?|$)/i,
+    /(?:what|tell me|describe|explain) (.+?)(?:\?|$)/i,
+    /(?:how|why|when|where) (?:is|are|does) (.+?)(?:\?|$)/i,
+    /(?:can you tell me about|do you know about) (.+?)(?:\?|$)/i,
+    /(.+?)\?$/i
+  ];
+
+  const terms = [];
+  for (const pattern of patterns) {
+    const match = normalizedText.match(pattern);
+    if (match && match[1]) {
+      const term = match[1].trim()
+        .replace(/^(what|tell me|describe|explain|how|why|when|where|is|are|does|about) /i, '')
+        .replace(/(what|tell me|describe|explain|how|why|when|where|is|are|does|about)$/i, '')
+        .trim();
+      if (term) {
+        terms.push(term);
+      }
+    }
+  }
+
+  return terms;
+}
 
 /**
  * Extract sentiment from text

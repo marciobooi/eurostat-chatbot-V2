@@ -58,29 +58,14 @@ export class MessageService {
   }
 
   static createBotResponse(definition, language, context = null) {
-    // Remove greeting check from here since it's already handled in processUserInput
-    
-    // Check for relationship questions
-    let relationshipInfo = null;
-    if (context?.input) {
-      relationshipInfo = contextManager.checkRelationship(context.input, language);
-      if (relationshipInfo?.isRelationshipQuestion) {
-        // If it's a relationship question with only one valid term or invalid terms
-        if (relationshipInfo.relationshipType === 'single_term') {
-          const followUp = getRandomElement(followUpPhrases[language] || followUpPhrases[CONFIG.DEFAULT_LANGUAGE]);
-          return {
-            sender: 'bot',
-            text: relationshipInfo.response + ' ' + followUp,
-            language,
-            suggestions: relationshipInfo.terms.map(t => t.term),
-            hasVisualization: relationshipInfo.terms[0].definition.hasVisualization || false,
-            visualizationType: relationshipInfo.terms[0].definition.visualizationType || [],
-            dataset: relationshipInfo.terms[0].definition.dataset,
-            fuelType: relationshipInfo.terms[0].term
-          };
-        }
+    if (!definition) {
+      return this.createUnknownResponse(language, context);
+    }
 
-        // For valid relationship questions
+    // Check if we have a relationship question match
+    if (context?.relationshipInfo) {
+      const relationshipInfo = context.relationshipInfo;
+      if (relationshipInfo.isRelationshipQuestion && relationshipInfo.terms?.length > 0) {
         return {
           sender: 'bot',
           text: relationshipInfo.response,
@@ -89,32 +74,26 @@ export class MessageService {
           isRelationship: true,
           relationshipType: relationshipInfo.relationshipType,
           terms: relationshipInfo.terms,
-          isFollowUpNeeded: true
+          hasVisualization: relationshipInfo.terms[0].definition.hasVisualization || false,
+          visualizationType: relationshipInfo.terms[0].definition.visualizationType || [],
+          dataset: relationshipInfo.terms[0].definition.dataset,
+          fuelType: relationshipInfo.terms[0].term
         };
       }
     }
 
-    if (!definition) {
-      return this.createUnknownResponse(language, context);
-    }
-
-    const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
-    const terms = context?.input ? 
-      Object.keys(dictionary).filter(term => 
-        context.input.toLowerCase().includes(term.toLowerCase())
-      ) : [];
-
     const baseResponse = {
       sender: 'bot',
       title: definition.title,
-      text: typeof definition.text === 'string' ? definition.text : JSON.stringify(definition.text),
+      text: definition.text,
       language,
-      suggestions: terms.length >= 2 ? terms.slice(0, 2) : (definition.subFuels || []),
+      suggestions: [...(definition.subFuels || []), ...(definition.related || [])],
       hasVisualization: definition.hasVisualization || false,
       visualizationType: definition.visualizationType || [],
       dataset: definition.dataset,
       link: definition.link,
-      fuelType: definition.fuelCode
+      fuelType: definition.fuelCode,
+      intent: context?.intent
     };
 
     // Add contextual enhancements if available
@@ -137,6 +116,12 @@ export class MessageService {
         baseResponse.suggestions = [
           ...new Set([...baseResponse.suggestions, ...energyTypes])
         ];
+      }
+
+      // Add followup suggestions based on key concepts
+      if (definition.key_concepts && definition.key_concepts.length > 0) {
+        baseResponse.followupSuggestions = definition.key_concepts
+          .slice(0, NLP_CONFIG.questionProcessing.maxFollowupSuggestions);
       }
     }
 

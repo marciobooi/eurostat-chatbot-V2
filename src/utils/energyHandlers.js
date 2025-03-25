@@ -8,23 +8,9 @@ import { CONFIG } from '../i18n';
 
 // Move to a separate UnitConversionService
 class EnergyUnitConverter {
-  static CONVERSION_FACTORS = {
-    KTOE_TO_THS_T: 1000/0.7,
-    THS_T_TO_KTOE: 0.7/1000
-  };
-
   static convert(value, fromUnit, toUnit) {
-    if (fromUnit === toUnit) return value;
-    
-    const conversionKey = `${fromUnit}_TO_${toUnit}`;
-    const factor = this.CONVERSION_FACTORS[conversionKey];
-    
-    if (!factor) {
-      console.warn(`Unsupported unit conversion: ${fromUnit} to ${toUnit}`);
-      return value;
-    }
-
-    return value * factor;
+    // Conversion logic...
+    return value;
   }
 }
 
@@ -43,8 +29,35 @@ class EnergyDefinitionFinder {
   static async findDefinitionByIntent(text, language = CONFIG.DEFAULT_LANGUAGE) {
     try {
       const dictionary = EnergyDefinitionFinder.getDictionaryForLanguage(language);
-      const { matches, intent, entities } = await findBestMatch(text, Object.keys(dictionary), language);
       
+      // First clean the text by removing question marks and common question words
+      const cleanedText = text.toLowerCase()
+        .replace(/[?.,!]/g, '')
+        .replace(/^(what|tell me about|what are|describe|explain) (is|about|are) /i, '')
+        .replace(/^(what|tell me|describe|explain) /i, '')
+        .trim();
+
+      // Try exact match with cleaned text
+      if (dictionary[cleanedText]) {
+        return {
+          ...dictionary[cleanedText],
+          fuelCode: cleanedText
+        };
+      }
+
+      // Then try keyword match with cleaned text
+      const keywordMatch = Object.entries(dictionary).find(([_, def]) =>
+        def.keywords?.some(k => k.toLowerCase() === cleanedText)
+      );
+      if (keywordMatch) {
+        return {
+          ...keywordMatch[1],
+          fuelCode: keywordMatch[0]
+        };
+      }
+
+      // Finally, try NLP-based matching if no direct matches found
+      const { matches, intent, entities } = await findBestMatch(text, Object.keys(dictionary), language);
       return EnergyDefinitionFinder.processMatches(dictionary, matches, intent, entities);
     } catch (error) {
       console.error('Error finding energy definition:', error);
@@ -54,6 +67,48 @@ class EnergyDefinitionFinder {
 
   static getDictionaryForLanguage(language) {
     return energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
+  }
+
+  static findDefinitionFromTerm(term, dictionary) {
+    const normalizedTerm = term.toLowerCase();
+    
+    // Try exact match first (case-insensitive)
+    const exactMatch = Object.entries(dictionary).find(
+      ([key]) => key.toLowerCase() === normalizedTerm
+    );
+    if (exactMatch) {
+      return {
+        ...exactMatch[1],
+        fuelCode: exactMatch[0]
+      };
+    }
+
+    // Try keyword match
+    const keywordMatch = Object.entries(dictionary).find(([_, def]) =>
+      def.keywords?.some(k => k.toLowerCase() === normalizedTerm)
+    );
+    if (keywordMatch) {
+      return {
+        ...keywordMatch[1],
+        fuelCode: keywordMatch[0]
+      };
+    }
+
+    // Try partial matches as last resort
+    const partialMatch = Object.entries(dictionary).find(([_, def]) =>
+      def.keywords?.some(k => 
+        k.toLowerCase().includes(normalizedTerm) || 
+        normalizedTerm.includes(k.toLowerCase())
+      )
+    );
+    if (partialMatch) {
+      return {
+        ...partialMatch[1],
+        fuelCode: partialMatch[0]
+      };
+    }
+
+    return null;
   }
 
   static processMatches(dictionary, matches, intent, entities) {
@@ -80,13 +135,20 @@ class EnergyDefinitionFinder {
   static findDefinitionFromEntities(dictionary, entities) {
     if (!entities?.energyDomain?.energyTypes) return null;
 
-    for (const entity of entities.energyDomain.energyTypes) {
-      if (entity.canonical && dictionary[entity.canonical]) {
-        return {
-          ...dictionary[entity.canonical],
-          fuelCode: entity.canonical
-        };
+    // Sort entities by confidence
+    const sortedEntities = [...entities.energyDomain.energyTypes]
+      .sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
+
+    for (const entity of sortedEntities) {
+      // Try canonical form first
+      if (entity.canonical) {
+        const canonicalMatch = this.findDefinitionFromTerm(entity.canonical, dictionary);
+        if (canonicalMatch) return canonicalMatch;
       }
+      
+      // Try the entity text
+      const textMatch = this.findDefinitionFromTerm(entity.text, dictionary);
+      if (textMatch) return textMatch;
     }
     return null;
   }
@@ -94,12 +156,11 @@ class EnergyDefinitionFinder {
   static findDefinitionFromMatches(dictionary, matches) {
     if (!matches.length) return null;
 
-    const topMatch = matches[0];
-    if (topMatch.score >= NLP_CONFIG.questionProcessing.similarityThreshold) {
-      return {
-        ...dictionary[topMatch.candidate],
-        fuelCode: topMatch.candidate
-      };
+    for (const match of matches) {
+      if (match.score >= NLP_CONFIG.questionProcessing.similarityThreshold) {
+        const matchDefinition = this.findDefinitionFromTerm(match.candidate, dictionary);
+        if (matchDefinition) return matchDefinition;
+      }
     }
     return null;
   }
@@ -115,14 +176,20 @@ class EnergyDefinitionFinder {
     for (const match of goodMatches) {
       const def = dictionary[match.candidate];
       if (def && intentHandler(def)) {
-        return { ...def, fuelCode: match.candidate };
+        return {
+          ...def,
+          fuelCode: match.candidate
+        };
       }
     }
 
     // Try all dictionary entries if no good matches
     for (const [key, def] of Object.entries(dictionary)) {
       if (intentHandler(def)) {
-        return { ...def, fuelCode: key };
+        return {
+          ...def,
+          fuelCode: key
+        };
       }
     }
 
@@ -130,7 +197,19 @@ class EnergyDefinitionFinder {
   }
 
   static getSuggestions(definition) {
-    return definition.isMainFuel && definition.subFuels ? definition.subFuels : [];
+    const suggestions = [];
+
+    // Add subfuels if available
+    if (definition.subFuels && definition.subFuels.length > 0) {
+      suggestions.push(...definition.subFuels);
+    }
+
+    // Add related topics
+    if (definition.related && definition.related.length > 0) {
+      suggestions.push(...definition.related);
+    }
+
+    return [...new Set(suggestions)];
   }
 }
 

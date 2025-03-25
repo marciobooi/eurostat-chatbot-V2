@@ -3,31 +3,65 @@ import model from 'wink-eng-lite-web-model';
 import { NLP_CONFIG } from '../../config/nlpConfig';
 import { customEntities } from '../../dictionaries/customEntities';
 import nlp from 'compromise';
+import { energyTermsEn, energyTermsFr, energyTermsDe } from './plugins/energyTerms';
+import { getDictionary } from '../energyDictionary';
 
 class EntityExtractor {
   constructor() {
     this.nlp = winkNLP(model);
     this.cache = new Map();
+    this.languagePlugins = {
+      en: energyTermsEn,
+      fr: energyTermsFr,
+      de: energyTermsDe
+    };
   }
 
   getCacheKey(text, language) {
     return `${language}:${text}`;
   }
 
+  processWithLanguage(text, language) {
+    const plugin = this.languagePlugins[language] || this.languagePlugins[NLP_CONFIG.languages.default];
+    const instance = nlp.extend(plugin);
+    return instance(text);
+  }
+
   async extractEntities(text, language = NLP_CONFIG.languages.default, compromiseEntities = null) {
-    const cacheKey = this.getCacheKey(text, language);
+    // Remove question marks and other punctuation, trim whitespace
+    const normalizedText = text.toLowerCase().replace(/[?.,!]/g, '').trim();
+    const cacheKey = this.getCacheKey(normalizedText, language);
     
     if (this.cache.has(cacheKey)) {
       return this.cache.get(cacheKey);
     }
+
+    // Extract question terms
+    const questionTerms = normalizedText.split(/\b(what is|tell me about|what are|how|why|when|where)\b/)
+      .map(t => t.trim())
+      .filter(t => t && !t.match(/^(what is|tell me about|what are|how|why|when|where)$/));
 
     const doc = this.nlp.readDoc(text);
     
     // Extract standard entities
     const standardEntities = this.extractStandardEntities(doc);
     
-    // Extract custom energy domain entities, now enhanced with Compromise results
-    const customEntitiesResult = await this.extractCustomEntities(text.toLowerCase(), language, compromiseEntities);
+    // Process with language-specific plugin if no pre-extracted entities
+    if (!compromiseEntities) {
+      const nlpDoc = this.processWithLanguage(text, language);
+      compromiseEntities = {
+        types: [...nlpDoc.energyTypes().out('array'), ...questionTerms],
+        terms: nlpDoc.energyTerms().out('array'),
+        indicators: nlpDoc.energyIndicators().out('array')
+      };
+    }
+
+    // Extract custom energy domain entities
+    const customEntitiesResult = await this.extractCustomEntities(
+      normalizedText, 
+      language, 
+      compromiseEntities
+    );
 
     const result = {
       standardEntities,
@@ -88,31 +122,34 @@ class EntityExtractor {
     const entityDictionary = customEntities[language] || customEntities[NLP_CONFIG.languages.default];
     const results = {};
     
-    // First, process any pre-extracted Compromise.js entities
+    // Process pre-extracted Compromise.js entities with canonical forms
     if (compromiseEntities) {
+      // Get language-specific dictionary for canonical forms
+      const languageDict = getDictionary(language);
+      
       results.energyTypes = await Promise.all(compromiseEntities.types.map(async term => ({
         text: term,
         type: 'energyType',
         confidence: 1,
-        canonical: await this.findCanonicalForm(term, language)
+        canonical: await this.findCanonicalForm(term, language, languageDict)
       })));
 
       results.energyTerms = await Promise.all(compromiseEntities.terms.map(async term => ({
         text: term,
         type: 'energyTerm',
         confidence: 1,
-        canonical: await this.findCanonicalForm(term, language)
+        canonical: await this.findCanonicalForm(term, language, languageDict)
       })));
 
       results.indicators = await Promise.all(compromiseEntities.indicators.map(async term => ({
         text: term,
         type: 'indicator',
         confidence: 1,
-        canonical: await this.findCanonicalForm(term, language)
+        canonical: await this.findCanonicalForm(term, language, languageDict)
       })));
     }
     
-    // Then process dictionary-based entities for any terms not caught by Compromise
+    // Process dictionary-based entities for terms not caught by Compromise
     for (const [category, terms] of Object.entries(entityDictionary)) {
       const found = terms.filter(term => {
         // Skip if already found by Compromise
@@ -130,12 +167,15 @@ class EntityExtractor {
         // Sort by length (descending) to prefer more specific matches
         const sortedTerms = found.sort((a, b) => b.length - a.length);
         
+        // Get language-specific dictionary for canonical forms
+        const languageDict = getDictionary(language);
+        
         // Use Promise.all to handle multiple async canonical form lookups
         const mappedTerms = await Promise.all(sortedTerms.map(async term => ({
           text: term,
           type: category,
           confidence: 1,
-          canonical: await this.findCanonicalForm(term, language)
+          canonical: await this.findCanonicalForm(term, language, languageDict)
         })));
         
         results[category] = (results[category] || []).concat(mappedTerms);
@@ -147,10 +187,20 @@ class EntityExtractor {
     };
   }
 
-  async findCanonicalForm(term, language) {
+  async findCanonicalForm(term, language, languageDict) {
     const entityDictionary = customEntities[language] || customEntities[NLP_CONFIG.languages.default];
     
-    // Look for exact matches first
+    // First try language-specific dictionary
+    if (languageDict) {
+      const dictEntry = Object.entries(languageDict).find(([_, def]) => 
+        def.keywords?.some(k => k.toLowerCase() === term.toLowerCase())
+      );
+      if (dictEntry) {
+        return dictEntry[0]; // Return the canonical form from dictionary
+      }
+    }
+    
+    // Then try entity dictionary
     for (const [category, terms] of Object.entries(entityDictionary)) {
       const exactMatch = terms.find(t => t.toLowerCase() === term.toLowerCase());
       if (exactMatch) {
@@ -158,7 +208,7 @@ class EntityExtractor {
       }
     }
     
-    // If no exact match, try partial matches
+    // Try partial matches as fallback
     for (const [category, terms] of Object.entries(entityDictionary)) {
       const partialMatch = terms.find(t => 
         t.toLowerCase().includes(term.toLowerCase()) || 
