@@ -139,7 +139,7 @@ class ComparisonModule {
     const title2 = def2.title?.toLowerCase() || '';
     const relationshipDict = relationshipPatterns[CONFIG.DEFAULT_LANGUAGE];
 
-    return relationshipDict.patterns.some(pattern => {
+    return relationshipDict.patternGroups.relationship.some(pattern => {
       const match = text1.match(pattern) || text2.match(pattern);
       if (!match) return false;
       const matchedText = match[0].toLowerCase();
@@ -215,6 +215,15 @@ class ComparisonModule {
   }
 
   /**
+   * Checks if a message is an existence question using language-specific patterns from the dictionary
+   */
+  isExistenceQuestion(input, language) {
+    const relationshipDict = relationshipPatterns[language] || relationshipPatterns[CONFIG.DEFAULT_LANGUAGE];
+    const existencePatterns = relationshipDict.patternGroups.existence;
+    return existencePatterns.some(pattern => pattern.test(input));
+  }
+
+  /**
    * Main method to process a relationship query.
    * @param {string} message - The user input message.
    * @param {string} [language=CONFIG.DEFAULT_LANGUAGE] - Language code.
@@ -227,15 +236,30 @@ class ComparisonModule {
     const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
     const relationshipDict = relationshipPatterns[language] || relationshipPatterns[CONFIG.DEFAULT_LANGUAGE];
 
-    // Match relationship pattern
-    const matchedPattern = relationshipDict.patterns.find(pattern => pattern.test(lowercaseInput));
-    if (!matchedPattern) return null;
+    // Check for existence patterns first
+    const existenceMatch = relationshipDict.patternGroups.existence.find(pattern => pattern.test(lowercaseInput));
+    if (existenceMatch) {
+      const terms = this.extractTermsFromMessage(lowercaseInput, dictionary);
+      const term = terms.exactMatches[0];
+      const def = term ? dictionary[term] : null;
+      if (def) {
+        return {
+          isRelationshipQuestion: true,
+          isRelated: true,
+          relationshipType: 'single_term',
+          terms: [{ term, definition: def }],
+          response: getRandomElement(relationshipDict.responses.single_term)
+            .replace('{term1}', def.title || term)
+        };
+      }
+    }
 
-    const matches = lowercaseInput.match(matchedPattern);
+    // Then check relationship patterns
+    const relationshipMatch = relationshipDict.patternGroups.relationship.find(pattern => pattern.test(lowercaseInput));
+    if (!relationshipMatch) return null;
+
+    const matches = lowercaseInput.match(relationshipMatch);
     if (!matches) return null;
-
-    // Special handling for "is X a thing" type patterns
-    const isExistenceQuestion = /is.*a thing\??|does.*exist\??|is.*real\??|is there such.*thing as/.test(lowercaseInput);
 
     // Extract terms before and after the pattern
     const before = lowercaseInput.substring(0, matches.index).trim();
@@ -275,18 +299,6 @@ class ComparisonModule {
     // Get second term
     const term2 = afterTerms.exactMatches[0] || beforeTerms.exactMatches[1];
     const def2 = term2 ? dictionary[term2] : null;
-
-    // Handle existence questions as single term requests
-    if (isExistenceQuestion) {
-      return {
-        isRelationshipQuestion: true,
-        isRelated: true,
-        relationshipType: 'single_term',
-        terms: [{ term: term1, definition: def1 }],
-        response: getRandomElement(relationshipDict.responses.single_term)
-          .replace('{term1}', def1.title || term1)
-      };
-    }
 
     // Two terms: Check relationship
     if (def1 && def2) {
