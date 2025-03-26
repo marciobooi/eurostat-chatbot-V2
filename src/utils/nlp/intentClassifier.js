@@ -1,25 +1,19 @@
-import { createClassifier } from './classifiers/ClassifierFactory';
-import { ClassificationResult } from './classifiers/BaseClassifier';
+import { classifierOrchestrator } from './classifiers/ClassifierFactory';
 import { NLP_CONFIG } from '../../config/nlpConfig';
 import { customEntities } from '../../dictionaries/customEntities';
 
 class IntentClassifier {
   constructor(config = {}) {
-    this.cache = new Map();
     this.config = {
-      maxCacheSize: NLP_CONFIG.cache.maxSize,
+      maxCacheSize: 100,
       ...config
     };
-
-    this.classifiers = {};
-    this.directTopicMatcher = this.buildDirectTopicMatcher();
-    this.initialized = this.initializeClassifiers();
+    this.cache = new Map();
+    this.initialized = this.initialize();
   }
 
-  async initializeClassifiers() {
-    this.classifiers.neural = await createClassifier('neural');
-    this.classifiers.decisionTree = await createClassifier('decision_tree');
-    this.classifiers.pattern = await createClassifier('pattern');
+  async initialize() {
+    await classifierOrchestrator.initialize();
   }
 
   buildDirectTopicMatcher() {
@@ -39,6 +33,23 @@ class IntentClassifier {
     return `${language}:${text}`;
   }
 
+  async classifyIntent(text, entities, language = NLP_CONFIG.languages.default) {
+    await this.initialized;
+    
+    const cacheKey = this.getCacheKey(text, language);
+    if (this.cache.has(cacheKey)) {
+      return this.cache.get(cacheKey);
+    }
+
+    const features = this.extractFeatures(text, entities, language);
+    const result = await classifierOrchestrator.classify(text, features);
+    
+    this.cache.set(cacheKey, result);
+    this.maintainCache();
+
+    return result;
+  }
+
   checkDirectTopicRequest(text, language) {
     const trimmedText = text.trim().toLowerCase();
     
@@ -54,67 +65,6 @@ class IntentClassifier {
     }
     
     return null;
-  }
-
-  async classifyIntent(text, entities, language = NLP_CONFIG.languages.default) {
-    await this.initialized; // Wait for classifiers to be ready
-    
-    const cacheKey = this.getCacheKey(text, language);
-    if (this.cache.has(cacheKey)) {
-      return this.cache.get(cacheKey);
-    }
-
-    // Check for direct topic requests first
-    const directTopicResult = this.checkDirectTopicRequest(text, language);
-    if (directTopicResult) {
-      return this.createResult([directTopicResult], language);
-    }
-
-    // Get predictions from all classifiers
-    const features = this.extractFeatures(text, entities, language);
-    const predictions = await this.getPredictions(text, features, language);
-    
-    // Create and cache the final result
-    const result = this.createResult(predictions, language);
-    this.cache.set(cacheKey, result);
-    this.maintainCache();
-
-    return result;
-  }
-
-  async getPredictions(text, features, language) {
-    const predictions = [];
-
-    // Get neural network prediction
-    const neuralResult = await this.classifiers.neural.predict(features);
-    predictions.push(neuralResult);
-
-    // Get decision tree prediction
-    const treeResult = await this.classifiers.decisionTree.predict(features);
-    predictions.push(treeResult);
-
-    // Get pattern matching prediction
-    const patternResult = await this.classifiers.pattern.predict(text, language);
-    predictions.push(patternResult);
-
-    // Calculate priorities
-    predictions.forEach(pred => {
-      pred.priority = this.calculatePriority(pred.intent, features);
-    });
-
-    return predictions;
-  }
-
-  createResult(predictions, language) {
-    // Sort by combined confidence and priority
-    predictions.sort((a, b) => (b.confidence * b.priority) - (a.confidence * a.priority));
-
-    return {
-      primaryIntent: predictions[0]?.intent || 'general_info',
-      allIntents: predictions,
-      confidence: predictions[0]?.confidence || 0,
-      language
-    };
   }
 
   maintainCache() {

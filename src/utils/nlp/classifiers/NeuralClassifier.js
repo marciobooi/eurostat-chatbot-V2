@@ -20,8 +20,33 @@ export class NeuralClassifier extends BaseClassifier {
     this.vocabSize = config.vocabSize || 10000;
   }
 
+  async saveModel() {
+    if (!this.model) return;
+    try {
+      await this.model.save('indexeddb://eurostat-chatbot-model');
+      console.log('Model saved successfully');
+    } catch (error) {
+      console.error('Error saving model:', error);
+    }
+  }
+
+  async loadModel() {
+    try {
+      this.model = await tf.loadLayersModel('indexeddb://eurostat-chatbot-model');
+      console.log('Model loaded successfully');
+      return true;
+    } catch (error) {
+      console.log('No saved model found, initializing new model');
+      return false;
+    }
+  }
+
   async initialize() {
     if (this.model) return;
+
+    // Try to load existing model first
+    const modelLoaded = await this.loadModel();
+    if (modelLoaded) return;
 
     const input = tf.input({shape: [this.inputDimension]});
     
@@ -93,11 +118,21 @@ export class NeuralClassifier extends BaseClassifier {
   async train(data) {
     await this.initialize();
     const { features, labels } = this.prepareTrainingData(data);
+    
+    // Train the model
     await this.model.fit(features, labels, {
       epochs: 50,
       batchSize: 32,
-      validationSplit: 0.2
+      validationSplit: 0.2,
+      callbacks: {
+        onEpochEnd: (epoch, logs) => {
+          console.log(`Epoch ${epoch + 1}: loss = ${logs.loss.toFixed(4)}, accuracy = ${logs.acc.toFixed(4)}`);
+        }
+      }
     });
+
+    // Save model after training
+    await this.saveModel();
   }
 
   prepareTrainingData(data) {
