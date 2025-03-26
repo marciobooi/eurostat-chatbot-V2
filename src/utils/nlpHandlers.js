@@ -15,6 +15,7 @@ import { entityExtractor } from './nlp/entityExtractor';
 import { intentClassifier } from './nlp/intentClassifier';
 import { contextManager } from './nlp/contextManager';
 import { energyTermsEn, energyTermsFr, energyTermsDe } from './nlp/plugins/energyTerms';
+import { commonQuestionPhrases } from '../dictionaries/questionPhrases';
 
 // Initialize base NLP library with common plugins
 nlp.extend(dates);
@@ -41,12 +42,34 @@ const processWithLanguage = (text, language) => {
 };
 
 /**
+ * Extract term from text using question patterns
+ */
+function extractTermFromQuestion(text, language) {
+  const questionPatterns = commonQuestionPhrases[language] || commonQuestionPhrases[NLP_CONFIG.languages.default];
+  const cleanedText = text.toLowerCase().trim();
+
+  for (const pattern of questionPatterns) {
+    if (pattern instanceof RegExp) {
+      const match = cleanedText.match(pattern);
+      if (match && match[1]) {
+        return match[1].trim();
+      }
+    }
+  }
+  return cleanedText;
+}
+
+/**
  * Process text through NLP pipeline
  */
 export const processText = async (text, language = NLP_CONFIG.languages.default) => {
   try {
-    // First extract any question terms
-    const questionTerms = extractQuestionTerms(text) || [];
+    // First extract any question terms using language-specific patterns
+    const questionTerms = [];
+    const extractedTerm = extractTermFromQuestion(text, language);
+    if (extractedTerm && extractedTerm !== text.toLowerCase().trim()) {
+      questionTerms.push(extractedTerm);
+    }
     
     // Process with language-specific plugin
     const doc = processWithLanguage(text, language);
@@ -89,50 +112,25 @@ export const processText = async (text, language = NLP_CONFIG.languages.default)
     };
   } catch (error) {
     console.error('Error in NLP processing:', error);
-    return {
-      entities: {
-        standardEntities: {},
-        energyDomain: {
-          energyTypes: [],
-          metrics: [],
-          timeframes: []
-        }
-      },
-      intent: 'general_info',
-      sentiment: { score: 0, comparative: 0 },
-      context: null,
-      language
-    };
+    return defaultNlpResponse(language);
   }
 };
 
-function extractQuestionTerms(text) {
-  const normalizedText = text.toLowerCase().trim();
-  
-  // Common question patterns
-  const patterns = [
-    /(?:what|tell me about|what are|describe|explain) (?:is|about|are) (.+?)(?:\?|$)/i,
-    /(?:what|tell me|describe|explain) (.+?)(?:\?|$)/i,
-    /(?:how|why|when|where) (?:is|are|does) (.+?)(?:\?|$)/i,
-    /(?:can you tell me about|do you know about) (.+?)(?:\?|$)/i,
-    /(.+?)\?$/i
-  ];
-
-  const terms = [];
-  for (const pattern of patterns) {
-    const match = normalizedText.match(pattern);
-    if (match && match[1]) {
-      const term = match[1].trim()
-        .replace(/^(what|tell me|describe|explain|how|why|when|where|is|are|does|about) /i, '')
-        .replace(/(what|tell me|describe|explain|how|why|when|where|is|are|does|about)$/i, '')
-        .trim();
-      if (term) {
-        terms.push(term);
+function defaultNlpResponse(language) {
+  return {
+    entities: {
+      standardEntities: {},
+      energyDomain: {
+        energyTypes: [],
+        metrics: [],
+        timeframes: []
       }
-    }
-  }
-
-  return terms;
+    },
+    intent: 'general_info',
+    sentiment: { score: 0, comparative: 0 },
+    context: null,
+    language
+  };
 }
 
 /**

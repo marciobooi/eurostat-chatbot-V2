@@ -2,6 +2,7 @@ import { customEntities } from '../../../dictionaries/customEntities';
 import { energyDefinitionsEn } from '../../../dictionaries/energyDefinitionsEn';
 import { energyBalanceIndicators } from '../../../dictionaries/energyBalanceIndicators';
 import { NLP_CONFIG } from '../../../config/nlpConfig';
+import { commonQuestionPhrases } from '../../../dictionaries/questionPhrases';
 
 const buildLanguageSpecificLexicon = (language) => {
   const lexicon = {};
@@ -71,7 +72,6 @@ const getLanguagePlugin = (language) => ({
   words: languages[language] || languages[NLP_CONFIG.languages.default],
   api: (Doc) => {
     Doc.prototype.energyTypes = function() {
-      // Match both single terms and multi-word phrases
       const matches = this.match('#EnergyType+');
       const terms = [];
       
@@ -81,17 +81,25 @@ const getLanguagePlugin = (language) => ({
           terms.push(m.text().toLowerCase());
         });
       }
-      
-      // Handle question patterns
-      const questions = this.match('(what|tell me|describe|explain) (is|about|are) [#EnergyType+]');
-      if (questions.found) {
-        questions.forEach(q => {
-          const term = q.text()
-            .replace(/^(what|tell me|describe|explain) (is|about|are) /i, '')
-            .toLowerCase();
-          terms.push(term);
-        });
-      }
+
+      // Extract terms from questions
+      this.questions().forEach(question => {
+        const text = question.text();
+        const questionPatterns = commonQuestionPhrases[language] || commonQuestionPhrases[NLP_CONFIG.languages.default];
+        
+        for (const pattern of questionPatterns) {
+          if (pattern instanceof RegExp) {
+            const match = text.toLowerCase().match(pattern);
+            if (match && match[1]) {
+              const term = match[1].trim();
+              if (term && !terms.includes(term)) {
+                terms.push(term);
+              }
+              break;
+            }
+          }
+        }
+      });
 
       return {
         out: (format) => format === 'array' ? terms : terms.join(' ')
@@ -108,17 +116,25 @@ const getLanguagePlugin = (language) => ({
           terms.push(m.text().toLowerCase());
         });
       }
-      
-      // Handle question patterns
-      const questions = this.match('(what|tell me|describe|explain) (is|about|are) [#EnergyTerm+]');
-      if (questions.found) {
-        questions.forEach(q => {
-          const term = q.text()
-            .replace(/^(what|tell me|describe|explain) (is|about|are) /i, '')
-            .toLowerCase();
-          terms.push(term);
-        });
-      }
+
+      // Extract terms from questions
+      this.questions().forEach(question => {
+        const text = question.text();
+        const questionPatterns = commonQuestionPhrases[language] || commonQuestionPhrases[NLP_CONFIG.languages.default];
+        
+        for (const pattern of questionPatterns) {
+          if (pattern instanceof RegExp) {
+            const match = text.toLowerCase().match(pattern);
+            if (match && match[1]) {
+              const term = match[1].trim();
+              if (term && !terms.includes(term)) {
+                terms.push(term);
+              }
+              break;
+            }
+          }
+        }
+      });
 
       return {
         out: (format) => format === 'array' ? terms : terms.join(' ')

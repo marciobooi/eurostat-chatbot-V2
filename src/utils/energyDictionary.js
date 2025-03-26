@@ -15,9 +15,9 @@ export const energyDictionary = {
  * Get dictionary for specific language with fallback
  */
 export const getDictionary = (language = CONFIG.DEFAULT_LANGUAGE) => {
-  console.log('Getting dictionary for language:', language);
+  // console.log('Getting dictionary for language:', language);
   const dict = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
-  console.log('Dictionary entries:', Object.keys(dict));
+  // console.log('Dictionary entries:', Object.keys(dict));
   return dict;
 };
 

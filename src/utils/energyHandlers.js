@@ -5,6 +5,7 @@ import { energyDictionary } from './energyDictionary';
 import { findBestMatch } from './nlpHandlers';
 import { NLP_CONFIG } from '../config/nlpConfig';
 import { CONFIG } from '../i18n';
+import { commonQuestionPhrases } from '../dictionaries/questionPhrases';
 
 // Move to a separate UnitConversionService
 class EnergyUnitConverter {
@@ -29,15 +30,9 @@ class EnergyDefinitionFinder {
   static async findDefinitionByIntent(text, language = CONFIG.DEFAULT_LANGUAGE) {
     try {
       const dictionary = EnergyDefinitionFinder.getDictionaryForLanguage(language);
+      const cleanedText = text.toLowerCase().replace(/[?.,!]/g, '').trim();
       
-      // First clean the text by removing question marks and common question words
-      const cleanedText = text.toLowerCase()
-        .replace(/[?.,!]/g, '')
-        .replace(/^(what|tell me about|what are|describe|explain) (is|about|are) /i, '')
-        .replace(/^(what|tell me|describe|explain) /i, '')
-        .trim();
-
-      // Try exact match with cleaned text
+      // Try exact match with cleaned text first
       if (dictionary[cleanedText]) {
         return {
           ...dictionary[cleanedText],
@@ -45,18 +40,48 @@ class EnergyDefinitionFinder {
         };
       }
 
-      // Then try keyword match with cleaned text
-      const keywordMatch = Object.entries(dictionary).find(([_, def]) =>
-        def.keywords?.some(k => k.toLowerCase() === cleanedText)
-      );
-      if (keywordMatch) {
-        return {
-          ...keywordMatch[1],
-          fuelCode: keywordMatch[0]
-        };
+      // Extract term from question patterns
+      const questionPatterns = commonQuestionPhrases[language] || commonQuestionPhrases[NLP_CONFIG.languages.default];
+      let extractedTerm = null;
+
+      // Try to find a match using the question patterns
+      for (const pattern of questionPatterns) {
+        if (pattern instanceof RegExp) {
+          const match = cleanedText.match(pattern);
+          if (match && match[1]) {
+            extractedTerm = match[1].trim();
+            if (extractedTerm) {
+              // Try exact match with extracted term
+              if (dictionary[extractedTerm]) {
+                return {
+                  ...dictionary[extractedTerm],
+                  fuelCode: extractedTerm
+                };
+              }
+
+              // Try keyword match with extracted term
+              const keywordMatch = Object.entries(dictionary).find(([_, def]) =>
+                def.keywords?.some(k => k.toLowerCase() === extractedTerm)
+              );
+              if (keywordMatch) {
+                return {
+                  ...keywordMatch[1],
+                  fuelCode: keywordMatch[0]
+                };
+              }
+            }
+          }
+        }
       }
 
-      // Finally, try NLP-based matching if no direct matches found
+      // If we found a term but no match, try NLP-based matching with the extracted term
+      if (extractedTerm) {
+        const { matches, intent, entities } = await findBestMatch(extractedTerm, Object.keys(dictionary), language);
+        const result = EnergyDefinitionFinder.processMatches(dictionary, matches, intent, entities);
+        if (result) return result;
+      }
+
+      // As a fallback, try NLP-based matching with the full text
       const { matches, intent, entities } = await findBestMatch(text, Object.keys(dictionary), language);
       return EnergyDefinitionFinder.processMatches(dictionary, matches, intent, entities);
     } catch (error) {

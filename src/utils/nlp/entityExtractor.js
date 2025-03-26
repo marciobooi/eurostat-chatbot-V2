@@ -5,6 +5,7 @@ import { customEntities } from '../../dictionaries/customEntities';
 import nlp from 'compromise';
 import { energyTermsEn, energyTermsFr, energyTermsDe } from './plugins/energyTerms';
 import { getDictionary } from '../energyDictionary';
+import { commonQuestionPhrases } from '../../dictionaries/questionPhrases';
 
 class EntityExtractor {
   constructor() {
@@ -36,10 +37,23 @@ class EntityExtractor {
       return this.cache.get(cacheKey);
     }
 
-    // Extract question terms
-    const questionTerms = normalizedText.split(/\b(what is|tell me about|what are|how|why|when|where)\b/)
-      .map(t => t.trim())
-      .filter(t => t && !t.match(/^(what is|tell me about|what are|how|why|when|where)$/));
+    // Get question patterns for language
+    const questionPatterns = commonQuestionPhrases[language] || commonQuestionPhrases[NLP_CONFIG.languages.default];
+    const questionTerms = [];
+    
+    // Extract terms using question patterns
+    for (const pattern of questionPatterns) {
+      if (pattern instanceof RegExp) {
+        const match = normalizedText.match(pattern);
+        if (match && match[1]) {
+          const term = match[1].trim();
+          if (term && !questionTerms.includes(term)) {
+            questionTerms.push(term);
+            break; // Use first matching pattern
+          }
+        }
+      }
+    }
 
     const doc = this.nlp.readDoc(text);
     

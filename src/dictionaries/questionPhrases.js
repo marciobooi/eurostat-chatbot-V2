@@ -1,5 +1,10 @@
 export const commonQuestionPhrases = {
   en: [
+    // Definition questions - these need to capture the energy term properly
+    /^(?:what|tell me|explain|describe)\s+(?:is|are)\s+([\w\s-]+)(?:\?)?$/i,
+    /^(?:can you tell me|could you explain|please describe)\s+(?:what|about)\s+([\w\s-]+)(?:\?)?$/i,
+    /^(?:define|give me information about|explain about)\s+([\w\s-]+)(?:\?)?$/i,
+    
     // Basic question starters (energy context)
     /^(?:what|how|why|where|when|which|who|whom|whose)\s/i,
     /^(?:can|could|should|would|will|do|does|did|is|are|was|were|have|has|had|am|may|might|must|shall|ought)\s/i,
@@ -86,6 +91,11 @@ export const commonQuestionPhrases = {
   ],
   
   fr: [
+    // Definition questions in French
+    /^(?:qu['e]est-ce que|que sont|c['e]est quoi|explique[zr]?[-\s]+moi)\s+([\w\s-]+)(?:\?)?$/i,
+    /^(?:peux-tu|pouvez-vous)\s+(?:me dire|m['e]expliquer)\s+(?:ce qu['e]est|ce que sont)\s+([\w\s-]+)(?:\?)?$/i,
+    /^(?:défini[rs]|donne[zr]?[-\s]+moi des informations sur)\s+([\w\s-]+)(?:\?)?$/i,
+    
     // Déclencheurs de questions de base (contexte énergétique)
     /^(?:quoi|comment|pourquoi|où|quand|lequel|laquelle|lesquels|lesquelles|qui|à qui|de qui)\s/i,
     /^(?:peux|pouvons|pouvez|devons|dois|doit|faut-il|est-ce que|est|sont|était|étaient|avoir|a|as|avez|avaient|sera|seront|serait|seraient)\s/i,
@@ -151,6 +161,11 @@ export const commonQuestionPhrases = {
     /\b(et si|supposons que|est-il possible|peut-on)\b/i
   ],
   de: [
+    // Definition questions in German
+    /^(?:was ist|was sind|erkläre[n]?)\s+([\w\s-]+)(?:\?)?$/i,
+    /^(?:kannst du|können sie)\s+(?:mir|uns)\s+(?:erklären|sagen)\s+was\s+([\w\s-]+)\s+(?:ist|sind)(?:\?)?$/i,
+    /^(?:definiere[n]?|beschreibe[n]?)\s+([\w\s-]+)(?:\?)?$/i,
+    
     // Grundlegende Frageanfänge (Energiekontext)
     /^(?:was|wie|warum|wo|wann|welche|wer|wem|wessen)\s/i,
     /^(?:kann|könnte|soll|sollte|würde|wird|ist|sind|war|waren|hat|haben|hätte|dürfte|muss|müssen)\s/i,
