@@ -16,23 +16,53 @@ export class NeuralClassifier extends BaseClassifier {
     this.inputDimension = config.inputDimension || 20;
     this.hiddenUnits = config.hiddenUnits || 32;
     this.dropoutRate = config.dropoutRate || 0.2;
+    this.embeddingDim = config.embeddingDim || 50;
+    this.vocabSize = config.vocabSize || 10000;
   }
 
   async initialize() {
     if (this.model) return;
 
-    this.model = tf.sequential();
-    this.model.add(tf.layers.dense({
+    const input = tf.input({shape: [this.inputDimension]});
+    
+    // Embedding layer
+    const embedded = tf.layers.embedding({
+      inputDim: this.vocabSize,
+      outputDim: this.embeddingDim,
+      inputLength: this.inputDimension
+    }).apply(input);
+
+    // Reshape for sequence processing
+    const reshape1 = tf.layers.reshape({
+      targetShape: [this.inputDimension, this.embeddingDim]
+    }).apply(embedded);
+
+    // Dense layer for feature extraction
+    const dense1 = tf.layers.dense({
+      units: this.embeddingDim,
+      activation: 'relu'
+    }).apply(reshape1);
+    
+    // Flatten the output instead of using global pooling
+    const flattened = tf.layers.flatten().apply(dense1);
+    
+    // Dense layers with dropout
+    const dense2 = tf.layers.dense({
       units: this.hiddenUnits,
-      activation: 'relu',
-      inputShape: [this.inputDimension]
-    }));
-    this.model.add(tf.layers.dropout({ rate: this.dropoutRate }));
-    this.model.add(tf.layers.dense({
+      activation: 'relu'
+    }).apply(flattened);
+    
+    const dropout = tf.layers.dropout({
+      rate: this.dropoutRate
+    }).apply(dense2);
+
+    const output = tf.layers.dense({
       units: this.intentLabels.length,
       activation: 'softmax'
-    }));
+    }).apply(dropout);
 
+    this.model = tf.model({inputs: input, outputs: output});
+    
     this.model.compile({
       optimizer: tf.train.adam(),
       loss: 'categoricalCrossentropy',

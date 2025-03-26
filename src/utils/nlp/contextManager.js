@@ -7,6 +7,8 @@ class ContextManager {
   constructor() {
     this.conversationHistory = new Map();
     this.eurostatModule = new EurostatQueryModule(this);
+    this.contextWindowSize = 5; // Size of sliding window
+    this.decayFactor = 0.8; // Decay factor for older context
   }
 
   getConversationKey(userId, language) {
@@ -42,16 +44,19 @@ class ContextManager {
 
     const currentContext = history[history.length - 1];
     const previousContext = history.length > 1 ? history[history.length - 2] : null;
+    
+    // Apply sliding window with decay
+    const contextWindow = this.getContextWindow(history);
 
     return {
       currentTopic: this.extractCurrentTopic(currentContext),
       isFollowUp: this.isFollowUpQuestion(currentContext, previousContext),
-      referencedEntities: this.getReferencedEntities(history),
+      referencedEntities: this.getReferencedEntities(contextWindow),
       contextualIntent: this.getContextualIntent(currentContext, previousContext),
-      topicChain: this.buildTopicChain(history),
-      sentiment: this.getOverallSentiment(history),
+      topicChain: this.buildTopicChain(contextWindow),
+      sentiment: this.getOverallSentiment(contextWindow),
       entities: currentContext.entities,
-      eurostat: this.getEurostatContext(history)
+      eurostat: this.getEurostatContext(contextWindow)
     };
   }
 
@@ -204,17 +209,12 @@ class ContextManager {
   }
 
   getOverallSentiment(history) {
-    if (history.length === 0) return null;
+    const weightedScores = history.reduce((acc, context) => {
+      return acc + (context.sentiment?.score || 0) * (context.weight || 1);
+    }, 0);
 
-    const sentiments = history.map(context => context.sentiment?.score || 0);
-    const average = sentiments.reduce((sum, score) => sum + score, 0) / sentiments.length;
-    const trend = this.calculateSentimentTrend(sentiments);
-
-    return {
-      current: history[history.length - 1].sentiment?.score || 0,
-      average,
-      trend
-    };
+    const totalWeight = history.reduce((acc, context) => acc + (context.weight || 1), 0);
+    return weightedScores / totalWeight;
   }
 
   calculateSentimentTrend(sentiments) {
@@ -277,6 +277,14 @@ class ContextManager {
   async processEurostatQuery(query, language = CONFIG.DEFAULT_LANGUAGE) {
     this.eurostatModule.setLanguage(language);
     return await this.eurostatModule.processQuery(query);
+  }
+
+  getContextWindow(history) {
+    const window = history.slice(-this.contextWindowSize);
+    return window.map((context, index) => ({
+      ...context,
+      weight: Math.pow(this.decayFactor, window.length - index - 1)
+    }));
   }
 }
 
