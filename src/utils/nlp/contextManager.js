@@ -150,25 +150,44 @@ class ContextManager {
   }
 
   getContextualIntent(current, previous) {
-    if (!current) return null;
+    if (!current || !previous) return current?.intent;
 
-    const baseIntent = current.intent;
+    const currentIntent = current.intent;
+    const previousIntent = previous.intent;
+
+    // Check if this is a follow-up question
+    const isFollowUp = this.isFollowUpQuestion(current, previous);
     
-    // Modify intent based on context
-    if (this.isFollowUpQuestion(current, previous)) {
-      return {
-        type: baseIntent,
-        isFollowUp: true,
-        originalIntent: previous.intent,
-        confidence: current.intent.confidence * 0.8 // Reduce confidence for follow-ups
-      };
+    if (isFollowUp) {
+      // If the current query is very short, likely inherits intent
+      const isShortQuery = current.message.split(/\s+/).length <= 3;
+      if (isShortQuery && this.hasSharedEntities(current.entities, previous.entities)) {
+        return previousIntent;
+      }
+
+      // If intents are related, use the more specific one
+      if (this.areIntentsRelated(currentIntent, previousIntent)) {
+        // Prefer trade > production > consumption for related queries
+        const intentPriority = {
+          'query_trade': 3,
+          'query_production': 2,
+          'query_consumption': 1
+        };
+
+        const currentPriority = intentPriority[currentIntent] || 0;
+        const previousPriority = intentPriority[previousIntent] || 0;
+
+        return currentPriority >= previousPriority ? currentIntent : previousIntent;
+      }
+
+      // If previous intent was comparison/trend, maintain it for follow-ups
+      if (['query_comparison', 'query_trend'].includes(previousIntent) &&
+          current.entities?.dates?.length > 0) {
+        return previousIntent;
+      }
     }
 
-    return {
-      type: baseIntent,
-      isFollowUp: false,
-      confidence: current.intent.confidence
-    };
+    return currentIntent;
   }
 
   buildTopicChain(history) {
