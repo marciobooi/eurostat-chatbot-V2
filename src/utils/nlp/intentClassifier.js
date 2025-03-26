@@ -1,11 +1,54 @@
 import { NLP_CONFIG } from '../../config/nlpConfig';
 import { intentPatterns } from '../../dictionaries/intentPatterns';
 import { customEntities } from '../../dictionaries/customEntities';
+import { energyBalanceIndicators } from '../../dictionaries/energyBalanceIndicators';
+
+class DecisionNode {
+  constructor(feature, threshold, left, right, value = null) {
+    this.feature = feature;
+    this.threshold = threshold;
+    this.left = left;
+    this.right = right;
+    this.value = value;
+  }
+
+  predict(features) {
+    if (this.value !== null) return this.value;
+    return features[this.feature] >= this.threshold 
+      ? this.right.predict(features) 
+      : this.left.predict(features);
+  }
+}
 
 class IntentClassifier {
   constructor() {
     this.cache = new Map();
     this.directTopicMatcher = this.buildDirectTopicMatcher();
+    this.decisionTree = this.buildDecisionTree();
+  }
+
+  buildDecisionTree() {
+    // Pre-defined decision tree structure based on feature importance
+    return new DecisionNode(
+      'hasEnergyType', 0.5,
+      new DecisionNode(
+        'hasDate', 0.5,
+        new DecisionNode(null, null, null, null, 'general_info'),
+        new DecisionNode('hasComparison', 0.5,
+          new DecisionNode(null, null, null, null, 'query_trend'),
+          new DecisionNode(null, null, null, null, 'query_trend')
+        )
+      ),
+      new DecisionNode(
+        'hasTradeTerms', 0.5,
+        new DecisionNode(
+          'hasProductionTerms', 0.5,
+          new DecisionNode(null, null, null, null, 'query_consumption'),
+          new DecisionNode(null, null, null, null, 'query_production')
+        ),
+        new DecisionNode(null, null, null, null, 'query_trade')
+      )
+    );
   }
 
   buildDirectTopicMatcher() {
@@ -20,6 +63,44 @@ class IntentClassifier {
     });
     
     return directTopicPatterns;
+  }
+
+  extractFeatures(text, entities, language = NLP_CONFIG.languages.default) {
+    // Get patterns for the current language or fall back to default
+    const patterns = intentPatterns[language] || intentPatterns[NLP_CONFIG.languages.default];
+    const balanceIndicators = energyBalanceIndicators;
+    
+    const features = {
+      hasEnergyType: entities?.energyDomain?.energyTypes?.length > 0 ? 1 : 0,
+      hasDate: entities?.dates?.length > 0 ? 1 : 0,
+      hasTradeTerms: this.matchesAnyPattern(text, [
+        ...patterns.query_trade,
+        ...balanceIndicators.IMP.patterns,
+        ...balanceIndicators.EXP.patterns
+      ]) ? 1 : 0,
+      hasProductionTerms: this.matchesAnyPattern(text, [
+        ...patterns.query_production,
+        ...Object.values(balanceIndicators)
+          .filter(indicator => indicator.intent === 'query_production')
+          .flatMap(indicator => indicator.patterns)
+      ]) ? 1 : 0,
+      hasComparison: this.matchesAnyPattern(text, patterns.query_comparison) ? 1 : 0,
+      hasTrendTerms: this.matchesAnyPattern(text, patterns.query_trend) ? 1 : 0
+    };
+
+    return features;
+  }
+
+  matchesAnyPattern(text, patterns) {
+    return patterns.some(pattern => {
+      // If pattern is already a RegExp, use it directly
+      if (pattern instanceof RegExp) {
+        return pattern.test(text);
+      }
+      // Otherwise, create a case-insensitive RegExp from the string pattern
+      const regex = new RegExp(`\\b${pattern}\\b`, 'i');
+      return regex.test(text);
+    });
   }
 
   getCacheKey(text, language) {
@@ -39,11 +120,16 @@ class IntentClassifier {
       return directTopic;
     }
 
+    // Extract features and use decision tree
+    const features = this.extractFeatures(text, entities, language);
+    const primaryIntent = this.decisionTree.predict(features);
+
+    // Calculate confidence using pattern matching as additional signal
     const patterns = intentPatterns[language] || intentPatterns[NLP_CONFIG.languages.default];
     const matches = {};
     const intents = [];
 
-    // Match patterns for each intent
+    // Combine decision tree result with pattern matching
     for (const [intent, intentPatterns] of Object.entries(patterns)) {
       const intentMatches = intentPatterns.filter(pattern => pattern.test(text));
       if (intentMatches.length > 0) {
@@ -58,10 +144,16 @@ class IntentClassifier {
       }
     }
 
-    // Sort intents by confidence and priority
-    intents.sort((a, b) => 
-      (b.confidence * b.priority) - (a.confidence * a.priority)
-    );
+    // Boost confidence for decision tree result
+    const decisionTreeConfidence = 0.8; // Base confidence in tree decision
+    intents.push({
+      intent: primaryIntent,
+      confidence: decisionTreeConfidence,
+      priority: this.calculatePriority(primaryIntent, entities)
+    });
+
+    // Sort by combined score
+    intents.sort((a, b) => (b.confidence * b.priority) - (a.confidence * a.priority));
 
     const result = {
       primaryIntent: intents[0]?.intent || 'general_info',

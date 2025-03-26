@@ -6,6 +6,38 @@
 // Cookie duration in days
 const COOKIE_DURATION = 7;
 
+const DB_NAME = 'eurostatChatDB';
+const DB_VERSION = 1;
+const CHAT_STORE = 'chatHistory';
+const STATS_STORE = 'energyStats';
+
+/**
+ * Initialize IndexedDB database
+ * @returns {Promise<IDBDatabase>}
+ */
+export const initializeDB = () => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      
+      // Create chat history store
+      if (!db.objectStoreNames.contains(CHAT_STORE)) {
+        db.createObjectStore(CHAT_STORE, { keyPath: 'id', autoIncrement: true });
+      }
+      
+      // Create energy statistics store
+      if (!db.objectStoreNames.contains(STATS_STORE)) {
+        db.createObjectStore(STATS_STORE, { keyPath: 'key' });
+      }
+    };
+  });
+};
+
 /**
  * Saves chat messages to a cookie
  * @param {Array} messages - Array of chat message objects
@@ -33,6 +65,35 @@ export const saveChatToCookie = (messages) => {
     broadcastChatUpdate(messagesString);
   } catch (error) {
     console.error('Error saving chat to storage:', error);
+  }
+};
+
+/**
+ * Save chat history to IndexedDB
+ * @param {Array} messages - Array of chat messages
+ */
+export const saveChatToIndexedDB = async (messages) => {
+  try {
+    const db = await initializeDB();
+    const transaction = db.transaction(CHAT_STORE, 'readwrite');
+    const store = transaction.objectStore(CHAT_STORE);
+
+    await new Promise((resolve, reject) => {
+      const request = store.put({
+        messages,
+        timestamp: Date.now()
+      });
+      
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+
+    // Keep using existing localStorage/cookie methods as fallback
+    saveChatToCookie(messages);
+  } catch (error) {
+    console.error('Error saving to IndexedDB:', error);
+    // Fallback to existing storage method
+    saveChatToCookie(messages);
   }
 };
 
@@ -79,6 +140,46 @@ export const loadChatFromCookie = () => {
   } catch (error) {
     console.error('Error loading chat from storage:', error);
     return null;
+  }
+};
+
+/**
+ * Load chat history from IndexedDB
+ * @returns {Promise<Array>} Chat messages
+ */
+export const loadChatFromIndexedDB = async () => {
+  try {
+    const db = await initializeDB();
+    const transaction = db.transaction(CHAT_STORE, 'readonly');
+    const store = transaction.objectStore(CHAT_STORE);
+
+    return new Promise((resolve, reject) => {
+      const request = store.getAll();
+      
+      request.onsuccess = () => {
+        const records = request.result;
+        if (records.length > 0) {
+          // Get the most recent chat history
+          const latestRecord = records.reduce((latest, current) => 
+            current.timestamp > latest.timestamp ? current : latest
+          );
+          resolve(latestRecord.messages);
+        } else {
+          // Try fallback storage methods
+          resolve(loadChatFromCookie());
+        }
+      };
+      
+      request.onerror = () => {
+        console.error('Error reading from IndexedDB:', request.error);
+        // Fallback to existing storage method
+        resolve(loadChatFromCookie());
+      };
+    });
+  } catch (error) {
+    console.error('Error accessing IndexedDB:', error);
+    // Fallback to existing storage method
+    return loadChatFromCookie();
   }
 };
 
