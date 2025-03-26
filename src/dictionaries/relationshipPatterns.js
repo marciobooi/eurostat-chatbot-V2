@@ -12,6 +12,7 @@ export const relationshipPatterns = {
       /subset of/i,
       /type of/i,
       /kind of/i,
+  
       // Family and hierarchical relationships
       /family of/i,
       /sub-family of/i,
@@ -24,6 +25,7 @@ export const relationshipPatterns = {
       /branch of/i,
       /category of/i,
       /classification of/i,
+  
       // Question patterns
       /relationship between/i,
       /how.*related/i,
@@ -36,17 +38,20 @@ export const relationshipPatterns = {
       /derived product/i,
       /by-product/i,
       /same (family|category|type|group)/i,
+  
       // Simple patterns for implicit questions
-      /^is\s+\w+.*(?:to|with|from)\s+\w+/i,  // Catches "is coke related to coal products?"
+      /^is\s+\w+.*(?:to|with|from)\s+\w+/i,
       /^(?:how|what).*(?:relation|connection)/i,
       /(?:include|contain|made from|derived from)/i,
       /(?:belong|part|component|element) of/i,
       /(?:used|processed|refined|produced) (?:in|from|by|with)/i,
+  
       // Add specific 'is a' patterns
-      /^is\s+[\w\s]+a\s+[\w\s]+/i,  // This catches "is hard coal a fossil fuel?"
+      /^is\s+[\w\s]+a\s+[\w\s]+/i,
       /^is\s+[\w\s]+an\s+[\w\s]+/i,
       /^are\s+[\w\s]+[\w\s]+/i,
-        // New patterns
+  
+      // New patterns
       /is.*a kind of/i,
       /is.*a type of/i,
       /belongs within/i,
@@ -65,44 +70,86 @@ export const relationshipPatterns = {
       /falls into the category of/i,
       /is.*a member of/i,
       /is a subclass of/i,
-      /can be grouped as/i
+      /can be grouped as/i,
+  
+      // Extended Relationship Patterns
+      /corresponds to/i,
+      /has a connection with/i,
+      /can be linked to/i,
+      /is.*within the scope of/i,
+      /is.*a branch of/i,
+      /is found in/i,
+      /exists as part of/i,
+      /falls within/i,
+      /is grouped into/i,
+      /assimilated into/i,
+      /is classified within/i,
+  
+      // Expanded "Is-A" Patterns
+      /is considered a/i,
+      /is deemed a/i,
+      /is viewed as a/i,
+      /is known as a/i,
+      /is thought of as a/i,
+      /is sometimes called a/i,
+      /is often seen as a/i,
+      /is a subform of/i,
+      /is.*a specific form of/i,
+  
+      // More Inclusion & Belonging
+      /is contained within/i,
+      /makes up part of/i,
+      /is comprised of/i,
+      /is a division of/i,
+      /is encompassed by/i,
+      /is a representative of/i,
+      /is an aspect of/i,
+      /resides within/i,
+      /is included in the group of/i,
+  
+      // Additional Derivation Patterns
+      /evolves from/i,
+      /is an offshoot of/i,
+      /is adapted from/i,
+      /descends from/i,
+      /is extracted from/i,
+      /is an extension of/i,
+      /is a transformation of/i,
+  
+      // More Relationship Questions
+      /does.*relate to/i,
+      /how does.*connect/i,
+      /how does.*relate/i,
+      /explain the relation between/i,
+      /what is the link between/i,
+      /does.*belong to the same/i,
+      /can be seen as related to/i,
+      /how is.*classified/i,
+      /is.*closely related to/i,
+      /do.*share similarities/i,
+      /how is.*grouped/i,
+
+      // Add "is X a thing" pattern
+      /is.*a thing\??/i,
+      /does.*exist\??/i,
+      /is.*real\??/i,
+      /is there such.*thing as/i
     ],
+  
     terms: {
       inclusion: [
-        'include', 'includes', 'including',
-        'part of', 'contains', 'containing',
-        'consists of', 'comprises', 'encompasses',
-        'made up of', 'incorporates', 'features',
-        'holds', 'involves', 'embraces',
-        'entails', 'covers', 'incorporates',
-        'composed of', 'contains parts of', 'is composed of'
+        'include', 'includes', 'including', 'part of', 'contains', 'containing', 'consists of', 'comprises', 'encompasses', 'made up of', 'incorporates', 'features', 'holds', 'involves', 'embraces', 'entails', 'covers', 'composed of', 'contains parts of', 'is composed of'
       ],
       derivation: [
-        'derive', 'derives', 'derived',
-        'originate', 'originates', 'originated',
-        'result from', 'is derived from', 'comes from',
-        'emanates from', 'is sourced from', 'has its origin in'
+        'derive', 'derives', 'derived', 'originate', 'originates', 'originated', 'result from', 'is derived from', 'comes from', 'emanates from', 'is sourced from', 'has its origin in'
       ],
       production: [
-        'produce', 'produces', 'produced',
-        'manufacture', 'manufactures', 'manufactured',
-        'create', 'creates', 'created',
-        'fabricate', 'fabricates', 'fabricated',
-        'generate', 'generates', 'generated',
-        'form', 'forms', 'formed',
-        'assemble', 'assembles', 'assembled'
+        'produce', 'produces', 'produced', 'manufacture', 'manufactures', 'manufactured', 'create', 'creates', 'created', 'fabricate', 'fabricates', 'fabricated', 'generate', 'generates', 'generated', 'form', 'forms', 'formed', 'assemble', 'assembles', 'assembled'
       ],
       processing: [
-        'made from', 'processed from',
-        'refined from', 'based on',
-        'extracted from', 'obtained from',
-        'created from', 'converted from',
-        'synthesized from', 'processed into',
-        'formed from', 'developed from',
-        'treated with', 'transformed from'
+        'made from', 'processed from', 'refined from', 'based on', 'extracted from', 'obtained from', 'created from', 'converted from', 'synthesized from', 'processed into', 'formed from', 'developed from', 'treated with', 'transformed from'
       ]
-    },
-    
+    },    
     responses: {
       // when 2 terms exist in the energy dictionary and they are related
       positive: [
@@ -113,9 +160,12 @@ export const relationshipPatterns = {
         "They are definitely related within the energy classification system. Would you like to know more about {term1} or {term2}?",
         "Yes, {term1} and {term2} are linked in the energy sector. They share a close relationship. Would you like to dive deeper into either?",
         "They are indeed connected. {term1} is a direct descendant of {term2} within the energy hierarchy. Let me know if you want more details about them.",
-        "Absolutely, {term1} and {term2} are part of the same family. Interested in learning about their differences or similarities?"
+        "Absolutely, {term1} and {term2} are part of the same family. Interested in learning about their differences or similarities?",
+        "Yes, these terms are interrelated in the energy ecosystem. Would you like a deeper dive into how they connect?",
+        "Certainly, {term1} and {term2} share foundational principles. I can elaborate on their relationship if you'd like.",
+        "Yes, they are connected through their use cases in energy systems. Would you like to explore their applications?"
       ],
-    
+
       // when 2 terms exist in the energy dictionary and they are NOT related
       negative: [
         "No, they are not directly related. {term1} and {term2} belong to different energy classifications. However, I can tell you about either one.",
@@ -125,9 +175,12 @@ export const relationshipPatterns = {
         "They are separate categories in the energy family. Would you like to know more about {term1} or {term2}?",
         "Although {term1} and {term2} are energy terms, they are from different categories. Let me know if you want more information on either of them.",
         "No direct connection between {term1} and {term2}. Would you like to learn more about either one in their respective contexts?",
-        "These two terms do not fall under the same energy category. I can provide you with details on either term separately."
+        "These two terms do not fall under the same energy category. I can provide you with details on either term separately.",
+        "{term1} and {term2} follow different paths in the energy landscape. I can break down their distinctions if you'd like.",
+        "They are part of different energy frameworks. Curious to dive deeper into either one?",
+        "No intrinsic link between {term1} and {term2}, but I can guide you through each independently."
       ],
-    
+
       // when 1 term exists in the energy dictionary
       single_term: [
         "I can tell you about {term1}. What would you like to know?",
@@ -137,9 +190,12 @@ export const relationshipPatterns = {
         "I'd be happy to tell you about {term1}. What information are you looking for?",
         "I can offer insights into {term1}. Is there a particular area you'd like to focus on?",
         "I'm happy to provide details about {term1}. What would you like to dive into?",
-        "Would you like more information on {term1}? Let me know what you're curious about."
+        "Would you like more information on {term1}? Let me know what you're curious about.",
+        "{term1} is an interesting topic. I can share its core concepts or recent developments. What's your focus?",
+        "There's much to uncover about {term1}. Do you want technical details, historical context, or practical uses?",
+        "I can explain {term1} from various angles. Let me know where you'd like to start."
       ],
-    
+
       // when the 2 terms do NOT exist in the energy dictionary
       invalid_comparison: [
         "I can only provide information about energy-related terms. Would you like to learn about {term1}?",
@@ -148,9 +204,12 @@ export const relationshipPatterns = {
         "I'm specialized in energy information. Would you like to learn about {term1}?",
         "I focus on energy-related information. Would you like to know about {term1} specifically?",
         "I’m afraid I don’t have information on that specific comparison. However, I can help with {term1}. Would you like to explore that?",
-        "I don’t have a direct match for those terms, but I can tell you about {term1}. Interested?"
+        "I don’t have a direct match for those terms, but I can tell you about {term1}. Interested?",
+        "I can assist you with energy topics. Let me know if you'd like to explore {term1} further.",
+        "My resources focus on energy-related areas. Would you like an overview of {term1}?",
+        "I may not connect those terms, but I can certainly shed light on {term1}. Curious to dive in?"
       ],
-    
+
       // when the 2 terms do NOT exist in the energy dictionary and don’t make sense
       suggestion: [
         "While I don't have specific information about that exact term, {term1} includes several related fuels that might interest you. Would you like to learn about any of them?",
@@ -159,7 +218,10 @@ export const relationshipPatterns = {
         "That's connected to {term1}. Would you like to learn about {term1} or explore some of its specific subtypes?",
         "This is related to the {term1} category. I can explain about {term1} or tell you about more specific fuel types in this category.",
         "Although I don't have information on that exact term, {term1} might give you useful context. Would you like to dive into it?",
-        "I'm not familiar with that exact term, but I can offer insights into {term1}. Let me know if you'd like more details."
+        "I'm not familiar with that exact term, but I can offer insights into {term1}. Let me know if you'd like more details.",
+        "{term1} is a broad area with many facets. I can break it down or highlight key areas if you'd like.",
+        "I may not have that exact comparison, but {term1} touches on a range of topics. Would you like an overview?",
+        "That term relates to {term1}. I can guide you through its basics or advanced details—your choice."
       ]
     }
     
@@ -225,8 +287,14 @@ export const relationshipPatterns = {
       /tombe dans la catégorie de/i,  
       /est.*un membre de/i,  
       /est une sous-classe de/i,  
-      /peut être regroupé comme/i  
-    
+      /peut être regroupé comme/i,
+      
+      // Add French equivalent patterns
+      /est.*une chose\??/i,
+      /existe-t-il\??/i,
+      /est.*réel\??/i,
+      /est-ce que.*existe\??/i,
+      /y a-t-il.*tel\??/i
     ],
     terms: {
       inclusion: [
@@ -386,8 +454,15 @@ export const relationshipPatterns = {
       /fällt in die Kategorie von/i,  
       /ist.*ein Mitglied von/i,  
       /ist eine Unterklasse von/i,  
-      /kann gruppiert werden als/i  
-    
+      /kann gruppiert werden als/i,
+      
+      // Add German equivalent patterns
+      /ist.*ein Ding\??/i,
+      /gibt es.*\??/i,
+      /existiert.*\??/i,
+      /ist.*echt\??/i,
+      /ist.*real\??/i,
+      /gibt es so etwas wie.*\??/i
     ],
     terms: {
       inclusion: [

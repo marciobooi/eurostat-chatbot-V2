@@ -13,39 +13,33 @@ import { questionWords } from '../dictionaries/questionWords';
 
 export const processUserMessage = async (message, language = 'en') => {
   try {
-    const result = await MessageService.analyzeMessage(message, language);
-    
-    // Enhanced question detection
-    const isQuestion = checkIsQuestion(message, language);
-    
     const [userMessage, botResponse] = await MessageService.processUserInput(message, language);
-    const matchedTopic = botResponse.title ? botResponse : null;
+    
+    // Return the bot response directly if it's a relationship question
+    if (botResponse.isRelationship) {
+      return botResponse;
+    }
 
-    return {
-      isQuestion,
-      topic: matchedTopic,
+    // For non-relationship questions, continue with normal analysis
+    const result = await MessageService.analyzeMessage(message, language);
+    const isQuestion = checkIsQuestion(message, language);
+    const botResponseWithContext = {
+      ...botResponse,
       nlpData: {
         ...result,
-        isQuestion  // Override with enhanced detection
+        isQuestion
       }
     };
+
+    return botResponseWithContext;
   } catch (error) {
     console.error('Error processing message:', error);
-    return {
-      isQuestion: false,
-      topic: null,
-      nlpData: {
-        sentiment: { score: 0, comparative: 0 }
-      }
-    };
+    return MessageService.createErrorResponse(language);
   }
 };
 
-/**
- * Enhanced question detection using both word patterns and phrase patterns
- */
+// Helper for checking if text is a question
 const checkIsQuestion = (message, language) => {
-  // First check simple question words
   const words = questionWords[language] || questionWords[CONFIG.DEFAULT_LANGUAGE];
   const hasQuestionWord = words.some(word => 
     message.toLowerCase().includes(word.toLowerCase())
@@ -53,13 +47,17 @@ const checkIsQuestion = (message, language) => {
 
   if (hasQuestionWord) return true;
 
-  // Then check complex question phrases
   const phrasePatterns = commonQuestionPhrases[language] || commonQuestionPhrases[CONFIG.DEFAULT_LANGUAGE];
   return phrasePatterns.some(pattern => pattern.test(message));
 };
 
 export const generateBotResponse = async (processedMessage, language = 'en') => {
   try {
+    // If the message is already a bot response (like from relationship handling), return it directly
+    if (processedMessage.sender === 'bot') {
+      return processedMessage;
+    }
+
     const { nlpData } = processedMessage;
     const text = nlpData.topics?.[0]?.text?.toLowerCase() || '';
     
@@ -82,9 +80,9 @@ export const createBotResponse = (definition, language = CONFIG.DEFAULT_LANGUAGE
   return {
     sender: 'bot',
     title: definition.title,
-    text: typeof definition.text === 'string' ? definition.text : JSON.stringify(definition.text),
+    text: definition.text,
     language,
-    suggestions: definition.subFuels || [],
+    suggestions: [...(definition.subFuels || []), ...(definition.related || [])],
     hasVisualization: definition.hasVisualization || false,
     visualizationType: definition.visualizationType || [],
     dataset: definition.dataset,
@@ -100,7 +98,7 @@ export const createUnknownResponse = (language = CONFIG.DEFAULT_LANGUAGE) => {
   const messages = unknownResponses[language] || unknownResponses[CONFIG.DEFAULT_LANGUAGE];
   const empathy = empathyPhrases[language] || empathyPhrases[CONFIG.DEFAULT_LANGUAGE];
   
-  // Get main energy topics for suggestions using language-specific dictionary
+  // Get main energy topics for suggestions
   const dictionary = energyDictionary[language] || energyDictionary[CONFIG.DEFAULT_LANGUAGE];
   const mainTopics = Object.entries(dictionary)
     .filter(([_, def]) => def.isMainFuel)
@@ -112,20 +110,6 @@ export const createUnknownResponse = (language = CONFIG.DEFAULT_LANGUAGE) => {
     text: getRandomElement(messages),
     language,
     suggestions: mainTopics,
-    followUp: getRandomElement(empathy)
-  };
-};
-
-/**
- * Create an error response
- */
-export const createErrorResponse = (message, language = CONFIG.DEFAULT_LANGUAGE) => {
-  const messages = errorMessages[language] || errorMessages[CONFIG.DEFAULT_LANGUAGE];
-  
-  return {
-    sender: 'bot',
-    text: message || getRandomElement(messages),
-    isError: true,
-    language
+    followUp: `${getRandomElement(empathy)} Would you like to learn about one of these topics instead?`
   };
 };

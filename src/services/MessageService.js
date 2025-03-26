@@ -252,8 +252,25 @@ export class MessageService {
       ? language 
       : CONFIG.DEFAULT_LANGUAGE;
 
-    // Create user message first
     const userMessage = this.createUserMessage(input, processLanguage);
+
+    // First check if it's a relationship question, before doing any other processing
+    const relationshipInfo = contextManager.checkRelationship(input, processLanguage);
+    if (relationshipInfo?.isRelationshipQuestion) {
+      const botResponse = {
+        sender: 'bot',
+        text: relationshipInfo.response,
+        language: processLanguage,
+        suggestions: relationshipInfo.suggestions || (relationshipInfo.terms ? relationshipInfo.terms.map(t => t.term) : []),
+        isRelationship: true,
+        relationshipType: relationshipInfo.relationshipType,
+        terms: relationshipInfo.terms
+      };
+
+      const messages = [userMessage, botResponse];
+      saveChatToCookie(messages);
+      return messages;
+    }
 
     // Try to process as Eurostat query first before any other checks
     try {
@@ -291,7 +308,7 @@ export class MessageService {
       // Continue with normal processing if Eurostat query fails
     }
 
-    // Check special message types after Eurostat check
+    // Check special message types after relationship and Eurostat checks
     if (this.isGreetingMessage(input, processLanguage)) {
       const messages = [userMessage, this.createWelcomeMessage(processLanguage)];
       saveChatToCookie(messages);
@@ -307,24 +324,6 @@ export class MessageService {
     if (this.isFarewellMessage(input, processLanguage)) {
       clearContext('default', processLanguage);
       const messages = [userMessage, this.createFarewellResponse(processLanguage)];
-      saveChatToCookie(messages);
-      return messages;
-    }
-
-    // First check if it's a relationship question, before doing any other processing
-    const relationshipInfo = contextManager.checkRelationship(input, processLanguage);
-    if (relationshipInfo?.isRelationshipQuestion) {
-      const botResponse = {
-        sender: 'bot',
-        text: relationshipInfo.response,
-        language: processLanguage,
-        suggestions: relationshipInfo.suggestions || (relationshipInfo.terms ? relationshipInfo.terms.map(t => t.term) : []),
-        isRelationship: true,
-        relationshipType: relationshipInfo.relationshipType,
-        terms: relationshipInfo.terms
-      };
-
-      const messages = [userMessage, botResponse];
       saveChatToCookie(messages);
       return messages;
     }
