@@ -2,6 +2,11 @@ import { classifierOrchestrator } from './classifiers/ClassifierFactory';
 import { NLP_CONFIG } from '../../config/nlpConfig';
 import { customEntities } from '../../dictionaries/customEntities';
 
+/**
+ * Classifies user intent based on text and extracted entities.
+ * Uses a caching mechanism to speed up responses for repeated queries.
+ * Leverages a ClassifierOrchestrator for the actual classification logic.
+ */
 class IntentClassifier {
   constructor(config = {}) {
     this.config = {
@@ -9,6 +14,7 @@ class IntentClassifier {
       ...config
     };
     this.cache = new Map();
+    this.directTopicMatcher = this.buildDirectTopicMatcher();
     this.initialized = this.initialize();
   }
 
@@ -16,6 +22,11 @@ class IntentClassifier {
     await classifierOrchestrator.initialize();
   }
 
+  /**
+   * Builds regular expressions for directly matching known energy types/topics.
+   * This allows for quick identification of simple topic requests.
+   * @returns {Object.<string, RegExp[]>} A dictionary mapping language codes to arrays of RegExps.
+   */
   buildDirectTopicMatcher() {
     const directTopicPatterns = {};
     
@@ -42,7 +53,13 @@ class IntentClassifier {
     }
 
     const features = this.extractFeatures(text, entities, language);
-    const result = await classifierOrchestrator.classify(text, features);
+    let result;
+    try {
+      result = await classifierOrchestrator.classify(text, features);
+    } catch (error) {
+      console.error('Error during intent classification in IntentClassifier:', error);
+      result = { intent: 'classification_error', confidence: 0.0, classificationFailed: true };
+    }
     
     this.cache.set(cacheKey, result);
     this.maintainCache();
@@ -50,6 +67,12 @@ class IntentClassifier {
     return result;
   }
 
+  /**
+   * Checks if the input text directly matches a known topic, typically for short queries.
+   * @param {string} text - The user input text.
+   * @param {string} language - The current language code.
+   * @returns {ClassificationResult|null} A ClassificationResult if a direct match is found, otherwise null.
+   */
   checkDirectTopicRequest(text, language) {
     const trimmedText = text.trim().toLowerCase();
     
@@ -74,6 +97,14 @@ class IntentClassifier {
     }
   }
 
+  /**
+   * Extracts a feature set from the input text and entities for the classifier.
+   * These features help the classifier determine the user's intent.
+   * @param {string} text - The user input text.
+   * @param {Object} entities - Entities extracted from the text.
+   * @param {string} language - The current language code.
+   * @returns {Object} A feature object (e.g., { hasEnergyType: 1, hasDate: 0 }).
+   */
   extractFeatures(text, entities, language = NLP_CONFIG.languages.default) {
     return {
       hasEnergyType: entities?.energyDomain?.energyTypes?.length > 0 ? 1 : 0,

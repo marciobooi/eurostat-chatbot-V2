@@ -1,5 +1,4 @@
 import { NeuralClassifier } from './NeuralClassifier';
-import { DecisionTreeClassifier } from './DecisionTreeClassifier';
 import { PatternClassifier } from './PatternClassifier';
 import { ModelMetricsCollector } from './ModelMetricsCollector';
 
@@ -10,8 +9,6 @@ export function createClassifier(type, config = {}) {
     switch (type) {
         case 'neural':
             return new NeuralClassifier(config);
-        case 'decisionTree':
-            return new DecisionTreeClassifier(config);
         case 'pattern':
             return new PatternClassifier(config);
         default:
@@ -19,23 +16,30 @@ export function createClassifier(type, config = {}) {
     }
 }
 
+/**
+ * Orchestrates various classification strategies.
+ * Prioritizes pattern matching for speed and availability,
+ * then attempts to use a neural network for more nuanced classification if available and confident.
+ * Falls back to pattern matching if the neural network is not ready or its confidence is low.
+ */
 export class ClassifierOrchestrator {
     constructor() {
         this.classifiers = {
             neural: new NeuralClassifier(),
             pattern: new PatternClassifier(),
-            decisionTree: new DecisionTreeClassifier()
+            // DecisionTreeClassifier was removed as it was unused.
         };
-        this.confidenceThreshold = 0.7;
-        this.isModelReady = false;
+        this.confidenceThreshold = 0.7; // Threshold for using neural network results.
+        this.isModelReady = false; // Tracks if the neural model has been initialized.
         this.metricsCollector = new ModelMetricsCollector();
     }
 
     async initialize() {
-        // Start with pattern matching (always available)
+        // Start with pattern matching as it's lightweight and always available.
         this.currentClassifier = this.classifiers.pattern;
         
-        // Initialize neural network in background
+        // Asynchronously initialize the neural network in the background.
+        // This allows the application to start classifying intents immediately using patterns.
         this.initializeNeuralNetwork();
     }
 
@@ -52,25 +56,26 @@ export class ClassifierOrchestrator {
     async classify(text, features) {
         const startTime = performance.now();
         
-        // Always get pattern matching result first
+        // Always get pattern matching result first for baseline and fallback.
         const patternResult = await this.classifiers.pattern.predict(text);
         
+        // If the neural network model isn't ready, use the pattern result.
         if (!this.isModelReady) {
             this.metricsCollector.recordPrediction(startTime, patternResult, null, true);
             return patternResult;
         }
 
-        // If neural network is ready, use it
+        // If neural network is ready, get its prediction.
         const neuralResult = await this.classifiers.neural.predict(features);
         
-        // Use neural network result if confidence is high enough
+        // Use neural network result if its confidence meets the threshold.
         if (neuralResult.confidence >= this.confidenceThreshold) {
             this.metricsCollector.recordPrediction(startTime, neuralResult);
             return neuralResult;
         }
         
-        // Fallback to pattern matching if neural confidence is low
-        this.metricsCollector.recordPrediction(startTime, patternResult, null, true);
+        // Fallback to pattern matching if neural network confidence is too low.
+        this.metricsCollector.recordPrediction(startTime, patternResult, null, true); // True indicates fallback was used
         return patternResult;
     }
 

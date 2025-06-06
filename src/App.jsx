@@ -21,7 +21,7 @@ function App() {
       setLoaded(true);
 
       // Run automated tests after app is loaded (only once)
-      if (process.env.NODE_ENV === 'development' && !testsRunRef.current) {
+      if (import.meta.env.DEV && !testsRunRef.current) {
         testsRunRef.current = true;
         await runTests();
       }
