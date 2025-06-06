@@ -22,7 +22,11 @@ export const useChatInteractions = () => {
     updateMessages,
     setUsedVisualizations,
     allMessages,
-    scrollToBottom
+    scrollToBottom,
+    setLastMentionedCountry,
+    setLastMentionedEnergyType,
+    lastMentionedCountry,
+    lastMentionedEnergyType
   } = useChatContext();
 
   // Handles sending a user's message.
@@ -39,7 +43,16 @@ export const useChatInteractions = () => {
 
     try {
       // Process the input and get responses
-      const [userMessageObj, botResponse] = await MessageService.processUserInput(userMessage, i18n.language);
+      const [userMessageObj, botResponse] = await MessageService.processUserInput(userMessage, i18n.language, lastMentionedCountry, lastMentionedEnergyType);
+
+      if (botResponse.queryContext) {
+        if (botResponse.queryContext.country) {
+          setLastMentionedCountry(botResponse.queryContext.country);
+        }
+        if (botResponse.queryContext.energyType) {
+          setLastMentionedEnergyType(botResponse.queryContext.energyType);
+        }
+      }
       
       // Add messages to chat
       updateMessages(prev => [...prev, userMessageObj, botResponse]);
@@ -61,7 +74,19 @@ export const useChatInteractions = () => {
     } finally {
       setIsTyping(false);
     }
-  }, [input, isTyping, setInput, setIsTyping, updateMessages, i18n.language, scrollToBottom]);
+  }, [
+      input,
+      isTyping,
+      setInput,
+      setIsTyping,
+      updateMessages,
+      i18n.language,
+      scrollToBottom,
+      setLastMentionedCountry,
+      setLastMentionedEnergyType,
+      lastMentionedCountry,
+      lastMentionedEnergyType
+    ]);
 
   // Handles the selection of a visualization type for a message.
   // Fetches data for the visualization, creates a new visualization message,
@@ -95,8 +120,11 @@ export const useChatInteractions = () => {
   const handleClearChat = useCallback(() => {
     const welcomeMessage = MessageService.createWelcomeMessage(i18n.language);
     updateMessages([welcomeMessage]);
-    setUsedVisualizations([]); 
-  }, [updateMessages, setUsedVisualizations, i18n.language]);
+    setUsedVisualizations([]);
+    // Reset last mentioned entities
+    setLastMentionedCountry(null);
+    setLastMentionedEnergyType(null);
+  }, [updateMessages, setUsedVisualizations, i18n.language, setLastMentionedCountry, setLastMentionedEnergyType]);
 
   // Handles clicks on smart suggestion messages.
   // It fetches a definition or information related to the suggestion

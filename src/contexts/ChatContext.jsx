@@ -32,6 +32,8 @@ export const ChatProvider = ({ children }) => {
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [showMoreButton, setShowMoreButton] = useState(false);
   const [usedVisualizations, setUsedVisualizations] = useState([]);
+  const [lastMentionedCountry, setLastMentionedCountry] = useState(null);
+  const [lastMentionedEnergyType, setLastMentionedEnergyType] = useState(null);
 
   const { i18n } = useTranslation();
   const messagesEndRef = useRef(null);
@@ -170,12 +172,16 @@ export const ChatProvider = ({ children }) => {
     showMoreButton,
     usedVisualizations,
     messagesEndRef,
+    lastMentionedCountry,
+    lastMentionedEnergyType,
 
     // Updaters
     setInput,
     setIsTyping,
     setShowScrollButton,
     setUsedVisualizations,
+    setLastMentionedCountry,
+    setLastMentionedEnergyType,
     updateMessages,
     loadMoreMessages,
     resetToRecentMessages,

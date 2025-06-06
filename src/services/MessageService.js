@@ -24,6 +24,8 @@ import { filteredWords } from '../dictionaries/filteredWords';
 import i18n from 'i18next';
 import COUNTRY_MAP from '../dictionaries/countries';
 import { commonQuestionPhrases } from '../dictionaries/questionPhrases';
+import { introductoryPhrases } from '../dictionaries/introductoryPhrases';
+import { eurostatResponsePhrases } from '../dictionaries/eurostatResponsePhrases';
 
 export class MessageService {
   static instance = null;
@@ -82,10 +84,14 @@ export class MessageService {
       }
     }
 
+    const introMessages = introductoryPhrases[language] || introductoryPhrases[CONFIG.DEFAULT_LANGUAGE];
+    let introText = getRandomElement(introMessages);
+    introText = introText.replace('{topic}', definition.title);
+
     const baseResponse = {
       sender: 'bot',
       title: definition.title,
-      text: definition.text,
+      text: `${introText}\n\n${definition.text}`, // New line with intro
       language,
       suggestions: [...(definition.subFuels || []), ...(definition.related || [])],
       hasVisualization: definition.hasVisualization || false,
@@ -247,7 +253,7 @@ export class MessageService {
     );
   }
 
-  static async processUserInput(input, language) {
+  static async processUserInput(input, language, lastMentionedCountry, lastMentionedEnergyType) {
     const processLanguage = CONFIG.SUPPORTED_LANGUAGES.includes(language) 
       ? language 
       : CONFIG.DEFAULT_LANGUAGE;
@@ -284,11 +290,22 @@ export class MessageService {
         const metadata = data?.metadata || {};
 
         // Format the message text with source in brackets
-        const text = `Here's the ${data.bal.toLowerCase()} data for ${data.siec.toLowerCase()} in ${data.country} for ${data.year}: ${data.value} ${data.unit} [Source: Eurostat]`;
+        const phrases = eurostatResponsePhrases[processLanguage] || eurostatResponsePhrases[CONFIG.DEFAULT_LANGUAGE];
+        let selectedPhrase = getRandomElement(phrases);
+
+        // Replace placeholders
+        selectedPhrase = selectedPhrase.replace('{country}', data.country_label || data.country); // Prefer label if available
+        selectedPhrase = selectedPhrase.replace('{year}', data.year);
+        selectedPhrase = selectedPhrase.replace('{balance}', data.bal_label || data.bal.toLowerCase()); // Prefer label
+        selectedPhrase = selectedPhrase.replace('{product}', data.siec_label || data.siec.toLowerCase()); // Prefer label
+        selectedPhrase = selectedPhrase.replace('{value}', data.value);
+        selectedPhrase = selectedPhrase.replace('{unit}', data.unit_label || data.unit); // Prefer label
+
+        const text = selectedPhrase; // Assign the formatted phrase to 'text'
 
         const botResponse = {
           sender: 'bot',
-          text: text,
+          text: text, // Use the new dynamic text
           language: processLanguage,
           isEurostatQuery: true,
           link: data.metadata?.url || 'https://ec.europa.eu/eurostat/databrowser/view/nrg_cb_sff/default/table?lang=en',
@@ -329,7 +346,7 @@ export class MessageService {
     }
 
     // If not a relationship question, continue with NLP processing and definition lookup
-    const nlpResult = await processText(input, processLanguage);
+    const nlpResult = await processText(input, processLanguage, lastMentionedCountry, lastMentionedEnergyType);
     const definition = await findEnergyDefinition(input.trim(), processLanguage);
     const botResponse = definition ? 
       this.createBotResponse(definition, processLanguage, nlpResult.context) : 
@@ -337,6 +354,10 @@ export class MessageService {
 
     if (nlpResult.intent) {
       botResponse.intent = nlpResult.intent;
+    }
+
+    if (nlpResult.context && nlpResult.context.resolvedEntities) {
+      botResponse.queryContext = { ...nlpResult.context.resolvedEntities };
     }
 
     const messages = [userMessage, botResponse];

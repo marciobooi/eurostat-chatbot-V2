@@ -62,17 +62,19 @@ function extractTermFromQuestion(text, language) {
 /**
  * Process text through NLP pipeline
  */
-export const processText = async (text, language = NLP_CONFIG.languages.default) => {
+export const processText = async (text, language = NLP_CONFIG.languages.default, lastMentionedCountry = null, lastMentionedEnergyType = null) => {
   try {
-    // First extract any question terms using language-specific patterns
+    // Resolve anaphora using the context from the previous turn
+    const resolvedText = contextManager.resolveAnaphora(text, lastMentionedCountry, lastMentionedEnergyType);
+
+    // Use resolvedText for all subsequent processing instead of the original 'text'
     const questionTerms = [];
-    const extractedTerm = extractTermFromQuestion(text, language);
-    if (extractedTerm && extractedTerm !== text.toLowerCase().trim()) {
+    const extractedTerm = extractTermFromQuestion(resolvedText, language); // Use resolvedText
+    if (extractedTerm && extractedTerm !== resolvedText.toLowerCase().trim()) {
       questionTerms.push(extractedTerm);
     }
     
-    // Process with language-specific plugin
-    const doc = processWithLanguage(text, language);
+    const doc = processWithLanguage(resolvedText, language); // Use resolvedText
     
     // Extract energy-specific entities
     const energyTypes = doc.energyTypes().out('array') || [];
@@ -86,20 +88,20 @@ export const processText = async (text, language = NLP_CONFIG.languages.default)
     };
 
     // Extract entities first to get canonical forms
-    const entities = await entityExtractor.extractEntities(text, language, energyEntities);
+    const entities = await entityExtractor.extractEntities(resolvedText, language, energyEntities); // Use resolvedText
     
     // Get intent using extracted entities
-    const intentResult = await intentClassifier.classifyIntent(text, entities, language);
+    const intentResult = await intentClassifier.classifyIntent(resolvedText, entities, language); // Use resolvedText
     
     // Analyze sentiment
-    const sentiment = await sentimentAnalyzer.analyzeSentiment(text, language);
+    const sentiment = await sentimentAnalyzer.analyzeSentiment(resolvedText, language); // Use resolvedText, though sentiment might be better on original
     
     // Update and get context using the conversation manager
-    const context = contextManager.updateContext('default', text, {
+    const context = contextManager.updateContext('default', text, { // Original text for history
       entities,
       intent: intentResult.primaryIntent,
       sentiment
-    }, language);
+    }, language, { lastMentionedCountry, lastMentionedEnergyType }); // Pass previous turn context
 
     return {
       entities,
@@ -107,8 +109,10 @@ export const processText = async (text, language = NLP_CONFIG.languages.default)
       allIntents: intentResult.allIntents,
       confidence: intentResult.confidence,
       sentiment,
-      context,
-      language
+      context, // This context is now based on processing resolvedText
+      language,
+      originalText: text, // Optionally return original text
+      resolvedText: resolvedText // Optionally return resolved text for debugging/transparency
     };
   } catch (error) {
     console.error('Error in NLP processing:', error);
@@ -152,7 +156,9 @@ export const extractEntities = async (text, language = NLP_CONFIG.languages.defa
  */
 export const findBestMatch = async (text, candidates, language = NLP_CONFIG.languages.default) => {
   try {
-    const nlpResult = await processText(text, language);
+    // Pass language and previous context to findBestMatch's processText call if it's intended to be context-aware for matching
+    // For now, assuming findBestMatch's internal processText call is for simpler, non-contextual processing or it handles its own context.
+    const nlpResult = await processText(text, language); // Removed undefined lastMentionedCountry, lastMentionedEnergyType
     const matches = [];
 
     // First try canonical forms from extracted entities
