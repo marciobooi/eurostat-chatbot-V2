@@ -24,8 +24,7 @@ import { filteredWords } from '../dictionaries/filteredWords';
 import i18n from 'i18next';
 import COUNTRY_MAP from '../dictionaries/countries';
 import { commonQuestionPhrases } from '../dictionaries/questionPhrases';
-import { introductoryPhrases } from '../dictionaries/introductoryPhrases';
-import { eurostatResponsePhrases } from '../dictionaries/eurostatResponsePhrases';
+import { dynamicMessages } from '../dictionaries/dynamicMessages';
 
 export class MessageService {
   static instance = null;
@@ -84,7 +83,7 @@ export class MessageService {
       }
     }
 
-    const introMessages = introductoryPhrases[language] || introductoryPhrases[CONFIG.DEFAULT_LANGUAGE];
+    const introMessages = dynamicMessages.introductions[language] || dynamicMessages.introductions[CONFIG.DEFAULT_LANGUAGE];
     let introText = getRandomElement(introMessages);
     introText = introText.replace('{topic}', definition.title);
 
@@ -290,7 +289,7 @@ export class MessageService {
         const metadata = data?.metadata || {};
 
         // Format the message text with source in brackets
-        const phrases = eurostatResponsePhrases[processLanguage] || eurostatResponsePhrases[CONFIG.DEFAULT_LANGUAGE];
+        const phrases = dynamicMessages.eurostatDataPresentations[processLanguage] || dynamicMessages.eurostatDataPresentations[CONFIG.DEFAULT_LANGUAGE];
         let selectedPhrase = getRandomElement(phrases);
 
         // Replace placeholders
