@@ -1,13 +1,45 @@
 // src/services/MessageService.test.js
-import MessageService from './MessageService'; // Assuming default export
+import MessageService from './MessageService';
 import { dynamicMessages } from '../dictionaries/dynamicMessages';
-import { CONFIG } from '../i18n'; // For default language
+import { CONFIG } from '../i18n';
 
 // Mocking randomUtils to control phrase selection
 jest.mock('../utils/randomUtils', () => ({
-  getRandomElement: jest.fn(arr => arr[0]) // Default mock: always pick the first element
+  getRandomElement: jest.fn(arr => arr[0])
 }));
 import { getRandomElement } from '../utils/randomUtils';
+
+// Mocking storageHandlers to prevent side effects
+jest.mock('../utils/storageHandlers', () => ({
+  saveChatToCookie: jest.fn(),
+  loadChatFromCookie: jest.fn(() => []),
+  setupCrossTabbingSyncListeners: jest.fn(() => jest.fn())
+}));
+
+// Mock contextManager and its methods
+jest.mock('../utils/nlp/contextManager', () => ({
+  contextManager: {
+    checkRelationship: jest.fn(() => ({ isRelationshipQuestion: false })),
+    processEurostatQuery: jest.fn(),
+    updateContext: jest.fn( (id, text, nlpResult) => ({
+        entities: nlpResult.entities,
+        intent: nlpResult.intent,
+    })),
+    resolveAnaphora: jest.fn((text) => text),
+  }
+}));
+// Import the mocked contextManager AFTER the jest.mock call
+import { contextManager } from '../utils/nlp/contextManager';
+
+// Mock nlpHandlers to control its output
+jest.mock('../utils/nlpHandlers', () => ({
+  ...jest.requireActual('../utils/nlpHandlers'),
+  findEnergyDefinition: jest.fn(),
+  processText: jest.fn().mockResolvedValue({
+    entities: {}, intent: 'general_info', sentiment: {score: 0}, context: {}
+  }),
+}));
+import { findEnergyDefinition, processText } from '../utils/nlpHandlers';
 
 
 describe('MessageService Response Phrasing', () => {
@@ -17,12 +49,10 @@ describe('MessageService Response Phrasing', () => {
     const mockDefinition = {
       title: 'Solar Power',
       text: 'This is the main text about solar power.',
-      // ... other necessary mock definition properties
     };
     const introPhrasesForLang = dynamicMessages.introductions[defaultLang];
 
     beforeEach(() => {
-      // Reset mock for each test if needed, or configure per test
       getRandomElement.mockImplementation(arr => arr[0]);
     });
 
@@ -35,31 +65,21 @@ describe('MessageService Response Phrasing', () => {
 
     test('should use a different introductory phrase if mock is changed', () => {
       if (introPhrasesForLang.length > 1) {
-        getRandomElement.mockImplementation(arr => arr[1]); // Pick the second phrase
+        getRandomElement.mockImplementation(arr => arr[1]);
         const response = MessageService.createBotResponse(mockDefinition, defaultLang, {});
         const expectedIntro = introPhrasesForLang[1].replace('{topic}', mockDefinition.title);
         expect(response.text.startsWith(expectedIntro)).toBe(true);
       } else {
-        // Skip or adjust if only one phrase for the language
-        expect(true).toBe(true); // Placeholder for test runner
+        expect(true).toBe(true);
       }
     });
 
     test('should verify multiple calls can produce different intros (conceptual, requires unmocked or more complex mock)', () => {
-      // This test is harder with simple mock.
-      // For a real test of randomness, you'd unmock getRandomElement for this specific test,
-      // call createBotResponse multiple times, and check that not all response.text are identical.
-      // Or, ensure your mock can be configured to return different values across calls.
-      // For now, we rely on the fact that getRandomElement is called.
-      expect(true).toBe(true); // Placeholder
+      expect(true).toBe(true);
     });
   });
 
   describe('processUserInput varied Eurostat responses', () => {
-    // Mocking contextManager.processEurostatQuery for these tests
-    // and other dependencies of processUserInput if they interfere.
-    // This is becoming more of an integration test for this part.
-
     const mockUserInput = "eurostat query text";
     const mockEurostatData = {
       isEurostatQuery: true,
@@ -78,24 +98,21 @@ describe('MessageService Response Phrasing', () => {
       }
     };
 
-    // Mock contextManager and its methods that processUserInput calls before Eurostat check
-    // This is simplified; a real scenario might need more extensive mocking.
-    jest.mock('../utils/nlp/contextManager', () => ({
-      contextManager: {
-        checkRelationship: jest.fn(() => ({ isRelationshipQuestion: false })),
-        processEurostatQuery: jest.fn(), // Will be configured per test
-        // Add other methods if processUserInput calls them before Eurostat part
-      }
-    }));
-    const { contextManager } = require('../utils/nlp/contextManager');
-
-
     const eurostatPhrasesForLang = dynamicMessages.eurostatDataPresentations[defaultLang];
 
     beforeEach(() => {
+      // Reset mocks before each test in this suite
       getRandomElement.mockImplementation(arr => arr[0]);
+
+      // Configure mocks for contextManager (already imported as mocked version)
+      contextManager.checkRelationship.mockReturnValue({ isRelationshipQuestion: false });
       contextManager.processEurostatQuery.mockResolvedValue(mockEurostatData);
-      // Reset other mocks if they are used by other parts of processUserInput
+
+      // Configure mocks for nlpHandlers (already imported as mocked versions)
+      findEnergyDefinition.mockResolvedValue(undefined);
+      processText.mockResolvedValue({ entities: {}, intent: 'general_info', sentiment: {score: 0}, context: { resolvedEntities: {} } });
+
+      // Mock static methods on MessageService that might interfere
       MessageService.isGreetingMessage = jest.fn(() => false);
       MessageService.isGratitudeMessage = jest.fn(() => false);
       MessageService.isFarewellMessage = jest.fn(() => false);
@@ -118,7 +135,7 @@ describe('MessageService Response Phrasing', () => {
 
     test('should use a different Eurostat phrase if mock is changed', async () => {
       if (eurostatPhrasesForLang.length > 1) {
-        getRandomElement.mockImplementation(arr => arr[1]); // Pick the second phrase
+        getRandomElement.mockImplementation(arr => arr[1]);
         const messages = await MessageService.processUserInput(mockUserInput, defaultLang, null, null);
         const botResponse = messages[1];
 
@@ -132,7 +149,7 @@ describe('MessageService Response Phrasing', () => {
 
         expect(botResponse.text).toBe(expectedText);
       } else {
-        expect(true).toBe(true); // Placeholder
+        expect(true).toBe(true);
       }
     });
   });

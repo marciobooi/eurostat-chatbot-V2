@@ -303,68 +303,57 @@ class ContextManager {
   }
 
   resolveAnaphora(text, lastMentionedCountry, lastMentionedEnergyType) {
-    let resolvedText = text;
+    let modifiedText = text; // Work on a copy
 
-    // Simple pronoun resolution for "it" or "its" referring to energy type
     if (lastMentionedEnergyType) {
-      // Regex to find "it" or "its" as whole words, possibly followed by 's for possessive "it's" (though "it's" is usually "it is")
-      // This needs to be careful not to replace "it" in words like "italy"
-      const itRegexEnergy = new RegExp(`\\b(it|its)\b`, 'gi');
-      if (/\b(it|its)\b/.test(resolvedText.toLowerCase())) {
-          // More specific checks can be added, e.g., if the sentence structure implies an entity
-          // For now, a broad replacement if "it/its" is present and a lastMentionedEnergyType exists.
-          // This is a placeholder for more sophisticated NLP checks.
-          // Example: "what is it?" -> "what is [lastMentionedEnergyType]?"
-          // Example: "tell me about its production" -> "tell me about [lastMentionedEnergyType] production"
+      const energyKeywords = ['production', 'consumption', 'import', 'export', 'data', 'info', 'details', 'usage', 'trend', 'about it', 'what is it', 'what about it'];
+      const itEnergyRegex = /\b(it|its)\b/gi;
 
-          // A simple heuristic: if "it" or "its" is near words like "production", "consumption", "import", "export", "data", "info"
-          const energyKeywords = ['production', 'consumption', 'import', 'export', 'data', 'info', 'details', 'usage', 'trend'];
-          let replacedIt = false;
-          energyKeywords.forEach(keyword => {
-              if (new RegExp(`\\b(it|its)\b\\s(\\w+\\s)?${keyword}`, 'i').test(resolvedText)) {
-                  resolvedText = resolvedText.replace(itRegexEnergy, lastMentionedEnergyType);
-                  replacedIt = true;
-              } else if (new RegExp(`${keyword}\\s(\\w+\\s)?\\b(it|its)\b`, 'i').test(resolvedText)) {
-                  resolvedText = resolvedText.replace(itRegexEnergy, lastMentionedEnergyType);
-                  replacedIt = true;
-              }
-          });
-          // If "it" is standalone, e.g. "what is it" or "tell me about it"
-          if (!replacedIt && /\b(what is it|tell me about it|what about it)\b/i.test(resolvedText)) {
-               resolvedText = resolvedText.replace(itRegexEnergy, lastMentionedEnergyType);
-          }
+      for (const keyword of energyKeywords) {
+        const pattern1 = new RegExp(`\\b(it|its)\\b(\\s+\\w+){0,2}\\s+${keyword}\\b`, 'i');
+        const pattern2 = new RegExp(`\\b${keyword}(\\s+\\w+){0,2}\\s+\\b(it|its)\\b`, 'i');
+        const pattern3 = new RegExp(`\\b${keyword}\\b`, 'i');
+
+        if (pattern1.test(modifiedText) || pattern2.test(modifiedText) || (keyword.includes(" it") && pattern3.test(modifiedText))) {
+          modifiedText = modifiedText.replace(itEnergyRegex, lastMentionedEnergyType);
+          break;
+        }
       }
     }
 
-    // Simple pronoun resolution for "it", "its", "they", "their" referring to country
     if (lastMentionedCountry) {
-      const countryPronounRegex = new RegExp(`\\b(it|its|they|their|them)\b`, 'gi');
-      if (/\b(it|its|they|their|them)\b/.test(resolvedText.toLowerCase())) {
-          // Similar heuristic: if pronouns are near country-related keywords or typical query structures
-          // This is also a placeholder for more sophisticated NLP.
-          // Example: "what is their total production" -> "what is [lastMentionedCountry] total production"
-          // Example: "show me data for them" -> "show me data for [lastMentionedCountry]"
-          const countryKeywords = ['data', 'stats', 'figures', 'information', 'population', 'capital', 'border'];
-           let replacedCountryPronoun = false;
-          countryKeywords.forEach(keyword => {
-              if (new RegExp(`\\b(it|its|they|their|them)\b\\s(\\w+\\s)?${keyword}`, 'i').test(resolvedText)) {
-                  resolvedText = resolvedText.replace(countryPronounRegex, lastMentionedCountry);
-                  replacedCountryPronoun = true;
-              } else if (new RegExp(`${keyword}\\s(\\w+\\s)?\\b(it|its|they|their|them)\b`, 'i').test(resolvedText)) {
-                   resolvedText = resolvedText.replace(countryPronounRegex, lastMentionedCountry);
-                   replacedCountryPronoun = true;
-              }
-          });
-          if (!replacedCountryPronoun && /\b(for them|about them|about it)\b/i.test(resolvedText)) {
-              resolvedText = resolvedText.replace(countryPronounRegex, lastMentionedCountry);
-          }
+      const countryKeywords = ['data', 'stats', 'figures', 'information', 'population', 'capital', 'border', 'production', 'consumption', 'import', 'export', 'for them', 'about them', 'about it'];
+      const specificCountryPronounRegex = /\b(they|their|them)\b/gi;
+
+      let replacedForCountry = false;
+      for (const keyword of countryKeywords) {
+        const pattern1 = new RegExp(`\\b(they|their|them)\\b(\\s+\\w+){0,2}\\s+${keyword}\\b`, 'i');
+        const pattern2 = new RegExp(`\\b${keyword}(\\s+\\w+){0,2}\\s+\\b(they|their|them)\b`, 'i');
+        const pattern3 = new RegExp(`\\b${keyword}\\b`, 'i');
+
+        if (pattern1.test(modifiedText) || pattern2.test(modifiedText) || (keyword.includes(" them") && pattern3.test(modifiedText))) {
+          modifiedText = modifiedText.replace(specificCountryPronounRegex, lastMentionedCountry);
+          replacedForCountry = true;
+          break;
+        }
+      }
+
+      if (!replacedForCountry) {
+         for (const keyword of countryKeywords) {
+            const pattern1 = new RegExp(`\\b(it|its)\\b(\\s+\\w+){0,2}\\s+${keyword}\\b`, 'i');
+            const pattern2 = new RegExp(`\\b${keyword}(\\s+\\w+){0,2}\\s+\\b(it|its)\\b`, 'i');
+            const pattern3 = new RegExp(`\\b${keyword}\\b`, 'i');
+
+            if (pattern1.test(modifiedText) || pattern2.test(modifiedText) || (keyword.includes(" it") && pattern3.test(modifiedText))) {
+                 if (/\b(it|its)\b/i.test(modifiedText)) {
+                    modifiedText = modifiedText.replace(/\b(it|its)\b/gi, lastMentionedCountry);
+                    break;
+                 }
+            }
+        }
       }
     }
-
-    // TODO: Add logic for underspecified queries, e.g., if user says "and production?"
-    // This would require checking the intent of the previous turn and filling in the missing entity (energyType).
-
-    return resolvedText;
+    return modifiedText;
   }
 }
 
