@@ -3,7 +3,7 @@ export const commonQuestionPhrases = {
     // Definition questions - these need to capture the energy term properly
     /^(?:what|tell me|explain|describe)\s+(?:is|are)\s+([\w\s-]+)(?:\?)?$/i,
     /^(?:can you tell me|could you explain|please describe)\s+(?:what|about)\s+([\w\s-]+)(?:\?)?$/i,
-    /^(?:define|give me information about|explain about)\s+([\w\s-]+)(?:\?)?$/i,
+    /^(?:tell me about|define|give me information about|explain about)\s+([\w\s-]+)(?:\?)?$/i,
     
     // Basic question starters (energy context)
     /^(?:what|how|why|where|when|which|who|whom|whose)\s/i,
