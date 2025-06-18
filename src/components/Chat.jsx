@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { findBestMatch, getGlobalRulerResult } from '../utils/ruler.js';
+import { processMessage } from '../utils/intentMessages.js';
 import { useKeyboardNavigation } from '../utils/keyboardNavigation.js';
 import { getTimeBasedWelcomeMessage } from '../data/WelcomeMessages.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -100,7 +100,6 @@ const Chat = () => {
       }
     }
   }, [messages]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!inputValue.trim() || isLoading) return;
@@ -121,30 +120,21 @@ const Chat = () => {
     await new Promise(resolve => setTimeout(resolve, 800));
 
     try {
-      // Use the ruler to find a match
-      const result = findBestMatch(query);
+      // Use the intent message processor
+      const response = await processMessage(query);
       
       // Add additional delay for more realistic typing simulation
       await new Promise(resolve => setTimeout(resolve, 1200));
       
-      let botResponse;
-      if (result && result.match) {
-        const match = result.match;
-        botResponse = {
-          id: Date.now() + 1,
-          type: 'bot',
-          content: formatMatchResponse(match, result),
-          timestamp: new Date(),
-          matchData: result
-        };
-      } else {
-        botResponse = {
-          id: Date.now() + 1,
-          type: 'bot',
-          content: 'I couldn\'t find a specific match for that term. Could you try rephrasing your question or using different keywords?',
-          timestamp: new Date(),
-          isError: true
-        };      }
+      const botResponse = {
+        id: Date.now() + 1,
+        type: 'bot',
+        content: response.content,
+        timestamp: new Date(),
+        responseType: response.type,
+        isError: response.isError,
+        matchData: response.matchData || null
+      };
 
       // Add the bot response directly
       setMessages(prev => [...prev, botResponse]);
@@ -159,35 +149,17 @@ const Chat = () => {
         isError: true
       };
       setMessages(prev => [...prev, errorResponse]);
-    } finally {setIsLoading(false);
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  const formatMatchResponse = (match, result) => {
-    let response = `**${match.title}**\n\n`;
-    
-    if (match.fuelCode) {
-      response += `**Fuel Code:** ${match.fuelCode}\n\n`;
-    }
-    
-    if (match.text) {
-      response += `${match.text}\n\n`;
-    }
-    
-    if (match.keywords && match.keywords.length > 0) {
-      response += `**Related terms:** ${match.keywords.join(', ')}\n\n`;
-    }
-    
-    response += `*Found using ${result.method} matching with ${(result.confidence * 100).toFixed(1)}% confidence*`;
-    
-    return response;
-  };
-
   const formatMessage = (content) => {
     // Simple markdown-like formatting
-    return content      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    return content
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/\n/g, '<br />');  };
+      .replace(/\n/g, '<br />');
+  };
 
   return (
     <div 
