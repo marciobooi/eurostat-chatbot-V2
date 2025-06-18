@@ -135,40 +135,13 @@ const normalizeInput = (input) => {
 };
 
 /**
- * Step 2: Intelligent spelling correction using nspell + energy dictionary + context
+ * Step 2: Intelligent spelling correction using nspell + centralized energy dictionary
  */
 const correctSpelling = (term) => {
-  // First check our custom energy spelling corrections
+  // First check our centralized energy spelling corrections
   if (spellingCorrections[term]) {
+    console.log(`   🔧 Energy-specific spell correction: "${term}" → "${spellingCorrections[term]}"`);
     return spellingCorrections[term];
-  }
-  
-  // Special handling for common energy term misspellings
-  const energySpecificCorrections = {
-    'blak': 'black',
-    'licor': 'liquor',
-    'fosil': 'fossil',
-    'renawable': 'renewable',
-    'sustanability': 'sustainability',
-    'eficiency': 'efficiency',
-    'comsumption': 'consumption',
-    'transformacion': 'transformation',
-    'electricty': 'electricity',
-    'hidrogen': 'hydrogen',
-    'prduction': 'production',
-    'nuclar': 'nuclear',
-    'winnd': 'wind',
-    'biogas': 'biogas',
-    'enegry': 'energy',
-    'powerr': 'power',
-    'oyl': 'oil',
-    'gass': 'gas'
-  };
-  
-  // Check energy-specific corrections first
-  if (energySpecificCorrections[term]) {
-    console.log(`   🔧 Energy-specific spell correction: "${term}" → "${energySpecificCorrections[term]}"`);
-    return energySpecificCorrections[term];
   }
   
   // If nspell is available, use it for intelligent correction

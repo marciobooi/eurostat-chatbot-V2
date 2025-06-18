@@ -41,8 +41,7 @@ export const spellingCorrections = {
   'solarpower': 'solar power',
   'hydropower': 'hydro power',
   'powerplant': 'power plant',
-  'powerstation': 'power station',
-  'energyuse': 'energy use',
+  'powerstation': 'power station',  'energyuse': 'energy use',
   'energysource': 'energy source',
   'energysources': 'energy sources',
   'energyproduction': 'energy production',
@@ -50,5 +49,19 @@ export const spellingCorrections = {
   'energyefficiency': 'energy efficiency',
   'greenenergy': 'green energy',
   'cleanenergy': 'clean energy',
-  'alternativeenergy': 'alternative energy'
+  'alternativeenergy': 'alternative energy',
+  
+  // Additional energy-specific spelling corrections
+  'blak': 'black',
+  'licor': 'liquor',
+  'hidrogen': 'hydrogen',
+  'prduction': 'production',
+  'nuclar': 'nuclear',
+  'winnd': 'wind',
+  'biogas': 'biogas',
+  'enegry': 'energy',
+  'powerr': 'power',
+  'oyl': 'oil',
+  'comsumption': 'consumption',
+  'transformacion': 'transformation'
 };
