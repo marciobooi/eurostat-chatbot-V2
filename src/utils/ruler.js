@@ -129,20 +129,76 @@ const extractMeaningfulTerms = (text) => {
 };
 
 /**
- * Step 6: Exact match search
+ * Universal field searcher - searches all fields with priority weighting
+ * Used by all 10 ruler steps for consistent comprehensive searching
+ */
+const searchAllFields = (item, query, matchFunction) => {
+  const results = [];
+  
+  // Define fields to search with their weights (higher = more important)
+  const fieldConfig = [
+    { field: 'title', weight: 0.3, value: item.title || '' },
+    { field: 'fuelCode', weight: 0.2, value: item.fuelCode || '' },
+    { field: 'keywords', weight: 0.25, value: (item.keywords || []).join(' ') },
+    { field: 'description', weight: 0.25, value: item.text || item.description || '' }
+  ];
+  
+  // Search each field
+  fieldConfig.forEach(config => {
+    if (config.value) {
+      const score = matchFunction(query, config.value);
+      if (score > 0) {
+        results.push({
+          field: config.field,
+          score: score * config.weight, // Apply field weight
+          rawScore: score,
+          value: config.value
+        });
+      }
+    }
+  });
+  
+  // Return best result across all fields
+  if (results.length > 0) {
+    const bestResult = results.reduce((best, current) => 
+      current.score > best.score ? current : best
+    );
+    return {
+      item,
+      score: bestResult.score,
+      rawScore: bestResult.rawScore,
+      field: bestResult.field,
+      matchedValue: bestResult.value
+    };
+  }
+  
+  return null;
+};
+
+/**
+ * Step 6: Exact match search (enhanced with universal field search)
  */
 const findExactMatch = (query) => {
   const normalizedQuery = normalizeInput(query);
   
-  return searchData.find(item => {
-    const normalizedTitle = normalizeInput(item.title || '');
-    const normalizedCode = normalizeInput(item.fuelCode || '');
-    const normalizedKeywords = (item.keywords || []).map(k => normalizeInput(k));
-    
-    return normalizedTitle === normalizedQuery || 
-           normalizedCode === normalizedQuery ||
-           normalizedKeywords.includes(normalizedQuery);
+  // Exact match function
+  const exactMatchFn = (q, fieldValue) => {
+    const normalizedField = normalizeInput(fieldValue);
+    return normalizedField === q ? 1.0 : 0;
+  };
+  
+  let bestMatch = null;
+  let bestScore = 0;
+  
+  searchData.forEach(item => {
+    const result = searchAllFields(item, normalizedQuery, exactMatchFn);
+    if (result && result.score > bestScore) {
+      bestScore = result.score;
+      bestMatch = result.item;
+    }
   });
+  
+  return bestMatch;
 };
 
 /**
@@ -155,37 +211,33 @@ const fuzzySearch = (query) => {
 };
 
 /**
- * Step 8: Levenshtein distance matching (fixed)
+ * Step 8: Levenshtein distance matching (enhanced with universal field search)
  */
 const levenshteinMatch = (query, threshold = 0.6) => {
+  // Levenshtein similarity function
+  const levenshteinSimilarity = (q, fieldValue) => {
+    const distance = levenshtein(q.toLowerCase(), fieldValue.toLowerCase());
+    const maxLength = Math.max(q.length, fieldValue.length);
+    const similarity = 1 - (distance / maxLength);
+    return similarity >= threshold ? similarity : 0;
+  };
+  
   let bestMatch = null;
   let bestScore = 0;
   
   searchData.forEach(item => {
-    // Check against title, keywords, and fuel code
-    const textsToCheck = [
-      item.title?.toLowerCase() || '',
-      ...(item.keywords || []).map(k => k.toLowerCase()),
-      item.fuelCode?.toLowerCase() || ''
-    ].filter(text => text.length > 0);
-    
-    textsToCheck.forEach(searchableText => {
-      const distance = levenshtein(query.toLowerCase(), searchableText);
-      const maxLength = Math.max(query.length, searchableText.length);
-      const similarity = 1 - (distance / maxLength);
-      
-      if (similarity >= threshold && similarity > bestScore) {
-        bestScore = similarity;
-        bestMatch = { item, score: similarity };
-      }
-    });
+    const result = searchAllFields(item, query, levenshteinSimilarity);
+    if (result && result.score > bestScore) {
+      bestScore = result.score;
+      bestMatch = result;
+    }
   });
   
   return bestMatch;
 };
 
 /**
- * Step 9: Phonetic matching using simple soundex (improved)
+ * Step 9: Phonetic matching using simple soundex (enhanced with universal field search)
  */
 const phoneticMatch = (query) => {
   try {
@@ -218,50 +270,37 @@ const phoneticMatch = (query) => {
       return result.padEnd(4, '0').substring(0, 4);
     };
     
-    const queryWords = query.split(/\s+/);
-    const queryPhonetics = queryWords.map(word => soundex(word)).filter(s => s);
+    // Phonetic similarity function
+    const phoneticSimilarity = (q, fieldValue) => {
+      const queryWords = q.split(/\s+/);
+      const queryPhonetics = queryWords.map(word => soundex(word)).filter(s => s);
+      
+      const fieldWords = fieldValue.split(/\s+/);
+      const fieldPhonetics = fieldWords.map(word => soundex(word)).filter(s => s);
+      
+      let matches = 0;
+      queryPhonetics.forEach(qPhonetic => {
+        if (fieldPhonetics.includes(qPhonetic)) {
+          matches++;
+        }
+      });
+      
+      // Return match ratio
+      return queryPhonetics.length > 0 ? matches / queryPhonetics.length : 0;
+    };
     
     let bestMatch = null;
-    let maxMatches = 0;
+    let bestScore = 0;
     
     searchData.forEach(item => {
-      try {
-        let matches = 0;
-        
-        // Check title words
-        if (item.title) {
-          const titleWords = item.title.split(/\s+/);
-          titleWords.forEach(word => {
-            const wordPhonetic = soundex(word);
-            if (queryPhonetics.includes(wordPhonetic)) {
-              matches += 2;
-            }
-          });
-        }
-        
-        // Check keywords
-        if (item.keywords) {
-          item.keywords.forEach(keyword => {
-            const keywordWords = keyword.split(/\s+/);
-            keywordWords.forEach(word => {
-              const wordPhonetic = soundex(word);
-              if (queryPhonetics.includes(wordPhonetic)) {
-                matches += 1;
-              }
-            });
-          });
-        }
-        
-        if (matches > maxMatches) {
-          maxMatches = matches;
-          bestMatch = { item, score: matches };
-        }
-      } catch (e) {
-        // Skip items that can't be processed
+      const result = searchAllFields(item, query, phoneticSimilarity);
+      if (result && result.score > bestScore) {
+        bestScore = result.score;
+        bestMatch = result;
       }
     });
     
-    return bestMatch && maxMatches > 0 ? bestMatch : null;
+    return bestMatch && bestMatch.score > 0 ? bestMatch : null;
   } catch (e) {
     console.log('Phonetic matching failed, skipping...');
     return null;
@@ -295,35 +334,32 @@ const hybridStem = (word) => {
 };
 
 /**
- * Step 10: Stemming-based matching using hybrid Porter stemmer (improved)
+ * Step 10: Stemming-based matching using hybrid Porter stemmer (enhanced with universal field search)
  */
 const stemmingMatch = (query) => {
-  const queryWords = query.split(/\s+/);
-  const queryStemmed = queryWords.map(word => hybridStem(word));
+  // Stemming similarity function
+  const stemmingSimilarity = (q, fieldValue) => {
+    const queryWords = q.split(/\s+/);
+    const queryStemmed = queryWords.map(word => hybridStem(word));
+    
+    const fieldWords = fieldValue.toLowerCase().split(/\s+/);
+    const fieldStemmed = fieldWords.map(word => hybridStem(word));
+    
+    const intersection = queryStemmed.filter(stem => fieldStemmed.includes(stem));
+    const score = intersection.length / Math.max(queryStemmed.length, fieldStemmed.length);
+    
+    return score > 0.2 ? score : 0; // Threshold for valid match
+  };
   
   let bestMatch = null;
   let bestScore = 0;
   
   searchData.forEach(item => {
-    // Create a comprehensive text to stem from multiple fields
-    const textFields = [
-      item.title || '',
-      ...(item.keywords || []),
-      item.fuelCode || ''
-    ].filter(text => text.length > 0);
-    
-    textFields.forEach(text => {
-      const itemWords = text.toLowerCase().split(/\s+/);
-      const itemStemmed = itemWords.map(word => hybridStem(word));
-      
-      const intersection = queryStemmed.filter(stem => itemStemmed.includes(stem));
-      const score = intersection.length / Math.max(queryStemmed.length, itemStemmed.length);
-      
-      if (score > bestScore && score > 0.2) { // Lower threshold for better coverage
-        bestScore = score;
-        bestMatch = { item, score };
-      }
-    });
+    const result = searchAllFields(item, query, stemmingSimilarity);
+    if (result && result.score > bestScore) {
+      bestScore = result.score;
+      bestMatch = result;
+    }
   });
   
   return bestMatch;
