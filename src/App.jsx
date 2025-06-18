@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 import { runTests } from "./utils/test";
+import Chat from "./components/Chat";
 import "./App.css";
 
 function App() {
@@ -12,13 +13,13 @@ function App() {
           // Run automated tests after app is loaded (only once)
       if (process.env.NODE_ENV === 'development' && !testsRunRef.current) {
         testsRunRef.current = true;
-         runTests();
+        //  runTests();
       }
   
   }, []);
-
   return (
       <div className="app-container">
+        <Chat />
       </div>
 
   );

@@ -95,7 +95,6 @@ const initSpellChecker = async () => {
         }
       });
       
-      console.log('✅ Added energy terms to spell checker');
     }
   } catch (error) {
     console.warn('⚠️ Spell checker initialization failed:', error.message);
