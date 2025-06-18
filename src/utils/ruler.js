@@ -12,6 +12,40 @@ import levenshtein from 'js-levenshtein';
 import stemmer from 'porter-stemmer';
 import nspell from 'nspell';
 
+// Performance improvements: Add caching mechanisms
+const queryCache = new Map();
+const CACHE_SIZE_LIMIT = 1000;
+const CACHE_TTL = 60000; // 1 minute
+
+// Clear cache when it gets too large
+const manageCacheSize = () => {
+  if (queryCache.size > CACHE_SIZE_LIMIT) {
+    const entries = Array.from(queryCache.entries());
+    const now = Date.now();
+    // Remove expired entries first
+    entries.forEach(([key, value]) => {
+      if (now - value.timestamp > CACHE_TTL) {
+        queryCache.delete(key);
+      }
+    });
+    // If still too large, remove oldest entries
+    if (queryCache.size > CACHE_SIZE_LIMIT) {
+      const sortedEntries = entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
+      const toRemove = queryCache.size - CACHE_SIZE_LIMIT + 100;
+      for (let i = 0; i < toRemove; i++) {
+        queryCache.delete(sortedEntries[i][0]);
+      }
+    }
+  }
+};
+
+// Performance monitoring
+const performanceMetrics = {
+  totalQueries: 0,
+  cacheHits: 0,
+  averageResponseTime: 0,
+  stepTimings: {}
+};
 
 
 
@@ -154,40 +188,46 @@ const normalizeInput = (input) => {
  * Step 2: Intelligent spelling correction using nspell + centralized energy dictionary
  */
 const correctSpelling = (term) => {
-  // First check our centralized energy spelling corrections
-  if (spellingCorrections[term]) {
-    console.log(`   🔧 Energy-specific spell correction: "${term}" → "${spellingCorrections[term]}"`);
-    return spellingCorrections[term];
-  }
-  
-  // If nspell is available, use it for intelligent correction
-  if (spellChecker) {
-    // Check if the word is already correct
-    if (spellChecker.correct(term)) {
-      return term;
+  try {
+    // First check our centralized energy spelling corrections
+    if (spellingCorrections[term]) {
+      console.log(`   🔧 Energy-specific spell correction: "${term}" → "${spellingCorrections[term]}"`);
+      return spellingCorrections[term];
     }
-      // Get suggestions for misspelled words
-    const suggestions = spellChecker.suggest(term);
     
-    if (suggestions.length > 0) {
-      // For energy context, prefer energy-related suggestions
-      for (const suggestion of suggestions) {
-        // Use centralized energy keyword checking
-        if (isEnergyRelated(suggestion)) {
-          console.log(`   🔧 Context-aware spell correction: "${term}" → "${suggestion}"`);
-          return suggestion;
-        }
+    // If nspell is available, use it for intelligent correction
+    if (spellChecker) {
+      // Check if the word is already correct
+      if (spellChecker.correct(term)) {
+        return term;
       }
       
-      // Fallback to first suggestion if no energy context found
-      const bestSuggestion = suggestions[0];
-      console.log(`   🔧 Spell correction: "${term}" → "${bestSuggestion}"`);
-      return bestSuggestion;
+      // Get suggestions for misspelled words
+      const suggestions = spellChecker.suggest(term);
+      
+      if (suggestions.length > 0) {
+        // For energy context, prefer energy-related suggestions
+        for (const suggestion of suggestions) {
+          // Use centralized energy keyword checking
+          if (isEnergyRelated(suggestion)) {
+            console.log(`   🔧 Context-aware spell correction: "${term}" → "${suggestion}"`);
+            return suggestion;
+          }
+        }
+        
+        // Fallback to first suggestion if no energy context found
+        const bestSuggestion = suggestions[0];
+        console.log(`   🔧 Spell correction: "${term}" → "${bestSuggestion}"`);
+        return bestSuggestion;
+      }
     }
+    
+    // Fallback to original term if no correction found
+    return term;
+  } catch (error) {
+    console.warn(`⚠️ Spell correction failed for "${term}":`, error.message);
+    return term;
   }
-  
-  // Fallback to original term if no correction found
-  return term;
 };
 
 /**
@@ -469,190 +509,227 @@ const stemmingMatch = (query) => {
 
 /**
  * Main ruler function - ALWAYS performs all 10 steps and chooses the best result
+ * Enhanced with caching and performance monitoring
  */
 export const findBestMatch = (userQuery) => {
-  console.log(`🔍 Ruler System: Processing query "${userQuery}"`);
+  const startTime = performance.now();
+  performanceMetrics.totalQueries++;
   
-  // Step 1: Normalize input
-  let processedQuery = normalizeInput(userQuery);
-  console.log(`Step 1 - Normalized: "${processedQuery}"`);
-  
-  // Step 2: Spelling correction
-  const words = processedQuery.split(/\s+/);
-  const correctedWords = words.map(correctSpelling);
-  processedQuery = correctedWords.join(' ');
-  console.log(`Step 2 - Spell corrected: "${processedQuery}"`);
-  
-  // Step 3: Expand abbreviations
-  const expandedWords = correctedWords.map(expandAbbreviations);
-  const expandedQuery = expandedWords.join(' ');
-  console.log(`Step 3 - Abbreviations expanded: "${expandedQuery}"`);
-  
-  // Step 4: Expand synonyms
-  const synonymWords = expandedWords.map(expandSynonyms);
-  const synonymQuery = synonymWords.join(' ');
-  console.log(`Step 4 - Synonyms expanded: "${synonymQuery}"`);
-  
-  // Step 5: Extract meaningful terms
-  const meaningfulTerms = extractMeaningfulTerms(synonymQuery);
-  console.log(`Step 5 - Meaningful terms: [${meaningfulTerms.join(', ')}]`);
-  
-  // Initialize candidates array to store ALL matches from all 10 steps
-  const candidates = [];
-  
-  // Step 6: Exact matching (highest priority)
-  console.log(`🔍 Step 6 - Exact matching...`);
-  const exactMatch = findExactMatch(processedQuery);
-  if (exactMatch) {
-    candidates.push({
-      match: exactMatch,
-      confidence: 100,  // Highest score for exact matches
-      method: 'exact',
-      step: 6,
-      query: processedQuery
-    });
-    console.log(`   ✅ Found: "${exactMatch.title}"`);
-  } else {
-    console.log(`   ❌ No exact match`);
+  // Check cache first
+  const cacheKey = userQuery.toLowerCase().trim();
+  const cachedResult = queryCache.get(cacheKey);
+  if (cachedResult && Date.now() - cachedResult.timestamp < CACHE_TTL) {
+    performanceMetrics.cacheHits++;
+    console.log(`� Cache hit for query: "${userQuery}"`);
+    return cachedResult.result;
   }
+  
+  console.log(`�🔍 Ruler System: Processing query "${userQuery}"`);
+  
+  try {
+    // Step 1: Normalize input
+    let processedQuery = normalizeInput(userQuery);
+    console.log(`Step 1 - Normalized: "${processedQuery}"`);
+    
+    // Step 2: Spelling correction
+    const words = processedQuery.split(/\s+/);
+    const correctedWords = words.map(correctSpelling);
+    processedQuery = correctedWords.join(' ');
+    console.log(`Step 2 - Spell corrected: "${processedQuery}"`);
+    
+    // Step 3: Expand abbreviations
+    const expandedWords = correctedWords.map(expandAbbreviations);
+    const expandedQuery = expandedWords.join(' ');
+    console.log(`Step 3 - Abbreviations expanded: "${expandedQuery}"`);
+    
+    // Step 4: Expand synonyms
+    const synonymWords = expandedWords.map(expandSynonyms);
+    const synonymQuery = synonymWords.join(' ');
+    console.log(`Step 4 - Synonyms expanded: "${synonymQuery}"`);
+    
+    // Step 5: Extract meaningful terms
+    const meaningfulTerms = extractMeaningfulTerms(synonymQuery);
+    console.log(`Step 5 - Meaningful terms: [${meaningfulTerms.join(', ')}]`);
+    
+    // Initialize candidates array to store ALL matches from all 10 steps
+    const candidates = [];
+    
+    // Step 6: Exact matching (highest priority)
+    console.log(`🔍 Step 6 - Exact matching...`);
+    const exactMatch = findExactMatch(processedQuery);
+    if (exactMatch) {
+      candidates.push({
+        match: exactMatch,
+        confidence: 100,  // Highest score for exact matches
+        method: 'exact',
+        step: 6,
+        query: processedQuery
+      });
+      console.log(`   ✅ Found: "${exactMatch.title}"`);
+    } else {
+      console.log(`   ❌ No exact match`);
+    }
+    
     // Step 7: Fuzzy search with multiple query variations
-  console.log(`🔍 Step 7 - Fuzzy matching...`);
-  const fuzzyQueries = [processedQuery, synonymQuery, expandedQuery];
-  let bestFuzzyResult = null;
-  let bestFuzzyScore = 1; // Lower is better for fuzzy
-  
-  fuzzyQueries.forEach(query => {
-    const result = fuzzySearch(query);
-    if (result && result.score < bestFuzzyScore) {
-      bestFuzzyScore = result.score;
-      bestFuzzyResult = result;
-    }
-  });
-  
-  if (bestFuzzyResult) {
-    const fuzzyScore = Math.max(0, (1 - bestFuzzyResult.score) * 85); // Max 85 points for fuzzy
-    candidates.push({
-      match: bestFuzzyResult.item,
-      confidence: fuzzyScore,
-      method: 'fuzzy',
-      step: 7,
-      query: 'multiple queries tested',
-      rawScore: bestFuzzyResult.score
+    console.log(`🔍 Step 7 - Fuzzy matching...`);
+    const fuzzyQueries = [processedQuery, synonymQuery, expandedQuery];
+    let bestFuzzyResult = null;
+    let bestFuzzyScore = 1; // Lower is better for fuzzy
+    
+    fuzzyQueries.forEach(query => {
+      const result = fuzzySearch(query);
+      if (result && result.score < bestFuzzyScore) {
+        bestFuzzyScore = result.score;
+        bestFuzzyResult = result;
+      }
     });
-    console.log(`   ✅ Found: "${bestFuzzyResult.item.title}" (score: ${fuzzyScore.toFixed(1)})`);
-  } else {
-    console.log(`   ❌ No fuzzy match`);
-  }
+    
+    if (bestFuzzyResult) {
+      const fuzzyScore = Math.max(0, (1 - bestFuzzyResult.score) * 85); // Max 85 points for fuzzy
+      candidates.push({
+        match: bestFuzzyResult.item,
+        confidence: fuzzyScore,
+        method: 'fuzzy',
+        step: 7,
+        query: 'multiple queries tested',
+        rawScore: bestFuzzyResult.score
+      });
+      console.log(`   ✅ Found: "${bestFuzzyResult.item.title}" (score: ${fuzzyScore.toFixed(1)})`);
+    } else {
+      console.log(`   ❌ No fuzzy match`);
+    }
+    
     // Step 8: Levenshtein matching with multiple query variations
-  console.log(`🔍 Step 8 - Levenshtein matching...`);
-  const levenshteinQueries = [processedQuery, synonymQuery, expandedQuery];
-  let bestLevenshteinResult = null;
-  let bestLevenshteinScore = 0;
-  
-  levenshteinQueries.forEach(query => {
-    const result = levenshteinMatch(query);
-    if (result && result.score > bestLevenshteinScore) {
-      bestLevenshteinScore = result.score;
-      bestLevenshteinResult = result;
-    }
-  });
-  
-  if (bestLevenshteinResult) {
-    const levenshteinScore = Math.max(0, bestLevenshteinResult.score * 70); // Max 70 points
-    candidates.push({
-      match: bestLevenshteinResult.item,
-      confidence: levenshteinScore,
-      method: 'levenshtein',
-      step: 8,
-      query: 'multiple queries tested',
-      rawScore: bestLevenshteinResult.score
+    console.log(`🔍 Step 8 - Levenshtein matching...`);
+    const levenshteinQueries = [processedQuery, synonymQuery, expandedQuery];
+    let bestLevenshteinResult = null;
+    let bestLevenshteinScore = 0;
+    
+    levenshteinQueries.forEach(query => {
+      const result = levenshteinMatch(query);
+      if (result && result.score > bestLevenshteinScore) {
+        bestLevenshteinScore = result.score;
+        bestLevenshteinResult = result;
+      }
     });
-    console.log(`   ✅ Found: "${bestLevenshteinResult.item.title}" (score: ${levenshteinScore.toFixed(1)})`);
-  } else {
-    console.log(`   ❌ No Levenshtein match`);
-  }
+    
+    if (bestLevenshteinResult) {
+      const levenshteinScore = Math.max(0, bestLevenshteinResult.score * 70); // Max 70 points
+      candidates.push({
+        match: bestLevenshteinResult.item,
+        confidence: levenshteinScore,
+        method: 'levenshtein',
+        step: 8,
+        query: 'multiple queries tested',
+        rawScore: bestLevenshteinResult.score
+      });
+      console.log(`   ✅ Found: "${bestLevenshteinResult.item.title}" (score: ${levenshteinScore.toFixed(1)})`);
+    } else {
+      console.log(`   ❌ No Levenshtein match`);
+    }
+    
     // Step 9: Phonetic matching with multiple query variations
-  console.log(`🔍 Step 9 - Phonetic matching...`);
-  const phoneticQueries = [processedQuery, synonymQuery, expandedQuery];
-  let bestPhoneticResult = null;
-  let bestPhoneticScore = 0;
-  
-  phoneticQueries.forEach(query => {
-    const result = phoneticMatch(query);
-    if (result && result.score > bestPhoneticScore) {
-      bestPhoneticScore = result.score;
-      bestPhoneticResult = result;
-    }
-  });
-  
-  if (bestPhoneticResult) {
-    const phoneticScore = Math.min(60, bestPhoneticResult.score * 15); // Max 60 points
-    candidates.push({
-      match: bestPhoneticResult.item,
-      confidence: phoneticScore,
-      method: 'phonetic',
-      step: 9,
-      query: 'multiple queries tested',
-      rawScore: bestPhoneticResult.score
+    console.log(`🔍 Step 9 - Phonetic matching...`);
+    const phoneticQueries = [processedQuery, synonymQuery, expandedQuery];
+    let bestPhoneticResult = null;
+    let bestPhoneticScore = 0;
+    
+    phoneticQueries.forEach(query => {
+      const result = phoneticMatch(query);
+      if (result && result.score > bestPhoneticScore) {
+        bestPhoneticScore = result.score;
+        bestPhoneticResult = result;
+      }
     });
-    console.log(`   ✅ Found: "${bestPhoneticResult.item.title}" (score: ${phoneticScore.toFixed(1)})`);
-  } else {
-    console.log(`   ❌ No phonetic match`);
-  }
+    
+    if (bestPhoneticResult) {
+      const phoneticScore = Math.min(60, bestPhoneticResult.score * 15); // Max 60 points
+      candidates.push({
+        match: bestPhoneticResult.item,
+        confidence: phoneticScore,
+        method: 'phonetic',
+        step: 9,
+        query: 'multiple queries tested',
+        rawScore: bestPhoneticResult.score
+      });
+      console.log(`   ✅ Found: "${bestPhoneticResult.item.title}" (score: ${phoneticScore.toFixed(1)})`);
+    } else {
+      console.log(`   ❌ No phonetic match`);
+    }
+    
     // Step 10: Stemming matching with multiple query variations
-  console.log(`🔍 Step 10 - Stemming matching...`);
-  const stemmingQueries = [processedQuery, synonymQuery, expandedQuery];
-  let bestStemmingResult = null;
-  let bestStemmingScore = 0;
-  
-  stemmingQueries.forEach(query => {
-    const result = stemmingMatch(query);
-    if (result && result.score > bestStemmingScore) {
-      bestStemmingScore = result.score;
-      bestStemmingResult = result;
-    }
-  });
-  
-  if (bestStemmingResult) {
-    const stemmingScore = Math.max(0, bestStemmingResult.score * 50); // Max 50 points
-    candidates.push({
-      match: bestStemmingResult.item,
-      confidence: stemmingScore,
-      method: 'stemming',
-      step: 10,
-      query: 'multiple queries tested',
-      rawScore: bestStemmingResult.score
+    console.log(`🔍 Step 10 - Stemming matching...`);
+    const stemmingQueries = [processedQuery, synonymQuery, expandedQuery];
+    let bestStemmingResult = null;
+    let bestStemmingScore = 0;
+    
+    stemmingQueries.forEach(query => {
+      const result = stemmingMatch(query);
+      if (result && result.score > bestStemmingScore) {
+        bestStemmingScore = result.score;
+        bestStemmingResult = result;
+      }
     });
-    console.log(`   ✅ Found: "${bestStemmingResult.item.title}" (score: ${stemmingScore.toFixed(1)})`);
-  } else {
-    console.log(`   ❌ No stemming match`);
-  }
-  
-  // Evaluate all candidates and choose the best one
-  if (candidates.length === 0) {
-    console.log(`❌ No matches found in any of the 10 steps for: "${userQuery}"`);
+    
+    if (bestStemmingResult) {
+      const stemmingScore = Math.max(0, bestStemmingResult.score * 50); // Max 50 points
+      candidates.push({
+        match: bestStemmingResult.item,
+        confidence: stemmingScore,
+        method: 'stemming',
+        step: 10,
+        query: 'multiple queries tested',
+        rawScore: bestStemmingResult.score
+      });
+      console.log(`   ✅ Found: "${bestStemmingResult.item.title}" (score: ${stemmingScore.toFixed(1)})`);
+    } else {
+      console.log(`   ❌ No stemming match`);
+    }
+    
+    // Evaluate all candidates and choose the best one
+    if (candidates.length === 0) {
+      console.log(`❌ No matches found in any of the 10 steps for: "${userQuery}"`);
+      return null;
+    }
+    
+    // Sort candidates by confidence score (highest first)
+    candidates.sort((a, b) => b.confidence - a.confidence);
+    
+    console.log(`\n📊 EVALUATION RESULTS (${candidates.length} candidates found):`);
+    candidates.forEach((candidate, index) => {
+      console.log(`   ${index + 1}. "${candidate.match.title}" - Step ${candidate.step} (${candidate.method}) - Score: ${candidate.confidence.toFixed(1)}`);
+    });
+    
+    // Choose the best candidate
+    const bestCandidate = candidates[0];
+    console.log(`\n🏆 BEST MATCH: "${bestCandidate.match.title}" from Step ${bestCandidate.step} (${bestCandidate.method}) with score ${bestCandidate.confidence.toFixed(1)}`);
+    
+    const result = {
+      match: bestCandidate.match,
+      confidence: bestCandidate.confidence / 100, // Convert back to 0-1 scale
+      method: bestCandidate.method,
+      step: bestCandidate.step,
+      allCandidates: candidates, // Include all candidates for analysis
+      queryProcessingTime: performance.now() - startTime
+    };
+    
+    // Cache the result
+    manageCacheSize();
+    queryCache.set(cacheKey, {
+      result,
+      timestamp: Date.now()
+    });
+    
+    // Update performance metrics
+    const responseTime = performance.now() - startTime;
+    performanceMetrics.averageResponseTime = 
+      (performanceMetrics.averageResponseTime * (performanceMetrics.totalQueries - 1) + responseTime) / performanceMetrics.totalQueries;
+    
+    return result;
+  } catch (error) {
+    console.error(`❌ Error processing query "${userQuery}":`, error);
     return null;
   }
-  
-  // Sort candidates by confidence score (highest first)
-  candidates.sort((a, b) => b.confidence - a.confidence);
-  
-  console.log(`\n📊 EVALUATION RESULTS (${candidates.length} candidates found):`);
-  candidates.forEach((candidate, index) => {
-    console.log(`   ${index + 1}. "${candidate.match.title}" - Step ${candidate.step} (${candidate.method}) - Score: ${candidate.confidence.toFixed(1)}`);
-  });
-  
-  // Choose the best candidate
-  const bestCandidate = candidates[0];
-  console.log(`\n🏆 BEST MATCH: "${bestCandidate.match.title}" from Step ${bestCandidate.step} (${bestCandidate.method}) with score ${bestCandidate.confidence.toFixed(1)}`);
-  
-  return {
-    match: bestCandidate.match,
-    confidence: bestCandidate.confidence / 100, // Convert back to 0-1 scale
-    method: bestCandidate.method,
-    step: bestCandidate.step,
-    allCandidates: candidates // Include all candidates for analysis
-  };
 };
 
 /**
@@ -724,4 +801,185 @@ export const getSearchDataStats = () => {
   });
   
   return stats;
+};
+
+/**
+ * Get performance metrics for monitoring and optimization
+ */
+export const getPerformanceMetrics = () => {
+  return {
+    ...performanceMetrics,
+    cacheHitRate: performanceMetrics.totalQueries > 0 ? 
+      (performanceMetrics.cacheHits / performanceMetrics.totalQueries * 100).toFixed(2) + '%' : '0%',
+    cacheSize: queryCache.size
+  };
+};
+
+/**
+ * Clear cache and reset performance metrics
+ */
+export const resetCache = () => {
+  queryCache.clear();
+  performanceMetrics.totalQueries = 0;
+  performanceMetrics.cacheHits = 0;
+  performanceMetrics.averageResponseTime = 0;
+  performanceMetrics.stepTimings = {};
+  console.log('🧹 Cache and performance metrics reset');
+};
+
+/**
+ * Get detailed analysis of search data quality
+ */
+export const analyzeSearchDataQuality = () => {
+  const analysis = {
+    totalItems: searchData.length,
+    quality: {
+      withTitle: 0,
+      withKeywords: 0,
+      withDescription: 0,
+      withFuelCode: 0,
+      withAllFields: 0,
+      empty: 0
+    },
+    averageKeywordsPerItem: 0,
+    averageDescriptionLength: 0,
+    duplicateTitles: []
+  };
+  
+  const titleCounts = {};
+  let totalKeywords = 0;
+  let totalDescriptionLength = 0;
+  
+  searchData.forEach(item => {
+    // Track title duplicates
+    if (item.title) {
+      titleCounts[item.title] = (titleCounts[item.title] || 0) + 1;
+      analysis.quality.withTitle++;
+    }
+    
+    if (item.keywords && item.keywords.length > 0) {
+      analysis.quality.withKeywords++;
+      totalKeywords += item.keywords.length;
+    }
+    
+    if (item.text || item.description) {
+      analysis.quality.withDescription++;
+      totalDescriptionLength += (item.text || item.description || '').length;
+    }
+    
+    if (item.fuelCode) {
+      analysis.quality.withFuelCode++;
+    }
+    
+    if (item.title && item.keywords && (item.text || item.description) && item.fuelCode) {
+      analysis.quality.withAllFields++;
+    }
+    
+    if (!item.title && (!item.keywords || item.keywords.length === 0) && 
+        !item.text && !item.description && !item.fuelCode) {
+      analysis.quality.empty++;
+    }
+  });
+  
+  // Find duplicate titles
+  analysis.duplicateTitles = Object.entries(titleCounts)
+    .filter(([title, count]) => count > 1)
+    .map(([title, count]) => ({ title, count }));
+  
+  analysis.averageKeywordsPerItem = analysis.quality.withKeywords > 0 ? 
+    (totalKeywords / analysis.quality.withKeywords).toFixed(2) : 0;
+  
+  analysis.averageDescriptionLength = analysis.quality.withDescription > 0 ? 
+    (totalDescriptionLength / analysis.quality.withDescription).toFixed(0) : 0;
+  
+  return analysis;
+};
+
+/**
+ * Batch processing for multiple queries with performance tracking
+ */
+export const batchFindBestMatch = async (queries, progressCallback = null) => {
+  const results = [];
+  const startTime = performance.now();
+  
+  for (let i = 0; i < queries.length; i++) {
+    const query = queries[i];
+    const result = findBestMatch(query);
+    results.push({
+      query,
+      result,
+      index: i
+    });
+    
+    if (progressCallback) {
+      progressCallback({
+        completed: i + 1,
+        total: queries.length,
+        percentage: ((i + 1) / queries.length * 100).toFixed(1),
+        currentQuery: query,
+        result
+      });
+    }
+    
+    // Add small delay to prevent blocking the UI
+    if (i % 10 === 0 && i > 0) {
+      await new Promise(resolve => setTimeout(resolve, 1));
+    }
+  }
+  
+  const totalTime = performance.now() - startTime;
+  console.log(`📊 Batch processing completed: ${queries.length} queries in ${totalTime.toFixed(2)}ms`);
+  
+  return {
+    results,
+    summary: {
+      totalQueries: queries.length,
+      totalTime: totalTime.toFixed(2),
+      averageTimePerQuery: (totalTime / queries.length).toFixed(2),
+      successRate: (results.filter(r => r.result !== null).length / queries.length * 100).toFixed(1)
+    }
+  };
+};
+
+/**
+ * Export configuration for fine-tuning
+ */
+export const getConfiguration = () => ({
+  fuseOptions,
+  cacheSettings: {
+    size: CACHE_SIZE_LIMIT,
+    ttl: CACHE_TTL
+  },
+  thresholds: {
+    fuzzy: 0.8,
+    levenshtein: 0.6,
+    stemming: 0.2
+  },
+  scoring: {
+    exact: 100,
+    fuzzy: 85,
+    levenshtein: 70,
+    phonetic: 60,
+    stemming: 50
+  }
+});
+
+/**
+ * Update configuration dynamically
+ */
+export const updateConfiguration = (newConfig) => {
+  if (newConfig.fuseOptions) {
+    Object.assign(fuseOptions, newConfig.fuseOptions);
+    console.log('🔧 Fuse.js options updated');
+  }
+  
+  // Recreate Fuse instance with new options if needed
+  if (newConfig.fuseOptions) {
+    const newFuse = new Fuse(searchData, fuseOptions);
+    // Replace the global fuse instance
+    Object.setPrototypeOf(fuse, newFuse);
+    Object.assign(fuse, newFuse);
+  }
+  
+  console.log('⚙️ Configuration updated successfully');
 };
