@@ -20,6 +20,8 @@
     "chalk": "^5.4.1",
     "compromise": "^14.14.4",
     "fuse.js": "^7.1.0",
+    "highcharts": "^12.2.0",
+    "highcharts-react-official": "^3.2.2",
     "js-levenshtein": "^1.1.6",
     "nspell": "^2.1.5",
     "porter-stemmer": "^0.9.1",

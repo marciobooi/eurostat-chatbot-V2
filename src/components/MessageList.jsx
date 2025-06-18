@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faRobot, 
@@ -8,6 +8,7 @@ import {
   faChartLine, 
   faExternalLinkAlt 
 } from '@fortawesome/free-solid-svg-icons';
+import Chart from './Chart';
 import './MessageList.css';
 
 const MessageList = forwardRef(({
@@ -60,6 +61,9 @@ const Message = ({
   onVisualizationClick,
   onLinkClick
 }) => {
+  // State to track which chart is currently displayed
+  const [currentChartType, setCurrentChartType] = useState(null);
+  
   // Helper function to get chart icon
   const getChartIcon = (chartType) => {
     switch (chartType) {
@@ -68,6 +72,26 @@ const Message = ({
       case 'line': return faChartLine;
       default: return faChartBar;
     }
+  };
+
+  // Handle visualization button click
+  const handleVisualizationClick = (chartType) => {
+    setCurrentChartType(chartType);
+    onVisualizationClick(chartType);
+  };
+
+  // Handle chart type change from within the chart
+  const handleChartTypeChange = (newChartType) => {
+    setCurrentChartType(newChartType);
+    onVisualizationClick(newChartType);
+  };
+
+  // Get remaining visualization types (exclude currently displayed)
+  const getRemainingVisualizationTypes = () => {
+    if (!message.visualizationType || !currentChartType) {
+      return message.visualizationType || [];
+    }
+    return message.visualizationType.filter(type => type !== currentChartType);
   };
 
   return (
@@ -94,24 +118,33 @@ const Message = ({
         <div className="message-header sr-only">
           {message.type === 'bot' ? 'Eurostat Energy Bot' : 'You'} said:
         </div>
-        
-        <div 
+          <div 
           className="message-text"
           dangerouslySetInnerHTML={{ __html: formatMessage(message.content) }}
           role="text"
         />
         
+        {/* Chart display for bot messages when a chart type is selected */}
+        {message.type === 'bot' && currentChartType && message.hasVisualization && (
+          <Chart
+            type={currentChartType}
+            title={`${message.content.split('**')[1] || 'Energy Data'} - ${currentChartType} Chart`}
+            remainingVisualizationTypes={getRemainingVisualizationTypes()}
+            onVisualizationChange={handleChartTypeChange}
+          />
+        )}
+        
         {/* Visualization and Link buttons for bot messages */}
         {message.type === 'bot' && (message.hasVisualization || message.link) && (
           <div className="message-actions" role="group" aria-label="Message actions">
-            {/* Visualization buttons */}
-            {message.hasVisualization && message.visualizationType && message.visualizationType.length > 0 && (
+            {/* Visualization buttons - only show if no chart is currently displayed */}
+            {message.hasVisualization && message.visualizationType && message.visualizationType.length > 0 && !currentChartType && (
               <div className="visualization-buttons">
                 {message.visualizationType.map((chartType, idx) => (
                   <button
                     key={idx}
                     className="action-button visualization-button"
-                    onClick={() => onVisualizationClick(chartType)}
+                    onClick={() => handleVisualizationClick(chartType)}
                     aria-label={`View ${chartType} chart`}
                     title={`View as ${chartType} chart`}
                   >
