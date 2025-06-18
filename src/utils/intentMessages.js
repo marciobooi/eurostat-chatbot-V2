@@ -2,24 +2,34 @@ import { findBestMatch } from './ruler.js';
 import { GREETING_WORDS, GREETING_RESPONSES } from '../data/greetings.js';
 import { goodbyeWords, FAREWELL_RESPONSES } from '../data/farewell.js';
 import { spellingCorrections } from '../data/SpellingCorrections.js';
+import { getRandomUnknownResponse } from '../data/UnknownResponses.js';
+import { energyKeywords, isEnergyRelated } from '../data/EnergyKeywords.js';
+import { isAmbiguousPhrase, isAmbiguousWord, AMBIGUOUS_QUESTION_WORDS } from '../data/AmbiguousPhrases.js';
 import nspell from 'nspell';
 
 /**
  * Message flow for the chat
  * 
  * This implements a comprehensive intent flow processing for the messages 
- * we try to find the word in dictionaries inside the data folder
- * with tokenization and intent classification
+ * using dictionaries from the data folder for consistent and maintainable classification
+ * 
+ * Dictionary Integration:
+ * - EnergyKeywords.js: Contains comprehensive energy-related terms for recognition
+ * - AmbiguousPhrases.js: Defines vague inputs that need clarification
+ * - greetings.js: Greeting patterns and response variations
+ * - farewell.js: Farewell patterns and response variations
+ * - UnknownResponses.js: Randomized responses for different unknown scenarios
  * 
  * Message Flow:
  * 1. User Input → Trim + Lowercase + Tokenization
  * 2. Check spelling with nspell and corrections
  * 3. Detect greetings → provide random greeting response
  * 4. Detect farewells → provide random farewell response
- * 5. Find definition (delegate to ruler) → structured energy definition response
- * 6. Default → helpful fallback response
+ * 5. Check for ambiguous inputs → provide clarification request
+ * 6. Find definition (delegate to ruler) → structured energy definition response
+ * 7. Default → helpful fallback response
  * 
- * All responses except definitions provide random variations for natural conversation
+ * All responses use dictionary-based randomization for natural conversation
  */
 
 // Intent types
@@ -149,6 +159,52 @@ const getRandomResponse = (responseArray) => {
 };
 
 /**
+ * Check if input is too short or ambiguous and needs clarification
+ */
+const needsClarification = (text, tokens) => {
+  // Very short inputs (1-2 characters)
+  if (text.length <= 2) {
+    return true;
+  }
+  
+  // Check if the entire phrase is ambiguous
+  if (isAmbiguousPhrase(text)) {
+    return true;
+  }
+  
+  // Single word that's not a greeting, farewell, or energy-related term
+  if (tokens.length === 1) {
+    const token = tokens[0];
+    const greetingWords = GREETING_WORDS.en || [];
+    const farewellWords = goodbyeWords.en || [];
+    
+    // Check if it's an ambiguous word
+    if (isAmbiguousWord(token)) {
+      return true;
+    }
+    
+    // Check if it's a known greeting or farewell
+    const isGreetingOrFarewell = greetingWords.includes(token) ||
+                                farewellWords.some(farewell => farewell.toLowerCase().includes(token));
+    
+    // Check if it's energy-related
+    const isEnergyWord = isEnergyRelated(token);
+    
+    // If it's not a greeting, farewell, or energy-related, it needs clarification
+    if (!isGreetingOrFarewell && !isEnergyWord) {
+      return true;
+    }
+  }
+  
+  // Short phrases with ambiguous question words
+  if (tokens.length <= 2 && tokens.some(token => isAmbiguousWord(token))) {
+    return true;
+  }
+  
+  return false;
+};
+
+/**
  * Classify user intent based on input
  */
 const classifyIntent = (text, tokens) => {
@@ -162,7 +218,12 @@ const classifyIntent = (text, tokens) => {
     return INTENT_TYPES.FAREWELL;
   }
   
-  // If not greeting or farewell, assume it's a definition request
+  // Check if input needs clarification
+  if (needsClarification(text, tokens)) {
+    return INTENT_TYPES.UNKNOWN;
+  }
+  
+  // If not greeting, farewell, or ambiguous, assume it's a definition request
   // The ruler will determine if it's actually answerable
   return INTENT_TYPES.DEFINITION;
 };
@@ -174,7 +235,7 @@ const formatDefinitionResponse = (match, result) => {
   if (!match) {
     return {
       type: RESPONSE_TYPES.FALLBACK,
-      content: "I couldn't find a specific match for that term. Could you try rephrasing your question or using different keywords? I specialize in energy definitions, fuel codes, and energy-related terminology.",
+      content: getRandomUnknownResponse('no_match'),
       isError: false
     };
   }
@@ -227,8 +288,7 @@ export const processMessage = async (userInput) => {
     
     // Step 4: Classify intent
     const intent = classifyIntent(correctedText, tokens);
-    
-    // Step 5: Generate response based on intent
+      // Step 5: Generate response based on intent
     switch (intent) {
       case INTENT_TYPES.GREETING:
         return {
@@ -244,15 +304,21 @@ export const processMessage = async (userInput) => {
           isError: false
         };
       
+      case INTENT_TYPES.UNKNOWN:
+        return {
+          type: RESPONSE_TYPES.FALLBACK,
+          content: getRandomUnknownResponse('clarification'),
+          isError: false
+        };
+      
       case INTENT_TYPES.DEFINITION:
         // Delegate to ruler for definition matching
         const result = findBestMatch(correctedText);
         return formatDefinitionResponse(result?.match, result);
-      
-      default:
+        default:
         return {
           type: RESPONSE_TYPES.FALLBACK,
-          content: "I'm here to help with energy-related questions, definitions, and fuel codes. What would you like to know?",
+          content: getRandomUnknownResponse('unknown'),
           isError: false
         };
     }
@@ -278,4 +344,29 @@ export const getProcessingInfo = (originalText, correctedText, intent) => {
     detectedIntent: intent,
     timestamp: new Date()
   };
+};
+
+/**
+ * Test function to preview different unknown response types
+ * Useful for testing the variety of responses
+ */
+export const previewUnknownResponses = () => {
+  console.log('🎭 Preview of Unknown Response Types:\n');
+  
+  console.log('📝 Unknown/General responses:');
+  for (let i = 0; i < 3; i++) {
+    console.log(`   ${i + 1}. ${getRandomUnknownResponse('unknown')}`);
+  }
+  
+  console.log('\n🚫 No Match responses:');
+  for (let i = 0; i < 3; i++) {
+    console.log(`   ${i + 1}. ${getRandomUnknownResponse('no_match')}`);
+  }
+  
+  console.log('\n❓ Clarification responses:');
+  for (let i = 0; i < 3; i++) {
+    console.log(`   ${i + 1}. ${getRandomUnknownResponse('clarification')}`);
+  }
+  
+  console.log('\n✨ All responses are randomized for natural conversation!');
 };
