@@ -336,6 +336,5 @@
   .keyboard-instructions {
     background: rgba(79, 70, 229, 0.1);
     border-color: rgba(79, 70, 229, 0.2);
-    color: var(--neutral-300);
-  }
+    color: var(--neutral-300);  }
 }

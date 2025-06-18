@@ -415,3 +415,201 @@
     color: var(--neutral-400);
   }
 }
+
+/* Subfuel Section Styles */
+.subfuel-section {
+  padding: var(--spacing-4) var(--spacing-6);
+  margin: 0 var(--spacing-4);
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(67, 56, 202, 0.08) 100%);
+  border-radius: 20px;
+  border: 1px solid rgba(79, 70, 229, 0.15);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  animation: slideInUp 0.4s ease-out;
+}
+
+.subfuel-section:hover {
+  border-color: rgba(79, 70, 229, 0.25);
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.1);
+}
+
+.subfuel-section-header {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--neutral-700);
+  margin-bottom: var(--spacing-3);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  text-align: center;
+  justify-content: center;
+}
+
+.subfuel-buttons-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+  align-items: center;
+  justify-content: center;
+}
+
+.subfuel-button {
+  background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+  color: white;
+  border: none;
+  padding: var(--spacing-2-5) var(--spacing-4);
+  border-radius: 25px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 4px 12px rgba(79, 70, 229, 0.25),
+    0 2px 4px rgba(79, 70, 229, 0.1);
+  position: relative;
+  overflow: hidden;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.3;
+  white-space: nowrap;
+  transform: scale(1);
+}
+
+.subfuel-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.6s ease;
+}
+
+.subfuel-button:hover {
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 
+    0 8px 25px rgba(79, 70, 229, 0.35),
+    0 4px 8px rgba(79, 70, 229, 0.15);
+}
+
+.subfuel-button:hover::before {
+  left: 100%;
+}
+
+.subfuel-button:active {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 
+    0 4px 12px rgba(79, 70, 229, 0.25),
+    0 2px 4px rgba(79, 70, 229, 0.1);
+}
+
+.subfuel-button:focus {
+  outline: none;
+  box-shadow: 
+    0 4px 12px rgba(79, 70, 229, 0.25),
+    0 0 0 3px rgba(79, 70, 229, 0.3);
+}
+
+.subfuel-button:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}
+
+.subfuel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  pointer-events: none;
+}
+
+/* Responsive subfuel section */
+@media (max-width: 768px) {
+  .subfuel-section {
+    padding: var(--spacing-3) var(--spacing-4);
+    margin: 0 var(--spacing-2);
+    border-radius: 16px;
+  }
+  
+  .subfuel-section-header {
+    font-size: 0.875rem;
+    margin-bottom: var(--spacing-2);
+  }
+  
+  .subfuel-buttons-container {
+    gap: var(--spacing-1-5);
+  }
+  
+  .subfuel-button {
+    font-size: 0.8rem;
+    padding: var(--spacing-2) var(--spacing-3);
+    border-radius: 20px;
+    min-height: 36px;
+  }
+}
+
+/* Dark mode subfuel section */
+@media (prefers-color-scheme: dark) {
+  .subfuel-section {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(67, 56, 202, 0.18) 100%);
+    border-color: rgba(79, 70, 229, 0.3);
+  }
+  
+  .subfuel-section:hover {
+    border-color: rgba(79, 70, 229, 0.4);
+    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.2);
+  }
+  
+  .subfuel-section-header {
+    color: var(--neutral-200);
+  }
+  
+  .subfuel-button {
+    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+    box-shadow: 
+      0 4px 12px rgba(79, 70, 229, 0.4),
+      0 2px 4px rgba(79, 70, 229, 0.2);
+  }
+  
+  .subfuel-button:hover {
+    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+    box-shadow: 
+      0 8px 25px rgba(79, 70, 229, 0.5),
+      0 4px 8px rgba(79, 70, 229, 0.25);
+  }
+}
+
+/* Animation for subfuel section appearing */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pulse animation for new subfuel buttons */
+.subfuel-button {
+  animation: buttonPulse 0.6s ease-out;
+}
+
+@keyframes buttonPulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

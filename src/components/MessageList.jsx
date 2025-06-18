@@ -45,7 +45,7 @@ const Message = ({
   index, 
   isTyping, 
   isFocused, 
-  formatMessage 
+  formatMessage
 }) => {
   return (
     <div 
@@ -67,7 +67,8 @@ const Message = ({
         )}
       </div>
       
-      <div className="message-content">        <div className="message-header sr-only">
+      <div className="message-content">
+        <div className="message-header sr-only">
           {message.type === 'bot' ? 'Eurostat Energy Bot' : 'You'} said:
         </div>
         

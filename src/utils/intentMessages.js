@@ -5,6 +5,7 @@ import { spellingCorrections } from '../data/SpellingCorrections.js';
 import { getRandomUnknownResponse } from '../data/UnknownResponses.js';
 import { energyKeywords, isEnergyRelated } from '../data/EnergyKeywords.js';
 import { isAmbiguousPhrase, isAmbiguousWord, AMBIGUOUS_QUESTION_WORDS } from '../data/AmbiguousPhrases.js';
+import { getRandomStarter, getConfidencePhrase, getSubfuelIntro } from '../data/DefinitionStarters.js';
 import nspell from 'nspell';
 
 /**
@@ -240,26 +241,40 @@ const formatDefinitionResponse = (match, result) => {
     };
   }
 
-  let response = `**${match.title}**\n\n`;
+  // Get starter phrase and confidence phrase
+  const starter = getRandomStarter();
+  const confidencePhrase = getConfidencePhrase(result.confidence * 100);
   
+  // Start with confidence phrase and starter
+  let response = `${confidencePhrase} ${starter} **${match.title}**:\n\n`;
+  
+  // Add fuel code if available
   if (match.fuelCode) {
     response += `**Fuel Code:** ${match.fuelCode}\n\n`;
   }
   
+  // Add definition text
   if (match.text) {
     response += `${match.text}\n\n`;
   }
   
-  if (match.keywords && match.keywords.length > 0) {
-    response += `**Related terms:** ${match.keywords.join(', ')}\n\n`;
+  // Handle subfuels instead of related terms
+  if (match.subFuels && match.subFuels.length > 0) {
+    const subfuelIntro = getSubfuelIntro();
+    response += `**${subfuelIntro}**\n`;
+    // Create dynamic buttons for subfuels (this will be handled in the UI)
+    const subfuelList = match.subFuels.map(fuel => `• ${fuel}`).join('\n');
+    response += `${subfuelList}\n\n`;
   }
   
-  response += `*Found using ${result.method} matching with ${(result.confidence * 100).toFixed(1)}% confidence*`;
+  // Add technical info with method and confidence
+  response += `*${result.method} matching • ${(result.confidence * 100).toFixed(1)}% confidence*`;
   
   return {
     type: RESPONSE_TYPES.DEFINITION,
     content: response,
     matchData: result,
+    subfuels: match.subFuels || [],
     isError: false
   };
 };

@@ -24,9 +24,11 @@ const Chat = () => {
       type: 'bot',
       content: welcomeMessage.content,
       timestamp: welcomeMessage.timestamp
-    }
-  ]);const [inputValue, setInputValue] = useState('');  const [isLoading, setIsLoading] = useState(false);
+    }  ]);
+  const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [currentSubfuels, setCurrentSubfuels] = useState([]);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const messagesContainerRef = useRef(null);  const clearButtonRef = useRef(null);
@@ -52,8 +54,7 @@ const Chat = () => {
     announceToScreenReader('Keyboard shortcuts help closed');
     // Return focus to help button
     helpButtonRef.current?.focus();
-  };
-  const clearChat = () => {
+  };  const clearChat = () => {
     // Get a fresh welcome message when clearing chat
     const newWelcomeMessage = getTimeBasedWelcomeMessage();
     setMessages([
@@ -64,8 +65,69 @@ const Chat = () => {
         timestamp: newWelcomeMessage.timestamp
       }
     ]);
+    setCurrentSubfuels([]);
     inputRef.current?.focus();
   };
+
+  // Handle subfuel button clicks
+  const handleSubfuelClick = async (subfuelName) => {
+    if (isLoading) return;
+
+    // Add user message for the subfuel click
+    const userMessage = {
+      id: Date.now(),
+      type: 'user',
+      content: subfuelName,
+      timestamp: new Date(),
+      isSubfuelClick: true
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setIsLoading(true);
+
+    // Add typing delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    try {
+      // Process the subfuel name as a definition request
+      const response = await processMessage(subfuelName);
+      
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      
+      const botResponse = {
+        id: Date.now() + 1,
+        type: 'bot',
+        content: response.content,
+        timestamp: new Date(),
+        responseType: response.type,
+        isError: response.isError,
+        matchData: response.matchData || null,        subfuels: response.subfuels || []
+      };
+
+      setMessages(prev => [...prev, botResponse]);
+      
+      // Update current subfuels for the button area
+      if (response.subfuels && response.subfuels.length > 0) {
+        setCurrentSubfuels(response.subfuels);
+      } else {
+        setCurrentSubfuels([]);
+      }
+      
+    } catch (error) {
+      console.error('Error processing subfuel:', error);
+      const errorResponse = {
+        id: Date.now() + 1,
+        type: 'bot',
+        content: 'Sorry, I encountered an error while looking up that fuel type. Please try again.',
+        timestamp: new Date(),
+        isError: true
+      };
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Use keyboard navigation hook
   const {
     focusedMessageIndex,
@@ -124,20 +186,26 @@ const Chat = () => {
       const response = await processMessage(query);
       
       // Add additional delay for more realistic typing simulation
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      
-      const botResponse = {
+      await new Promise(resolve => setTimeout(resolve, 1200));      const botResponse = {
         id: Date.now() + 1,
         type: 'bot',
         content: response.content,
         timestamp: new Date(),
         responseType: response.type,
         isError: response.isError,
-        matchData: response.matchData || null
+        matchData: response.matchData || null,
+        subfuels: response.subfuels || []
       };
 
       // Add the bot response directly
       setMessages(prev => [...prev, botResponse]);
+      
+      // Update current subfuels for the button area
+      if (response.subfuels && response.subfuels.length > 0) {
+        setCurrentSubfuels(response.subfuels);
+      } else {
+        setCurrentSubfuels([]);
+      }
       
     } catch (error) {
       console.error('Error processing message:', error);
@@ -205,8 +273,7 @@ const Chat = () => {
             <FontAwesomeIcon icon={faTrash} />
           </button>
         </div>
-      </div>      <div className="chat-content">
-        <MessageList
+      </div>      <div className="chat-content">        <MessageList
           ref={messagesContainerRef}
           messages={messages}
           focusedMessageIndex={focusedMessageIndex}
@@ -214,14 +281,36 @@ const Chat = () => {
           messagesEndRef={messagesEndRef}
           formatMessage={formatMessage}
         />
-        
-        <TypingIndicator 
+          <TypingIndicator 
           isVisible={isLoading}
           message="Bot is typing..."
           showAvatar={true}
           size="default"
         />
       </div>
+
+      {/* Subfuel buttons section */}
+      {currentSubfuels.length > 0 && (
+        <div className="subfuel-section" role="group" aria-label="Related fuel types">
+          <div className="subfuel-section-header">
+            🔗 Explore specific fuel types:
+          </div>
+          <div className="subfuel-buttons-container">
+            {currentSubfuels.map((subfuel, idx) => (
+              <button
+                key={idx}
+                className="subfuel-button"
+                onClick={() => handleSubfuelClick(subfuel)}
+                disabled={isLoading}
+                aria-label={`Get definition for ${subfuel}`}
+                title={`Click to learn about ${subfuel}`}
+              >
+                {subfuel}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       
       <form onSubmit={handleSubmit} className="chat-input-form" role="search">
         <div className="input-group">
