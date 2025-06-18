@@ -5,13 +5,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faQuestionCircle, 
   faTrash, 
-  faRobot, 
-  faUser, 
   faPaperPlane
 } from '@fortawesome/free-solid-svg-icons';
 import HelpModal from './HelpModal';
 import TypingIndicator from './TypingIndicator';
 import LoadingSpinner from './LoadingSpinner';
+import MessageList from './MessageList';
 import './Chat.css';
 
 const Chat = () => {
@@ -229,66 +228,22 @@ const Chat = () => {
             <FontAwesomeIcon icon={faTrash} />
           </button>
         </div>
-      </div>
-      <div 
-        className="chat-messages"        ref={messagesContainerRef}
-        role="log"
-        aria-live="polite"
-        aria-label="Chat conversation"
-        aria-describedby="chat-description"
-        tabIndex="0"
-      >
-        <div className="keyboard-instructions" aria-hidden={!isKeyboardUser}>
-          Use arrow keys to navigate messages, Enter to interact, / to focus input
-        </div>
+      </div>      <div className="chat-content">
+        <MessageList
+          ref={messagesContainerRef}
+          messages={messages}
+          focusedMessageIndex={focusedMessageIndex}
+          isKeyboardUser={isKeyboardUser}
+          messagesEndRef={messagesEndRef}
+          formatMessage={formatMessage}
+        />
         
-        {messages.map((message, index) => (
-          <div 
-            key={message.id} 
-            className={`message ${message.type} ${message.isError ? 'error' : ''} ${index === focusedMessageIndex ? 'focused' : ''}`}
-            role="article"
-            aria-label={`${message.type === 'bot' ? 'Bot' : 'User'} message`}
-            tabIndex="-1"
-            data-message-index={index}
-          >
-            <div className="message-avatar" aria-hidden="true">              {message.type === 'bot' ? (
-                <div className="bot-avatar">
-                  <FontAwesomeIcon icon={faRobot} />
-                </div>
-              ) : (
-                <div className="user-avatar">
-                  <FontAwesomeIcon icon={faUser} />
-                </div>
-              )}
-            </div>
-            <div className="message-content">
-              <div className="message-header sr-only">
-                {message.type === 'bot' ? 'Bot' : 'User'} said at {message.timestamp.toLocaleTimeString()}:
-              </div>              <div 
-                className="message-text"
-                dangerouslySetInnerHTML={{ __html: formatMessage(message.content) }}
-                role="text"
-              />
-              <div className="message-timestamp" aria-hidden="true">
-                {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </div>
-              
-              {/* Additional information for screen readers */}
-              {message.matchData && (
-                <div className="sr-only">
-                  Match found using {message.matchData.method} method with {Math.round(message.matchData.confidence * 100)}% confidence.
-                </div>
-              )}
-            </div>
-          </div>        ))}        
         <TypingIndicator 
           isVisible={isLoading}
           message="Bot is typing..."
           showAvatar={true}
           size="default"
         />
-        
-        <div ref={messagesEndRef} />
       </div>
       
       <form onSubmit={handleSubmit} className="chat-input-form" role="search">
