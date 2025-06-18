@@ -9,6 +9,7 @@ import { removeStopwords } from 'stopword';
 import nlp from 'compromise';
 import levenshtein from 'js-levenshtein';
 import stemmer from 'porter-stemmer';
+import nspell from 'nspell';
 
 
 
@@ -21,7 +22,7 @@ import stemmer from 'porter-stemmer';
  * 
  * Process Flow (Ruler Pattern):
  * 1. User Input → Trim + Lowercase
- * 2. Check spellingFixes.json
+ * 2. Check spelling with nspell
  * 3. Expand abbreviations
  * 4. Check synonymMap
  * 5. Extract nouns (compromise) + remove stopwords
@@ -34,6 +35,60 @@ import stemmer from 'porter-stemmer';
  */
 
 // Initialize professional NLP tools (Porter stemmer)
+
+// Initialize nspell for intelligent spelling correction
+let spellChecker = null;
+
+// Initialize spell checker with local dictionary files
+const initSpellChecker = async () => {
+  try {
+    const fs = await import('fs');
+    const path = await import('path');
+    const { fileURLToPath } = await import('url');
+    
+    // Get the directory path for ES modules
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    
+    // Read local dictionary files
+    const dicPath = path.join(__dirname, '..', 'dictionaries', 'en.dic');
+    const affPath = path.join(__dirname, '..', 'dictionaries', 'en.aff');
+    
+    const dicContent = fs.readFileSync(dicPath, 'utf8');
+    const affContent = fs.readFileSync(affPath, 'utf8');
+    
+    // Initialize nspell with local dictionary files
+    spellChecker = nspell({
+      dic: dicContent,
+      aff: affContent
+    });
+    
+    // Add energy-specific terms to the spell checker dictionary
+    const energyTerms = [
+      ...Object.keys(spellingCorrections),
+      ...Object.values(spellingCorrections),
+      ...Object.keys(abbreviations),
+      ...Object.values(abbreviations).flat(),
+      ...Object.keys(synonyms),
+      ...Object.values(synonyms).flat()
+    ];
+    
+    // Add energy terms to avoid false corrections
+    energyTerms.forEach(term => {
+      if (term && typeof term === 'string') {
+        spellChecker.add(term.toLowerCase());
+      }
+    });
+    
+    console.log('✅ Spell checker initialized with local dictionaries and energy terms');
+  } catch (error) {
+    console.warn('⚠️ Spell checker initialization failed:', error.message);
+    spellChecker = null;
+  }
+};
+
+// Initialize spell checker when module loads
+initSpellChecker();
 
 // Configuration for Fuse.js fuzzy search
 const fuseOptions = {
@@ -80,10 +135,71 @@ const normalizeInput = (input) => {
 };
 
 /**
- * Step 2: Spelling corrections using dictionary
+ * Step 2: Intelligent spelling correction using nspell + energy dictionary + context
  */
 const correctSpelling = (term) => {
-  return spellingCorrections[term] || term;
+  // First check our custom energy spelling corrections
+  if (spellingCorrections[term]) {
+    return spellingCorrections[term];
+  }
+  
+  // Special handling for common energy term misspellings
+  const energySpecificCorrections = {
+    'blak': 'black',
+    'licor': 'liquor',
+    'fosil': 'fossil',
+    'renawable': 'renewable',
+    'sustanability': 'sustainability',
+    'eficiency': 'efficiency',
+    'comsumption': 'consumption',
+    'transformacion': 'transformation',
+    'electricty': 'electricity',
+    'hidrogen': 'hydrogen',
+    'prduction': 'production',
+    'nuclar': 'nuclear',
+    'winnd': 'wind',
+    'biogas': 'biogas',
+    'enegry': 'energy',
+    'powerr': 'power',
+    'oyl': 'oil',
+    'gass': 'gas'
+  };
+  
+  // Check energy-specific corrections first
+  if (energySpecificCorrections[term]) {
+    console.log(`   🔧 Energy-specific spell correction: "${term}" → "${energySpecificCorrections[term]}"`);
+    return energySpecificCorrections[term];
+  }
+  
+  // If nspell is available, use it for intelligent correction
+  if (spellChecker) {
+    // Check if the word is already correct
+    if (spellChecker.correct(term)) {
+      return term;
+    }
+    
+    // Get suggestions for misspelled words
+    const suggestions = spellChecker.suggest(term);
+    
+    if (suggestions.length > 0) {
+      // For energy context, prefer energy-related suggestions
+      for (const suggestion of suggestions) {
+        // Prefer suggestions that are energy-related
+        if (suggestion.match(/(energy|power|fuel|gas|oil|electric|solar|wind|hydro|nuclear|bio|coal|renewable)/i)) {
+          console.log(`   🔧 Context-aware spell correction: "${term}" → "${suggestion}"`);
+          return suggestion;
+        }
+      }
+      
+      // Fallback to first suggestion if no energy context found
+      const bestSuggestion = suggestions[0];
+      console.log(`   🔧 Spell correction: "${term}" → "${bestSuggestion}"`);
+      return bestSuggestion;
+    }
+  }
+  
+  // Fallback to original term if no correction found
+  return term;
 };
 
 /**
