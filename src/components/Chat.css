@@ -254,21 +254,6 @@
   font-weight: 500;
 }
 
-/* Typing Cursor Animation */
-.typing-cursor {
-  display: inline-block;
-  font-weight: bold;
-  font-size: var(--font-size-lg);
-  color: var(--primary-blue);
-  animation: blink 1s infinite;
-  margin-left: 2px;
-}
-
-@keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
-}
-
 .message-timestamp {
   font-size: var(--font-size-xs);
   opacity: 0.6;
@@ -282,37 +267,6 @@
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.05);
   padding: var(--spacing-4) var(--spacing-5);
-}
-
-.typing-indicator {
-  display: flex;
-  gap: var(--spacing-2);
-  align-items: center;
-  padding: var(--spacing-2) 0;
-}
-
-.typing-indicator span {
-  width: 10px;
-  height: 10px;
-  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
-  border-radius: var(--radius-full);
-  animation: typingBounce 1.4s infinite ease-in-out;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.typing-indicator span:nth-child(1) { animation-delay: 0s; }
-.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes typingBounce {
-  0%, 60%, 100% {
-    transform: scale(0.8) translateY(0);
-    opacity: 0.5;
-  }
-  30% {
-    transform: scale(1.2) translateY(-10px);
-    opacity: 1;
-  }
 }
 
 /* Input Form */
@@ -567,21 +521,11 @@ kbd {
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-  .message.focused {
-    transform: none;
+  .message.focused {    transform: none;
     transition: background-color 0.2s ease;
   }
     .keyboard-instructions {
-    transition: opacity 0.2s ease;
-    transform: none;
-  }
-  
-  .typing-cursor {
-    animation: none;
-  }
-  
-  .typing-indicator span {
-    animation: none;
+    transition: opacity 0.2s ease;    transform: none;
   }
 }
 

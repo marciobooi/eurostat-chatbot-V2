@@ -7,10 +7,11 @@ import {
   faTrash, 
   faRobot, 
   faUser, 
-  faPaperPlane,
-  faSpinner
+  faPaperPlane
 } from '@fortawesome/free-solid-svg-icons';
 import HelpModal from './HelpModal';
+import TypingIndicator from './TypingIndicator';
+import LoadingSpinner from './LoadingSpinner';
 import './Chat.css';
 
 const Chat = () => {
@@ -139,11 +140,10 @@ const Chat = () => {
           content: 'I couldn\'t find a specific match for that term. Could you try rephrasing your question or using different keywords?',
           timestamp: new Date(),
           isError: true
-        };
-      }
+        };      }
 
-      // Simulate typing the response character by character
-      await typeMessage(botResponse);
+      // Add the bot response directly
+      setMessages(prev => [...prev, botResponse]);
       
     } catch (error) {
       console.error('Error processing message:', error);
@@ -154,49 +154,9 @@ const Chat = () => {
         timestamp: new Date(),
         isError: true
       };
-      await typeMessage(errorResponse);
-    } finally {
-      setIsLoading(false);
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {setIsLoading(false);
     }
-  };
-
-  const typeMessage = async (message) => {
-    // Add the message with empty content first
-    const emptyMessage = { ...message, content: '', isTyping: true };
-    setMessages(prev => [...prev, emptyMessage]);
-
-    // Type the message character by character
-    const fullContent = message.content;
-    let currentContent = '';
-    
-    for (let i = 0; i < fullContent.length; i++) {
-      currentContent += fullContent[i];
-      
-      setMessages(prev => 
-        prev.map(msg => 
-          msg.id === message.id 
-            ? { ...msg, content: currentContent }
-            : msg
-        )
-      );
-      
-      // Variable typing speed for more natural feel
-      const delay = fullContent[i] === ' ' ? 50 : 
-                   fullContent[i] === '.' ? 200 :
-                   fullContent[i] === ',' ? 150 :
-                   Math.random() * 40 + 20;
-      
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-
-    // Mark typing as complete
-    setMessages(prev => 
-      prev.map(msg => 
-        msg.id === message.id 
-          ? { ...msg, isTyping: false }
-          : msg
-      )
-    );
   };
 
   const formatMatchResponse = (match, result) => {
@@ -285,7 +245,7 @@ const Chat = () => {
         {messages.map((message, index) => (
           <div 
             key={message.id} 
-            className={`message ${message.type} ${message.isError ? 'error' : ''} ${message.isTyping ? 'typing' : ''} ${index === focusedMessageIndex ? 'focused' : ''}`}
+            className={`message ${message.type} ${message.isError ? 'error' : ''} ${index === focusedMessageIndex ? 'focused' : ''}`}
             role="article"
             aria-label={`${message.type === 'bot' ? 'Bot' : 'User'} message`}
             tabIndex="-1"
@@ -304,15 +264,11 @@ const Chat = () => {
             <div className="message-content">
               <div className="message-header sr-only">
                 {message.type === 'bot' ? 'Bot' : 'User'} said at {message.timestamp.toLocaleTimeString()}:
-              </div>
-              <div 
+              </div>              <div 
                 className="message-text"
                 dangerouslySetInnerHTML={{ __html: formatMessage(message.content) }}
                 role="text"
               />
-              {message.isTyping && (
-                <div className="typing-cursor" aria-hidden="true">|</div>
-              )}
               <div className="message-timestamp" aria-hidden="true">
                 {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </div>
@@ -324,24 +280,13 @@ const Chat = () => {
                 </div>
               )}
             </div>
-          </div>
-        ))}        
-        {isLoading && (          <div className="message bot loading" role="status" aria-live="polite">
-            <div className="message-avatar" aria-hidden="true">
-              <div className="bot-avatar">
-                <FontAwesomeIcon icon={faRobot} />
-              </div>
-            </div>
-            <div className="message-content">
-              <div className="typing-indicator">
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-              </div>
-              <div className="sr-only">Bot is typing...</div>
-            </div>
-          </div>
-        )}
+          </div>        ))}        
+        <TypingIndicator 
+          isVisible={isLoading}
+          message="Bot is typing..."
+          showAvatar={true}
+          size="default"
+        />
         
         <div ref={messagesEndRef} />
       </div>
@@ -371,12 +316,17 @@ const Chat = () => {
           </div>
           <button 
             ref={sendButtonRef}
-            type="submit" 
-            className="send-button"
+            type="submit"            className="send-button"
             disabled={!inputValue.trim() || isLoading}
             aria-label={isLoading ? 'Message is being processed' : 'Send message'}
-          >            {isLoading ? (
-              <FontAwesomeIcon icon={faSpinner} spin />
+          >
+            {isLoading ? (
+              <LoadingSpinner 
+                isLoading={true}
+                type="spinner"
+                size="small"
+                inline={true}
+              />
             ) : (
               <FontAwesomeIcon icon={faPaperPlane} />
             )}
