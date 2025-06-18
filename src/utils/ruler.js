@@ -40,48 +40,63 @@ import nspell from 'nspell';
 // Initialize nspell for intelligent spelling correction
 let spellChecker = null;
 
-// Initialize spell checker with local dictionary files
+// Initialize spell checker with browser-compatible approach
 const initSpellChecker = async () => {
   try {
-    const fs = await import('fs');
-    const path = await import('path');
-    const { fileURLToPath } = await import('url');
-    
-    // Get the directory path for ES modules
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    
-    // Read local dictionary files
-    const dicPath = path.join(__dirname, '..', 'dictionaries', 'en.dic');
-    const affPath = path.join(__dirname, '..', 'dictionaries', 'en.aff');
-    
-    const dicContent = fs.readFileSync(dicPath, 'utf8');
-    const affContent = fs.readFileSync(affPath, 'utf8');
-    
-    // Initialize nspell with local dictionary files
-    spellChecker = nspell({
-      dic: dicContent,
-      aff: affContent
-    });
-    
-    // Add energy-specific terms to the spell checker dictionary
-    const energyTerms = [
-      ...Object.keys(spellingCorrections),
-      ...Object.values(spellingCorrections),
-      ...Object.keys(abbreviations),
-      ...Object.values(abbreviations).flat(),
-      ...Object.keys(synonyms),
-      ...Object.values(synonyms).flat()
-    ];
-    
-    // Add energy terms to avoid false corrections
-    energyTerms.forEach(term => {
-      if (term && typeof term === 'string') {
-        spellChecker.add(term.toLowerCase());
+    // In browser environment, we'll try to fetch dictionary files
+    // If that fails, we'll rely on the centralized spelling corrections only
+      if (typeof window !== 'undefined') {
+      // Browser environment - fetch dictionary files from public folder
+      try {
+        const [dicResponse, affResponse] = await Promise.all([
+          fetch('dictionaries/en.dic'),
+          fetch('dictionaries/en.aff')
+        ]);
+        
+        if (dicResponse.ok && affResponse.ok) {
+          const dicContent = await dicResponse.text();
+          const affContent = await affResponse.text();
+          
+          // Initialize nspell with fetched dictionary files
+          spellChecker = nspell({
+            dic: dicContent,
+            aff: affContent
+          });
+          
+          console.log('✅ Spell checker initialized with browser-fetched dictionaries');
+        } else {
+          throw new Error('Dictionary files not accessible via fetch');
+        }
+      } catch (fetchError) {
+        console.warn('⚠️ Could not fetch dictionary files, using centralized corrections only');
+        spellChecker = null;
       }
-    });
+    } else {
+      // Non-browser environment - disable nspell for now
+      console.warn('⚠️ nspell disabled in non-browser environment, using centralized corrections only');
+      spellChecker = null;
+    }
     
-    console.log('✅ Spell checker initialized with local dictionaries and energy terms');
+    // Add energy-specific terms if spell checker is available
+    if (spellChecker) {
+      const energyTerms = [
+        ...Object.keys(spellingCorrections),
+        ...Object.values(spellingCorrections),
+        ...Object.keys(abbreviations),
+        ...Object.values(abbreviations).flat(),
+        ...Object.keys(synonyms),
+        ...Object.values(synonyms).flat()
+      ];
+      
+      // Add energy terms to avoid false corrections
+      energyTerms.forEach(term => {
+        if (term && typeof term === 'string') {
+          spellChecker.add(term.toLowerCase());
+        }
+      });
+      
+      console.log('✅ Added energy terms to spell checker');
+    }
   } catch (error) {
     console.warn('⚠️ Spell checker initialization failed:', error.message);
     spellChecker = null;
