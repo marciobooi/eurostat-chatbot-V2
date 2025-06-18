@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { findBestMatch, getGlobalRulerResult } from '../utils/ruler.js';
+import { useKeyboardNavigation } from '../utils/keyboardNavigation.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faQuestionCircle, 
@@ -20,100 +21,15 @@ const Chat = () => {
       content: 'Hello! I\'m the Eurostat Energy Chatbot. Ask me about energy definitions, fuel codes, or any energy-related terms.',
       timestamp: new Date()
     }
-  ]);
-  const [inputValue, setInputValue] = useState('');  const [isLoading, setIsLoading] = useState(false);
-  const [focusedMessageIndex, setFocusedMessageIndex] = useState(-1);
+  ]);  const [inputValue, setInputValue] = useState('');  const [isLoading, setIsLoading] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const messagesContainerRef = useRef(null);  const clearButtonRef = useRef(null);
   const sendButtonRef = useRef(null);
   const helpButtonRef = useRef(null);
-
-  // Accessibility: Track if user is using keyboard navigation
-  const [isKeyboardUser, setIsKeyboardUser] = useState(false);
   // Live region for screen readers
   const [liveRegionContent, setLiveRegionContent] = useState('');
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  // Keyboard navigation handlers
-  const handleKeyDown = (e) => {
-    setIsKeyboardUser(true);
-    
-    // Handle global chat shortcuts
-    if (e.ctrlKey || e.metaKey) {
-      switch (e.key) {
-        case 'k':
-          e.preventDefault();          clearChat();
-          announceToScreenReader('Chat cleared');
-          break;        case 'l':
-          e.preventDefault();
-          inputRef.current?.focus();
-          break;
-        case '/':
-          e.preventDefault();
-          setShowHelpModal(true);
-          break;
-        default:
-          break;
-      }
-    }
-
-    // Handle arrow key navigation in messages
-    if (e.target === messagesContainerRef.current || e.target.closest('.message')) {
-      switch (e.key) {
-        case 'ArrowUp':
-          e.preventDefault();
-          navigateMessages('up');
-          break;
-        case 'ArrowDown':
-          e.preventDefault();
-          navigateMessages('down');
-          break;
-        case 'Home':
-          e.preventDefault();
-          navigateToMessage(0);
-          break;
-        case 'End':
-          e.preventDefault();
-          navigateToMessage(messages.length - 1);
-          break;
-        default:
-          break;
-      }
-    }
-  };
-
-  const handleMouseDown = () => {
-    setIsKeyboardUser(false);
-  };
-
-  const navigateMessages = (direction) => {
-    const newIndex = direction === 'up' 
-      ? Math.max(0, focusedMessageIndex - 1)
-      : Math.min(messages.length - 1, focusedMessageIndex + 1);
-    
-    navigateToMessage(newIndex);
-  };
-
-  const navigateToMessage = (index) => {
-    setFocusedMessageIndex(index);
-    const messageElements = messagesContainerRef.current?.querySelectorAll('.message');
-    if (messageElements && messageElements[index]) {
-      messageElements[index].focus();
-      messageElements[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
-      
-      // Announce message to screen reader
-      const message = messages[index];
-      if (message) {
-        const announcement = `${message.type === 'bot' ? 'Bot' : 'User'} message: ${message.content}`;
-        announceToScreenReader(announcement);
-      }
-    }
-  };
 
   const announceToScreenReader = (message) => {
     setLiveRegionContent(message);
@@ -121,15 +37,50 @@ const Chat = () => {
     setTimeout(() => setLiveRegionContent(''), 1000);
   };
 
-  // Handle input keyboard shortcuts
-  const handleInputKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit(e);
-    } else if (e.key === 'Escape') {
-      setInputValue('');
-      announceToScreenReader('Input cleared');
-    }
+  // Help modal functions
+  const openHelpModal = () => {
+    setShowHelpModal(true);
+    announceToScreenReader('Keyboard shortcuts help opened');
+  };
+
+  const closeHelpModal = () => {
+    setShowHelpModal(false);
+    announceToScreenReader('Keyboard shortcuts help closed');
+    // Return focus to help button
+    helpButtonRef.current?.focus();
+  };
+
+  const clearChat = () => {
+    setMessages([
+      {
+        id: 1,
+        type: 'bot',
+        content: 'Hello! I\'m the Eurostat Energy Chatbot. Ask me about energy definitions, fuel codes, or any energy-related terms.',
+        timestamp: new Date()
+      }
+    ]);
+    inputRef.current?.focus();
+  };
+  // Use keyboard navigation hook
+  const {
+    focusedMessageIndex,
+    isKeyboardUser,
+    handleInputKeyDown,
+    setFocusedMessageIndex
+  } = useKeyboardNavigation({
+    messages,
+    inputRef,
+    messagesContainerRef,
+    helpButtonRef,
+    clearButtonRef,
+    sendButtonRef,
+    onClearChat: clearChat,
+    onOpenHelp: openHelpModal,
+    onAnnounce: announceToScreenReader,
+    onSubmit: (e) => handleSubmit(e)
+  });
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
@@ -145,26 +96,6 @@ const Chat = () => {
     }
   }, [messages]);
 
-  // Add global keyboard event listeners
-  useEffect(() => {
-    const handleGlobalKeyDown = (e) => {
-      // Focus input with '/' key (like Discord, Slack)
-      if (e.key === '/' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-        e.preventDefault();
-        inputRef.current?.focus();
-      }
-    };
-
-    document.addEventListener('keydown', handleGlobalKeyDown);
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('mousedown', handleMouseDown);
-
-    return () => {
-      document.removeEventListener('keydown', handleGlobalKeyDown);
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('mousedown', handleMouseDown);
-    };
-  }, [focusedMessageIndex, messages]);
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!inputValue.trim() || isLoading) return;
@@ -290,35 +221,9 @@ const Chat = () => {
 
   const formatMessage = (content) => {
     // Simple markdown-like formatting
-    return content
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    return content      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/\n/g, '<br />');  };
-  // Help modal functions
-  const openHelpModal = () => {
-    setShowHelpModal(true);
-    announceToScreenReader('Keyboard shortcuts help opened');
-  };
-
-  const closeHelpModal = () => {
-    setShowHelpModal(false);
-    announceToScreenReader('Keyboard shortcuts help closed');
-    // Return focus to help button
-    helpButtonRef.current?.focus();
-  };
-  
-  const clearChat = () => {
-    setMessages([
-      {
-        id: 1,
-        type: 'bot',
-        content: 'Hello! I\'m the Eurostat Energy Chatbot. Ask me about energy definitions, fuel codes, or any energy-related terms.',
-        timestamp: new Date()
-      }
-    ]);
-    setFocusedMessageIndex(-1);
-    inputRef.current?.focus();
-  };
 
   return (
     <div 
@@ -366,14 +271,12 @@ const Chat = () => {
         </div>
       </div>
       <div 
-        className="chat-messages"
-        ref={messagesContainerRef}
+        className="chat-messages"        ref={messagesContainerRef}
         role="log"
         aria-live="polite"
         aria-label="Chat conversation"
         aria-describedby="chat-description"
         tabIndex="0"
-        onKeyDown={handleKeyDown}
       >
         <div className="keyboard-instructions" aria-hidden={!isKeyboardUser}>
           Use arrow keys to navigate messages, Enter to interact, / to focus input
