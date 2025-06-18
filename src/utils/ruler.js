@@ -725,6 +725,9 @@ export const findBestMatch = (userQuery) => {
     performanceMetrics.averageResponseTime = 
       (performanceMetrics.averageResponseTime * (performanceMetrics.totalQueries - 1) + responseTime) / performanceMetrics.totalQueries;
     
+    // Learn from the query for future improvements
+    learnFromQuery(userQuery, result);
+    
     return result;
   } catch (error) {
     console.error(`❌ Error processing query "${userQuery}":`, error);
@@ -982,4 +985,359 @@ export const updateConfiguration = (newConfig) => {
   }
   
   console.log('⚙️ Configuration updated successfully');
+};
+
+// Advanced query intelligence and learning capabilities
+const queryAnalytics = {
+  popularQueries: new Map(),
+  queryPatterns: new Map(),
+  userSessions: new Map(),
+  failedQueries: new Map(),
+  querySuggestions: new Map()
+};
+
+// Query learning and suggestion system
+const learnFromQuery = (query, result, userAction = null) => {
+  const normalizedQuery = normalizeInput(query);
+  
+  // Track popular queries
+  const count = queryAnalytics.popularQueries.get(normalizedQuery) || 0;
+  queryAnalytics.popularQueries.set(normalizedQuery, count + 1);
+  
+  // Track failed queries for improvement
+  if (!result) {
+    const failCount = queryAnalytics.failedQueries.get(normalizedQuery) || 0;
+    queryAnalytics.failedQueries.set(normalizedQuery, failCount + 1);
+  }
+  
+  // Track user actions (click, dismiss, etc.)
+  if (userAction && result) {
+    const pattern = `${normalizedQuery}:${result.match.key}:${userAction}`;
+    const actionCount = queryAnalytics.queryPatterns.get(pattern) || 0;
+    queryAnalytics.queryPatterns.set(pattern, actionCount + 1);
+  }
+};
+
+// Intelligent query suggestions based on learning
+const getIntelligentSuggestions = (query) => {
+  const normalizedQuery = normalizeInput(query);
+  const suggestions = [];
+  
+  // Find similar successful queries
+  for (const [pastQuery, count] of queryAnalytics.popularQueries.entries()) {
+    if (pastQuery.includes(normalizedQuery) || normalizedQuery.includes(pastQuery)) {
+      suggestions.push({
+        query: pastQuery,
+        popularity: count,
+        type: 'popular'
+      });
+    }
+  }
+  
+  // Add pattern-based suggestions
+  const words = normalizedQuery.split(' ');
+  for (const word of words) {
+    for (const [pattern, count] of queryAnalytics.queryPatterns.entries()) {
+      const [patternQuery, resultKey, action] = pattern.split(':');
+      if (patternQuery.includes(word) && action === 'clicked') {
+        suggestions.push({
+          query: patternQuery,
+          resultKey,
+          confidence: count,
+          type: 'pattern'
+        });
+      }
+    }
+  }
+  
+  return suggestions
+    .sort((a, b) => (b.popularity || b.confidence) - (a.popularity || a.confidence))
+    .slice(0, 5);
+};
+
+// Auto-correction based on successful patterns
+const getAutoCorrection = (query) => {
+  const normalizedQuery = normalizeInput(query);
+  
+  // Find the most similar successful query
+  let bestMatch = null;
+  let bestSimilarity = 0;
+    for (const [successfulQuery, count] of queryAnalytics.popularQueries.entries()) {
+    if (count > 5) { // Only consider queries with sufficient data
+      const similarity = 1 - (levenshtein(normalizedQuery, successfulQuery) / 
+        Math.max(normalizedQuery.length, successfulQuery.length));
+      
+      if (similarity > 0.7 && similarity > bestSimilarity) {
+        bestSimilarity = similarity;
+        bestMatch = {
+          suggestion: successfulQuery,
+          confidence: similarity,          popularity: count
+        };
+      }
+    }
+  }
+  
+  return bestMatch;
+};
+
+/**
+ * Advanced search features and query processing
+ */
+
+// Multi-language support for queries
+const multiLanguageProcessor = {
+  // Common energy terms in different languages
+  translations: {
+    'energia': 'energy',
+    'énergie': 'energy',
+    'energie': 'energy',
+    'solar': 'solar',
+    'solaire': 'solar',
+    'solare': 'solar',
+    'viento': 'wind',
+    'vent': 'wind',
+    'vento': 'wind'
+  },
+  
+  detectAndTranslate(query) {
+    let translatedQuery = query.toLowerCase();
+    
+    for (const [foreign, english] of Object.entries(this.translations)) {
+      const regex = new RegExp(`\\b${foreign}\\b`, 'gi');
+      translatedQuery = translatedQuery.replace(regex, english);
+    }
+    
+    return translatedQuery;
+  }
+};
+
+// Contextual search with domain awareness
+const contextualSearch = {
+  domains: {
+    'renewable': ['solar', 'wind', 'hydro', 'geothermal', 'biomass'],
+    'fossil': ['coal', 'oil', 'gas', 'petroleum'],
+    'nuclear': ['nuclear', 'uranium', 'reactor'],
+    'efficiency': ['consumption', 'savings', 'efficiency', 'reduction']
+  },
+  
+  enhanceWithContext(query, domain = null) {
+    if (!domain) {
+      // Auto-detect domain
+      domain = this.detectDomain(query);
+    }
+    
+    if (domain && this.domains[domain]) {
+      const contextTerms = this.domains[domain];
+      const queryWords = query.toLowerCase().split(' ');
+      
+      // Add relevant context terms if not already present
+      const enhancedTerms = [...queryWords];
+      contextTerms.forEach(term => {
+        if (!queryWords.some(word => word.includes(term) || term.includes(word))) {
+          enhancedTerms.push(term);
+        }
+      });
+      
+      return enhancedTerms.join(' ');
+    }
+    
+    return query;
+  },
+  
+  detectDomain(query) {
+    const lowerQuery = query.toLowerCase();
+    
+    for (const [domain, terms] of Object.entries(this.domains)) {
+      if (terms.some(term => lowerQuery.includes(term))) {
+        return domain;
+      }
+    }
+    
+    return null;
+  }
+};
+
+// Temporal query processing (year, period detection)
+const temporalProcessor = {
+  patterns: {
+    year: /\b(19|20)\d{2}\b/g,
+    period: /\b(annual|monthly|quarterly|yearly|daily)\b/gi,
+    timeRange: /\b(from|between|since|until|before|after)\s+(\d{4})\b/gi
+  },
+  
+  extractTemporalInfo(query) {
+    const temporal = {
+      years: [],
+      periods: [],
+      ranges: []
+    };
+    
+    // Extract years
+    const yearMatches = query.match(this.patterns.year);
+    if (yearMatches) {
+      temporal.years = yearMatches.map(y => parseInt(y));
+    }
+    
+    // Extract periods
+    const periodMatches = query.match(this.patterns.period);
+    if (periodMatches) {
+      temporal.periods = periodMatches.map(p => p.toLowerCase());
+    }
+    
+    // Extract time ranges
+    const rangeMatches = [...query.matchAll(this.patterns.timeRange)];
+    if (rangeMatches.length > 0) {
+      temporal.ranges = rangeMatches.map(match => ({
+        type: match[1].toLowerCase(),
+        year: parseInt(match[2])
+      }));
+    }
+    
+    return temporal;
+  },
+  
+  filterByTemporal(results, temporalInfo) {
+    if (!temporalInfo.years.length && !temporalInfo.ranges.length) {
+      return results;
+    }
+    
+    return results.filter(result => {
+      // Check if result has temporal relevance
+      // This would depend on your data structure
+      return true; // Placeholder - implement based on your needs
+    });
+  }
+};
+
+// Smart query completion and suggestions
+const queryCompletion = {
+  commonPatterns: [
+    'renewable energy',
+    'solar power',
+    'wind energy',
+    'fossil fuels',
+    'energy consumption',
+    'electricity generation',
+    'energy efficiency',
+    'carbon emissions',
+    'energy storage',
+    'grid infrastructure'
+  ],
+  
+  getCompletions(partialQuery, limit = 5) {
+    const lowerPartial = partialQuery.toLowerCase().trim();
+    
+    if (lowerPartial.length < 2) return [];
+    
+    const completions = [];
+    
+    // Find matching patterns
+    this.commonPatterns.forEach(pattern => {
+      if (pattern.toLowerCase().startsWith(lowerPartial)) {
+        completions.push({
+          completion: pattern,
+          type: 'common',
+          confidence: 0.9
+        });
+      } else if (pattern.toLowerCase().includes(lowerPartial)) {
+        completions.push({
+          completion: pattern,
+          type: 'partial',
+          confidence: 0.7
+        });
+      }
+    });
+    
+    // Add popular queries from analytics
+    if (queryAnalytics.popularQueries.size > 0) {
+      for (const [query, count] of queryAnalytics.popularQueries.entries()) {
+        if (query.startsWith(lowerPartial) && count > 3) {
+          completions.push({
+            completion: query,
+            type: 'popular',
+            confidence: Math.min(0.95, 0.5 + (count / 100)),
+            popularity: count
+          });
+        }
+      }
+    }
+    
+    return completions
+      .sort((a, b) => b.confidence - a.confidence)
+      .slice(0, limit);
+  }
+};
+
+// Enhanced findBestMatch with advanced features
+export const findBestMatchAdvanced = (userQuery, options = {}) => {
+  const {
+    enableMultiLanguage = true,
+    enableContextual = true,
+    enableTemporal = true,
+    sessionId = null,
+    userAction = null,
+    domain = null
+  } = options;
+  
+  let processedQuery = userQuery;
+  
+  // Multi-language processing
+  if (enableMultiLanguage) {
+    processedQuery = multiLanguageProcessor.detectAndTranslate(processedQuery);
+  }
+  
+  // Contextual enhancement
+  if (enableContextual) {
+    processedQuery = contextualSearch.enhanceWithContext(processedQuery, domain);
+  }
+  
+  // Extract temporal information
+  let temporalInfo = null;
+  if (enableTemporal) {
+    temporalInfo = temporalProcessor.extractTemporalInfo(processedQuery);
+  }
+  
+  // Get basic result from standard ruler
+  const result = findBestMatch(processedQuery);
+  
+  // Learn from the query
+  learnFromQuery(userQuery, result, userAction);
+  
+  // Track session if provided
+  if (sessionId) {
+    trackUserSession(sessionId, userQuery, result);
+  }
+  
+  // Apply temporal filtering if applicable
+  if (result && temporalInfo) {
+    // You could enhance the result with temporal relevance here
+    result.temporalInfo = temporalInfo;
+  }
+  
+  // Add intelligent suggestions if no result found
+  if (!result) {
+    const autoCorrection = getAutoCorrection(userQuery);
+    const intelligentSuggestions = getIntelligentSuggestions(userQuery);
+    
+    return {
+      match: null,
+      confidence: 0,
+      suggestions: {
+        autoCorrection,
+        intelligent: intelligentSuggestions,
+        completions: queryCompletion.getCompletions(userQuery)
+      },
+      processedQuery,
+      temporalInfo
+    };
+  }
+  
+  return {
+    ...result,
+    processedQuery,
+    temporalInfo,
+    suggestions: {
+      completions: queryCompletion.getCompletions(userQuery)
+    }
+  };
 };
