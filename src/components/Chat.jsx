@@ -1,5 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { findBestMatch, getGlobalRulerResult } from '../utils/ruler.js';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faQuestionCircle, 
+  faTrash, 
+  faRobot, 
+  faUser, 
+  faPaperPlane,
+  faSpinner
+} from '@fortawesome/free-solid-svg-icons';
 import HelpModal from './HelpModal';
 import './Chat.css';
 
@@ -335,8 +344,7 @@ const Chat = () => {
           <h1 id="chat-title">Eurostat Energy Chatbot</h1>
           <p id="chat-description">Ask about energy definitions and fuel codes</p>
         </div>
-        <div className="header-buttons">
-          <button 
+        <div className="header-buttons">          <button 
             ref={helpButtonRef}
             onClick={openHelpModal} 
             className="help-button" 
@@ -344,13 +352,8 @@ const Chat = () => {
             aria-label="Show keyboard shortcuts help. Keyboard shortcut: Control slash"
             type="button"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-              <line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-          </button>
-          <button 
+            <FontAwesomeIcon icon={faQuestionCircle} />
+          </button>          <button 
             ref={clearButtonRef}
             onClick={clearChat} 
             className="clear-button" 
@@ -358,11 +361,7 @@ const Chat = () => {
             aria-label="Clear chat history. Keyboard shortcut: Control K"
             type="button"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c0 1 1 2 2 2v2"/>
-              <line x1="10" y1="11" x2="10" y2="17"/>
-              <line x1="14" y1="11" x2="14" y2="17"/>
-            </svg>
+            <FontAwesomeIcon icon={faTrash} />
           </button>
         </div>
       </div>
@@ -389,24 +388,13 @@ const Chat = () => {
             tabIndex="-1"
             data-message-index={index}
           >
-            <div className="message-avatar" aria-hidden="true">
-              {message.type === 'bot' ? (
+            <div className="message-avatar" aria-hidden="true">              {message.type === 'bot' ? (
                 <div className="bot-avatar">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                    <path d="M12 8V4H8"/>
-                    <rect width="16" height="12" x="4" y="8" rx="2"/>
-                    <path d="M2 14h2"/>
-                    <path d="M20 14h2"/>
-                    <path d="M15 13v2"/>
-                    <path d="M9 13v2"/>
-                  </svg>
+                  <FontAwesomeIcon icon={faRobot} />
                 </div>
               ) : (
                 <div className="user-avatar">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
-                  </svg>
+                  <FontAwesomeIcon icon={faUser} />
                 </div>
               )}
             </div>
@@ -435,18 +423,10 @@ const Chat = () => {
             </div>
           </div>
         ))}        
-        {isLoading && (
-          <div className="message bot loading" role="status" aria-live="polite">
+        {isLoading && (          <div className="message bot loading" role="status" aria-live="polite">
             <div className="message-avatar" aria-hidden="true">
               <div className="bot-avatar">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                  <path d="M12 8V4H8"/>
-                  <rect width="16" height="12" x="4" y="8" rx="2"/>
-                  <path d="M2 14h2"/>
-                  <path d="M20 14h2"/>
-                  <path d="M15 13v2"/>
-                  <path d="M9 13v2"/>
-                </svg>
+                <FontAwesomeIcon icon={faRobot} />
               </div>
             </div>
             <div className="message-content">
@@ -492,16 +472,11 @@ const Chat = () => {
             className="send-button"
             disabled={!inputValue.trim() || isLoading}
             aria-label={isLoading ? 'Message is being processed' : 'Send message'}
-          >
-            {isLoading ? (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-              </svg>
+          >            {isLoading ? (
+              <FontAwesomeIcon icon={faSpinner} spin />
             ) : (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <line x1="22" y1="2" x2="11" y2="13"/>
-                <polygon points="22,2 15,22 11,13 2,9 22,2"/>
-              </svg>            )}
+              <FontAwesomeIcon icon={faPaperPlane} />
+            )}
           </button>
         </div>
       </form>

@@ -91,6 +91,13 @@
   outline-offset: 2px;
 }
 
+/* Font Awesome icon styling for modal */
+.modal-close-button svg {
+  width: 20px;
+  height: 20px;
+  color: inherit;
+}
+
 .modal-content {
   padding: var(--spacing-6) var(--spacing-8);
   max-height: 60vh;

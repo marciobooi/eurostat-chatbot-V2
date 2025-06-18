@@ -1,4 +1,6 @@
 import { useRef, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import './Modal.css';
 
 const Modal = ({ 
@@ -70,17 +72,13 @@ const Modal = ({
         tabIndex="-1"
       >
         <div className="modal-header">
-          <h2 id={ariaLabelledBy}>{title}</h2>
-          <button 
+          <h2 id={ariaLabelledBy}>{title}</h2>          <button 
             onClick={onClose}
             className="modal-close-button"
             aria-label="Close modal"
             type="button"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
+            <FontAwesomeIcon icon={faTimes} />
           </button>
         </div>
         
