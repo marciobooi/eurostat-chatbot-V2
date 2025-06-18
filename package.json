@@ -14,6 +14,7 @@
     "serve:preview": "serve -s dist -l 5000 --config serve.json"
   },
   "dependencies": {
+    "chalk": "^5.4.1",
     "compromise": "^14.14.4",
     "fuse.js": "^7.1.0",
     "js-levenshtein": "^1.1.6",

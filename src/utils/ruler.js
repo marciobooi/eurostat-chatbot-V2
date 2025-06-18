@@ -146,60 +146,111 @@ const findExactMatch = (query) => {
 };
 
 /**
- * Step 7: Fuzzy search using Fuse.js
+ * Step 7: Fuzzy search using Fuse.js with better threshold
  */
 const fuzzySearch = (query) => {
   const results = fuse.search(query);
-  return results.length > 0 ? results[0] : null;
+  // Return the best result if score is reasonable (less than 0.8 = 80% similarity or better)
+  return results.length > 0 && results[0].score < 0.8 ? results[0] : null;
 };
 
 /**
- * Step 8: Levenshtein distance matching
+ * Step 8: Levenshtein distance matching (fixed)
  */
-const levenshteinMatch = (query, threshold = 0.7) => {
+const levenshteinMatch = (query, threshold = 0.6) => {
   let bestMatch = null;
   let bestScore = 0;
   
   searchData.forEach(item => {
-    const searchableText = item.searchText;
-    const distance = levenshtein(query.toLowerCase(), searchableText);
-    const maxLength = Math.max(query.length, searchableText.length);
-    const similarity = 1 - (distance / maxLength);
+    // Check against title, keywords, and fuel code
+    const textsToCheck = [
+      item.title?.toLowerCase() || '',
+      ...(item.keywords || []).map(k => k.toLowerCase()),
+      item.fuelCode?.toLowerCase() || ''
+    ].filter(text => text.length > 0);
     
-    if (similarity > threshold && similarity > bestScore) {
-      bestScore = similarity;
-      bestMatch = { item, score: similarity };
-    }
+    textsToCheck.forEach(searchableText => {
+      const distance = levenshtein(query.toLowerCase(), searchableText);
+      const maxLength = Math.max(query.length, searchableText.length);
+      const similarity = 1 - (distance / maxLength);
+      
+      if (similarity >= threshold && similarity > bestScore) {
+        bestScore = similarity;
+        bestMatch = { item, score: similarity };
+      }
+    });
   });
   
   return bestMatch;
 };
 
 /**
- * Step 9: Phonetic matching using Metaphone
+ * Step 9: Phonetic matching using simple soundex (improved)
  */
 const phoneticMatch = (query) => {
   try {
-    const queryPhonetic = metaphone(query);
+    // Improved soundex implementation
+    const soundex = (str) => {
+      if (!str) return '';
+      const cleanStr = str.toLowerCase().replace(/[^a-z]/g, '');
+      if (cleanStr.length === 0) return '';
+      
+      let result = cleanStr.charAt(0).toUpperCase();
+      let prev = '';
+      
+      for (let i = 1; i < cleanStr.length && result.length < 4; i++) {
+        const char = cleanStr.charAt(i).toUpperCase();
+        let code = '';
+        
+        if ('BFPV'.includes(char)) code = '1';
+        else if ('CGJKQSXZ'.includes(char)) code = '2';
+        else if ('DT'.includes(char)) code = '3';
+        else if ('L'.includes(char)) code = '4';
+        else if ('MN'.includes(char)) code = '5';
+        else if ('R'.includes(char)) code = '6';
+        
+        if (code && code !== prev) {
+          result += code;
+          prev = code;
+        }
+      }
+      
+      return result.padEnd(4, '0').substring(0, 4);
+    };
+    
+    const queryWords = query.split(/\s+/);
+    const queryPhonetics = queryWords.map(word => soundex(word)).filter(s => s);
+    
     let bestMatch = null;
     let maxMatches = 0;
     
     searchData.forEach(item => {
       try {
-        const titlePhonetic = metaphone(item.title || '');
-        const keywordPhonetics = (item.keywords || []).map(k => {
-          try {
-            return metaphone(k);
-          } catch (e) {
-            return '';
-          }
-        });
-        
         let matches = 0;
-        if (titlePhonetic === queryPhonetic) matches += 3;
-        keywordPhonetics.forEach(kp => {
-          if (kp === queryPhonetic) matches += 1;
-        });
+        
+        // Check title words
+        if (item.title) {
+          const titleWords = item.title.split(/\s+/);
+          titleWords.forEach(word => {
+            const wordPhonetic = soundex(word);
+            if (queryPhonetics.includes(wordPhonetic)) {
+              matches += 2;
+            }
+          });
+        }
+        
+        // Check keywords
+        if (item.keywords) {
+          item.keywords.forEach(keyword => {
+            const keywordWords = keyword.split(/\s+/);
+            keywordWords.forEach(word => {
+              const wordPhonetic = soundex(word);
+              if (queryPhonetics.includes(wordPhonetic)) {
+                matches += 1;
+              }
+            });
+          });
+        }
         
         if (matches > maxMatches) {
           maxMatches = matches;
@@ -210,7 +261,7 @@ const phoneticMatch = (query) => {
       }
     });
     
-    return bestMatch;
+    return bestMatch && maxMatches > 0 ? bestMatch : null;
   } catch (e) {
     console.log('Phonetic matching failed, skipping...');
     return null;
@@ -244,7 +295,7 @@ const hybridStem = (word) => {
 };
 
 /**
- * Step 10: Stemming-based matching using hybrid Porter stemmer
+ * Step 10: Stemming-based matching using hybrid Porter stemmer (improved)
  */
 const stemmingMatch = (query) => {
   const queryWords = query.split(/\s+/);
@@ -254,16 +305,25 @@ const stemmingMatch = (query) => {
   let bestScore = 0;
   
   searchData.forEach(item => {
-    const itemWords = (item.searchText || '').split(/\s+/);
-    const itemStemmed = itemWords.map(word => hybridStem(word));
+    // Create a comprehensive text to stem from multiple fields
+    const textFields = [
+      item.title || '',
+      ...(item.keywords || []),
+      item.fuelCode || ''
+    ].filter(text => text.length > 0);
     
-    const intersection = queryStemmed.filter(stem => itemStemmed.includes(stem));
-    const score = intersection.length / Math.max(queryStemmed.length, itemStemmed.length);
-    
-    if (score > bestScore && score > 0.3) {
-      bestScore = score;
-      bestMatch = { item, score };
-    }
+    textFields.forEach(text => {
+      const itemWords = text.toLowerCase().split(/\s+/);
+      const itemStemmed = itemWords.map(word => hybridStem(word));
+      
+      const intersection = queryStemmed.filter(stem => itemStemmed.includes(stem));
+      const score = intersection.length / Math.max(queryStemmed.length, itemStemmed.length);
+      
+      if (score > bestScore && score > 0.2) { // Lower threshold for better coverage
+        bestScore = score;
+        bestMatch = { item, score };
+      }
+    });
   });
   
   return bestMatch;
@@ -317,75 +377,115 @@ export const findBestMatch = (userQuery) => {
   } else {
     console.log(`   ❌ No exact match`);
   }
-  
-  // Step 7: Fuzzy search
+    // Step 7: Fuzzy search with multiple query variations
   console.log(`🔍 Step 7 - Fuzzy matching...`);
-  const fuzzyResult = fuzzySearch(synonymQuery);
-  if (fuzzyResult) {
-    const fuzzyScore = Math.max(0, (1 - fuzzyResult.score) * 85); // Max 85 points for fuzzy
+  const fuzzyQueries = [processedQuery, synonymQuery, expandedQuery];
+  let bestFuzzyResult = null;
+  let bestFuzzyScore = 1; // Lower is better for fuzzy
+  
+  fuzzyQueries.forEach(query => {
+    const result = fuzzySearch(query);
+    if (result && result.score < bestFuzzyScore) {
+      bestFuzzyScore = result.score;
+      bestFuzzyResult = result;
+    }
+  });
+  
+  if (bestFuzzyResult) {
+    const fuzzyScore = Math.max(0, (1 - bestFuzzyResult.score) * 85); // Max 85 points for fuzzy
     candidates.push({
-      match: fuzzyResult.item,
+      match: bestFuzzyResult.item,
       confidence: fuzzyScore,
       method: 'fuzzy',
       step: 7,
-      query: synonymQuery,
-      rawScore: fuzzyResult.score
+      query: 'multiple queries tested',
+      rawScore: bestFuzzyResult.score
     });
-    console.log(`   ✅ Found: "${fuzzyResult.item.title}" (score: ${fuzzyScore.toFixed(1)})`);
+    console.log(`   ✅ Found: "${bestFuzzyResult.item.title}" (score: ${fuzzyScore.toFixed(1)})`);
   } else {
     console.log(`   ❌ No fuzzy match`);
   }
-  
-  // Step 8: Levenshtein matching
+    // Step 8: Levenshtein matching with multiple query variations
   console.log(`🔍 Step 8 - Levenshtein matching...`);
-  const levenshteinResult = levenshteinMatch(processedQuery);
-  if (levenshteinResult) {
-    const levenshteinScore = Math.max(0, levenshteinResult.score * 70); // Max 70 points
+  const levenshteinQueries = [processedQuery, synonymQuery, expandedQuery];
+  let bestLevenshteinResult = null;
+  let bestLevenshteinScore = 0;
+  
+  levenshteinQueries.forEach(query => {
+    const result = levenshteinMatch(query);
+    if (result && result.score > bestLevenshteinScore) {
+      bestLevenshteinScore = result.score;
+      bestLevenshteinResult = result;
+    }
+  });
+  
+  if (bestLevenshteinResult) {
+    const levenshteinScore = Math.max(0, bestLevenshteinResult.score * 70); // Max 70 points
     candidates.push({
-      match: levenshteinResult.item,
+      match: bestLevenshteinResult.item,
       confidence: levenshteinScore,
       method: 'levenshtein',
       step: 8,
-      query: processedQuery,
-      rawScore: levenshteinResult.score
+      query: 'multiple queries tested',
+      rawScore: bestLevenshteinResult.score
     });
-    console.log(`   ✅ Found: "${levenshteinResult.item.title}" (score: ${levenshteinScore.toFixed(1)})`);
+    console.log(`   ✅ Found: "${bestLevenshteinResult.item.title}" (score: ${levenshteinScore.toFixed(1)})`);
   } else {
     console.log(`   ❌ No Levenshtein match`);
   }
-  
-  // Step 9: Phonetic matching
+    // Step 9: Phonetic matching with multiple query variations
   console.log(`🔍 Step 9 - Phonetic matching...`);
-  const phoneticResult = phoneticMatch(processedQuery);
-  if (phoneticResult) {
-    const phoneticScore = Math.min(60, phoneticResult.score * 15); // Max 60 points
+  const phoneticQueries = [processedQuery, synonymQuery, expandedQuery];
+  let bestPhoneticResult = null;
+  let bestPhoneticScore = 0;
+  
+  phoneticQueries.forEach(query => {
+    const result = phoneticMatch(query);
+    if (result && result.score > bestPhoneticScore) {
+      bestPhoneticScore = result.score;
+      bestPhoneticResult = result;
+    }
+  });
+  
+  if (bestPhoneticResult) {
+    const phoneticScore = Math.min(60, bestPhoneticResult.score * 15); // Max 60 points
     candidates.push({
-      match: phoneticResult.item,
+      match: bestPhoneticResult.item,
       confidence: phoneticScore,
       method: 'phonetic',
       step: 9,
-      query: processedQuery,
-      rawScore: phoneticResult.score
+      query: 'multiple queries tested',
+      rawScore: bestPhoneticResult.score
     });
-    console.log(`   ✅ Found: "${phoneticResult.item.title}" (score: ${phoneticScore.toFixed(1)})`);
+    console.log(`   ✅ Found: "${bestPhoneticResult.item.title}" (score: ${phoneticScore.toFixed(1)})`);
   } else {
     console.log(`   ❌ No phonetic match`);
   }
-  
-  // Step 10: Stemming matching
+    // Step 10: Stemming matching with multiple query variations
   console.log(`🔍 Step 10 - Stemming matching...`);
-  const stemmingResult = stemmingMatch(synonymQuery);
-  if (stemmingResult) {
-    const stemmingScore = Math.max(0, stemmingResult.score * 50); // Max 50 points
+  const stemmingQueries = [processedQuery, synonymQuery, expandedQuery];
+  let bestStemmingResult = null;
+  let bestStemmingScore = 0;
+  
+  stemmingQueries.forEach(query => {
+    const result = stemmingMatch(query);
+    if (result && result.score > bestStemmingScore) {
+      bestStemmingScore = result.score;
+      bestStemmingResult = result;
+    }
+  });
+  
+  if (bestStemmingResult) {
+    const stemmingScore = Math.max(0, bestStemmingResult.score * 50); // Max 50 points
     candidates.push({
-      match: stemmingResult.item,
+      match: bestStemmingResult.item,
       confidence: stemmingScore,
       method: 'stemming',
       step: 10,
-      query: synonymQuery,
-      rawScore: stemmingResult.score
+      query: 'multiple queries tested',
+      rawScore: bestStemmingResult.score
     });
-    console.log(`   ✅ Found: "${stemmingResult.item.title}" (score: ${stemmingScore.toFixed(1)})`);
+    console.log(`   ✅ Found: "${bestStemmingResult.item.title}" (score: ${stemmingScore.toFixed(1)})`);
   } else {
     console.log(`   ❌ No stemming match`);
   }

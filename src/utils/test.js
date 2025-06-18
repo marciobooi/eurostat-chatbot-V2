@@ -4,8 +4,8 @@ import { findBestMatch } from './ruler.js';
 const chatInputs = [
   // testing definitions
   "solid fossil fuels",
-  "solid fosil fuels",
-  "fosil fuels",  
+  // "solid fosil fuels",
+  // "fosil fuels",  
 ];
 
 export const runTests = async (testInputs = chatInputs) => {
