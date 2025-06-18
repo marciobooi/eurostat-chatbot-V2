@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { findBestMatch, getGlobalRulerResult } from '../utils/ruler.js';
+import HelpModal from './HelpModal';
 import './Chat.css';
 
 const Chat = () => {
@@ -16,11 +17,9 @@ const Chat = () => {
   const [showHelpModal, setShowHelpModal] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
-  const messagesContainerRef = useRef(null);
-  const clearButtonRef = useRef(null);
+  const messagesContainerRef = useRef(null);  const clearButtonRef = useRef(null);
   const sendButtonRef = useRef(null);
   const helpButtonRef = useRef(null);
-  const helpModalRef = useRef(null);
 
   // Accessibility: Track if user is using keyboard navigation
   const [isKeyboardUser, setIsKeyboardUser] = useState(false);
@@ -286,15 +285,10 @@ const Chat = () => {
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/\n/g, '<br />');  };
-
   // Help modal functions
   const openHelpModal = () => {
     setShowHelpModal(true);
     announceToScreenReader('Keyboard shortcuts help opened');
-    // Focus the modal after it's rendered
-    setTimeout(() => {
-      helpModalRef.current?.focus();
-    }, 100);
   };
 
   const closeHelpModal = () => {
@@ -302,20 +296,6 @@ const Chat = () => {
     announceToScreenReader('Keyboard shortcuts help closed');
     // Return focus to help button
     helpButtonRef.current?.focus();
-  };
-
-  const handleModalKeyDown = (e) => {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      closeHelpModal();
-    }
-  };
-
-  // Handle clicks outside modal to close it
-  const handleModalBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      closeHelpModal();
-    }
   };
   
   const clearChat = () => {
@@ -521,102 +501,13 @@ const Chat = () => {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <line x1="22" y1="2" x2="11" y2="13"/>
                 <polygon points="22,2 15,22 11,13 2,9 22,2"/>
-              </svg>
-            )}          </button>
+              </svg>            )}
+          </button>
         </div>
       </form>
 
       {/* Help Modal */}
-      {showHelpModal && (
-        <div 
-          className="modal-backdrop"
-          onClick={handleModalBackdropClick}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="help-modal-title"
-          aria-describedby="help-modal-description"
-        >
-          <div 
-            ref={helpModalRef}
-            className="help-modal"
-            onKeyDown={handleModalKeyDown}
-            tabIndex="-1"
-          >
-            <div className="modal-header">
-              <h2 id="help-modal-title">Keyboard Shortcuts</h2>
-              <button 
-                onClick={closeHelpModal}
-                className="modal-close-button"
-                aria-label="Close help modal"
-                type="button"
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                  <line x1="18" y1="6" x2="6" y2="18"/>
-                  <line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
-              </button>
-            </div>
-            
-            <div id="help-modal-description" className="modal-content">
-              <div className="shortcuts-section">
-                <h3>Message Navigation</h3>
-                <div className="shortcut-item">
-                  <kbd>↑</kbd> <kbd>↓</kbd>
-                  <span>Navigate through messages</span>
-                </div>
-                <div className="shortcut-item">
-                  <kbd>Home</kbd>
-                  <span>Go to first message</span>
-                </div>
-                <div className="shortcut-item">
-                  <kbd>End</kbd>
-                  <span>Go to last message</span>
-                </div>
-              </div>
-
-              <div className="shortcuts-section">
-                <h3>Chat Actions</h3>
-                <div className="shortcut-item">
-                  <kbd>Enter</kbd>
-                  <span>Send message</span>
-                </div>
-                <div className="shortcut-item">
-                  <kbd>Esc</kbd>
-                  <span>Clear input field</span>
-                </div>
-                <div className="shortcut-item">
-                  <kbd>Ctrl</kbd> + <kbd>K</kbd>
-                  <span>Clear entire chat</span>
-                </div>
-                <div className="shortcut-item">
-                  <kbd>Ctrl</kbd> + <kbd>L</kbd>
-                  <span>Focus input field</span>
-                </div>
-              </div>
-
-              <div className="shortcuts-section">
-                <h3>Quick Access</h3>
-                <div className="shortcut-item">
-                  <kbd>/</kbd>
-                  <span>Focus input field (from anywhere)</span>
-                </div>
-                <div className="shortcut-item">
-                  <kbd>Ctrl</kbd> + <kbd>/</kbd>
-                  <span>Show this help</span>
-                </div>
-                <div className="shortcut-item">
-                  <kbd>Esc</kbd>
-                  <span>Close this help modal</span>
-                </div>
-              </div>
-
-              <div className="modal-footer">
-                <p>Tip: Use <kbd>Tab</kbd> to navigate between interactive elements.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <HelpModal isOpen={showHelpModal} onClose={closeHelpModal} />
     </div>
   );
 };

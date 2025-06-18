@@ -1,0 +1,122 @@
+/* Help Modal Specific Styles */
+
+.shortcuts-section {
+  margin-bottom: var(--spacing-6);
+}
+
+.shortcuts-section:last-of-type {
+  margin-bottom: 0;
+}
+
+.shortcuts-section h3 {
+  margin: 0 0 var(--spacing-4) 0;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--primary-blue-dark);
+  border-bottom: 2px solid var(--primary-blue);
+  padding-bottom: var(--spacing-2);
+}
+
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-3) 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.shortcut-item:last-child {
+  border-bottom: none;
+}
+
+.shortcut-item kbd {
+  background: linear-gradient(135deg, var(--neutral-100) 0%, var(--neutral-200) 100%);
+  border: 2px solid var(--neutral-300);
+  border-radius: 8px;
+  padding: var(--spacing-2) var(--spacing-3);
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--neutral-700);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  min-width: 32px;
+  text-align: center;
+}
+
+.shortcut-item span {
+  flex: 1;
+  color: var(--neutral-700);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+}
+
+.modal-footer {
+  margin-top: var(--spacing-6);
+  padding-top: var(--spacing-4);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.modal-footer p {
+  margin: 0;
+  color: var(--neutral-600);
+  font-size: var(--font-size-sm);
+  font-style: italic;
+}
+
+.modal-footer kbd {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+  color: white;
+  border: none;
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-xs);
+}
+
+/* Responsive help modal */
+@media (max-width: 768px) {
+  .shortcuts-section h3 {
+    font-size: var(--font-size-base);
+  }
+  
+  .shortcut-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-2);
+  }
+  
+  .shortcut-item kbd {
+    margin-bottom: var(--spacing-1);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .shortcuts-section h3 {
+    color: var(--neutral-200);
+    border-color: var(--primary-blue-light);
+  }
+  
+  .shortcut-item {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .shortcut-item kbd {
+    background: linear-gradient(135deg, var(--neutral-700) 0%, var(--neutral-600) 100%);
+    border-color: var(--neutral-500);
+    color: var(--neutral-200);
+  }
+  
+  .shortcut-item span {
+    color: var(--neutral-300);
+  }
+  
+  .modal-footer {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .modal-footer p {
+    color: var(--neutral-400);
+  }
+}
