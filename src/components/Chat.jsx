@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { findBestMatch, getGlobalRulerResult } from '../utils/ruler.js';
 import { useKeyboardNavigation } from '../utils/keyboardNavigation.js';
+import { getTimeBasedWelcomeMessage } from '../data/WelcomeMessages.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faQuestionCircle, 
@@ -14,14 +15,17 @@ import MessageList from './MessageList';
 import './Chat.css';
 
 const Chat = () => {
+  // Get a dynamic welcome message based on time of day
+  const welcomeMessage = getTimeBasedWelcomeMessage();
+  
   const [messages, setMessages] = useState([
     {
       id: 1,
       type: 'bot',
-      content: 'Hello! I\'m the Eurostat Energy Chatbot. Ask me about energy definitions, fuel codes, or any energy-related terms.',
-      timestamp: new Date()
+      content: welcomeMessage.content,
+      timestamp: welcomeMessage.timestamp
     }
-  ]);  const [inputValue, setInputValue] = useState('');  const [isLoading, setIsLoading] = useState(false);
+  ]);const [inputValue, setInputValue] = useState('');  const [isLoading, setIsLoading] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -49,14 +53,15 @@ const Chat = () => {
     // Return focus to help button
     helpButtonRef.current?.focus();
   };
-
   const clearChat = () => {
+    // Get a fresh welcome message when clearing chat
+    const newWelcomeMessage = getTimeBasedWelcomeMessage();
     setMessages([
       {
         id: 1,
         type: 'bot',
-        content: 'Hello! I\'m the Eurostat Energy Chatbot. Ask me about energy definitions, fuel codes, or any energy-related terms.',
-        timestamp: new Date()
+        content: newWelcomeMessage.content,
+        timestamp: newWelcomeMessage.timestamp
       }
     ]);
     inputRef.current?.focus();
