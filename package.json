@@ -14,8 +14,13 @@
     "serve:preview": "serve -s dist -l 5000 --config serve.json"
   },
   "dependencies": {
+    "compromise": "^14.14.4",
+    "fuse.js": "^7.1.0",
+    "natural": "^8.1.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "stemmer": "^2.0.1",
+    "stopword": "^3.1.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
