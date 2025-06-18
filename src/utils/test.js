@@ -1,25 +1,31 @@
 import chalk from "chalk";
+import { findBestMatch } from './ruler.js';
 
-const defaultUserInputs = [
+const chatInputs = [
   // testing definitions
   "solid fossil fuels",
   "solid fosil fuels",
-  "hard coal?",
-  "coking coal?",
+  "fosil fuels",  
 ];
 
-export const runTests = async (userInputs = defaultUserInputs) => {
+export const runTests = async (testInputs = chatInputs) => {
   console.log(chalk.bold.green("\n🚀 Starting chatbot tests...\n"));
 
-  // Use static method to send messages
-  for (const input of userInputs) {
+  for (const input of testInputs) {
     try {
-      // Process input using static method
-      const messages = await MessageService.processUserInput(input, "en");
-      const botResponse = messages[1]; // Get bot response from returned messages
-
       console.log(chalk.cyan(`👤 User: ${chalk.bold(input)}`));
-      console.log(chalk.yellow(`🤖 Bot: ${chalk.bold(botResponse.text)}`));
+      
+      const result = findBestMatch(input);
+      
+      if (result) {
+        console.log(chalk.yellow(`🤖 Bot: Found "${result.match.title}" (${result.method}, ${(result.confidence * 100).toFixed(1)}%)`));
+        if (result.match.text) {
+          console.log(chalk.white(`� ${result.match.text.substring(0, 150)}...`));
+        }
+      } else {
+        console.log(chalk.red(`🤖 Bot: No match found for "${input}"`));
+      }
+      
       console.log(chalk.gray("──────────────NEXT────────────\n"));
     } catch (error) {
       console.error(chalk.red(`❌ Error handling input: "${input}"`));

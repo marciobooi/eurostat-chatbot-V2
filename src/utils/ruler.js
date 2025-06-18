@@ -5,9 +5,14 @@ import { synonyms } from '../data/Synonyms.js';
 import { stopwords } from '../data/Stopwords.js';
 import { suffixes, minWordLength, stemExceptions } from '../data/Suffixes.js';
 import Fuse from 'fuse.js';
-import natural from 'natural';
 import { removeStopwords } from 'stopword';
 import nlp from 'compromise';
+import levenshtein from 'js-levenshtein';
+import * as metaphoneLib from 'metaphone';
+import stemmer from 'porter-stemmer';
+
+
+
 
 /**
  * Enhanced Term Resolution System with Ruler Pattern
@@ -29,8 +34,8 @@ import nlp from 'compromise';
  * 11. If no match → Suggest similar terms
  */
 
-// Initialize NLP tools
-const { PorterStemmer, JaroWinklerDistance, LevenshteinDistance } = natural;
+// Initialize professional NLP tools
+const metaphone = metaphoneLib.default || metaphoneLib;
 
 // Configuration for Fuse.js fuzzy search
 const fuseOptions = {
@@ -157,7 +162,7 @@ const levenshteinMatch = (query, threshold = 0.7) => {
   
   searchData.forEach(item => {
     const searchableText = item.searchText;
-    const distance = LevenshteinDistance(query.toLowerCase(), searchableText);
+    const distance = levenshtein(query.toLowerCase(), searchableText);
     const maxLength = Math.max(query.length, searchableText.length);
     const similarity = 1 - (distance / maxLength);
     
@@ -175,16 +180,16 @@ const levenshteinMatch = (query, threshold = 0.7) => {
  */
 const phoneticMatch = (query) => {
   try {
-    const queryPhonetic = natural.Metaphone.process(query);
+    const queryPhonetic = metaphone(query);
     let bestMatch = null;
     let maxMatches = 0;
     
     searchData.forEach(item => {
       try {
-        const titlePhonetic = natural.Metaphone.process(item.title || '');
+        const titlePhonetic = metaphone(item.title || '');
         const keywordPhonetics = (item.keywords || []).map(k => {
           try {
-            return natural.Metaphone.process(k);
+            return metaphone(k);
           } catch (e) {
             return '';
           }
@@ -213,9 +218,9 @@ const phoneticMatch = (query) => {
 };
 
 /**
- * Custom stemming function using suffix dictionary
+ * Hybrid stemming function using Porter stemmer + custom dictionary
  */
-const customStem = (word) => {
+const hybridStem = (word) => {
   const lowercaseWord = word.toLowerCase();
   
   // Check for irregular forms first
@@ -223,31 +228,34 @@ const customStem = (word) => {
     return stemExceptions[lowercaseWord];
   }
   
-  // Try to remove suffixes (longest first)
-  for (const suffix of suffixes) {
-    if (lowercaseWord.endsWith(suffix) && 
-        lowercaseWord.length > suffix.length + minWordLength) {
-      return lowercaseWord.slice(0, -suffix.length);
+  // Use Porter stemmer for regular words
+  try {
+    return stemmer(lowercaseWord);
+  } catch (e) {
+    // Fallback to custom suffix removal if Porter fails
+    for (const suffix of suffixes) {
+      if (lowercaseWord.endsWith(suffix) && 
+          lowercaseWord.length > suffix.length + minWordLength) {
+        return lowercaseWord.slice(0, -suffix.length);
+      }
     }
+    return lowercaseWord;
   }
-  
-  // If no suffix found, return original word
-  return lowercaseWord;
 };
 
 /**
- * Step 10: Stemming-based matching using custom stemmer
+ * Step 10: Stemming-based matching using hybrid Porter stemmer
  */
 const stemmingMatch = (query) => {
   const queryWords = query.split(/\s+/);
-  const queryStemmed = queryWords.map(word => customStem(word));
+  const queryStemmed = queryWords.map(word => hybridStem(word));
   
   let bestMatch = null;
   let bestScore = 0;
   
   searchData.forEach(item => {
     const itemWords = (item.searchText || '').split(/\s+/);
-    const itemStemmed = itemWords.map(word => customStem(word));
+    const itemStemmed = itemWords.map(word => hybridStem(word));
     
     const intersection = queryStemmed.filter(stem => itemStemmed.includes(stem));
     const score = intersection.length / Math.max(queryStemmed.length, itemStemmed.length);
@@ -262,7 +270,7 @@ const stemmingMatch = (query) => {
 };
 
 /**
- * Main ruler function - implements the 10-step process
+ * Main ruler function - ALWAYS performs all 10 steps and chooses the best result
  */
 export const findBestMatch = (userQuery) => {
   console.log(`🔍 Ruler System: Processing query "${userQuery}"`);
@@ -291,43 +299,122 @@ export const findBestMatch = (userQuery) => {
   const meaningfulTerms = extractMeaningfulTerms(synonymQuery);
   console.log(`Step 5 - Meaningful terms: [${meaningfulTerms.join(', ')}]`);
   
-  // Step 6: Try exact match first
-  let result = findExactMatch(processedQuery);
-  if (result) {
-    console.log(`✅ Step 6 - Exact match found: "${result.title}"`);
-    return { match: result, confidence: 1.0, method: 'exact' };
+  // Initialize candidates array to store ALL matches from all 10 steps
+  const candidates = [];
+  
+  // Step 6: Exact matching (highest priority)
+  console.log(`🔍 Step 6 - Exact matching...`);
+  const exactMatch = findExactMatch(processedQuery);
+  if (exactMatch) {
+    candidates.push({
+      match: exactMatch,
+      confidence: 100,  // Highest score for exact matches
+      method: 'exact',
+      step: 6,
+      query: processedQuery
+    });
+    console.log(`   ✅ Found: "${exactMatch.title}"`);
+  } else {
+    console.log(`   ❌ No exact match`);
   }
   
   // Step 7: Fuzzy search
-  result = fuzzySearch(synonymQuery);
-  if (result && result.score < 0.3) { // Good fuzzy match
-    console.log(`✅ Step 7 - Fuzzy match found: "${result.item.title}" (score: ${result.score})`);
-    return { match: result.item, confidence: 1 - result.score, method: 'fuzzy' };
+  console.log(`🔍 Step 7 - Fuzzy matching...`);
+  const fuzzyResult = fuzzySearch(synonymQuery);
+  if (fuzzyResult) {
+    const fuzzyScore = Math.max(0, (1 - fuzzyResult.score) * 85); // Max 85 points for fuzzy
+    candidates.push({
+      match: fuzzyResult.item,
+      confidence: fuzzyScore,
+      method: 'fuzzy',
+      step: 7,
+      query: synonymQuery,
+      rawScore: fuzzyResult.score
+    });
+    console.log(`   ✅ Found: "${fuzzyResult.item.title}" (score: ${fuzzyScore.toFixed(1)})`);
+  } else {
+    console.log(`   ❌ No fuzzy match`);
   }
   
   // Step 8: Levenshtein matching
-  result = levenshteinMatch(processedQuery);
-  if (result) {
-    console.log(`✅ Step 8 - Levenshtein match found: "${result.item.title}" (score: ${result.score})`);
-    return { match: result.item, confidence: result.score, method: 'levenshtein' };
+  console.log(`🔍 Step 8 - Levenshtein matching...`);
+  const levenshteinResult = levenshteinMatch(processedQuery);
+  if (levenshteinResult) {
+    const levenshteinScore = Math.max(0, levenshteinResult.score * 70); // Max 70 points
+    candidates.push({
+      match: levenshteinResult.item,
+      confidence: levenshteinScore,
+      method: 'levenshtein',
+      step: 8,
+      query: processedQuery,
+      rawScore: levenshteinResult.score
+    });
+    console.log(`   ✅ Found: "${levenshteinResult.item.title}" (score: ${levenshteinScore.toFixed(1)})`);
+  } else {
+    console.log(`   ❌ No Levenshtein match`);
   }
   
   // Step 9: Phonetic matching
-  result = phoneticMatch(processedQuery);
-  if (result) {
-    console.log(`✅ Step 9 - Phonetic match found: "${result.item.title}" (score: ${result.score})`);
-    return { match: result.item, confidence: result.score / 5, method: 'phonetic' };
+  console.log(`🔍 Step 9 - Phonetic matching...`);
+  const phoneticResult = phoneticMatch(processedQuery);
+  if (phoneticResult) {
+    const phoneticScore = Math.min(60, phoneticResult.score * 15); // Max 60 points
+    candidates.push({
+      match: phoneticResult.item,
+      confidence: phoneticScore,
+      method: 'phonetic',
+      step: 9,
+      query: processedQuery,
+      rawScore: phoneticResult.score
+    });
+    console.log(`   ✅ Found: "${phoneticResult.item.title}" (score: ${phoneticScore.toFixed(1)})`);
+  } else {
+    console.log(`   ❌ No phonetic match`);
   }
   
-  // Step 10: Stemming match
-  result = stemmingMatch(synonymQuery);
-  if (result) {
-    console.log(`✅ Step 10 - Stemming match found: "${result.item.title}" (score: ${result.score})`);
-    return { match: result.item, confidence: result.score, method: 'stemming' };
+  // Step 10: Stemming matching
+  console.log(`🔍 Step 10 - Stemming matching...`);
+  const stemmingResult = stemmingMatch(synonymQuery);
+  if (stemmingResult) {
+    const stemmingScore = Math.max(0, stemmingResult.score * 50); // Max 50 points
+    candidates.push({
+      match: stemmingResult.item,
+      confidence: stemmingScore,
+      method: 'stemming',
+      step: 10,
+      query: synonymQuery,
+      rawScore: stemmingResult.score
+    });
+    console.log(`   ✅ Found: "${stemmingResult.item.title}" (score: ${stemmingScore.toFixed(1)})`);
+  } else {
+    console.log(`   ❌ No stemming match`);
   }
   
-  console.log(`❌ No match found for: "${userQuery}"`);
-  return null;
+  // Evaluate all candidates and choose the best one
+  if (candidates.length === 0) {
+    console.log(`❌ No matches found in any of the 10 steps for: "${userQuery}"`);
+    return null;
+  }
+  
+  // Sort candidates by confidence score (highest first)
+  candidates.sort((a, b) => b.confidence - a.confidence);
+  
+  console.log(`\n📊 EVALUATION RESULTS (${candidates.length} candidates found):`);
+  candidates.forEach((candidate, index) => {
+    console.log(`   ${index + 1}. "${candidate.match.title}" - Step ${candidate.step} (${candidate.method}) - Score: ${candidate.confidence.toFixed(1)}`);
+  });
+  
+  // Choose the best candidate
+  const bestCandidate = candidates[0];
+  console.log(`\n🏆 BEST MATCH: "${bestCandidate.match.title}" from Step ${bestCandidate.step} (${bestCandidate.method}) with score ${bestCandidate.confidence.toFixed(1)}`);
+  
+  return {
+    match: bestCandidate.match,
+    confidence: bestCandidate.confidence / 100, // Convert back to 0-1 scale
+    method: bestCandidate.method,
+    step: bestCandidate.step,
+    allCandidates: candidates // Include all candidates for analysis
+  };
 };
 
 /**
