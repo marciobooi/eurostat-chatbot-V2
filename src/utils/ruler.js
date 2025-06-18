@@ -8,7 +8,6 @@ import Fuse from 'fuse.js';
 import { removeStopwords } from 'stopword';
 import nlp from 'compromise';
 import levenshtein from 'js-levenshtein';
-import * as metaphoneLib from 'metaphone';
 import stemmer from 'porter-stemmer';
 
 
@@ -34,8 +33,7 @@ import stemmer from 'porter-stemmer';
  * 11. If no match → Suggest similar terms
  */
 
-// Initialize professional NLP tools
-const metaphone = metaphoneLib.default || metaphoneLib;
+// Initialize professional NLP tools (Porter stemmer)
 
 // Configuration for Fuse.js fuzzy search
 const fuseOptions = {

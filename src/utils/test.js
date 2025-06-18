@@ -3,7 +3,9 @@ import { findBestMatch } from './ruler.js';
 
 const chatInputs = [
   // testing definitions
-  "solid fossil fuels",
+  // "solid fossil fuels",
+  // "black liquor",
+  "blak licor"
   // "solid fosil fuels",
   // "fosil fuels",  
 ];
