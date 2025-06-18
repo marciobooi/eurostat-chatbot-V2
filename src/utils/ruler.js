@@ -4,6 +4,7 @@ import { abbreviations } from '../data/Abbreviations.js';
 import { synonyms } from '../data/Synonyms.js';
 import { stopwords } from '../data/Stopwords.js';
 import { suffixes, minWordLength, stemExceptions } from '../data/Suffixes.js';
+import { isEnergyRelated } from '../data/EnergyKeywords.js';
 import Fuse from 'fuse.js';
 import { removeStopwords } from 'stopword';
 import nlp from 'compromise';
@@ -150,15 +151,14 @@ const correctSpelling = (term) => {
     if (spellChecker.correct(term)) {
       return term;
     }
-    
-    // Get suggestions for misspelled words
+      // Get suggestions for misspelled words
     const suggestions = spellChecker.suggest(term);
     
     if (suggestions.length > 0) {
       // For energy context, prefer energy-related suggestions
       for (const suggestion of suggestions) {
-        // Prefer suggestions that are energy-related
-        if (suggestion.match(/(energy|power|fuel|gas|oil|electric|solar|wind|hydro|nuclear|bio|coal|renewable)/i)) {
+        // Use centralized energy keyword checking
+        if (isEnergyRelated(suggestion)) {
           console.log(`   🔧 Context-aware spell correction: "${term}" → "${suggestion}"`);
           return suggestion;
         }
