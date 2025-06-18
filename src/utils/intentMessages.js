@@ -255,26 +255,17 @@ const formatDefinitionResponse = (match, result) => {
   
   // Add definition text
   if (match.text) {
-    response += `${match.text}\n\n`;
+    response += `${match.text}`;
   }
-  
-  // Handle subfuels instead of related terms
-  if (match.subFuels && match.subFuels.length > 0) {
-    const subfuelIntro = getSubfuelIntro();
-    response += `**${subfuelIntro}**\n`;
-    // Create dynamic buttons for subfuels (this will be handled in the UI)
-    const subfuelList = match.subFuels.map(fuel => `• ${fuel}`).join('\n');
-    response += `${subfuelList}\n\n`;
-  }
-  
-  // Add technical info with method and confidence
-  response += `*${result.method} matching • ${(result.confidence * 100).toFixed(1)}% confidence*`;
   
   return {
     type: RESPONSE_TYPES.DEFINITION,
     content: response,
     matchData: result,
     subfuels: match.subFuels || [],
+    hasVisualization: match.hasVisualization || false,
+    visualizationType: match.visualizationType || [],
+    link: match.link || '',
     isError: false
   };
 };
@@ -348,40 +339,5 @@ export const processMessage = async (userInput) => {
   }
 };
 
-/**
- * Helper function to get processing metadata
- */
-export const getProcessingInfo = (originalText, correctedText, intent) => {
-  return {
-    originalText,
-    correctedText,
-    wasSpellCorrected: originalText.toLowerCase() !== correctedText.toLowerCase(),
-    detectedIntent: intent,
-    timestamp: new Date()
-  };
-};
 
-/**
- * Test function to preview different unknown response types
- * Useful for testing the variety of responses
- */
-export const previewUnknownResponses = () => {
-  console.log('🎭 Preview of Unknown Response Types:\n');
-  
-  console.log('📝 Unknown/General responses:');
-  for (let i = 0; i < 3; i++) {
-    console.log(`   ${i + 1}. ${getRandomUnknownResponse('unknown')}`);
-  }
-  
-  console.log('\n🚫 No Match responses:');
-  for (let i = 0; i < 3; i++) {
-    console.log(`   ${i + 1}. ${getRandomUnknownResponse('no_match')}`);
-  }
-  
-  console.log('\n❓ Clarification responses:');
-  for (let i = 0; i < 3; i++) {
-    console.log(`   ${i + 1}. ${getRandomUnknownResponse('clarification')}`);
-  }
-  
-  console.log('\n✨ All responses are randomized for natural conversation!');
-};
+

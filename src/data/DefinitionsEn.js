@@ -88,8 +88,8 @@ export const energyDefinitionsEn = {
       "Coal mining"
     ],
     "score": 0.0457,
-    "hasVisualization": false,
-    "visualizationType": [],
+    "hasVisualization": true,
+    "visualizationType": ["pie", "bar", "line"],
     "statisticalConcepts": [
       "Solid fossil fuels",
       "Coal production",

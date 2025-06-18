@@ -1,6 +1,13 @@
 import { forwardRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRobot, faUser } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faRobot, 
+  faUser, 
+  faChartPie, 
+  faChartBar, 
+  faChartLine, 
+  faExternalLinkAlt 
+} from '@fortawesome/free-solid-svg-icons';
 import './MessageList.css';
 
 const MessageList = forwardRef(({
@@ -8,7 +15,9 @@ const MessageList = forwardRef(({
   focusedMessageIndex,
   isKeyboardUser,
   messagesEndRef,
-  formatMessage
+  formatMessage,
+  onVisualizationClick,
+  onLinkClick
 }, messagesContainerRef) => {
   return (
     <div 
@@ -32,6 +41,8 @@ const MessageList = forwardRef(({
           isTyping={false}
           isFocused={index === focusedMessageIndex}
           formatMessage={formatMessage}
+          onVisualizationClick={onVisualizationClick}
+          onLinkClick={onLinkClick}
         />
       ))}
       
@@ -45,8 +56,20 @@ const Message = ({
   index, 
   isTyping, 
   isFocused, 
-  formatMessage
+  formatMessage,
+  onVisualizationClick,
+  onLinkClick
 }) => {
+  // Helper function to get chart icon
+  const getChartIcon = (chartType) => {
+    switch (chartType) {
+      case 'pie': return faChartPie;
+      case 'bar': return faChartBar;
+      case 'line': return faChartLine;
+      default: return faChartBar;
+    }
+  };
+
   return (
     <div 
       className={`message ${message.type} ${message.isError ? 'error' : ''} ${isFocused ? 'focused' : ''}`}
@@ -77,6 +100,42 @@ const Message = ({
           dangerouslySetInnerHTML={{ __html: formatMessage(message.content) }}
           role="text"
         />
+        
+        {/* Visualization and Link buttons for bot messages */}
+        {message.type === 'bot' && (message.hasVisualization || message.link) && (
+          <div className="message-actions" role="group" aria-label="Message actions">
+            {/* Visualization buttons */}
+            {message.hasVisualization && message.visualizationType && message.visualizationType.length > 0 && (
+              <div className="visualization-buttons">
+                {message.visualizationType.map((chartType, idx) => (
+                  <button
+                    key={idx}
+                    className="action-button visualization-button"
+                    onClick={() => onVisualizationClick(chartType)}
+                    aria-label={`View ${chartType} chart`}
+                    title={`View as ${chartType} chart`}
+                  >
+                    <FontAwesomeIcon icon={getChartIcon(chartType)} />
+                    <span className="button-label">{chartType}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            
+            {/* Link button */}
+            {message.link && (
+              <button
+                className="action-button link-button"
+                onClick={() => onLinkClick(message.link)}
+                aria-label="Open external link"
+                title="View source or additional information"
+              >
+                <FontAwesomeIcon icon={faExternalLinkAlt} />
+                <span className="button-label">source</span>
+              </button>
+            )}
+          </div>
+        )}
         
         <div className="message-timestamp" aria-hidden="true">
           {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

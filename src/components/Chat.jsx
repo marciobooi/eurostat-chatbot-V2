@@ -101,7 +101,11 @@ const Chat = () => {
         timestamp: new Date(),
         responseType: response.type,
         isError: response.isError,
-        matchData: response.matchData || null,        subfuels: response.subfuels || []
+        matchData: response.matchData || null,
+        subfuels: response.subfuels || [],
+        hasVisualization: response.hasVisualization || false,
+        visualizationType: response.visualizationType || [],
+        link: response.link || ''
       };
 
       setMessages(prev => [...prev, botResponse]);
@@ -126,6 +130,19 @@ const Chat = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Handle visualization button clicks
+  const handleVisualizationClick = (chartType) => {
+    console.log(`📊 Visualization requested: ${chartType} chart`);
+    // TODO: Implement chart visualization
+  };
+
+  // Handle link button clicks
+  const handleLinkClick = (link) => {
+    console.log(`🔗 Link clicked: ${link}`);
+    // Open link in new tab
+    window.open(link, '_blank', 'noopener,noreferrer');
   };
 
   // Use keyboard navigation hook
@@ -194,7 +211,10 @@ const Chat = () => {
         responseType: response.type,
         isError: response.isError,
         matchData: response.matchData || null,
-        subfuels: response.subfuels || []
+        subfuels: response.subfuels || [],
+        hasVisualization: response.hasVisualization || false,
+        visualizationType: response.visualizationType || [],
+        link: response.link || ''
       };
 
       // Add the bot response directly
@@ -280,6 +300,8 @@ const Chat = () => {
           isKeyboardUser={isKeyboardUser}
           messagesEndRef={messagesEndRef}
           formatMessage={formatMessage}
+          onVisualizationClick={handleVisualizationClick}
+          onLinkClick={handleLinkClick}
         />
           <TypingIndicator 
           isVisible={isLoading}
