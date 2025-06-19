@@ -274,13 +274,6 @@ export const getAvailableCountries = (data) => {
     }));
   } catch (error) {
     console.error('Error getting available countries:', error);
-    return [
-      { code: 'DE', name: 'Germany' },
-      { code: 'FR', name: 'France' },
-      { code: 'IT', name: 'Italy' },
-      { code: 'ES', name: 'Spain' },
-      { code: 'PL', name: 'Poland' }
-    ];
   }
 };
 
@@ -300,7 +293,7 @@ export const getChartData = async ({
   indicator_type, 
   fuelCode, 
   chartType, 
-  selectedCountry = 'DE', 
+  selectedCountry = 'EU27_2020', 
   selectedFuel = 'Solid fossil fuels' 
 }) => {
   try {
