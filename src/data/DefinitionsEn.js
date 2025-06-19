@@ -59,7 +59,7 @@ export const energyDefinitionsEn = {
     "text": "Solid fossil fuels is a product aggregate equal to the sum of Hard coal, Brown coal and Coal products.",
     "dataset": "nrg_ind_id",
     "fuelCode": "C0000X0350-0370",
-    "indicator_type": "INDIC_NRG",
+    "indicator_type": "siec",
     "keywords": [
       "brown coal",
       "coal",

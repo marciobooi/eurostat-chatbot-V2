@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import './Chart.css';
@@ -9,16 +9,8 @@ const Chart = ({
   title, 
   remainingVisualizationTypes = [], 
   onVisualizationChange,
-  animate = true 
-}) => {
-  const chartRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    // Animate chart appearance
-    const timer = setTimeout(() => setIsVisible(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
+  animate = false 
+}) => {  const chartRef = useRef(null);
 
   // Generate sample data based on fuel types (you can replace with real data)
   const generateChartData = () => {
@@ -184,9 +176,8 @@ const Chart = ({
     };
 
     return baseOptions;
-  };
-  return (
-    <div className={`chart-container ${isVisible ? 'visible' : ''}`}>
+  };  return (
+    <div className="chart-container">
       <div className="chart-header">
         <h4 className="chart-title">
           {type === 'pie' && '📊 Distribution'}
