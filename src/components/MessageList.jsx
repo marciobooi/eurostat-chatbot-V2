@@ -7,7 +7,6 @@ import {
   faChartBar, 
   faChartLine, 
   faExternalLinkAlt,
-  faThLarge,
   faLayerGroup
 } from '@fortawesome/free-solid-svg-icons';
 import Chart from './Chart';
@@ -71,7 +70,6 @@ const Message = ({
       case 'pie': return faChartPie;
       case 'bar': return faChartBar;
       case 'line': return faChartLine;
-      case 'heatmap': return faThLarge;
       case 'stacked': return faLayerGroup;
       default: return faChartBar;
     }

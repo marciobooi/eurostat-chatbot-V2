@@ -89,7 +89,7 @@ export const energyDefinitionsEn = {
     ],
     "score": 0.0457,
     "hasVisualization": true,
-    "visualizationType": ["pie", "bar", "line", "heatmap", "stacked"],
+    "visualizationType": ["pie", "bar", "line", "stacked"],
     "statisticalConcepts": [
       "Solid fossil fuels",
       "Coal production",
@@ -243,7 +243,6 @@ export const energyDefinitionsEn = {
       "pie",
       "bar",
       "line",
-      "heatmap",
       "stacked"
     ],
     "statisticalConcepts": [
