@@ -6,7 +6,9 @@ import {
   faChartPie, 
   faChartBar, 
   faChartLine, 
-  faExternalLinkAlt 
+  faExternalLinkAlt,
+  faThLarge,
+  faLayerGroup
 } from '@fortawesome/free-solid-svg-icons';
 import Chart from './Chart';
 import './MessageList.css';
@@ -63,13 +65,14 @@ const Message = ({
 }) => {
   // State to track which chart is currently displayed
   const [currentChartType, setCurrentChartType] = useState(null);
-  
-  // Helper function to get chart icon
+    // Helper function to get chart icon
   const getChartIcon = (chartType) => {
     switch (chartType) {
       case 'pie': return faChartPie;
       case 'bar': return faChartBar;
       case 'line': return faChartLine;
+      case 'heatmap': return faThLarge;
+      case 'stacked': return faLayerGroup;
       default: return faChartBar;
     }
   };
@@ -123,11 +126,15 @@ const Message = ({
           dangerouslySetInnerHTML={{ __html: formatMessage(message.content) }}
           role="text"
         />
-        
-        {/* Chart display for bot messages when a chart type is selected */}
+          {/* Chart display for bot messages when a chart type is selected */}
         {message.type === 'bot' && currentChartType && message.hasVisualization && (
           <Chart
             type={currentChartType}
+            dataset={message.dataset}
+            indicator_type={message.indicator_type}
+            fuelCode={message.fuelCode}
+            selectedCountry="DE" // Default to Germany, will add country selection later
+            selectedFuel={message.content.split('**')[1]?.split('**')[0] || 'Energy Data'}
             title={`${message.content.split('**')[1] || 'Energy Data'} - ${currentChartType} Chart`}
             remainingVisualizationTypes={getRemainingVisualizationTypes()}
             onVisualizationChange={handleChartTypeChange}

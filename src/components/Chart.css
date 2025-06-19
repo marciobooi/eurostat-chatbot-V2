@@ -373,6 +373,60 @@
   border-radius: 20px;
 }
 
+/* Loading and Error States */
+.chart-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: var(--neutral-500);
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--neutral-200);
+  border-top: 3px solid var(--primary-500);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.chart-error {
+  padding: var(--spacing-4);
+  text-align: center;
+  color: var(--neutral-600);
+  font-size: 0.875rem;
+}
+
+.chart-type-badge.error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Dark mode loading states */
+@media (prefers-color-scheme: dark) {
+  .chart-loading {
+    background: linear-gradient(135deg, rgba(51, 65, 85, 0.8) 0%, rgba(71, 85, 105, 0.9) 100%);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--neutral-400);
+  }
+  
+  .chart-error {
+    background: linear-gradient(135deg, rgba(127, 29, 29, 0.3) 0%, rgba(153, 27, 27, 0.4) 100%);
+    border-color: rgba(248, 113, 113, 0.3);
+    color: var(--red-400);
+  }
+  
+  .loading-spinner {
+    border-color: rgba(79, 70, 229, 0.2);
+    border-top-color: var(--primary-400);
+  }
+}
+
 /* Hover effects */
 .chart-container:hover {
   box-shadow: 

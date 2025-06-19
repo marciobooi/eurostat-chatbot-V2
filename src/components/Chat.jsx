@@ -99,13 +99,16 @@ const Chat = () => {
         type: 'bot',
         content: response.content,
         timestamp: new Date(),
-        responseType: response.type,
-        isError: response.isError,
+        responseType: response.type,        isError: response.isError,
         matchData: response.matchData || null,
         subfuels: response.subfuels || [],
         hasVisualization: response.hasVisualization || false,
         visualizationType: response.visualizationType || [],
-        link: response.link || ''
+        link: response.link || '',
+        // API parameters for chart data
+        dataset: response.dataset || null,
+        indicator_type: response.indicator_type || null,
+        fuelCode: response.fuelCode || null
       };
 
       setMessages(prev => [...prev, botResponse]);
@@ -201,8 +204,7 @@ const Chat = () => {
     try {
       // Use the intent message processor
       const response = await processMessage(query);
-      
-      // Add additional delay for more realistic typing simulation
+        // Add additional delay for more realistic typing simulation
       await new Promise(resolve => setTimeout(resolve, 1200));      const botResponse = {
         id: Date.now() + 1,
         type: 'bot',
@@ -214,7 +216,11 @@ const Chat = () => {
         subfuels: response.subfuels || [],
         hasVisualization: response.hasVisualization || false,
         visualizationType: response.visualizationType || [],
-        link: response.link || ''
+        link: response.link || '',
+        // API parameters for chart data
+        dataset: response.dataset || null,
+        indicator_type: response.indicator_type || null,
+        fuelCode: response.fuelCode || null
       };
 
       // Add the bot response directly

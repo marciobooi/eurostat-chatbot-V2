@@ -89,7 +89,7 @@ export const energyDefinitionsEn = {
     ],
     "score": 0.0457,
     "hasVisualization": true,
-    "visualizationType": ["pie", "bar", "line"],
+    "visualizationType": ["pie", "bar", "line", "heatmap", "stacked"],
     "statisticalConcepts": [
       "Solid fossil fuels",
       "Coal production",
@@ -236,14 +236,15 @@ export const energyDefinitionsEn = {
       "The Production Of A Coke (Coke Oven Coke) Suitable",
       "Blast Furnace Charge.",
       "Its Gross Calorific Value",
-      "24 000 KJ/Kg",
-      "Moist Basis."
+      "24 000 KJ/Kg",      "Moist Basis."
     ],
     "hasVisualization": true,
     "visualizationType": [
       "pie",
       "bar",
-      "line"
+      "line",
+      "heatmap",
+      "stacked"
     ],
     "statisticalConcepts": [
       "Coking coal",
