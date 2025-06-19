@@ -123,20 +123,27 @@ const Message = ({
           className="message-text"
           dangerouslySetInnerHTML={{ __html: formatMessage(message.content) }}
           role="text"
-        />
-          {/* Chart display for bot messages when a chart type is selected */}
+        />          {/* Chart display for bot messages when a chart type is selected */}
         {message.type === 'bot' && currentChartType && message.hasVisualization && (
-          <Chart
-            type={currentChartType}
-            dataset={message.dataset}
-            indicator_type={message.indicator_type}
-            fuelCode={message.fuelCode}
-            selectedCountry="DE" // Default to Germany, will add country selection later
-            selectedFuel={message.content.split('**')[1]?.split('**')[0] || 'Energy Data'}
-            title={`${message.content.split('**')[1] || 'Energy Data'} - ${currentChartType} Chart`}
-            remainingVisualizationTypes={getRemainingVisualizationTypes()}
-            onVisualizationChange={handleChartTypeChange}
-          />
+          <>
+            {console.log('📊 Rendering Chart with message data:', { 
+              dataset: message.dataset, 
+              indicator_type: message.indicator_type, 
+              fuelCode: message.fuelCode,
+              messageKeys: Object.keys(message)
+            })}
+            <Chart
+              type={currentChartType}
+              dataset={message.dataset || 'nrg_ind_id'}
+              indicator_type={message.indicator_type || 'INDIC_NRG'}
+              fuelCode={message.fuelCode || 'C0000X0350-0370'}
+              selectedCountry="DE" // Default to Germany, will add country selection later
+              selectedFuel={message.content.split('**')[1]?.split('**')[0] || 'Energy Data'}
+              title={`${message.content.split('**')[1] || 'Energy Data'} - ${currentChartType} Chart`}
+              remainingVisualizationTypes={getRemainingVisualizationTypes()}
+              onVisualizationChange={handleChartTypeChange}
+            />
+          </>
         )}
         
         {/* Visualization and Link buttons for bot messages */}

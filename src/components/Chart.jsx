@@ -20,13 +20,16 @@ const Chart = ({
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   // Fetch data when component mounts or parameters change
   useEffect(() => {
+    console.log('🔍 Chart useEffect triggered with:', { type, dataset, indicator_type, fuelCode, selectedCountry, selectedFuel });
+    
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
+        
+        console.log('📡 About to call getChartData with:', { dataset, indicator_type, fuelCode, chartType: type, selectedCountry, selectedFuel });
         
         const data = await getChartData({
           dataset,
@@ -36,7 +39,9 @@ const Chart = ({
           selectedCountry,
           selectedFuel
         });
-          setChartData(data);
+        
+        console.log('✅ Chart data received:', data);
+        setChartData(data);
       } catch (err) {
         console.error('Error fetching chart data:', err);
         setError(err.message);
@@ -63,9 +68,7 @@ const Chart = ({
         case 'pie': return 'pie';
         default: return 'column';
       }
-    };
-
-    const baseOptions = {
+    };    const baseOptions = {
       chart: {
         type: getHighchartsType(),
         backgroundColor: 'transparent',
@@ -75,6 +78,9 @@ const Chart = ({
         },
         animation: animate ? { duration: 800, easing: 'easeOutQuart' } : false,
         height: 280
+      },
+      accessibility: {
+        enabled: false
       },
       title: {
         text: null

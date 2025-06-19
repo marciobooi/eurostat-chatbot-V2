@@ -36,11 +36,16 @@ export const fetchEurostatData = async ({ dataset, indicator_type, fuelCode }) =
     };
 
     console.log('🔍 Fetching Eurostat data:', { url, params });
-    
-    const response = await eurostatAPI.get(url, { params });
+      const response = await eurostatAPI.get(url, { params });
     
     if (response.data && response.data.value) {
       console.log('✅ Data fetched successfully');
+      console.log('📊 API Response structure:', {
+        hasValue: !!response.data.value,
+        hasDimension: !!response.data.dimension,
+        dimensionKeys: response.data.dimension ? Object.keys(response.data.dimension) : 'none',
+        valueLength: response.data.value ? Object.keys(response.data.value).length : 0
+      });
       return response.data;
     } else {
       throw new Error('No data found in response');
@@ -61,34 +66,62 @@ export const fetchEurostatData = async ({ dataset, indicator_type, fuelCode }) =
  */
 export const processLineChartData = (data, selectedCountry) => {
   try {
-    const { value, dimension } = data;
-    const years = Object.keys(dimension.TIME_PERIOD.category.label);
-    const chartData = [];
+    console.log('📈 Processing line chart data for country:', selectedCountry);
+    
+    if (!data?.value || !data?.dimension) {
+      throw new Error('Invalid data structure for line chart');
+    }
 
-    years.forEach(year => {
-      const key = `${year}.${selectedCountry}`;
-      if (value[key] !== undefined && value[key] !== null) {
+    const { value, dimension, size } = data;
+    
+    const geoIndex = dimension.geo.category.index;
+    const timeIndex = dimension.time.category.index;
+    const geoLabels = dimension.geo.category.label;
+    const timeLabels = dimension.time.category.label;
+    
+    // Check if selected country exists in the data
+    if (!geoIndex[selectedCountry]) {
+      throw new Error(`Country ${selectedCountry} not found in data`);
+    }
+    
+    const selectedGeoIdx = geoIndex[selectedCountry];
+    const timeSize = size[4]; // time dimension size
+    const chartData = [];
+    
+    // Get all time periods for the selected country
+    Object.keys(timeIndex).forEach(timeKey => {
+      const timeIdx = timeIndex[timeKey];
+      const valueIndex = selectedGeoIdx * timeSize + timeIdx;
+      const val = value[valueIndex];
+      
+      if (val !== null && val !== undefined && !isNaN(val)) {
         chartData.push({
-          x: parseInt(year),
-          y: parseFloat(value[key])
+          x: timeKey,
+          y: parseFloat(val)
         });
       }
     });
+    
+    // Sort by time period
+    chartData.sort((a, b) => a.x.localeCompare(b.x));
+    
+    if (chartData.length === 0) {
+      throw new Error(`No data available for country: ${selectedCountry}`);
+    }
 
-    // Sort by year
-    chartData.sort((a, b) => a.x - b.x);
-
+    console.log('✅ Line chart data processed:', chartData.length, 'points');
+    
     return {
-      categories: chartData.map(item => item.x.toString()),
+      categories: chartData.map(item => timeLabels[item.x] || item.x),
       series: [{
-        name: `${dimension.GEO.category.label[selectedCountry] || selectedCountry}`,
+        name: geoLabels[selectedCountry] || selectedCountry,
         data: chartData.map(item => item.y),
         color: '#4F46E5'
       }]
     };
   } catch (error) {
     console.error('Error processing line chart data:', error);
-    return { categories: [], series: [] };
+    throw error;
   }
 };
 
@@ -100,20 +133,40 @@ export const processLineChartData = (data, selectedCountry) => {
  */
 export const processBarChartData = (data, maxCountries = 10) => {
   try {
-    const { value, dimension } = data;
-    const years = Object.keys(dimension.TIME_PERIOD.category.label);
-    const countries = Object.keys(dimension.GEO.category.label);
-    const latestYear = Math.max(...years.map(y => parseInt(y))).toString();
+    console.log('📊 Processing bar chart data');
     
+    if (!data?.value || !data?.dimension) {
+      throw new Error('Invalid data structure for bar chart');
+    }
+
+    const { value, dimension, size } = data;
+    
+    const geoIndex = dimension.geo.category.index;
+    const timeIndex = dimension.time.category.index;
+    const geoLabels = dimension.geo.category.label;
+    const timeLabels = dimension.time.category.label;
+    
+    // Get the latest time period
+    const timeKeys = Object.keys(timeIndex);
+    const latestTimeKey = timeKeys[timeKeys.length - 1];
+    const latestTimeIdx = timeIndex[latestTimeKey];
+    
+    console.log('📅 Using latest time period for bar chart:', latestTimeKey);
+    
+    const timeSize = size[4]; // time dimension size
     const countryData = [];
 
-    countries.forEach(country => {
-      const key = `${latestYear}.${country}`;
-      if (value[key] !== undefined && value[key] !== null) {
+    // Get data for all countries for the latest time period
+    Object.keys(geoIndex).forEach(geoCode => {
+      const geoIdx = geoIndex[geoCode];
+      const valueIndex = geoIdx * timeSize + latestTimeIdx;
+      const val = value[valueIndex];
+      
+      if (val !== null && val !== undefined && !isNaN(val) && val > 0) {
         countryData.push({
-          name: dimension.GEO.category.label[country] || country,
-          code: country,
-          value: parseFloat(value[key])
+          name: geoLabels[geoCode] || geoCode,
+          code: geoCode,
+          value: parseFloat(val)
         });
       }
     });
@@ -122,10 +175,12 @@ export const processBarChartData = (data, maxCountries = 10) => {
     countryData.sort((a, b) => b.value - a.value);
     const topCountries = countryData.slice(0, maxCountries);
 
+    console.log('✅ Bar chart data processed:', topCountries.length, 'countries');
+
     return {
       categories: topCountries.map(item => item.name),
       series: [{
-        name: `Production (${latestYear})`,
+        name: `${timeLabels[latestTimeKey] || latestTimeKey}`,
         data: topCountries.map(item => item.value),
         color: '#4F46E5'
       }]
@@ -145,35 +200,61 @@ export const processBarChartData = (data, maxCountries = 10) => {
  */
 export const processPieChartData = (data, selectedCountry, selectedFuel) => {
   try {
-    const { value, dimension } = data;
-    const years = Object.keys(dimension.TIME_PERIOD.category.label);
-    const latestYear = Math.max(...years.map(y => parseInt(y))).toString();
-    
-    // For pie chart, we'll show the selected fuel vs. other major fuel categories
-    // This is a simplified approach - in reality, you'd need to fetch multiple fuel types
-    const fuelCategories = [
-      { name: selectedFuel, color: '#4F46E5' },
-      { name: 'Other Solid Fuels', color: '#7C3AED' },
-      { name: 'Natural Gas', color: '#EC4899' },
-      { name: 'Oil Products', color: '#06B6D4' },
-      { name: 'Renewables', color: '#10B981' }
-    ];
+    console.log('🥧 Processing pie chart data:', { selectedCountry, selectedFuel });
+    console.log('📊 Raw data structure:', data);
 
-    const key = `${latestYear}.${selectedCountry}`;
-    const selectedFuelValue = value[key] || 100;
+    if (!data?.value || !data?.dimension) {
+      throw new Error('Invalid data structure for pie chart');
+    }    const { value, dimension, size } = data;
     
-    // Generate proportional distribution (mock data approach)
-    const totalValue = selectedFuelValue * 2.5; // Assume selected fuel is ~40% of total
-    const pieData = fuelCategories.map((fuel, index) => ({
-      name: fuel.name,
-      y: index === 0 ? selectedFuelValue : (totalValue - selectedFuelValue) * (0.3 - index * 0.05),
-      color: fuel.color
-    }));
+    // Get the GEO dimension (countries) 
+    if (!dimension.geo?.category?.label) {
+      throw new Error('No geographic data available for pie chart');
+    }
 
-    return pieData.filter(item => item.y > 0);
+    const geoLabels = dimension.geo.category.label;
+    const geoIndex = dimension.geo.category.index;
+    const timeIndex = dimension.time.category.index;
+    
+    // Create pie chart data showing distribution across countries
+    const pieData = [];
+    
+    // Get the latest time period
+    const timeKeys = Object.keys(timeIndex);
+    const latestTimeKey = timeKeys[timeKeys.length - 1];
+    const latestTimeIdx = timeIndex[latestTimeKey];
+    
+    console.log('📅 Using latest time period:', latestTimeKey, 'at index:', latestTimeIdx);
+    console.log('📏 Data dimensions size:', size);
+    
+    // Collect data for each country for the latest time period
+    Object.keys(geoIndex).forEach((geoCode, idx) => {
+      const geoIdx = geoIndex[geoCode];
+      
+      // Calculate the value index: geoIdx * timeSize + latestTimeIdx
+      const timeSize = size[4]; // time dimension size
+      const valueIndex = geoIdx * timeSize + latestTimeIdx;
+      
+      const val = value[valueIndex];
+      
+      if (val !== null && val !== undefined && !isNaN(val) && val > 0) {
+        pieData.push({
+          name: geoLabels[geoCode] || geoCode,
+          y: parseFloat(val),
+          color: ['#4F46E5', '#7C3AED', '#EC4899', '#06B6D4', '#10B981', '#F59E0B', '#EF4444'][idx % 7]
+        });
+      }
+    });
+
+    // Sort by value and take top 8 for better visualization
+    pieData.sort((a, b) => b.y - a.y);
+    const topData = pieData.slice(0, 8);
+    
+    console.log('✅ Pie chart data processed:', topData);
+    return topData;
   } catch (error) {
     console.error('Error processing pie chart data:', error);
-    return [];
+    throw error;
   }
 };
 

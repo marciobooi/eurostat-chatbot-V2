@@ -257,8 +257,7 @@ const formatDefinitionResponse = (match, result) => {
   if (match.text) {
     response += `${match.text}`;
   }
-  
-  return {
+    return {
     type: RESPONSE_TYPES.DEFINITION,
     content: response,
     matchData: result,
@@ -266,6 +265,10 @@ const formatDefinitionResponse = (match, result) => {
     hasVisualization: match.hasVisualization || false,
     visualizationType: match.visualizationType || [],
     link: match.link || '',
+    // API parameters for chart data
+    dataset: match.dataset || 'nrg_ind_id',
+    indicator_type: match.indicator_type || 'INDIC_NRG',
+    fuelCode: match.fuelCode || '',
     isError: false
   };
 };
