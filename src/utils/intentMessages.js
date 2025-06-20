@@ -2,6 +2,7 @@ import { findBestMatch } from './ruler.js';
 import { GREETING_WORDS, GREETING_RESPONSES } from '../data/greetings.js';
 import { goodbyeWords, FAREWELL_RESPONSES } from '../data/farewell.js';
 import { spellingCorrections } from '../data/SpellingCorrections.js';
+import { applyPhraseCorrections } from '../data/PhraseCorrections.js';
 import { getRandomUnknownResponse } from '../data/UnknownResponses.js';
 import { energyKeywords, isEnergyRelated } from '../data/EnergyKeywords.js';
 import { isAmbiguousPhrase, isAmbiguousWord, AMBIGUOUS_QUESTION_WORDS } from '../data/AmbiguousPhrases.js';
@@ -101,18 +102,40 @@ const tokenize = (text) => {
 
 /**
  * Spell correction using nspell or fallback corrections
+ * Enhanced for data query context
  */
 const correctSpelling = (word) => {
+  const lowerWord = word.toLowerCase();
+  
   // First check our custom corrections dictionary
-  if (spellingCorrections[word]) {
-    return spellingCorrections[word];
+  if (spellingCorrections[lowerWord]) {
+    return spellingCorrections[lowerWord];
   }
   
   // Then try nspell if available
-  if (spellChecker && !spellChecker.correct(word)) {
-    const suggestions = spellChecker.suggest(word);
+  if (spellChecker) {
+    // Check if word is already correct
+    if (spellChecker.correct(lowerWord)) {
+      return word; // Word is correct, return original case
+    }
+    
+    // Get suggestions for misspelled word
+    const suggestions = spellChecker.suggest(lowerWord);
     if (suggestions.length > 0) {
-      return suggestions[0]; // Return best suggestion
+      // For data queries, prefer energy-related suggestions
+      const energySuggestion = suggestions.find(suggestion => 
+        isEnergyRelated(suggestion) || 
+        energyKeywords.some(keyword => keyword.includes(suggestion.toLowerCase()))
+      );
+      
+      if (energySuggestion) {
+        console.log(`🔧 Energy-focused spell correction: "${word}" → "${energySuggestion}"`);
+        return energySuggestion;
+      }
+      
+      // Return the first (most likely) suggestion
+      console.log(`🔧 Dictionary spell correction: "${word}" → "${suggestions[0]}"`);
+      return suggestions[0];
     }
   }
   
@@ -120,12 +143,30 @@ const correctSpelling = (word) => {
 };
 
 /**
- * Apply spell correction to a text string
+ * Apply spell correction to a text string with enhanced data query support
  */
 const correctText = (text) => {
-  const tokens = tokenize(text);
-  const correctedTokens = tokens.map(token => correctSpelling(token));
-  return correctedTokens.join(' ');
+  let correctedText = text;
+  
+  // First apply context-aware phrase corrections from the PhraseCorrections dictionary
+  correctedText = applyPhraseCorrections(correctedText);
+  
+  // Then apply individual word spell correction to remaining words
+  const tokens = tokenize(correctedText);
+  console.log(`🔍 Tokens after phrase correction: [${tokens.join(', ')}]`);
+  
+  const correctedTokens = tokens.map(token => {
+    const corrected = correctSpelling(token);
+    if (corrected !== token) {
+      console.log(`🔧 Spell correction: "${token}" → "${corrected}"`);
+    }
+    return corrected;
+  });
+  
+  const finalText = correctedTokens.join(' ');
+  console.log(`📝 Final corrected text: "${finalText}"`);
+  
+  return finalText;
 };
 
 /**
@@ -295,16 +336,16 @@ export const processMessage = async (userInput) => {
         content: "Please enter a message.",
         isError: true
       };
-    }
-
-    // Step 2: Tokenize input
+    }    // Step 2: Tokenize input
     const tokens = tokenize(cleanInput);
     
-    // Step 3: Apply spell correction
+    // Step 3: Apply enhanced spell correction for data queries
     const correctedText = correctText(cleanInput);
+    console.log(`📝 Original: "${cleanInput}"`);
+    console.log(`✅ Corrected: "${correctedText}"`);
     
-    // Step 4: Classify intent
-    const intent = classifyIntent(correctedText, tokens);      // Step 5: Generate response based on intent
+    // Step 4: Classify intent using corrected text
+    const intent = classifyIntent(correctedText, tokenize(correctedText));// Step 5: Generate response based on intent
     switch (intent) {
       case INTENT_TYPES.GREETING:
         return {
