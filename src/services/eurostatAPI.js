@@ -21,22 +21,29 @@ const eurostatAPI = axios.create({
 /**
  * Fetch data from Eurostat API
  * @param {Object} params - API parameters
- * @param {string} params.dataset - Dataset identifier (e.g., 'nrg_ind_id')
- * @param {string} params.indicator_type - Indicator type field name (e.g., 'INDIC_NRG')
- * @param {string} params.fuelCode - Fuel code (e.g., 'C0000X0350-0370')
+ * @param {string} params.dataset - Dataset identifier (e.g., 'nrg_bal_c')
+ * @param {string} params.format - Response format (default: 'JSON')
+ * @param {string} params.time - Time period (e.g., '2023')
+ * @param {string} params.geo - Geographic area (e.g., 'EU27_2020', 'PT')
+ * @param {string} params.unit - Unit of measurement (e.g., 'KTOE')
+ * @param {string} params.nrg_bal - Energy balance (e.g., 'TOTAL', 'NRGSUP')
+ * @param {string} params.siec - Energy product code (e.g., 'C0000X0350-0370')
+ * @param {string} params.indic_nrg - Indicator code (for some datasets)
+ * @param {string} params.lang - Language (default: 'en')
  * @returns {Promise<Object>} API response data
  */
-export const fetchEurostatData = async ({ dataset, indicator_type, fuelCode }) => {
+export const fetchEurostatData = async (params) => {
   try {
+    const { dataset, ...queryParams } = params;
     const url = `${EUROSTAT_BASE_URL}/${dataset}`;
-    const params = {
-      format: 'JSON',
-      [indicator_type]: fuelCode,
-      lang: 'en'
-    };
+    
+    // Filter out undefined parameters
+    const cleanParams = Object.fromEntries(
+      Object.entries(queryParams).filter(([key, value]) => value !== undefined)
+    );
 
-    console.log('🔍 Fetching Eurostat data:', { url, params });
-      const response = await eurostatAPI.get(url, { params });
+    console.log('🔍 Fetching Eurostat data:', { url, params: cleanParams });
+    const response = await eurostatAPI.get(url, { params: cleanParams });
     
     if (response.data && response.data.value) {
       console.log('✅ Data fetched successfully');

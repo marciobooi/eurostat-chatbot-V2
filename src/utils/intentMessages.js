@@ -107,6 +107,12 @@ const tokenize = (text) => {
 const correctSpelling = (word) => {
   const lowerWord = word.toLowerCase();
   
+  // Don't correct valid years (1990-2030)
+  const yearMatch = /^(19[9]\d|20[0-3]\d)$/.test(word);
+  if (yearMatch) {
+    return word; // Return the year unchanged
+  }
+  
   // First check our custom corrections dictionary
   if (spellingCorrections[lowerWord]) {
     return spellingCorrections[lowerWord];

@@ -163,29 +163,65 @@ export const formatDataQueryResponse = async (text, tokens) => {
   const entities = transformation.entities;
   
   try {
-    // Fetch actual data from Eurostat API
-    const apiData = await fetchEurostatData({
-      dataset: 'nrg_ind_id',
-      indicator_type: 'INDIC_NRG', 
-      fuelCode: transformation.fuelCode
+    // Get the fuel definition to extract dataset and indicator_type
+    const fuelDefinition = getFuelDefinition(entities.fuel);
+      // Use dynamic parameters from the fuel definition, with fallbacks
+    const dataset = fuelDefinition?.dataset || 'nrg_bal_c';
+    const indicator_type = fuelDefinition?.indicator_type || 'SIEC';
+      // Get appropriate year for the dataset (hack for nrg_bal_c limitation)
+    const availableYear = getAvailableYear(transformation.transformed?.date || transformation.entities?.date, dataset);
+      // Debug: Log the transformation data
+    console.log('🔍 Transformation data:', {
+      entities: entities,
+      countryCode: transformation.transformed?.countryCode,
+      fuelCode: transformation.transformed?.fuelCode,
+      year: transformation.transformed?.date,
+      availableYear: availableYear,
+      dataset: dataset
     });
     
-    if (apiData && apiData.value) {
-      // Extract some key data points for the message
-      const dataPoints = Object.keys(apiData.value).length;
-      const countries = apiData.dimension?.geo?.category?.label ? 
-        Object.keys(apiData.dimension.geo.category.label).length : 'multiple';
+    // Fetch actual data from Eurostat API with all required parameters
+    const apiData = await fetchEurostatData({
+      dataset: dataset,
+      format: 'JSON',
+      time: availableYear,
+      geo: transformation.transformed?.countryCode ? transformation.transformed.countryCode.toUpperCase() : 'EU27_2020',
+      unit: 'KTOE',
+      nrg_bal: 'NRGSUP',
+      siec: transformation.transformed?.fuelCode, // For nrg_bal_c dataset
+      indic_nrg: indicator_type === 'INDIC_NRG' ? transformation.transformed?.fuelCode : undefined, // For nrg_ind_id dataset
+      lang: 'en'
+    });if (apiData && apiData.value) {
+      // Extract the actual data value and meaningful information
+      const dataValue = Object.values(apiData.value)[0]; // Get the actual value (5.233)
+      const unit = apiData.dimension?.unit?.category?.label ? 
+        Object.values(apiData.dimension.unit.category.label)[0] : 'units';
+      const countryName = apiData.dimension?.geo?.category?.label ? 
+        Object.values(apiData.dimension.geo.category.label)[0] : entities.country;
+      const fuelName = apiData.dimension?.siec?.category?.label ? 
+        Object.values(apiData.dimension.siec.category.label)[0] : entities.fuel;
+      const balanceType = apiData.dimension?.nrg_bal?.category?.label ? 
+        Object.values(apiData.dimension.nrg_bal.category.label)[0] : 'Total energy supply';
+      
+      // Check if we used a different year than requested
+      const yearMessage = availableYear !== transformation.year ? 
+        `**${entities.date}** (showing data for ${availableYear} - latest available)` : 
+        `**${entities.date}**`;
       
       return {
         type: 'data_query_response',
-        content: `Here's what I found for **${entities.fuel}** in **${entities.country}** for **${entities.date}**:\n\nI found ${dataPoints} data points across ${countries} countries. The data shows energy statistics from the Eurostat database.`,
+        content: `Here's what I found for **${fuelName}** in **${countryName}** for ${yearMessage}:\n\n**${balanceType}**: ${dataValue} ${unit}\n\nThis data represents the energy supply from ${fuelName.toLowerCase()} in ${countryName} for the specified period.`,
         entities: entities,
         transformation: transformation,
+        actualYear: availableYear,
+        dataValue: dataValue,
+        unit: unit,
         apiData: apiData,
         hasVisualization: true,
         visualizationType: ['chart', 'table'],
-        dataset: 'nrg_ind_id',
-        indicator_type: 'INDIC_NRG',
+        dataset: dataset,
+        indicator_type: indicator_type,
+        nrg_bal: 'NRGSUP',
         isError: false
       };
     } else {
@@ -196,8 +232,9 @@ export const formatDataQueryResponse = async (text, tokens) => {
         transformation: transformation,
         hasVisualization: false,
         visualizationType: [],
-        dataset: 'nrg_ind_id',
-        indicator_type: 'INDIC_NRG',
+        dataset: dataset,
+        indicator_type: indicator_type,
+        nrg_bal: 'NRGSUP',
         isError: false
       };
     }
@@ -284,4 +321,66 @@ export const getAvailableFuelTerms = () => {
     totalCompoundTerms: COMPOUND_FUEL_TERMS.length,
     basicKeywords: energyKeywords.slice(0, 20), // First 20 for brevity
     totalBasicKeywords: energyKeywords.length  };
+};
+
+/**
+ * Get fuel definition from the energy definitions database
+ */
+const getFuelDefinition = (fuelName) => {
+  const lowerFuelName = fuelName.toLowerCase();
+  
+  // Search through all definitions to find a match
+  for (const [key, definition] of Object.entries(energyDefinitionsEn)) {
+    // Check title match
+    if (definition.title && definition.title.toLowerCase() === lowerFuelName) {
+      return definition;
+    }
+    
+    // Check key_concepts match
+    if (definition.key_concepts && Array.isArray(definition.key_concepts)) {
+      for (const concept of definition.key_concepts) {
+        if (concept.toLowerCase() === lowerFuelName) {
+          return definition;
+        }
+      }
+    }
+    
+    // Check keywords match
+    if (definition.keywords && Array.isArray(definition.keywords)) {
+      for (const keyword of definition.keywords) {
+        if (keyword.toLowerCase() === lowerFuelName) {
+          return definition;
+        }
+      }
+    }
+  }
+  
+  return null;
+};
+
+/**
+ * Get the appropriate year for API call, handling dataset limitations
+ */
+const getAvailableYear = (requestedYear, dataset) => {
+  const currentYear = new Date().getFullYear();
+  
+  // For nrg_bal_c dataset, data is only available until 2023
+  if (dataset === 'nrg_bal_c') {
+    const maxAvailableYear = 2023;
+    
+    // If requested year is beyond available data, use the latest available
+    if (parseInt(requestedYear) > maxAvailableYear) {
+      console.log(`⚠️ Requested year ${requestedYear} not available for ${dataset}. Using latest available: ${maxAvailableYear}`);
+      return maxAvailableYear.toString();
+    }
+    
+    // If requested year is too old, use a reasonable fallback
+    if (parseInt(requestedYear) < 2010) {
+      console.log(`⚠️ Requested year ${requestedYear} too old for ${dataset}. Using 2010`);
+      return '2010';
+    }
+  }
+  
+  // For other datasets, use the requested year
+  return requestedYear;
 };
