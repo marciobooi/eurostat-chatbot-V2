@@ -89,3 +89,43 @@ export const extractCountry = (text) => {
   
   return null;
 };
+
+/**
+ * Mapping from country names to ISO 2-letter codes
+ */
+const COUNTRY_TO_CODE_MAP = {
+  // EU countries
+  'austria': 'at', 'belgium': 'be', 'bulgaria': 'bg', 'croatia': 'hr', 
+  'cyprus': 'cy', 'czechia': 'cz', 'czech republic': 'cz', 'denmark': 'dk',
+  'estonia': 'ee', 'finland': 'fi', 'france': 'fr', 'germany': 'de',
+  'greece': 'gr', 'hungary': 'hu', 'ireland': 'ie', 'italy': 'it',
+  'latvia': 'lv', 'lithuania': 'lt', 'luxembourg': 'lu', 'malta': 'mt',
+  'netherlands': 'nl', 'poland': 'pl', 'portugal': 'pt', 'romania': 'ro',
+  'slovakia': 'sk', 'slovenia': 'si', 'spain': 'es', 'sweden': 'se',
+  
+  // Other major countries
+  'united kingdom': 'gb', 'great britain': 'gb', 'uk': 'gb',
+  'united states': 'us', 'usa': 'us', 'us': 'us',
+  'norway': 'no', 'switzerland': 'ch', 'iceland': 'is', 'turkey': 'tr',
+  'russia': 'ru', 'china': 'cn', 'japan': 'jp', 'india': 'in',
+  'brazil': 'br', 'canada': 'ca', 'australia': 'au', 'south africa': 'za',
+  'new zealand': 'nz', 'mexico': 'mx', 'argentina': 'ar', 'chile': 'cl',
+  'south korea': 'kr', 'indonesia': 'id', 'thailand': 'th'
+};
+
+/**
+ * Convert country name to ISO 2-letter code
+ */
+export const getCountryCode = (countryName) => {
+  if (!countryName) return null;
+  
+  const lowerName = countryName.toLowerCase();
+  
+  // Check if it's already a code
+  if (lowerName.length === 2 && COUNTRIES.euCodes.concat(COUNTRIES.otherCodes).includes(lowerName)) {
+    return lowerName;
+  }
+  
+  // Look up in the mapping
+  return COUNTRY_TO_CODE_MAP[lowerName] || null;
+};

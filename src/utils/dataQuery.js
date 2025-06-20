@@ -8,8 +8,8 @@
  * - Format responses for data queries
  */
 
-import { extractCountry, containsCountry } from '../data/Countries.js';
-import { extractDate, containsDate } from '../data/DatePatterns.js';
+import { extractCountry, containsCountry, getCountryCode } from '../data/Countries.js';
+import { extractDate, containsDate, resolveRelativeDate } from '../data/DatePatterns.js';
 import { energyKeywords, isEnergyRelated } from '../data/EnergyKeywords.js';
 import { energyDefinitionsEn } from '../data/DefinitionsEn.js';
 
@@ -102,6 +102,33 @@ export const extractFuel = (text) => {
 };
 
 /**
+ * Get fuel code from fuel name using the definitions database
+ */
+export const getFuelCode = (fuelName) => {
+  if (!fuelName) return null;
+  
+  const lowerFuelName = fuelName.toLowerCase();
+  
+  // Search through all definitions to find matching fuel
+  for (const [key, definition] of Object.entries(energyDefinitionsEn)) {
+    if (definition.title && definition.title.toLowerCase() === lowerFuelName) {
+      return definition.fuelCode || null;
+    }
+    
+    // Also check key_concepts for matches
+    if (definition.key_concepts && Array.isArray(definition.key_concepts)) {
+      for (const concept of definition.key_concepts) {
+        if (concept.toLowerCase() === lowerFuelName) {
+          return definition.fuelCode || null;
+        }
+      }
+    }
+  }
+  
+  return null;
+};
+
+/**
  * Check if input is a data query (contains country, date, and fuel)
  */
 export const isDataQuery = (text, tokens) => {
@@ -131,12 +158,14 @@ export const extractDataQueryEntities = (text, tokens) => {
  * Format data query response with extracted entities
  */
 export const formatDataQueryResponse = (text, tokens) => {
-  const entities = extractDataQueryEntities(text, tokens);
+  const transformation = transformToStructuredFormat(text, tokens);
+  const entities = transformation.entities;
   
   return {
     type: 'data_query_response',
     content: `I understand you're looking for data about **${entities.fuel}** in **${entities.country}** for **${entities.date}**. Let me fetch that information for you.`,
     entities: entities,
+    transformation: transformation,
     hasVisualization: true,
     visualizationType: ['chart', 'table'],
     // Default dataset for energy data
@@ -170,6 +199,42 @@ export const validateDataQueryEntities = (entities) => {
 };
 
 /**
+ * Transform natural language query to structured format: "countryCode fuelCode year"
+ * Example: "portugal solid fossil fuels this year" → "pt C0000X0350-0370 2025"
+ */
+export const transformToStructuredFormat = (text, tokens) => {
+  const entities = extractDataQueryEntities(text, tokens);
+  
+  // Transform each component
+  const countryCode = getCountryCode(entities.country) || entities.country;
+  const fuelCode = getFuelCode(entities.fuel) || entities.fuel;
+  const resolvedDate = resolveRelativeDate(entities.date) || entities.date;
+  
+  const structuredFormat = `${countryCode} ${fuelCode} ${resolvedDate}`;
+  
+  // Log the transformation for debugging
+  console.log('🔄 Query Transformation:');
+  console.log(`Original: "${text}"`);
+  console.log(`Country: "${entities.country}" → "${countryCode}"`);
+  console.log(`Fuel: "${entities.fuel}" → "${fuelCode}"`);
+  console.log(`Date: "${entities.date}" → "${resolvedDate}"`);
+  console.log(`Structured Format: "${structuredFormat}"`);
+  console.log('─'.repeat(50));
+  
+  return {
+    original: text,
+    entities: entities,
+    transformed: {
+      countryCode,
+      fuelCode,
+      date: resolvedDate
+    },
+    structuredFormat,
+    isValid: countryCode && fuelCode && resolvedDate
+  };
+};
+
+/**
  * Get all available fuel terms for debugging/testing
  * @returns {object} Object containing compound terms and basic keywords
  */
@@ -178,6 +243,5 @@ export const getAvailableFuelTerms = () => {
     compoundTerms: COMPOUND_FUEL_TERMS.slice(0, 20), // First 20 for brevity
     totalCompoundTerms: COMPOUND_FUEL_TERMS.length,
     basicKeywords: energyKeywords.slice(0, 20), // First 20 for brevity
-    totalBasicKeywords: energyKeywords.length
-  };
+    totalBasicKeywords: energyKeywords.length  };
 };
