@@ -20,15 +20,15 @@ import nspell from 'nspell';
  * - greetings.js: Greeting patterns and response variations
  * - farewell.js: Farewell patterns and response variations
  * - UnknownResponses.js: Randomized responses for different unknown scenarios
- * 
- * Message Flow:
+ * * Message Flow:
  * 1. User Input → Trim + Lowercase + Tokenization
  * 2. Check spelling with nspell and corrections
  * 3. Detect greetings → provide random greeting response
  * 4. Detect farewells → provide random farewell response
  * 5. Check for ambiguous inputs → provide clarification request
- * 6. Find definition (delegate to ruler) → structured energy definition response
- * 7. Default → helpful fallback response
+ * 6. Detect data queries (country + date + fuel) → structured data query response
+ * 7. Find definition (delegate to ruler) → structured energy definition response
+ * 8. Default → helpful fallback response
  * 
  * All responses use dictionary-based randomization for natural conversation
  */
@@ -38,6 +38,7 @@ export const INTENT_TYPES = {
   GREETING: 'greeting',
   FAREWELL: 'farewell',
   DEFINITION: 'definition',
+  DATA_QUERY: 'data_query',
   UNKNOWN: 'unknown'
 };
 
@@ -46,6 +47,7 @@ export const RESPONSE_TYPES = {
   GREETING: 'greeting_response',
   FAREWELL: 'farewell_response',
   DEFINITION: 'definition_response',
+  DATA_QUERY: 'data_query_response',
   ERROR: 'error_response',
   FALLBACK: 'fallback_response'
 };
@@ -149,6 +151,98 @@ const detectFarewell = (tokens) => {
 };
 
 /**
+ * Common country names and codes for detection
+ */
+const COUNTRY_PATTERNS = [
+  // EU countries
+  'austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czechia', 'czech republic',
+  'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary',
+  'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands',
+  'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden',
+  // Common country codes
+  'at', 'be', 'bg', 'hr', 'cy', 'cz', 'dk', 'ee', 'fi', 'fr', 'de', 'gr', 'hu',
+  'ie', 'it', 'lv', 'lt', 'lu', 'mt', 'nl', 'pl', 'pt', 'ro', 'sk', 'si', 'es', 'se',
+  // Other common countries
+  'uk', 'united kingdom', 'usa', 'united states', 'canada', 'norway', 'switzerland',
+  'iceland', 'turkey', 'russia', 'china', 'japan', 'india', 'brazil'
+];
+
+/**
+ * Date patterns for detection
+ */
+const DATE_PATTERNS = [
+  // Years (1990-2030)
+  /\b(19[9]\d|20[0-3]\d)\b/,
+  // Date formats (MM/YYYY, YYYY-MM, etc.)
+  /\b\d{1,2}\/\d{4}\b/,
+  /\b\d{4}-\d{1,2}\b/,
+  /\b\d{1,2}-\d{4}\b/,
+  // Month names
+  /\b(january|february|march|april|may|june|july|august|september|october|november|december)\b/,
+  /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b/
+];
+
+/**
+ * Check if input contains country references
+ */
+const detectCountry = (text, tokens) => {
+  const lowerText = text.toLowerCase();
+  
+  // Check for country names in the full text
+  const hasCountryInText = COUNTRY_PATTERNS.some(country => 
+    lowerText.includes(country.toLowerCase())
+  );
+  
+  // Check for country names in tokens
+  const hasCountryInTokens = tokens.some(token => 
+    COUNTRY_PATTERNS.some(country => 
+      country.toLowerCase() === token || 
+      country.toLowerCase().includes(token) ||
+      token.includes(country.toLowerCase())
+    )
+  );
+  
+  return hasCountryInText || hasCountryInTokens;
+};
+
+/**
+ * Check if input contains date references
+ */
+const detectDate = (text, tokens) => {
+  const lowerText = text.toLowerCase();
+  
+  // Check regex patterns
+  const hasDatePattern = DATE_PATTERNS.some(pattern => pattern.test(lowerText));
+  
+  // Check for year tokens (4-digit numbers that could be years)
+  const hasYearToken = tokens.some(token => {
+    const num = parseInt(token);
+    return !isNaN(num) && num >= 1990 && num <= 2030;
+  });
+  
+  return hasDatePattern || hasYearToken;
+};
+
+/**
+ * Check if input contains fuel/energy references
+ */
+const detectFuel = (text, tokens) => {
+  // Use existing energy keywords detection
+  return isEnergyRelated(text) || tokens.some(token => isEnergyRelated(token));
+};
+
+/**
+ * Check if input is a data query (contains country, date, and fuel)
+ */
+const detectDataQuery = (text, tokens) => {
+  const hasCountry = detectCountry(text, tokens);
+  const hasDate = detectDate(text, tokens);
+  const hasFuel = detectFuel(text, tokens);
+  
+  return hasCountry && hasDate && hasFuel;
+};
+
+/**
  * Get random response from array
  */
 const getRandomResponse = (responseArray) => {
@@ -224,7 +318,12 @@ const classifyIntent = (text, tokens) => {
     return INTENT_TYPES.UNKNOWN;
   }
   
-  // If not greeting, farewell, or ambiguous, assume it's a definition request
+  // Check for data queries (country + date + fuel) after clarification check
+  if (detectDataQuery(text, tokens)) {
+    return INTENT_TYPES.DATA_QUERY;
+  }
+  
+  // If not greeting, farewell, ambiguous, or data query, assume it's a definition request
   // The ruler will determine if it's actually answerable
   return INTENT_TYPES.DEFINITION;
 };
@@ -274,6 +373,78 @@ const formatDefinitionResponse = (match, result) => {
 };
 
 /**
+ * Format data query response with extracted entities
+ */
+const formatDataQueryResponse = (text, tokens) => {
+  // Extract entities from the query
+  const entities = extractDataQueryEntities(text, tokens);
+  
+  return {
+    type: RESPONSE_TYPES.DATA_QUERY,
+    content: `I understand you're looking for data about **${entities.fuel}** in **${entities.country}** for **${entities.date}**. Let me fetch that information for you.`,
+    entities: entities,
+    hasVisualization: true,
+    visualizationType: ['chart', 'table'],
+    // Default dataset for energy data
+    dataset: 'nrg_ind_id',
+    indicator_type: 'INDIC_NRG',
+    isError: false
+  };
+};
+
+/**
+ * Extract country, date, and fuel entities from text
+ */
+const extractDataQueryEntities = (text, tokens) => {
+  const lowerText = text.toLowerCase();
+  
+  // Extract country
+  let country = null;
+  for (const countryPattern of COUNTRY_PATTERNS) {
+    if (lowerText.includes(countryPattern.toLowerCase())) {
+      country = countryPattern;
+      break;
+    }
+  }
+  
+  // Extract date/year
+  let date = null;
+  for (const pattern of DATE_PATTERNS) {
+    const match = lowerText.match(pattern);
+    if (match) {
+      date = match[0];
+      break;
+    }
+  }
+  
+  // If no regex match, look for year tokens
+  if (!date) {
+    const yearToken = tokens.find(token => {
+      const num = parseInt(token);
+      return !isNaN(num) && num >= 1990 && num <= 2030;
+    });
+    if (yearToken) {
+      date = yearToken;
+    }
+  }
+  
+  // Extract fuel/energy type using the energyKeywords array
+  let fuel = null;
+  for (const term of energyKeywords) {
+    if (lowerText.includes(term.toLowerCase())) {
+      fuel = term;
+      break;
+    }
+  }
+  
+  return {
+    country: country || 'unspecified country',
+    date: date || 'unspecified date',
+    fuel: fuel || 'energy'
+  };
+};
+
+/**
  * Main message processing function
  * Processes user input and returns appropriate response
  */
@@ -296,8 +467,7 @@ export const processMessage = async (userInput) => {
     const correctedText = correctText(cleanInput);
     
     // Step 4: Classify intent
-    const intent = classifyIntent(correctedText, tokens);
-      // Step 5: Generate response based on intent
+    const intent = classifyIntent(correctedText, tokens);      // Step 5: Generate response based on intent
     switch (intent) {
       case INTENT_TYPES.GREETING:
         return {
@@ -313,6 +483,9 @@ export const processMessage = async (userInput) => {
           isError: false
         };
       
+      case INTENT_TYPES.DATA_QUERY:
+        return formatDataQueryResponse(correctedText, tokens);
+      
       case INTENT_TYPES.UNKNOWN:
         return {
           type: RESPONSE_TYPES.FALLBACK,
@@ -324,6 +497,11 @@ export const processMessage = async (userInput) => {
         // Delegate to ruler for definition matching
         const result = findBestMatch(correctedText);
         return formatDefinitionResponse(result?.match, result);
+      
+      case INTENT_TYPES.DATA_QUERY:
+        // Extract entities and format response
+        return formatDataQueryResponse(correctedText, tokens);
+        
         default:
         return {
           type: RESPONSE_TYPES.FALLBACK,
