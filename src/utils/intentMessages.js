@@ -6,6 +6,7 @@ import { getRandomUnknownResponse } from '../data/UnknownResponses.js';
 import { energyKeywords, isEnergyRelated } from '../data/EnergyKeywords.js';
 import { isAmbiguousPhrase, isAmbiguousWord, AMBIGUOUS_QUESTION_WORDS } from '../data/AmbiguousPhrases.js';
 import { getRandomStarter, getConfidencePhrase, getSubfuelIntro } from '../data/DefinitionStarters.js';
+import { isDataQuery, formatDataQueryResponse } from './dataQuery.js';
 import nspell from 'nspell';
 
 /**
@@ -151,100 +152,6 @@ const detectFarewell = (tokens) => {
 };
 
 /**
- * Common country names and codes for detection
- */
-const COUNTRY_PATTERNS = [
-  // EU countries (full names first for better matching)
-  'austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czechia', 'czech republic',
-  'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary',
-  'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands',
-  'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden',
-  'united kingdom', 'united states', 'great britain',
-  // Other common countries (full names)
-  'norway', 'switzerland', 'iceland', 'turkey', 'russia', 'china', 'japan', 
-  'india', 'brazil', 'canada', 'australia', 'south africa', 'new zealand',
-  // Country codes (2-letter codes should be checked more carefully)
-  'at', 'be', 'bg', 'hr', 'cy', 'cz', 'dk', 'ee', 'fi', 'fr', 'de', 'gr', 'hu',
-  'ie', 'it', 'lv', 'lt', 'lu', 'mt', 'nl', 'pl', 'pt', 'ro', 'sk', 'si', 'es', 'se',
-  'uk', 'us', 'gb', 'no', 'ch', 'is', 'tr', 'ru', 'cn', 'jp', 'in', 'br', 'ca'
-];
-
-/**
- * Date patterns for detection
- */
-const DATE_PATTERNS = [
-  // Years (1990-2030)
-  /\b(19[9]\d|20[0-3]\d)\b/,
-  // Date formats (MM/YYYY, YYYY-MM, etc.)
-  /\b\d{1,2}\/\d{4}\b/,
-  /\b\d{4}-\d{1,2}\b/,
-  /\b\d{1,2}-\d{4}\b/,
-  // Month names
-  /\b(january|february|march|april|may|june|july|august|september|october|november|december)\b/,
-  /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b/
-];
-
-/**
- * Check if input contains country references
- */
-const detectCountry = (text, tokens) => {
-  const lowerText = text.toLowerCase();
-  
-  // Check for country names in the full text
-  const hasCountryInText = COUNTRY_PATTERNS.some(country => 
-    lowerText.includes(country.toLowerCase())
-  );
-  
-  // Check for country names in tokens
-  const hasCountryInTokens = tokens.some(token => 
-    COUNTRY_PATTERNS.some(country => 
-      country.toLowerCase() === token || 
-      country.toLowerCase().includes(token) ||
-      token.includes(country.toLowerCase())
-    )
-  );
-  
-  return hasCountryInText || hasCountryInTokens;
-};
-
-/**
- * Check if input contains date references
- */
-const detectDate = (text, tokens) => {
-  const lowerText = text.toLowerCase();
-  
-  // Check regex patterns
-  const hasDatePattern = DATE_PATTERNS.some(pattern => pattern.test(lowerText));
-  
-  // Check for year tokens (4-digit numbers that could be years)
-  const hasYearToken = tokens.some(token => {
-    const num = parseInt(token);
-    return !isNaN(num) && num >= 1990 && num <= 2030;
-  });
-  
-  return hasDatePattern || hasYearToken;
-};
-
-/**
- * Check if input contains fuel/energy references
- */
-const detectFuel = (text, tokens) => {
-  // Use existing energy keywords detection
-  return isEnergyRelated(text) || tokens.some(token => isEnergyRelated(token));
-};
-
-/**
- * Check if input is a data query (contains country, date, and fuel)
- */
-const detectDataQuery = (text, tokens) => {
-  const hasCountry = detectCountry(text, tokens);
-  const hasDate = detectDate(text, tokens);
-  const hasFuel = detectFuel(text, tokens);
-  
-  return hasCountry && hasDate && hasFuel;
-};
-
-/**
  * Get random response from array
  */
 const getRandomResponse = (responseArray) => {
@@ -321,7 +228,7 @@ const classifyIntent = (text, tokens) => {
   }
   
   // Check for data queries (country + date + fuel) after clarification check
-  if (detectDataQuery(text, tokens)) {
+  if (isDataQuery(text, tokens)) {
     return INTENT_TYPES.DATA_QUERY;
   }
   
@@ -371,98 +278,6 @@ const formatDefinitionResponse = (match, result) => {
     indicator_type: match.indicator_type || 'INDIC_NRG',
     fuelCode: match.fuelCode || '',
     isError: false
-  };
-};
-
-/**
- * Format data query response with extracted entities
- */
-const formatDataQueryResponse = (text, tokens) => {
-  // Extract entities from the query
-  const entities = extractDataQueryEntities(text, tokens);
-  
-  return {
-    type: RESPONSE_TYPES.DATA_QUERY,
-    content: `I understand you're looking for data about **${entities.fuel}** in **${entities.country}** for **${entities.date}**. Let me fetch that information for you.`,
-    entities: entities,
-    hasVisualization: true,
-    visualizationType: ['chart', 'table'],
-    // Default dataset for energy data
-    dataset: 'nrg_ind_id',
-    indicator_type: 'INDIC_NRG',
-    isError: false
-  };
-};
-
-/**
- * Extract country, date, and fuel entities from text
- */
-const extractDataQueryEntities = (text, tokens) => {
-  const lowerText = text.toLowerCase();
-  
-  // Extract country - prioritize longer matches
-  let country = null;
-  const sortedCountries = COUNTRY_PATTERNS.sort((a, b) => b.length - a.length); // Sort by length desc
-  for (const countryPattern of sortedCountries) {
-    if (lowerText.includes(countryPattern.toLowerCase())) {
-      country = countryPattern;
-      break;
-    }
-  }
-  
-  // Extract date/year
-  let date = null;
-  for (const pattern of DATE_PATTERNS) {
-    const match = lowerText.match(pattern);
-    if (match) {
-      date = match[0];
-      break;
-    }
-  }
-  
-  // If no regex match, look for year tokens
-  if (!date) {
-    const yearToken = tokens.find(token => {
-      const num = parseInt(token);
-      return !isNaN(num) && num >= 1990 && num <= 2030;
-    });
-    if (yearToken) {
-      date = yearToken;
-    }
-  }
-  
-  // Extract fuel/energy type - prioritize longer matches for compound terms
-  let fuel = null;
-  const sortedEnergyKeywords = energyKeywords.sort((a, b) => b.length - a.length);
-  
-  // First try to find compound fuel terms in the original text
-  const compoundFuelTerms = [
-    'solid fossil fuels', 'renewable energy', 'nuclear energy', 'natural gas',
-    'crude oil', 'fossil fuels', 'solar energy', 'wind energy', 'hydro energy',
-    'biomass energy', 'geothermal energy'
-  ];
-  
-  for (const compound of compoundFuelTerms) {
-    if (lowerText.includes(compound.toLowerCase())) {
-      fuel = compound;
-      break;
-    }
-  }
-  
-  // If no compound term found, try individual keywords
-  if (!fuel) {
-    for (const term of sortedEnergyKeywords) {
-      if (lowerText.includes(term.toLowerCase())) {
-        fuel = term;
-        break;
-      }
-    }
-  }
-  
-  return {
-    country: country || 'unspecified country',
-    date: date || 'unspecified date',
-    fuel: fuel || 'energy'
   };
 };
 
@@ -519,12 +334,8 @@ export const processMessage = async (userInput) => {
         // Delegate to ruler for definition matching
         const result = findBestMatch(correctedText);
         return formatDefinitionResponse(result?.match, result);
-      
-      case INTENT_TYPES.DATA_QUERY:
-        // Extract entities and format response
-        return formatDataQueryResponse(correctedText, tokens);
         
-        default:
+      default:
         return {
           type: RESPONSE_TYPES.FALLBACK,
           content: getRandomUnknownResponse('unknown'),
