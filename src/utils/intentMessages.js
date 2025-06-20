@@ -154,17 +154,19 @@ const detectFarewell = (tokens) => {
  * Common country names and codes for detection
  */
 const COUNTRY_PATTERNS = [
-  // EU countries
+  // EU countries (full names first for better matching)
   'austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czechia', 'czech republic',
   'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary',
   'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands',
   'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden',
-  // Common country codes
+  'united kingdom', 'united states', 'great britain',
+  // Other common countries (full names)
+  'norway', 'switzerland', 'iceland', 'turkey', 'russia', 'china', 'japan', 
+  'india', 'brazil', 'canada', 'australia', 'south africa', 'new zealand',
+  // Country codes (2-letter codes should be checked more carefully)
   'at', 'be', 'bg', 'hr', 'cy', 'cz', 'dk', 'ee', 'fi', 'fr', 'de', 'gr', 'hu',
   'ie', 'it', 'lv', 'lt', 'lu', 'mt', 'nl', 'pl', 'pt', 'ro', 'sk', 'si', 'es', 'se',
-  // Other common countries
-  'uk', 'united kingdom', 'usa', 'united states', 'canada', 'norway', 'switzerland',
-  'iceland', 'turkey', 'russia', 'china', 'japan', 'india', 'brazil'
+  'uk', 'us', 'gb', 'no', 'ch', 'is', 'tr', 'ru', 'cn', 'jp', 'in', 'br', 'ca'
 ];
 
 /**
@@ -398,9 +400,10 @@ const formatDataQueryResponse = (text, tokens) => {
 const extractDataQueryEntities = (text, tokens) => {
   const lowerText = text.toLowerCase();
   
-  // Extract country
+  // Extract country - prioritize longer matches
   let country = null;
-  for (const countryPattern of COUNTRY_PATTERNS) {
+  const sortedCountries = COUNTRY_PATTERNS.sort((a, b) => b.length - a.length); // Sort by length desc
+  for (const countryPattern of sortedCountries) {
     if (lowerText.includes(countryPattern.toLowerCase())) {
       country = countryPattern;
       break;
@@ -428,12 +431,31 @@ const extractDataQueryEntities = (text, tokens) => {
     }
   }
   
-  // Extract fuel/energy type using the energyKeywords array
+  // Extract fuel/energy type - prioritize longer matches for compound terms
   let fuel = null;
-  for (const term of energyKeywords) {
-    if (lowerText.includes(term.toLowerCase())) {
-      fuel = term;
+  const sortedEnergyKeywords = energyKeywords.sort((a, b) => b.length - a.length);
+  
+  // First try to find compound fuel terms in the original text
+  const compoundFuelTerms = [
+    'solid fossil fuels', 'renewable energy', 'nuclear energy', 'natural gas',
+    'crude oil', 'fossil fuels', 'solar energy', 'wind energy', 'hydro energy',
+    'biomass energy', 'geothermal energy'
+  ];
+  
+  for (const compound of compoundFuelTerms) {
+    if (lowerText.includes(compound.toLowerCase())) {
+      fuel = compound;
       break;
+    }
+  }
+  
+  // If no compound term found, try individual keywords
+  if (!fuel) {
+    for (const term of sortedEnergyKeywords) {
+      if (lowerText.includes(term.toLowerCase())) {
+        fuel = term;
+        break;
+      }
     }
   }
   
