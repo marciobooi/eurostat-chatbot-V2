@@ -360,9 +360,8 @@ export const processMessage = async (userInput) => {
           content: getRandomResponse(FAREWELL_RESPONSES.en),
           isError: false
         };
-      
-      case INTENT_TYPES.DATA_QUERY:
-        return formatDataQueryResponse(correctedText, tokens);
+        case INTENT_TYPES.DATA_QUERY:
+        return await formatDataQueryResponse(correctedText, tokens);
       
       case INTENT_TYPES.UNKNOWN:
         return {

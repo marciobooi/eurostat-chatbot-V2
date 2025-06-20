@@ -12,6 +12,7 @@ import { extractCountry, containsCountry, getCountryCode } from '../data/Countri
 import { extractDate, containsDate, resolveRelativeDate } from '../data/DatePatterns.js';
 import { energyKeywords, isEnergyRelated } from '../data/EnergyKeywords.js';
 import { energyDefinitionsEn } from '../data/DefinitionsEn.js';
+import { fetchEurostatData } from '../services/eurostatAPI.js';
 
 /**
  * Extract fuel terms from the energy definitions database
@@ -155,24 +156,63 @@ export const extractDataQueryEntities = (text, tokens) => {
 };
 
 /**
- * Format data query response with extracted entities
+ * Format data query response with extracted entities and actual API data
  */
-export const formatDataQueryResponse = (text, tokens) => {
+export const formatDataQueryResponse = async (text, tokens) => {
   const transformation = transformToStructuredFormat(text, tokens);
   const entities = transformation.entities;
   
-  return {
-    type: 'data_query_response',
-    content: `I understand you're looking for data about **${entities.fuel}** in **${entities.country}** for **${entities.date}**. Let me fetch that information for you.`,
-    entities: entities,
-    transformation: transformation,
-    hasVisualization: true,
-    visualizationType: ['chart', 'table'],
-    // Default dataset for energy data
-    dataset: 'nrg_ind_id',
-    indicator_type: 'INDIC_NRG',
-    isError: false
-  };
+  try {
+    // Fetch actual data from Eurostat API
+    const apiData = await fetchEurostatData({
+      dataset: 'nrg_ind_id',
+      indicator_type: 'INDIC_NRG', 
+      fuelCode: transformation.fuelCode
+    });
+    
+    if (apiData && apiData.value) {
+      // Extract some key data points for the message
+      const dataPoints = Object.keys(apiData.value).length;
+      const countries = apiData.dimension?.geo?.category?.label ? 
+        Object.keys(apiData.dimension.geo.category.label).length : 'multiple';
+      
+      return {
+        type: 'data_query_response',
+        content: `Here's what I found for **${entities.fuel}** in **${entities.country}** for **${entities.date}**:\n\nI found ${dataPoints} data points across ${countries} countries. The data shows energy statistics from the Eurostat database.`,
+        entities: entities,
+        transformation: transformation,
+        apiData: apiData,
+        hasVisualization: true,
+        visualizationType: ['chart', 'table'],
+        dataset: 'nrg_ind_id',
+        indicator_type: 'INDIC_NRG',
+        isError: false
+      };
+    } else {
+      return {
+        type: 'data_query_response',
+        content: `I searched for **${entities.fuel}** data in **${entities.country}** for **${entities.date}**, but couldn't find specific data for this combination. This might be because the data is not available for this time period or the specific fuel type.`,
+        entities: entities,
+        transformation: transformation,
+        hasVisualization: false,
+        visualizationType: [],
+        dataset: 'nrg_ind_id',
+        indicator_type: 'INDIC_NRG',
+        isError: false
+      };
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return {
+      type: 'data_query_response', 
+      content: `I tried to fetch **${entities.fuel}** data for **${entities.country}** in **${entities.date}**, but encountered an error accessing the Eurostat database. Please try again later.`,
+      entities: entities,
+      transformation: transformation,
+      hasVisualization: false,
+      visualizationType: [],
+      isError: true
+    };
+  }
 };
 
 /**
