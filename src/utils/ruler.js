@@ -63,7 +63,7 @@ const initSpellChecker = async () => {
             aff: affContent
           });
           
-          console.log('✅ Spell checker initialized with browser-fetched dictionaries');
+        
         } else {
           throw new Error('Dictionary files not accessible via fetch');
         }
@@ -158,7 +158,7 @@ const normalizeInput = (input) => {
 const correctSpelling = (term) => {
   // First check our centralized energy spelling corrections
   if (spellingCorrections[term]) {
-    console.log(`   🔧 Energy-specific spell correction: "${term}" → "${spellingCorrections[term]}"`);
+  
     return spellingCorrections[term];
   }
   
@@ -176,14 +176,14 @@ const correctSpelling = (term) => {
       for (const suggestion of suggestions) {
         // Use centralized energy keyword checking
         if (isEnergyRelated(suggestion)) {
-          console.log(`   🔧 Context-aware spell correction: "${term}" → "${suggestion}"`);
+        
           return suggestion;
         }
       }
       
       // Fallback to first suggestion if no energy context found
       const bestSuggestion = suggestions[0];
-      console.log(`   🔧 Spell correction: "${term}" → "${bestSuggestion}"`);
+    
       return bestSuggestion;
     }
   }
@@ -406,7 +406,7 @@ const phoneticMatch = (query) => {
     
     return bestMatch && bestMatch.score > 0 ? bestMatch : null;
   } catch (e) {
-    console.log('Phonetic matching failed, skipping...');
+  
     return null;
   }
 };
@@ -473,37 +473,37 @@ const stemmingMatch = (query) => {
  * Main ruler function - ALWAYS performs all 10 steps and chooses the best result
  */
 export const findBestMatch = (userQuery) => {
-  console.log(`🔍 Ruler System: Processing query "${userQuery}"`);
+
   
   // Step 1: Normalize input
   let processedQuery = normalizeInput(userQuery);
-  console.log(`Step 1 - Normalized: "${processedQuery}"`);
+
   
   // Step 2: Spelling correction
   const words = processedQuery.split(/\s+/);
   const correctedWords = words.map(correctSpelling);
   processedQuery = correctedWords.join(' ');
-  console.log(`Step 2 - Spell corrected: "${processedQuery}"`);
+
   
   // Step 3: Expand abbreviations
   const expandedWords = correctedWords.map(expandAbbreviations);
   const expandedQuery = expandedWords.join(' ');
-  console.log(`Step 3 - Abbreviations expanded: "${expandedQuery}"`);
+
   
   // Step 4: Expand synonyms
   const synonymWords = expandedWords.map(expandSynonyms);
   const synonymQuery = synonymWords.join(' ');
-  console.log(`Step 4 - Synonyms expanded: "${synonymQuery}"`);
+
   
   // Step 5: Extract meaningful terms
   const meaningfulTerms = extractMeaningfulTerms(synonymQuery);
-  console.log(`Step 5 - Meaningful terms: [${meaningfulTerms.join(', ')}]`);
+
   
   // Initialize candidates array to store ALL matches from all 10 steps
   const candidates = [];
   
   // Step 6: Exact matching (highest priority)
-  console.log(`🔍 Step 6 - Exact matching...`);
+
   const exactMatch = findExactMatch(processedQuery);
   if (exactMatch) {
     candidates.push({
@@ -513,12 +513,12 @@ export const findBestMatch = (userQuery) => {
       step: 6,
       query: processedQuery
     });
-    console.log(`   ✅ Found: "${exactMatch.title}"`);
+  
   } else {
-    console.log(`   ❌ No exact match`);
+  
   }
     // Step 7: Fuzzy search with multiple query variations
-  console.log(`🔍 Step 7 - Fuzzy matching...`);
+
   const fuzzyQueries = [processedQuery, synonymQuery, expandedQuery];
   let bestFuzzyResult = null;
   let bestFuzzyScore = 1; // Lower is better for fuzzy
@@ -541,12 +541,12 @@ export const findBestMatch = (userQuery) => {
       query: 'multiple queries tested',
       rawScore: bestFuzzyResult.score
     });
-    console.log(`   ✅ Found: "${bestFuzzyResult.item.title}" (score: ${fuzzyScore.toFixed(1)})`);
+  
   } else {
-    console.log(`   ❌ No fuzzy match`);
+  
   }
     // Step 8: Levenshtein matching with multiple query variations
-  console.log(`🔍 Step 8 - Levenshtein matching...`);
+
   const levenshteinQueries = [processedQuery, synonymQuery, expandedQuery];
   let bestLevenshteinResult = null;
   let bestLevenshteinScore = 0;
@@ -569,12 +569,12 @@ export const findBestMatch = (userQuery) => {
       query: 'multiple queries tested',
       rawScore: bestLevenshteinResult.score
     });
-    console.log(`   ✅ Found: "${bestLevenshteinResult.item.title}" (score: ${levenshteinScore.toFixed(1)})`);
+  
   } else {
-    console.log(`   ❌ No Levenshtein match`);
+  
   }
     // Step 9: Phonetic matching with multiple query variations
-  console.log(`🔍 Step 9 - Phonetic matching...`);
+
   const phoneticQueries = [processedQuery, synonymQuery, expandedQuery];
   let bestPhoneticResult = null;
   let bestPhoneticScore = 0;
@@ -597,12 +597,12 @@ export const findBestMatch = (userQuery) => {
       query: 'multiple queries tested',
       rawScore: bestPhoneticResult.score
     });
-    console.log(`   ✅ Found: "${bestPhoneticResult.item.title}" (score: ${phoneticScore.toFixed(1)})`);
+  
   } else {
-    console.log(`   ❌ No phonetic match`);
+  
   }
     // Step 10: Stemming matching with multiple query variations
-  console.log(`🔍 Step 10 - Stemming matching...`);
+
   const stemmingQueries = [processedQuery, synonymQuery, expandedQuery];
   let bestStemmingResult = null;
   let bestStemmingScore = 0;
@@ -625,13 +625,13 @@ export const findBestMatch = (userQuery) => {
       query: 'multiple queries tested',
       rawScore: bestStemmingResult.score
     });
-    console.log(`   ✅ Found: "${bestStemmingResult.item.title}" (score: ${stemmingScore.toFixed(1)})`);
+  
   } else {
-    console.log(`   ❌ No stemming match`);
+  
   }
     // Evaluate all candidates and choose the best one
   if (candidates.length === 0) {
-    console.log(`❌ No matches found in any of the 10 steps for: "${userQuery}"`);
+  
     globalRulerResult = null;
     return null;
   }
@@ -639,12 +639,12 @@ export const findBestMatch = (userQuery) => {
   // Sort candidates by confidence score (highest first)
   candidates.sort((a, b) => b.confidence - a.confidence);
   
-  console.log(`\n📊 EVALUATION RESULTS (${candidates.length} candidates found):`);
+
   candidates.forEach((candidate, index) => {
-    console.log(`   ${index + 1}. "${candidate.match.title}" - Step ${candidate.step} (${candidate.method}) - Score: ${candidate.confidence.toFixed(1)}`);
+  
   });  // Choose the best candidate
   const bestCandidate = candidates[0];
-  console.log(`\n🏆 BEST MATCH: "${bestCandidate.match.title}" from Step ${bestCandidate.step} (${bestCandidate.method}) with score ${bestCandidate.confidence.toFixed(1)}`);
+
   
   const result = {
     match: bestCandidate.match,
@@ -677,32 +677,32 @@ export const getSuggestions = (userQuery, limit = 5) => {
  * Helper function to demonstrate the ruler in action
  */
 export const testRuler = (queries) => {
-  console.log('🧪 Testing Professional Ruler System\n' + '='.repeat(50));
+
   
   queries.forEach((query, index) => {
-    console.log(`\n📝 Test ${index + 1}: "${query}"`);
-    console.log('-'.repeat(30));
+  
+  
     
     const result = findBestMatch(query);
     
     if (result) {
-      console.log(`🎯 Match found!`);
-      console.log(`   Title: ${result.match.title}`);
-      console.log(`   Method: ${result.method}`);
-      console.log(`   Confidence: ${(result.confidence * 100).toFixed(1)}%`);
+    
+    
+    
+    
       if (result.match.fuelCode) {
-        console.log(`   Fuel Code: ${result.match.fuelCode}`);
+      
       }
       if (result.match.category) {
-        console.log(`   Category: ${result.match.category}`);
+      
       }
     } else {
-      console.log(`❌ No match found`);
+    
       const suggestions = getSuggestions(query, 3);
       if (suggestions.length > 0) {
-        console.log(`💡 Suggestions:`);
+      
         suggestions.forEach(suggestion => {
-          console.log(`   - ${suggestion.title} (${suggestion.category})`);
+        
         });
       }
     }

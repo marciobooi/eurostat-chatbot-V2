@@ -57,17 +57,13 @@ export const QUESTION_PATTERNS = {
  */
 export const isDefinitionQuestion = (text) => {
   const trimmedText = text.trim();
-  console.log('🔍 Checking if definition question:', trimmedText);
   
   // Check if it matches definition patterns
-  const matchesDefinitionPattern = QUESTION_PATTERNS.definition.some(pattern => {
-    const matches = pattern.test(trimmedText);
-    console.log(`🔍 Pattern ${pattern} matches: ${matches}`);
-    return matches;
-  });
+  const matchesDefinitionPattern = QUESTION_PATTERNS.definition.some(pattern => 
+    pattern.test(trimmedText)
+  );
   
   if (!matchesDefinitionPattern) {
-    console.log('🔍 No definition pattern matched');
     return false;
   }
   
@@ -75,11 +71,9 @@ export const isDefinitionQuestion = (text) => {
   // it's likely a data query phrased as a question
   const hasCountryDateFuel = hasDataQueryContext(trimmedText);
   if (hasCountryDateFuel) {
-    console.log('🔍 Contains country/date/fuel context - likely a data query, not pure definition');
     return false;
   }
   
-  console.log('🔍 Final definition question result: true (pattern matched, no data context)');
   return true;
 };
 
@@ -94,15 +88,7 @@ const hasDataQueryContext = (text) => {
   const hasCountryKeywords = /\b(spain|france|germany|italy|uk|usa|canada|belgium|netherlands|sweden|denmark|portugal|greece|austria|ireland|finland|poland|czechia|hungary|slovakia|slovenia|croatia|romania|bulgaria|lithuania|latvia|estonia|luxembourg|malta|cyprus)\b/i.test(text);
   const hasDataKeywords = /\b(consumption|production|data|statistics|values|numbers|figures|amounts|quantities|in\s+\w+\s+in\s+\d{4})\b/i.test(text);
   
-  const result = hasYear && (hasCountryKeywords || hasDataKeywords);
-  console.log('🔍 Data query context check:', {
-    hasYear,
-    hasCountryKeywords,
-    hasDataKeywords,
-    result
-  });
-  
-  return result;
+  return hasYear && (hasCountryKeywords || hasDataKeywords);
 };
 
 /**
@@ -180,10 +166,7 @@ export const cleanQuestionForDefinition = (text) => {
   cleanedText = cleanedText.replace(/^what\s+does\s+/i, '');
   cleanedText = cleanedText.replace(/\s+mean\??$/i, '');
   
-  // Clean up extra whitespace
-  cleanedText = cleanedText.trim().replace(/\s+/g, ' ');
-  
-  console.log(`🧹 Question cleaning: "${text}" → "${cleanedText}"`);
+  // Clean up extra whitespace  cleanedText = cleanedText.trim().replace(/\s+/g, ' ');
   
   return cleanedText;
 };

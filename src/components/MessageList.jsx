@@ -123,17 +123,9 @@ const Message = ({
           className="message-text"
           dangerouslySetInnerHTML={{ __html: formatMessage(message.content) }}
           role="text"
-        />          {/* Chart display for bot messages when a chart type is selected */}
+        />        {/* Chart display for bot messages when a chart type is selected */}
         {message.type === 'bot' && currentChartType && message.hasVisualization && (
-          <>            {console.log('📊 Message object keys:', Object.keys(message))}
-            {console.log('📊 Message object nrgBalCodes specifically:', message.nrgBalCodes)}
-            {console.log('📊 Rendering Chart with message data:', { 
-              dataset: message.dataset, 
-              indicator_type: message.indicator_type, 
-              fuelCode: message.fuelCode,
-              nrgBalCodes: message.nrgBalCodes,
-              hasNrgBalCodes: !!message.nrgBalCodes
-            })}<Chart
+          <><Chart
               type={currentChartType}
               dataset={message.dataset || 'nrg_ind_id'}
               indicator_type={message.indicator_type || 'INDIC_NRG'}

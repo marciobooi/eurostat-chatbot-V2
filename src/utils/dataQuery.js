@@ -137,14 +137,6 @@ export const isDataQuery = (text, tokens) => {
   const hasDate = containsDate(text);
   const hasFuel = containsFuel(text, tokens);
   
-  console.log('📊 Data query detection:', {
-    text,
-    hasCountry,
-    hasDate,
-    hasFuel,
-    isDataQuery: hasCountry && hasDate && hasFuel
-  });
-  
   // A data query needs all three: country, date, and fuel
   return hasCountry && hasDate && hasFuel;
 };
@@ -169,30 +161,9 @@ export const extractDataQueryEntities = (text, tokens) => {
  */
 export const formatDataQueryResponse = async (text, tokens) => {  const transformation = transformToStructuredFormat(text, tokens);
   const entities = transformation.entities;
-  
-  // Debug logging for data query entity extraction
-  console.log('🔍 Data query entity extraction:', {
-    originalText: text,
-    extractedCountry: entities.country,
-    extractedFuel: entities.fuel,
-    extractedDate: entities.date,
-    transformedCountryCode: transformation.transformed?.countryCode,
-    transformedFuelCode: transformation.transformed?.fuelCode,
-    transformedDate: transformation.transformed?.date
-  });
-  
-  try {    // Get the fuel definition to extract dataset and indicator_type
+  try {
+    // Get the fuel definition to extract dataset and indicator_type
     const fuelDefinition = getFuelDefinition(entities.fuel);
-    
-    // Debug logging for data queries
-    console.log('🔍 Data query fuel definition lookup:', {
-      fuelName: entities.fuel,
-      foundDefinition: !!fuelDefinition,
-      hasVisualization: fuelDefinition?.hasVisualization,
-      visualizationType: fuelDefinition?.visualizationType,
-      fuelCode: fuelDefinition?.fuelCode,
-      nrgBal: fuelDefinition?.nrg_bal
-    });
     
     // Use dynamic parameters from the fuel definition, with fallbacks
     const dataset = fuelDefinition?.dataset || 'nrg_bal_c';
@@ -210,17 +181,7 @@ export const formatDataQueryResponse = async (text, tokens) => {  const transfor
                          Array.isArray(fuelDefinition.nrg_bal)) ? fuelDefinition.nrg_bal : null;
       // Get appropriate year for the dataset (hack for nrg_bal_c limitation)
     const availableYear = getAvailableYear(transformation.transformed?.date || transformation.entities?.date, dataset);
-      // Debug: Log the transformation data
-    console.log('🔍 Transformation data:', {
-      entities: entities,
-      countryCode: transformation.transformed?.countryCode,
-      fuelCode: transformation.transformed?.fuelCode,
-      year: transformation.transformed?.date,
-      availableYear: availableYear,
-      dataset: dataset
-    });
-    
-    // Fetch actual data from Eurostat API with all required parameters
+      // Debug: Log the transformation data    // Fetch actual data from Eurostat API with all required parameters
     const apiData = await fetchEurostatData({
       dataset: dataset,
       format: 'JSON',
@@ -331,17 +292,7 @@ export const transformToStructuredFormat = (text, tokens) => {
   const countryCode = getCountryCode(entities.country) || entities.country;
   const fuelCode = getFuelCode(entities.fuel) || entities.fuel;
   const resolvedDate = resolveRelativeDate(entities.date) || entities.date;
-  
-  const structuredFormat = `${countryCode} ${fuelCode} ${resolvedDate}`;
-  
-  // Log the transformation for debugging
-  console.log('🔄 Query Transformation:');
-  console.log(`Original: "${text}"`);
-  console.log(`Country: "${entities.country}" → "${countryCode}"`);
-  console.log(`Fuel: "${entities.fuel}" → "${fuelCode}"`);
-  console.log(`Date: "${entities.date}" → "${resolvedDate}"`);
-  console.log(`Structured Format: "${structuredFormat}"`);
-  console.log('─'.repeat(50));
+    const structuredFormat = `${countryCode} ${fuelCode} ${resolvedDate}`;
   
   return {
     original: text,
@@ -412,16 +363,13 @@ const getAvailableYear = (requestedYear, dataset) => {
   // For nrg_bal_c dataset, data is only available until 2023
   if (dataset === 'nrg_bal_c') {
     const maxAvailableYear = 2023;
-    
-    // If requested year is beyond available data, use the latest available
+      // If requested year is beyond available data, use the latest available
     if (parseInt(requestedYear) > maxAvailableYear) {
-      console.log(`⚠️ Requested year ${requestedYear} not available for ${dataset}. Using latest available: ${maxAvailableYear}`);
       return maxAvailableYear.toString();
     }
     
     // If requested year is too old, use a reasonable fallback
     if (parseInt(requestedYear) < 2010) {
-      console.log(`⚠️ Requested year ${requestedYear} too old for ${dataset}. Using 2010`);
       return '2010';
     }
   }

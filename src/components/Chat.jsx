@@ -134,16 +134,13 @@ const Chat = () => {
       setIsLoading(false);
     }
   };
-
   // Handle visualization button clicks
   const handleVisualizationClick = (chartType) => {
-    console.log(`📊 Visualization requested: ${chartType} chart`);
     // TODO: Implement chart visualization
   };
 
   // Handle link button clicks
   const handleLinkClick = (link) => {
-    console.log(`🔗 Link clicked: ${link}`);
     // Open link in new tab
     window.open(link, '_blank', 'noopener,noreferrer');
   };

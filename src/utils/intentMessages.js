@@ -119,9 +119,7 @@ const correctSpelling = (word) => {
   const countryPatterns = getAllCountryPatterns();
   const isCountryName = countryPatterns.some(country => 
     country.toLowerCase() === lowerWord
-  );
-  if (isCountryName) {
-    console.log(`🌍 Protected country name from spell correction: "${word}"`);
+  );  if (isCountryName) {
     return word; // Return the country name unchanged
   }
   
@@ -145,9 +143,7 @@ const correctSpelling = (word) => {
         isEnergyRelated(suggestion) || 
         energyKeywords.some(keyword => keyword.includes(suggestion.toLowerCase()))
       );
-      
-      if (energySuggestion) {
-        console.log(`🔧 Energy-focused spell correction: "${word}" → "${energySuggestion}"`);
+        if (energySuggestion) {
         return energySuggestion;
       }
       
@@ -157,12 +153,10 @@ const correctSpelling = (word) => {
       );
       
       if (countrySuggestion) {
-        console.log(`🌍 Country-focused spell correction: "${word}" → "${countrySuggestion}"`);
         return countrySuggestion;
       }
       
       // Return the first (most likely) suggestion
-      console.log(`🔧 Dictionary spell correction: "${word}" → "${suggestions[0]}"`);
       return suggestions[0];
     }
   }
@@ -175,24 +169,18 @@ const correctSpelling = (word) => {
  */
 const correctText = (text) => {
   let correctedText = text;
-  
-  // First apply context-aware phrase corrections from the PhraseCorrections dictionary
+    // First apply context-aware phrase corrections from the PhraseCorrections dictionary
   correctedText = applyPhraseCorrections(correctedText);
   
   // Then apply individual word spell correction to remaining words
   const tokens = tokenize(correctedText);
-  console.log(`🔍 Tokens after phrase correction: [${tokens.join(', ')}]`);
   
   const correctedTokens = tokens.map(token => {
     const corrected = correctSpelling(token);
-    if (corrected !== token) {
-      console.log(`🔧 Spell correction: "${token}" → "${corrected}"`);
-    }
     return corrected;
   });
   
   const finalText = correctedTokens.join(' ');
-  console.log(`📝 Final corrected text: "${finalText}"`);
   
   return finalText;
 };
@@ -202,7 +190,6 @@ const correctText = (text) => {
  */
 const detectGreeting = (tokens) => {
   const greetingWords = GREETING_WORDS.en || [];
-  console.log('👋 Checking greeting for tokens:', tokens);
   
   // Join tokens to check for multi-word greetings first
   const fullText = tokens.join(' ');
@@ -214,7 +201,6 @@ const detectGreeting = (tokens) => {
   });
   
   if (multiWordMatch) {
-    console.log('👋 Multi-word greeting match found');
     return true;
   }
   
@@ -230,11 +216,9 @@ const detectGreeting = (tokens) => {
       return greetingWords.includes(token) && !['what', 'how', 'when', 'where', 'why', 'who', 'are'].includes(token);
     });
     
-    console.log(`👋 Token "${token}": direct=${directMatch}, meaningful_partial=${meaningfulPartialMatch}`);
     return directMatch || meaningfulPartialMatch;
   });
   
-  console.log('👋 Final greeting result:', isGreeting);
   return isGreeting;
 };
 
@@ -243,10 +227,23 @@ const detectGreeting = (tokens) => {
  */
 const detectFarewell = (tokens) => {
   const farewellWords = goodbyeWords.en || [];
+  
+  // Join tokens to check for multi-word farewells first
+  const fullText = tokens.join(' ');
+  
+  // Check for exact multi-word farewell matches first
+  const multiWordMatch = farewellWords.some(farewell => {
+    const normalizedFarewell = farewell.toLowerCase().trim();
+    return fullText === normalizedFarewell || fullText.startsWith(normalizedFarewell + ' ') || fullText.endsWith(' ' + normalizedFarewell);
+  });
+  
+  if (multiWordMatch) {
+    return true;
+  }
+  
+  // For single token matches, be more strict - only exact matches
   return tokens.some(token => 
-    farewellWords.some(farewell => 
-      farewell.toLowerCase().includes(token) || token.includes(farewell.toLowerCase())
-    )
+    farewellWords.some(farewell => farewell.toLowerCase() === token)
   );
 };
 
@@ -273,10 +270,8 @@ const needsClarification = (text, tokens) => {
   if (isAmbiguousPhrase(text)) {
     return true;
   }
-  
-  // If it's a definition question, don't require clarification
+    // If it's a definition question, don't require clarification
   if (isDefinitionQuestion(text)) {
-    console.log('🤔 Definition question detected, bypassing clarification');
     return false;
   }
   
@@ -315,50 +310,39 @@ const needsClarification = (text, tokens) => {
  * Classify user intent based on input
  */
 const classifyIntent = (text, tokens) => {
-  console.log('🎯 Classifying intent for:', { text, tokens });
-  
   // Check for data queries FIRST (priority for country + date + fuel combinations)
   const isDataQueryResult = isDataQuery(text, tokens);
-  console.log('📊 Is data query check:', isDataQueryResult, 'for text:', text);
   
   if (isDataQueryResult) {
-    console.log('✅ Classified as DATA_QUERY (contains country/date/fuel) - PRIORITY');
     return INTENT_TYPES.DATA_QUERY;
   }
   
   // Check for greetings (after data query check)
   const isGreeting = detectGreeting(tokens);
-  console.log('👋 Is greeting check:', isGreeting, 'for tokens:', tokens);
   
   if (isGreeting) {
-    console.log('✅ Classified as GREETING');
     return INTENT_TYPES.GREETING;
   }
   
   // Check for farewells
   if (detectFarewell(tokens)) {
-    console.log('✅ Classified as FAREWELL');
     return INTENT_TYPES.FAREWELL;
   }
   
   // Check if input needs clarification
   if (needsClarification(text, tokens)) {
-    console.log('✅ Classified as UNKNOWN (needs clarification)');
     return INTENT_TYPES.UNKNOWN;
   }
   
   // Check if it's a definition question (after data query and greeting checks)
   const isDefQuestion = isDefinitionQuestion(text);
-  console.log('❓ Is definition question check:', isDefQuestion, 'for text:', text);
   
   if (isDefQuestion) {
-    console.log('✅ Classified as DEFINITION (question pattern matched)');
     return INTENT_TYPES.DEFINITION;
   }
   
   // If not greeting, farewell, ambiguous, data query, or definition question, assume it's a definition request
   // The ruler will determine if it's actually answerable
-  console.log('✅ Classified as DEFINITION (default case)');
   return INTENT_TYPES.DEFINITION;
 };
 
@@ -388,26 +372,11 @@ const formatDefinitionResponse = (match, result) => {
   
   // Add definition text
   if (match.text) {
-    response += `${match.text}`;  }
-  // Extract nrg_bal codes for stacked charts if available
+    response += `${match.text}`;  }  // Extract nrg_bal codes for stacked charts if available
   const nrgBalCodes = (match.visualizationType && 
                        match.visualizationType.includes('stacked') && 
                        match.nrg_bal && 
                        Array.isArray(match.nrg_bal)) ? match.nrg_bal : null;
-  
-  // Debug logging for all fuel matches and stacked charts
-  console.log('🔍 Fuel match found:', match.title);
-  console.log('📊 Visualization types:', match.visualizationType);
-  console.log('🔧 Has nrg_bal:', !!match.nrg_bal);
-  console.log('🔧 nrg_bal array:', match.nrg_bal);
-  console.log('✅ Final nrgBalCodes:', nrgBalCodes);
-  
-  if (match.visualizationType && match.visualizationType.includes('stacked')) {
-    console.log('🎯 Stacked chart detected for fuel:', match.title);
-    console.log('📊 Available visualizationType:', match.visualizationType);
-    console.log('🔧 nrg_bal array:', match.nrg_bal);
-    console.log('✅ Extracted nrgBalCodes:', nrgBalCodes);
-  }
   
     return {
     type: RESPONSE_TYPES.DEFINITION,
@@ -442,11 +411,8 @@ export const processMessage = async (userInput) => {
       };
     }    // Step 2: Tokenize input
     const tokens = tokenize(cleanInput);
-    
-    // Step 3: Apply enhanced spell correction for data queries
+      // Step 3: Apply enhanced spell correction for data queries
     const correctedText = correctText(cleanInput);
-    console.log(`📝 Original: "${cleanInput}"`);
-    console.log(`✅ Corrected: "${correctedText}"`);
     
     // Step 4: Classify intent using corrected text
     const intent = classifyIntent(correctedText, tokenize(correctedText));// Step 5: Generate response based on intent
@@ -473,12 +439,9 @@ export const processMessage = async (userInput) => {
           content: getRandomUnknownResponse('clarification'),
           isError: false
         };
-        case INTENT_TYPES.DEFINITION:
-        // Clean question text for better definition matching
+        case INTENT_TYPES.DEFINITION:        // Clean question text for better definition matching
         const cleanedText = isDefinitionQuestion(correctedText) ? 
           cleanQuestionForDefinition(correctedText) : correctedText;
-        
-        console.log('🔍 Definition search text:', cleanedText);
         
         // Delegate to ruler for definition matching
         const result = findBestMatch(cleanedText);

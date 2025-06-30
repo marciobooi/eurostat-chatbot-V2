@@ -50,17 +50,9 @@ export const fetchEurostatData = async (params) => {
       const nrgBalParams = nrg_bal.map(code => `nrg_bal=${encodeURIComponent(code)}`).join('&');
       const finalUrl = `${baseUrl}&${nrgBalParams}`;
       
-      console.log('🔍 Fetching Eurostat data with multiple nrg_bal:', { url: finalUrl, nrg_bal });
-      const response = await eurostatAPI.get(finalUrl);
-      
+
+      const response = await eurostatAPI.get(finalUrl);      
       if (response.data && response.data.value) {
-        console.log('✅ Data fetched successfully with multiple nrg_bal');
-        console.log('📊 API Response structure:', {
-          hasValue: !!response.data.value,
-          hasDimension: !!response.data.dimension,
-          dimensionKeys: response.data.dimension ? Object.keys(response.data.dimension) : 'none',
-          valueLength: response.data.value ? Object.keys(response.data.value).length : 0
-        });
         return response.data;
       } else {
         throw new Error('No data found in response');
@@ -70,18 +62,9 @@ export const fetchEurostatData = async (params) => {
       if (nrg_bal !== undefined) {
         cleanParams.nrg_bal = nrg_bal;
       }
-      
-      console.log('🔍 Fetching Eurostat data:', { url, params: cleanParams });
-      const response = await eurostatAPI.get(url, { params: cleanParams });
+          const response = await eurostatAPI.get(url, { params: cleanParams });
     
       if (response.data && response.data.value) {
-        console.log('✅ Data fetched successfully');
-        console.log('📊 API Response structure:', {
-          hasValue: !!response.data.value,
-          hasDimension: !!response.data.dimension,
-          dimensionKeys: response.data.dimension ? Object.keys(response.data.dimension) : 'none',
-          valueLength: response.data.value ? Object.keys(response.data.value).length : 0
-        });
         return response.data;
       } else {
         throw new Error('No data found in response');
@@ -103,38 +86,38 @@ export const fetchEurostatData = async (params) => {
  */
 export const processLineChartData = (data, selectedCountry) => {
   try {
-    console.log('📈 Processing line chart data for country:', selectedCountry);
+
     
     if (!data?.value || !data?.dimension) {
       throw new Error('Invalid data structure for line chart');
     }    const { value, dimension, size } = data;
     
     // Debug the data structure
-    console.log('📈 Data dimensions:', Object.keys(dimension));
-    console.log('📏 Size array:', size);
-    console.log('💾 Value object keys:', Object.keys(value));
-    console.log('💾 Value object length:', Object.keys(value).length);
+
+
+
+
     
     const geoIndex = dimension.geo.category.index;
     const timeIndex = dimension.time.category.index;
     const geoLabels = dimension.geo.category.label;
     const timeLabels = dimension.time.category.label;
-      console.log('🌍 Available geo codes:', Object.keys(geoIndex));
-    console.log('� GeoIndex object:', geoIndex);
-    console.log('�📅 Available time periods:', Object.keys(timeIndex));
+
+
+
       // Check if selected country exists in the data
     if (!(selectedCountry in geoIndex)) {
-      console.log('❌ Country not found. Looking for:', selectedCountry);
-      console.log('📋 Available countries in geoIndex:', Object.keys(geoIndex));
+
+
       throw new Error(`Country ${selectedCountry} not found in data`);
     }
     
     const selectedGeoIdx = geoIndex[selectedCountry];
-    console.log('🎯 Selected country index:', selectedGeoIdx);
+
     
     // If there are no values, return empty data
     if (Object.keys(value).length === 0) {
-      console.log('⚠️ No data values found in response');
+
       throw new Error(`No data available for country: ${selectedCountry}`);    }
     
     const timeSize = size[size.length - 1]; // time dimension is usually last
@@ -145,7 +128,7 @@ export const processLineChartData = (data, selectedCountry) => {
       const timeIdx = timeIndex[timeKey];
       const valueIndex = selectedGeoIdx * timeSize + timeIdx;
       
-      console.log(`🔍 Checking ${timeKey} (idx: ${timeIdx}): valueIndex = ${valueIndex}`);
+
       
       const val = value[valueIndex];
       
@@ -164,7 +147,7 @@ export const processLineChartData = (data, selectedCountry) => {
       throw new Error(`No data available for country: ${selectedCountry}`);
     }
 
-    console.log('✅ Line chart data processed:', chartData.length, 'points');
+
     
     return {
       categories: chartData.map(item => timeLabels[item.x] || item.x),
@@ -188,7 +171,7 @@ export const processLineChartData = (data, selectedCountry) => {
  */
 export const processBarChartData = (data, maxCountries = 10) => {
   try {
-    console.log('📊 Processing bar chart data');
+
     
     if (!data?.value || !data?.dimension) {
       throw new Error('Invalid data structure for bar chart');
@@ -205,7 +188,7 @@ export const processBarChartData = (data, maxCountries = 10) => {
     const timeKeys = Object.keys(timeIndex);
     const latestTimeKey = timeKeys[timeKeys.length - 1];
     const latestTimeIdx = timeIndex[latestTimeKey];
-      console.log('📅 Using latest time period for bar chart:', latestTimeKey);
+
     
     const timeSize = size[size.length - 1]; // time dimension is usually last
     const countryData = [];
@@ -229,7 +212,7 @@ export const processBarChartData = (data, maxCountries = 10) => {
     countryData.sort((a, b) => b.value - a.value);
     const topCountries = countryData.slice(0, maxCountries);
 
-    console.log('✅ Bar chart data processed:', topCountries.length, 'countries');
+
 
     return {
       categories: topCountries.map(item => item.name),
@@ -254,8 +237,8 @@ export const processBarChartData = (data, maxCountries = 10) => {
  */
 export const processPieChartData = (data, selectedCountry, selectedFuel) => {
   try {
-    console.log('🥧 Processing pie chart data:', { selectedCountry, selectedFuel });
-    console.log('📊 Raw data structure:', data);
+
+
 
     if (!data?.value || !data?.dimension) {
       throw new Error('Invalid data structure for pie chart');
@@ -264,10 +247,10 @@ export const processPieChartData = (data, selectedCountry, selectedFuel) => {
     const { value, dimension, size } = data;
     
     // Debug the data structure
-    console.log('📈 Data dimensions:', Object.keys(dimension));
-    console.log('📏 Size array:', size);
-    console.log('💾 Value object keys:', Object.keys(value));
-    console.log('💾 Value object length:', Object.keys(value).length);
+
+
+
+
     
     // Get the GEO dimension (countries) 
     if (!dimension.geo?.category?.label) {
@@ -278,8 +261,8 @@ export const processPieChartData = (data, selectedCountry, selectedFuel) => {
     const geoIndex = dimension.geo.category.index;
     const timeIndex = dimension.time.category.index;
     
-    console.log('🌍 Available geo codes:', Object.keys(geoIndex));
-    console.log('📅 Available time periods:', Object.keys(timeIndex));
+
+
     
     // Create pie chart data showing distribution across countries
     const pieData = [];
@@ -289,12 +272,12 @@ export const processPieChartData = (data, selectedCountry, selectedFuel) => {
     const latestTimeKey = timeKeys[timeKeys.length - 1];
     const latestTimeIdx = timeIndex[latestTimeKey];
     
-    console.log('📅 Using latest time period:', latestTimeKey, 'at index:', latestTimeIdx);
-    console.log('📏 Data dimensions size:', size);
+
+
     
     // If there are no values, return empty data
     if (Object.keys(value).length === 0) {
-      console.log('⚠️ No data values found in response');
+
       return [];
     }
     
@@ -306,7 +289,7 @@ export const processPieChartData = (data, selectedCountry, selectedFuel) => {
       const timeSize = size[size.length - 1]; // time dimension is usually last
       const valueIndex = geoIdx * timeSize + latestTimeIdx;
       
-      console.log(`🔍 Checking ${geoCode} (idx: ${geoIdx}): valueIndex = ${valueIndex}`);
+
       
       const val = value[valueIndex];
       
@@ -323,7 +306,7 @@ export const processPieChartData = (data, selectedCountry, selectedFuel) => {
     pieData.sort((a, b) => b.y - a.y);
     const topData = pieData.slice(0, 8);
     
-    console.log('✅ Pie chart data processed:', topData);
+
     return topData;
   } catch (error) {
     console.error('Error processing pie chart data:', error);
@@ -434,7 +417,7 @@ export const getChartData = async ({
   nrgBalCodes = null
 }) => {
   try {
-    console.log('📊 Preparing chart data:', { chartType, selectedCountry, fuelCode, nrgBalCodes });
+
     
     // Build proper API parameters for charts
     const apiParams = buildChartAPIParams({ 
@@ -445,7 +428,7 @@ export const getChartData = async ({
       nrgBalCodes
     });
     
-    console.log('🔧 Using chart API parameters:', apiParams);
+
     
     const data = await fetchEurostatData(apiParams);
     
@@ -477,7 +460,7 @@ export const getChartData = async ({
  */
 export const processStackedChartData = (data, maxCountries = 8) => {
   try {
-    console.log('📚 Processing stacked chart data');
+
     
     if (!data?.value || !data?.dimension) {
       throw new Error('Invalid data structure for stacked chart');
@@ -486,9 +469,9 @@ export const processStackedChartData = (data, maxCountries = 8) => {
     const { value, dimension, size } = data;
     
     // Debug the data structure
-    console.log('📈 Stacked Data dimensions:', Object.keys(dimension));
-    console.log('📏 Stacked Size array:', size);
-    console.log('💾 Stacked Value object length:', Object.keys(value).length);
+
+
+
     
     const geoIndex = dimension.geo.category.index;
     const nrgBalIndex = dimension.nrg_bal.category.index;
@@ -497,16 +480,16 @@ export const processStackedChartData = (data, maxCountries = 8) => {
     const nrgBalLabels = dimension.nrg_bal.category.label;
     const timeLabels = dimension.time.category.label;
     
-    console.log('🌍 Available geo codes:', Object.keys(geoIndex));
-    console.log('⚡ Available energy balance types:', Object.keys(nrgBalIndex));
-    console.log('📅 Available time periods:', Object.keys(timeIndex));
+
+
+
     
     // Get the latest time period
     const timeKeys = Object.keys(timeIndex);
     const latestTimeKey = timeKeys[timeKeys.length - 1];
     const latestTimeIdx = timeIndex[latestTimeKey];
     
-    console.log('📅 Using latest time period for stacked chart:', latestTimeKey);
+
     
     // Calculate dimension sizes
     const timeSize = size[size.length - 1]; // time dimension is usually last
@@ -559,7 +542,7 @@ export const processStackedChartData = (data, maxCountries = 8) => {
       color: ['#4F46E5', '#7C3AED', '#EC4899', '#06B6D4', '#10B981', '#F59E0B', '#EF4444'][idx % 7]
     }));
 
-    console.log('✅ Stacked chart data processed:', topCountries.length, 'countries');
+
 
     return {
       categories: topCountries.map(item => item.name),

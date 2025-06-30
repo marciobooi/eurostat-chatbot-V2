@@ -20,16 +20,12 @@ const Chart = ({
   const chartRef = useRef(null);
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  // Fetch data when component mounts or parameters change
+  const [error, setError] = useState(null);  // Fetch data when component mounts or parameters change
   useEffect(() => {
-    console.log('🔍 Chart useEffect triggered with:', { type, dataset, indicator_type, fuelCode, selectedCountry, selectedFuel });
-    
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
-          console.log('📡 About to call getChartData with:', { dataset, indicator_type, fuelCode, chartType: type, selectedCountry, selectedFuel, nrgBalCodes });
         
         const data = await getChartData({
           dataset,
@@ -41,7 +37,6 @@ const Chart = ({
           nrgBalCodes
         });
         
-        console.log('✅ Chart data received:', data);
         setChartData(data);
       } catch (err) {
         console.error('Error fetching chart data:', err);
