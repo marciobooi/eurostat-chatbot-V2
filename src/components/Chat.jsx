@@ -2,38 +2,84 @@ import { useState, useRef, useEffect } from 'react';
 import { processMessage } from '../utils/intentMessages.js';
 import { useKeyboardNavigation } from '../utils/keyboardNavigation.js';
 import { getTimeBasedWelcomeMessage } from '../data/WelcomeMessages.js';
+import { 
+  storageManager, 
+  getChatHistory, 
+  addChatMessage, 
+  clearChatHistory, 
+  getUserPreferences,
+  addSearchQuery 
+} from '../utils/storage.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faQuestionCircle, 
   faTrash, 
-  faPaperPlane
+  faPaperPlane,
+  faCog
 } from '@fortawesome/free-solid-svg-icons';
 import HelpModal from './HelpModal';
+import SettingsModal from './SettingsModal';
 import TypingIndicator from './TypingIndicator';
 import LoadingSpinner from './LoadingSpinner';
 import MessageList from './MessageList';
 import './Chat.css';
 
 const Chat = () => {
-  // Get a dynamic welcome message based on time of day
-  const welcomeMessage = getTimeBasedWelcomeMessage();
+  // Load user preferences with error handling
+  const getUserPreferencesWithFallback = () => {
+    try {
+      return getUserPreferences();
+    } catch (error) {
+      console.warn('Error loading user preferences, using defaults:', error);
+      return {
+        autoSave: true,
+        showWelcomeMessage: true,
+        maxChatHistory: 100,
+        defaultCountry: 'EU27_2020'
+      };
+    }
+  };
   
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      type: 'bot',
-      content: welcomeMessage.content,
-      timestamp: welcomeMessage.timestamp
-    }  ]);
-  const [inputValue, setInputValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const userPreferences = getUserPreferencesWithFallback();
+  
+  // Initialize messages from storage or with welcome message
+  const initializeMessages = () => {
+    try {
+      const savedHistory = getChatHistory();
+      if (savedHistory.length > 0 && userPreferences.autoSave) {
+        return savedHistory;
+      } else {
+        // Get a dynamic welcome message based on time of day
+        const welcomeMessage = getTimeBasedWelcomeMessage();
+        return [{
+          id: 1,
+          type: 'bot',
+          content: welcomeMessage.content,
+          timestamp: welcomeMessage.timestamp
+        }];
+      }
+    } catch (error) {
+      console.warn('Error loading chat history, starting fresh:', error);
+      const welcomeMessage = getTimeBasedWelcomeMessage();
+      return [{
+        id: 1,
+        type: 'bot',
+        content: welcomeMessage.content,
+        timestamp: welcomeMessage.timestamp
+      }];
+    }
+  };
+  
+  const [messages, setMessages] = useState(initializeMessages);
+  const [inputValue, setInputValue] = useState('');  const [isLoading, setIsLoading] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [currentSubfuels, setCurrentSubfuels] = useState([]);
   const messagesEndRef = useRef(null);
-  const inputRef = useRef(null);
-  const messagesContainerRef = useRef(null);  const clearButtonRef = useRef(null);
+  const inputRef = useRef(null);  const messagesContainerRef = useRef(null);  const clearButtonRef = useRef(null);
   const sendButtonRef = useRef(null);
   const helpButtonRef = useRef(null);
+  const settingsButtonRef = useRef(null);
   // Live region for screen readers
   const [liveRegionContent, setLiveRegionContent] = useState('');
 
@@ -48,27 +94,54 @@ const Chat = () => {
     setShowHelpModal(true);
     announceToScreenReader('Keyboard shortcuts help opened');
   };
-
   const closeHelpModal = () => {
     setShowHelpModal(false);
     announceToScreenReader('Keyboard shortcuts help closed');
     // Return focus to help button
     helpButtonRef.current?.focus();
-  };  const clearChat = () => {
-    // Get a fresh welcome message when clearing chat
-    const newWelcomeMessage = getTimeBasedWelcomeMessage();
-    setMessages([
-      {
-        id: 1,
-        type: 'bot',
-        content: newWelcomeMessage.content,
-        timestamp: newWelcomeMessage.timestamp
-      }
-    ]);
-    setCurrentSubfuels([]);
-    inputRef.current?.focus();
   };
 
+  const openSettingsModal = () => {
+    setShowSettingsModal(true);
+    announceToScreenReader('Settings modal opened');
+  };
+
+  const closeSettingsModal = () => {
+    setShowSettingsModal(false);
+    announceToScreenReader('Settings modal closed');
+    // Return focus to settings button
+    settingsButtonRef.current?.focus();
+  };  const clearChat = () => {
+    // Clear storage
+    try {
+      clearChatHistory();
+    } catch (error) {
+      console.warn('Error clearing chat history:', error);
+    }
+    
+    // Get a fresh welcome message when clearing chat
+    const newWelcomeMessage = getTimeBasedWelcomeMessage();
+    const welcomeMessageObj = {
+      id: 1,
+      type: 'bot',
+      content: newWelcomeMessage.content,
+      timestamp: newWelcomeMessage.timestamp
+    };
+    
+    setMessages([welcomeMessageObj]);
+    setCurrentSubfuels([]);
+    inputRef.current?.focus();
+    
+    // Save the welcome message to storage
+    try {
+      const userPreferences = getUserPreferencesWithFallback();
+      if (userPreferences.autoSave) {
+        addChatMessage(welcomeMessageObj);
+      }
+    } catch (error) {
+      console.warn('Error saving welcome message:', error);
+    }
+  };
   // Handle subfuel button clicks
   const handleSubfuelClick = async (subfuelName) => {
     if (isLoading) return;
@@ -83,7 +156,15 @@ const Chat = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
-    setIsLoading(true);
+    setIsLoading(true);    // Save user message to storage
+    try {
+      const userPreferences = getUserPreferencesWithFallback();
+      if (userPreferences.autoSave) {
+        addChatMessage(userMessage);
+      }
+    } catch (error) {
+      console.warn('Error saving subfuel click to storage:', error);
+    }
 
     // Add typing delay
     await new Promise(resolve => setTimeout(resolve, 800));
@@ -112,14 +193,22 @@ const Chat = () => {
       };
 
       setMessages(prev => [...prev, botResponse]);
+        // Save bot response to storage
+      try {
+        const userPreferences = getUserPreferencesWithFallback();
+        if (userPreferences.autoSave) {
+          addChatMessage(botResponse);
+        }
+      } catch (error) {
+        console.warn('Error saving subfuel response to storage:', error);
+      }
       
       // Update current subfuels for the button area
       if (response.subfuels && response.subfuels.length > 0) {
         setCurrentSubfuels(response.subfuels);
       } else {
         setCurrentSubfuels([]);
-      }
-      
+      }      
     } catch (error) {
       console.error('Error processing subfuel:', error);
       const errorResponse = {
@@ -130,6 +219,15 @@ const Chat = () => {
         isError: true
       };
       setMessages(prev => [...prev, errorResponse]);
+        // Save error message to storage
+      try {
+        const userPreferences = getUserPreferencesWithFallback();
+        if (userPreferences.autoSave) {
+          addChatMessage(errorResponse);
+        }
+      } catch (error) {
+        console.warn('Error saving subfuel error to storage:', error);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -178,8 +276,7 @@ const Chat = () => {
         announceToScreenReader(announcement);
       }
     }
-  }, [messages]);
-  const handleSubmit = async (e) => {
+  }, [messages]);  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!inputValue.trim() || isLoading) return;
 
@@ -193,7 +290,16 @@ const Chat = () => {
     setMessages(prev => [...prev, userMessage]);
     const query = inputValue.trim();
     setInputValue('');
-    setIsLoading(true);
+    setIsLoading(true);    // Save user message to storage and search history
+    try {
+      const userPreferences = getUserPreferencesWithFallback();
+      if (userPreferences.autoSave) {
+        addChatMessage(userMessage);
+        addSearchQuery(query);
+      }
+    } catch (error) {
+      console.warn('Error saving user message to storage:', error);
+    }
 
     // Add typing animation delay
     await new Promise(resolve => setTimeout(resolve, 800));
@@ -222,6 +328,15 @@ const Chat = () => {
 
       // Add the bot response directly
       setMessages(prev => [...prev, botResponse]);
+        // Save bot message to storage
+      try {
+        const userPreferences = getUserPreferencesWithFallback();
+        if (userPreferences.autoSave) {
+          addChatMessage(botResponse);
+        }
+      } catch (error) {
+        console.warn('Error saving bot response to storage:', error);
+      }
       
       // Update current subfuels for the button area
       if (response.subfuels && response.subfuels.length > 0) {
@@ -240,6 +355,15 @@ const Chat = () => {
         isError: true
       };
       setMessages(prev => [...prev, errorResponse]);
+        // Save error message to storage
+      try {
+        const userPreferences = getUserPreferencesWithFallback();
+        if (userPreferences.autoSave) {
+          addChatMessage(errorResponse);
+        }
+      } catch (error) {
+        console.warn('Error saving error message to storage:', error);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -283,9 +407,21 @@ const Chat = () => {
             title="Show keyboard shortcuts (Ctrl+/)"
             aria-label="Show keyboard shortcuts help. Keyboard shortcut: Control slash"
             type="button"
+          >            <FontAwesomeIcon icon={faQuestionCircle} />
+          </button>
+
+          <button 
+            ref={settingsButtonRef}
+            onClick={openSettingsModal} 
+            className="help-button" 
+            title="Open settings"
+            aria-label="Open settings modal"
+            type="button"
           >
-            <FontAwesomeIcon icon={faQuestionCircle} />
-          </button>          <button 
+            <FontAwesomeIcon icon={faCog} />
+          </button>
+
+          <button 
             ref={clearButtonRef}
             onClick={clearChat} 
             className="clear-button" 
@@ -378,10 +514,11 @@ const Chat = () => {
             )}
           </button>
         </div>
-      </form>
-
-      {/* Help Modal */}
+      </form>      {/* Help Modal */}
       <HelpModal isOpen={showHelpModal} onClose={closeHelpModal} />
+      
+      {/* Settings Modal */}
+      <SettingsModal isOpen={showSettingsModal} onClose={closeSettingsModal} />
     </div>
   );
 };

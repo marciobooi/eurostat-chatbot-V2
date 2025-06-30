@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { getChartData } from '../services/eurostatAPI';
+import { getChartSettings } from '../utils/storage.js';
 import './Chart.css';
 
 const Chart = ({ 
@@ -52,9 +53,11 @@ const Chart = ({
       setError('Missing required data parameters');
       setLoading(false);
     }
-  }, [type, dataset, indicator_type, fuelCode, selectedCountry, selectedFuel, nrgBalCodes]);
-  // Revolut-style chart configuration
+  }, [type, dataset, indicator_type, fuelCode, selectedCountry, selectedFuel, nrgBalCodes]);  // Revolut-style chart configuration
   const getChartOptions = () => {
+    // Get chart settings from storage
+    const chartSettings = getChartSettings();
+    
     // Map our chart types to Highcharts types
     const getHighchartsType = () => {
       switch (type) {
@@ -64,7 +67,9 @@ const Chart = ({
         case 'pie': return 'pie';
         default: return 'column';
       }
-    };    const baseOptions = {
+    };
+
+    const baseOptions = {
       chart: {
         type: getHighchartsType(),
         backgroundColor: 'transparent',
@@ -72,7 +77,7 @@ const Chart = ({
         style: {
           fontFamily: 'arial, sans-serif'
         },
-        animation: animate ? { duration: 800, easing: 'easeOutQuart' } : false,
+        animation: chartSettings.animationEnabled && animate ? { duration: 800, easing: 'easeOutQuart' } : false,
         height: 280
       },
       accessibility: {
@@ -81,9 +86,8 @@ const Chart = ({
       title: {
         text: null
       },
-      credits: { enabled: false },
-      legend: {
-        enabled: type === 'pie' || type === 'stacked',
+      credits: { enabled: false },      legend: {
+        enabled: chartSettings.showLegend && (type === 'pie' || type === 'stacked'),
         align: 'right',
         verticalAlign: 'middle',
         layout: 'vertical',
@@ -94,6 +98,7 @@ const Chart = ({
         }
       },
       tooltip: {
+        enabled: chartSettings.showTooltip,
         backgroundColor: 'rgba(15, 23, 42, 0.95)',
         borderColor: 'transparent',
         borderRadius: 12,
@@ -134,10 +139,10 @@ const Chart = ({
             fontSize: '11px',
             color: '#64748B',
             fontWeight: '500'
-          }
-        },
+          }        },
         gridLineColor: 'transparent'
-      } : undefined,      yAxis: (type !== 'pie') ? {
+      } : undefined,
+      yAxis: (type !== 'pie') ? {
         title: { text: null },
         gridLineColor: '#F1F5F9',
         gridLineWidth: 1,
@@ -148,7 +153,8 @@ const Chart = ({
             fontWeight: '500'
           }
         }
-      } : undefined,      series: type === 'pie' ? [{
+      } : undefined,
+      series: type === 'pie' ? [{
         data: chartData || []
       }] : (chartData?.series || [])
     };
@@ -191,10 +197,10 @@ const Chart = ({
       </div>
     );
   }
-
   return (
     <div className="chart-container">
-      <div className="chart-header">        <h4 className="chart-title">
+      <div className="chart-header">
+        <h4 className="chart-title">
           {type === 'pie' && '📊 Distribution'}
           {type === 'bar' && '📈 Country Comparison'}
           {type === 'line' && '📉 Trends Over Time'}
