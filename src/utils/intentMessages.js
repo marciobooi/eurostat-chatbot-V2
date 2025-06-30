@@ -310,8 +310,27 @@ const formatDefinitionResponse = (match, result) => {
   
   // Add definition text
   if (match.text) {
-    response += `${match.text}`;
+    response += `${match.text}`;  }
+  // Extract nrg_bal codes for stacked charts if available
+  const nrgBalCodes = (match.visualizationType && 
+                       match.visualizationType.includes('stacked') && 
+                       match.nrg_bal && 
+                       Array.isArray(match.nrg_bal)) ? match.nrg_bal : null;
+  
+  // Debug logging for all fuel matches and stacked charts
+  console.log('🔍 Fuel match found:', match.title);
+  console.log('📊 Visualization types:', match.visualizationType);
+  console.log('🔧 Has nrg_bal:', !!match.nrg_bal);
+  console.log('🔧 nrg_bal array:', match.nrg_bal);
+  console.log('✅ Final nrgBalCodes:', nrgBalCodes);
+  
+  if (match.visualizationType && match.visualizationType.includes('stacked')) {
+    console.log('🎯 Stacked chart detected for fuel:', match.title);
+    console.log('📊 Available visualizationType:', match.visualizationType);
+    console.log('🔧 nrg_bal array:', match.nrg_bal);
+    console.log('✅ Extracted nrgBalCodes:', nrgBalCodes);
   }
+  
     return {
     type: RESPONSE_TYPES.DEFINITION,
     content: response,
@@ -324,6 +343,7 @@ const formatDefinitionResponse = (match, result) => {
     dataset: match.dataset || 'nrg_ind_id',
     indicator_type: match.indicator_type || 'INDIC_NRG',
     fuelCode: match.fuelCode || '',
+    nrgBalCodes: nrgBalCodes,
     isError: false
   };
 };

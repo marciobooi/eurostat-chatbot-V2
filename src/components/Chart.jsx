@@ -9,8 +9,9 @@ const Chart = ({
   dataset,
   indicator_type,
   fuelCode,
-  selectedCountry = 'DE',
+  selectedCountry = 'EU27_2020',
   selectedFuel = 'Solid fossil fuels',
+  nrgBalCodes = null,
   title, 
   remainingVisualizationTypes = [], 
   onVisualizationChange,
@@ -28,8 +29,7 @@ const Chart = ({
       try {
         setLoading(true);
         setError(null);
-        
-        console.log('📡 About to call getChartData with:', { dataset, indicator_type, fuelCode, chartType: type, selectedCountry, selectedFuel });
+          console.log('📡 About to call getChartData with:', { dataset, indicator_type, fuelCode, chartType: type, selectedCountry, selectedFuel, nrgBalCodes });
         
         const data = await getChartData({
           dataset,
@@ -37,7 +37,8 @@ const Chart = ({
           fuelCode,
           chartType: type,
           selectedCountry,
-          selectedFuel
+          selectedFuel,
+          nrgBalCodes
         });
         
         console.log('✅ Chart data received:', data);
@@ -56,7 +57,7 @@ const Chart = ({
       setError('Missing required data parameters');
       setLoading(false);
     }
-  }, [type, dataset, indicator_type, fuelCode, selectedCountry, selectedFuel]);
+  }, [type, dataset, indicator_type, fuelCode, selectedCountry, selectedFuel, nrgBalCodes]);
   // Revolut-style chart configuration
   const getChartOptions = () => {
     // Map our chart types to Highcharts types

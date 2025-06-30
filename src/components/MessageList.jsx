@@ -125,20 +125,22 @@ const Message = ({
           role="text"
         />          {/* Chart display for bot messages when a chart type is selected */}
         {message.type === 'bot' && currentChartType && message.hasVisualization && (
-          <>
+          <>            {console.log('📊 Message object keys:', Object.keys(message))}
+            {console.log('📊 Message object nrgBalCodes specifically:', message.nrgBalCodes)}
             {console.log('📊 Rendering Chart with message data:', { 
               dataset: message.dataset, 
               indicator_type: message.indicator_type, 
               fuelCode: message.fuelCode,
-              messageKeys: Object.keys(message)
-            })}
-            <Chart
+              nrgBalCodes: message.nrgBalCodes,
+              hasNrgBalCodes: !!message.nrgBalCodes
+            })}<Chart
               type={currentChartType}
               dataset={message.dataset || 'nrg_ind_id'}
               indicator_type={message.indicator_type || 'INDIC_NRG'}
               fuelCode={message.fuelCode || 'C0000X0350-0370'}
-              selectedCountry="DE" // Default to Germany, will add country selection later
+              selectedCountry="EU27_2020" // Default to EU27, will add country selection later
               selectedFuel={message.content.split('**')[1]?.split('**')[0] || 'Energy Data'}
+              nrgBalCodes={message.nrgBalCodes || null}
               title={`${message.content.split('**')[1] || 'Energy Data'} - ${currentChartType} Chart`}
               remainingVisualizationTypes={getRemainingVisualizationTypes()}
               onVisualizationChange={handleChartTypeChange}
