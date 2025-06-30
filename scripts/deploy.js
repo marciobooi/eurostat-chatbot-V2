@@ -1,6 +1,12 @@
-const ghpages = require("gh-pages");
-const fs = require("fs");
-const path = require("path");
+import ghpages from "gh-pages";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+// Get current directory in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Ensure .nojekyll file exists
 const nojekyllPath = path.join(__dirname, "..", "dist", ".nojekyll");
