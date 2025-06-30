@@ -153,11 +153,24 @@
     "SK": "Slovakia",
     "FI": "Finland",
     "SE": "Sweden"
-  },
-  "errors": {
+  },  "errors": {
     "somethingWentWrong": "Something went wrong",
     "tryAgain": "Please try again"
-  },  "accessibility": {
+  },
+  "toast": {
+    "dataExported": "Data exported successfully!",
+    "dataImported": "Data imported successfully!",
+    "dataCleared": "All data cleared successfully!",
+    "chatHistoryCleared": "Chat history cleared successfully!",
+    "searchHistoryCleared": "Search history cleared successfully!",
+    "exportFailed": "Failed to export data",
+    "importFailed": "Failed to import data. Please check the file format.",
+    "invalidFileFormat": "Invalid file format",    "confirmClearAll": "Are you sure you want to clear all stored data? This action cannot be undone.",
+    "confirmClearChat": "Are you sure you want to clear your chat history?",
+    "confirmClearSearch": "Are you sure you want to clear your search history?",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },"accessibility": {
     "closeModal": "Close modal",
     "botMessage": "Bot message",
     "userMessage": "User message",

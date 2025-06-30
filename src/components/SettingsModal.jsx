@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faTimes,
@@ -55,8 +56,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
     const updated = { ...chartSettings, [key]: value };
     setChartSettings(updated);
     updateChartSettings({ [key]: value });
-  };
-  const handleExportData = () => {
+  };  const handleExportData = () => {
     try {
       const data = exportData();
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -68,11 +68,11 @@ const SettingsModal = ({ isOpen, onClose }) => {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      toast.success(t('toast.dataExported'));
     } catch (error) {
-      alert(t('settings.data.exportFailed') + error.message);
+      toast.error(t('toast.exportFailed') + ': ' + error.message);
     }
-  };
-  const handleImportData = (event) => {
+  };  const handleImportData = (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -82,40 +82,82 @@ const SettingsModal = ({ isOpen, onClose }) => {
         const data = JSON.parse(e.target.result);
         const success = importData(data);
         if (success) {
-          alert(t('settings.data.dataImported'));
+          toast.success(t('toast.dataImported'));
           loadSettings();
         } else {
-          alert(t('settings.data.importFailed'));
+          toast.error(t('toast.importFailed'));
         }
       } catch (error) {
-        alert(t('settings.data.invalidFileFormat') + error.message);
+        toast.error(t('toast.invalidFileFormat') + ': ' + error.message);
       }
     };
     reader.readAsText(file);
     event.target.value = ''; // Reset file input
+  };  // Custom confirmation function using toast
+  const showConfirmation = (message, onConfirm) => {
+    toast((toastInstance) => (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div>{message}</div>
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+          <button
+            style={{
+              padding: '6px 12px',
+              backgroundColor: '#dc3545',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+            onClick={() => {
+              toast.dismiss(toastInstance.id);
+              onConfirm();
+            }}
+          >
+            {t('toast.confirm')}
+          </button>
+          <button
+            style={{
+              padding: '6px 12px',
+              backgroundColor: '#6c757d',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+            onClick={() => toast.dismiss(toastInstance.id)}
+          >
+            {t('toast.cancel')}
+          </button>
+        </div>
+      </div>
+    ), {
+      duration: Infinity,
+      position: 'top-center',
+    });
   };
+
   const handleClearAllData = () => {
-    if (window.confirm(t('settings.data.confirmClearAll'))) {
+    showConfirmation(t('toast.confirmClearAll'), () => {
       clearAllStorage();
-      alert(t('settings.data.dataCleared'));
+      toast.success(t('toast.dataCleared'));
       loadSettings();
-    }
+    });
   };
 
   const handleClearChatHistory = () => {
-    if (window.confirm(t('settings.data.confirmClearChat'))) {
+    showConfirmation(t('toast.confirmClearChat'), () => {
       clearChatHistory();
-      alert(t('settings.data.chatHistoryCleared'));
+      toast.success(t('toast.chatHistoryCleared'));
       loadSettings();
-    }
+    });
   };
 
   const handleClearSearchHistory = () => {
-    if (window.confirm(t('settings.data.confirmClearSearch'))) {
+    showConfirmation(t('toast.confirmClearSearch'), () => {
       clearSearchHistory();
-      alert(t('settings.data.searchHistoryCleared'));
+      toast.success(t('toast.searchHistoryCleared'));
       loadSettings();
-    }
+    });
   };
 
   if (!isOpen) return null;

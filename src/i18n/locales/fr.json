@@ -153,11 +153,24 @@
     "SK": "Slovaquie",
     "FI": "Finlande",
     "SE": "Suède"
-  },
-  "errors": {
+  },  "errors": {
     "somethingWentWrong": "Quelque chose s'est mal passé",
     "tryAgain": "Veuillez réessayer"
-  },  "accessibility": {
+  },
+  "toast": {
+    "dataExported": "Données exportées avec succès !",
+    "dataImported": "Données importées avec succès !",
+    "dataCleared": "Toutes les données ont été effacées avec succès !",
+    "chatHistoryCleared": "L'historique du chat a été effacé avec succès !",
+    "searchHistoryCleared": "L'historique de recherche a été effacé avec succès !",
+    "exportFailed": "Échec de l'exportation des données",
+    "importFailed": "Échec de l'importation des données. Veuillez vérifier le format du fichier.",
+    "invalidFileFormat": "Format de fichier invalide",    "confirmClearAll": "Êtes-vous sûr de vouloir effacer toutes les données stockées ? Cette action ne peut pas être annulée.",
+    "confirmClearChat": "Êtes-vous sûr de vouloir effacer votre historique de chat ?",
+    "confirmClearSearch": "Êtes-vous sûr de vouloir effacer votre historique de recherche ?",
+    "confirm": "Confirmer",
+    "cancel": "Annuler"
+  },"accessibility": {
     "closeModal": "Fermer la fenêtre",
     "botMessage": "Message du bot",
     "userMessage": "Message utilisateur",
