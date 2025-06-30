@@ -9,6 +9,7 @@ import { isAmbiguousPhrase, isAmbiguousWord, AMBIGUOUS_QUESTION_WORDS } from '..
 import { getRandomStarter, getConfidencePhrase, getSubfuelIntro } from '../data/DefinitionStarters.js';
 import { isDataQuery, formatDataQueryResponse } from './dataQuery.js';
 import { containsCountry, getAllCountryPatterns } from '../data/Countries.js';
+import { isDefinitionQuestion, cleanQuestionForDefinition } from '../data/QuestionPatterns.js';
 import nspell from 'nspell';
 
 /**
@@ -201,10 +202,40 @@ const correctText = (text) => {
  */
 const detectGreeting = (tokens) => {
   const greetingWords = GREETING_WORDS.en || [];
-  return tokens.some(token => 
-    greetingWords.includes(token) || 
-    greetingWords.some(greeting => greeting.includes(token))
-  );
+  console.log('👋 Checking greeting for tokens:', tokens);
+  
+  // Join tokens to check for multi-word greetings first
+  const fullText = tokens.join(' ');
+  
+  // Check for exact multi-word greeting matches first
+  const multiWordMatch = greetingWords.some(greeting => {
+    const normalizedGreeting = greeting.toLowerCase().trim();
+    return fullText === normalizedGreeting || fullText.startsWith(normalizedGreeting + ' ') || fullText.endsWith(' ' + normalizedGreeting);
+  });
+  
+  if (multiWordMatch) {
+    console.log('👋 Multi-word greeting match found');
+    return true;
+  }
+  
+  // For single token matches, be more strict - only exact matches or meaningful partials
+  const isGreeting = tokens.some(token => {
+    // Direct exact match
+    const directMatch = greetingWords.includes(token);
+    
+    // Only allow partial matches for tokens that are reasonable substrings of greetings
+    // Avoid matching common question words like "what", "how", etc. unless they're standalone greetings
+    const meaningfulPartialMatch = token.length >= 3 && greetingWords.some(greeting => {
+      const greetingWords = greeting.toLowerCase().split(/\s+/);
+      return greetingWords.includes(token) && !['what', 'how', 'when', 'where', 'why', 'who', 'are'].includes(token);
+    });
+    
+    console.log(`👋 Token "${token}": direct=${directMatch}, meaningful_partial=${meaningfulPartialMatch}`);
+    return directMatch || meaningfulPartialMatch;
+  });
+  
+  console.log('👋 Final greeting result:', isGreeting);
+  return isGreeting;
 };
 
 /**
@@ -238,10 +269,15 @@ const needsClarification = (text, tokens) => {
   if (text.length <= 2) {
     return true;
   }
-  
-  // Check if the entire phrase is ambiguous
+    // Check if the entire phrase is ambiguous
   if (isAmbiguousPhrase(text)) {
     return true;
+  }
+  
+  // If it's a definition question, don't require clarification
+  if (isDefinitionQuestion(text)) {
+    console.log('🤔 Definition question detected, bypassing clarification');
+    return false;
   }
   
   // Single word that's not a greeting, farewell, or energy-related term
@@ -267,9 +303,8 @@ const needsClarification = (text, tokens) => {
       return true;
     }
   }
-  
-  // Short phrases with ambiguous question words
-  if (tokens.length <= 2 && tokens.some(token => isAmbiguousWord(token))) {
+    // Short phrases with ambiguous question words - but not if they're definition questions
+  if (tokens.length <= 2 && tokens.some(token => isAmbiguousWord(token)) && !isDefinitionQuestion(text)) {
     return true;
   }
   
@@ -280,28 +315,50 @@ const needsClarification = (text, tokens) => {
  * Classify user intent based on input
  */
 const classifyIntent = (text, tokens) => {
-  // Check for greetings first
-  if (detectGreeting(tokens)) {
+  console.log('🎯 Classifying intent for:', { text, tokens });
+  
+  // Check for data queries FIRST (priority for country + date + fuel combinations)
+  const isDataQueryResult = isDataQuery(text, tokens);
+  console.log('📊 Is data query check:', isDataQueryResult, 'for text:', text);
+  
+  if (isDataQueryResult) {
+    console.log('✅ Classified as DATA_QUERY (contains country/date/fuel) - PRIORITY');
+    return INTENT_TYPES.DATA_QUERY;
+  }
+  
+  // Check for greetings (after data query check)
+  const isGreeting = detectGreeting(tokens);
+  console.log('👋 Is greeting check:', isGreeting, 'for tokens:', tokens);
+  
+  if (isGreeting) {
+    console.log('✅ Classified as GREETING');
     return INTENT_TYPES.GREETING;
   }
   
   // Check for farewells
   if (detectFarewell(tokens)) {
+    console.log('✅ Classified as FAREWELL');
     return INTENT_TYPES.FAREWELL;
   }
   
   // Check if input needs clarification
   if (needsClarification(text, tokens)) {
+    console.log('✅ Classified as UNKNOWN (needs clarification)');
     return INTENT_TYPES.UNKNOWN;
   }
   
-  // Check for data queries (country + date + fuel) after clarification check
-  if (isDataQuery(text, tokens)) {
-    return INTENT_TYPES.DATA_QUERY;
+  // Check if it's a definition question (after data query and greeting checks)
+  const isDefQuestion = isDefinitionQuestion(text);
+  console.log('❓ Is definition question check:', isDefQuestion, 'for text:', text);
+  
+  if (isDefQuestion) {
+    console.log('✅ Classified as DEFINITION (question pattern matched)');
+    return INTENT_TYPES.DEFINITION;
   }
   
-  // If not greeting, farewell, ambiguous, or data query, assume it's a definition request
+  // If not greeting, farewell, ambiguous, data query, or definition question, assume it's a definition request
   // The ruler will determine if it's actually answerable
+  console.log('✅ Classified as DEFINITION (default case)');
   return INTENT_TYPES.DEFINITION;
 };
 
@@ -416,10 +473,15 @@ export const processMessage = async (userInput) => {
           content: getRandomUnknownResponse('clarification'),
           isError: false
         };
-      
-      case INTENT_TYPES.DEFINITION:
+        case INTENT_TYPES.DEFINITION:
+        // Clean question text for better definition matching
+        const cleanedText = isDefinitionQuestion(correctedText) ? 
+          cleanQuestionForDefinition(correctedText) : correctedText;
+        
+        console.log('🔍 Definition search text:', cleanedText);
+        
         // Delegate to ruler for definition matching
-        const result = findBestMatch(correctedText);
+        const result = findBestMatch(cleanedText);
         return formatDefinitionResponse(result?.match, result);
         
       default:

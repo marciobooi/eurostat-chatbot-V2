@@ -137,6 +137,15 @@ export const isDataQuery = (text, tokens) => {
   const hasDate = containsDate(text);
   const hasFuel = containsFuel(text, tokens);
   
+  console.log('📊 Data query detection:', {
+    text,
+    hasCountry,
+    hasDate,
+    hasFuel,
+    isDataQuery: hasCountry && hasDate && hasFuel
+  });
+  
+  // A data query needs all three: country, date, and fuel
   return hasCountry && hasDate && hasFuel;
 };
 
