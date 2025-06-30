@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { processMessage } from '../utils/intentMessages.js';
 import { useKeyboardNavigation } from '../utils/keyboardNavigation.js';
 import { getTimeBasedWelcomeMessage } from '../data/WelcomeMessages.js';
@@ -25,6 +26,8 @@ import MessageList from './MessageList';
 import './Chat.css';
 
 const Chat = () => {
+  const { t } = useTranslation();
+  
   // Load user preferences with error handling
   const getUserPreferencesWithFallback = () => {
     try {
@@ -397,36 +400,32 @@ const Chat = () => {
         Skip to chat input
       </a>      <div className="chat-header" role="banner">
         <div className="chat-title">
-          <h1 id="chat-title">Eurostat Energy Chatbot</h1>
-          <p id="chat-description">Ask about energy definitions and fuel codes</p>
+          <h1 id="chat-title">{t('chat.title')}</h1>
+          <p id="chat-description">{t('chat.description')}</p>
         </div>
         <div className="header-buttons">          <button 
             ref={helpButtonRef}
             onClick={openHelpModal} 
             className="help-button" 
-            title="Show keyboard shortcuts (Ctrl+/)"
-            aria-label="Show keyboard shortcuts help. Keyboard shortcut: Control slash"
+            title={t('chat.help')}
+            aria-label={`${t('chat.help')}. Keyboard shortcut: Control slash`}
             type="button"
-          >            <FontAwesomeIcon icon={faQuestionCircle} />
-          </button>
-
-          <button 
+          ><FontAwesomeIcon icon={faQuestionCircle} />
+          </button>          <button 
             ref={settingsButtonRef}
             onClick={openSettingsModal} 
             className="help-button" 
-            title="Open settings"
-            aria-label="Open settings modal"
+            title={t('chat.settings')}
+            aria-label={t('chat.settings')}
             type="button"
           >
             <FontAwesomeIcon icon={faCog} />
-          </button>
-
-          <button 
+          </button>          <button 
             ref={clearButtonRef}
             onClick={clearChat} 
             className="clear-button" 
-            title="Clear chat history (Ctrl+K)"
-            aria-label="Clear chat history. Keyboard shortcut: Control K"
+            title={`${t('chat.clearChat')} (Ctrl+K)`}
+            aria-label={`${t('chat.clearChat')}. Keyboard shortcut: Control K`}
             type="button"
           >
             <FontAwesomeIcon icon={faTrash} />
@@ -441,30 +440,26 @@ const Chat = () => {
           formatMessage={formatMessage}
           onVisualizationClick={handleVisualizationClick}
           onLinkClick={handleLinkClick}
-        />
-          <TypingIndicator 
+        />          <TypingIndicator 
           isVisible={isLoading}
-          message="Bot is typing..."
+          message={t('messages.botTyping')}
           showAvatar={true}
           size="default"
         />
-      </div>
-
-      {/* Subfuel buttons section */}
+      </div>      {/* Subfuel buttons section */}
       {currentSubfuels.length > 0 && (
-        <div className="subfuel-section" role="group" aria-label="Related fuel types">
+        <div className="subfuel-section" role="group" aria-label={t('subfuels.title')}>
           <div className="subfuel-section-header">
-            🔗 Explore specific fuel types:
+            {t('subfuels.title')}
           </div>
           <div className="subfuel-buttons-container">
             {currentSubfuels.map((subfuel, idx) => (
               <button
-                key={idx}
-                className="subfuel-button"
+                key={idx}                className="subfuel-button"
                 onClick={() => handleSubfuelClick(subfuel)}
                 disabled={isLoading}
-                aria-label={`Get definition for ${subfuel}`}
-                title={`Click to learn about ${subfuel}`}
+                aria-label={`${t('subfuels.clickToExplore')} ${subfuel}`}
+                title={`${t('subfuels.clickToExplore')} ${subfuel}`}
               >
                 {subfuel}
               </button>
@@ -473,10 +468,9 @@ const Chat = () => {
         </div>
       )}
       
-      <form onSubmit={handleSubmit} className="chat-input-form" role="search">
-        <div className="input-group">
+      <form onSubmit={handleSubmit} className="chat-input-form" role="search">        <div className="input-group">
           <label htmlFor="chat-input" className="sr-only">
-            Type your energy-related question here
+            {t('chat.inputPlaceholder')}
           </label>
           <input
             id="chat-input"
@@ -485,22 +479,21 @@ const Chat = () => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleInputKeyDown}
-            placeholder="Ask about energy terms, fuel codes, or definitions..."
+            placeholder={t('chat.inputPlaceholder')}
             className="chat-input"
             disabled={isLoading}
             aria-describedby="input-help"
-            aria-label="Type your energy-related question"
+            aria-label={t('chat.inputPlaceholder')}
             autoComplete="off"
             spellCheck="true"
           />
           <div id="input-help" className="sr-only">
             Press Enter to send, Escape to clear, or use keyboard shortcuts: Ctrl+K to clear chat, / to focus input
-          </div>
-          <button 
+          </div>          <button 
             ref={sendButtonRef}
             type="submit"            className="send-button"
             disabled={!inputValue.trim() || isLoading}
-            aria-label={isLoading ? 'Message is being processed' : 'Send message'}
+            aria-label={isLoading ? t('accessibility.messageBeingProcessed') : t('chat.sendButton')}
           >
             {isLoading ? (
               <LoadingSpinner 

@@ -1,69 +1,69 @@
+import { useTranslation } from 'react-i18next';
 import Modal from './Modal';
 import './HelpModal.css';
 
 const HelpModal = ({ isOpen, onClose }) => {
-  return (
-    <Modal
+  const { t } = useTranslation();
+  
+  return (    <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Keyboard Shortcuts"
+      title={t('help.title')}
       ariaLabelledBy="help-modal-title"
       ariaDescribedBy="help-modal-description"
     >
       <div className="shortcuts-section">
-        <h3>Message Navigation</h3>
+        <h3>{t('help.messageNavigation')}</h3>
         <div className="shortcut-item">
           <kbd>↑</kbd> <kbd>↓</kbd>
-          <span>Navigate through messages</span>
+          <span>{t('help.shortcuts.navigateMessages')}</span>
         </div>
         <div className="shortcut-item">
           <kbd>Home</kbd>
-          <span>Go to first message</span>
+          <span>{t('help.shortcuts.firstMessage')}</span>
         </div>
         <div className="shortcut-item">
           <kbd>End</kbd>
-          <span>Go to last message</span>
+          <span>{t('help.shortcuts.lastMessage')}</span>
         </div>
       </div>
 
       <div className="shortcuts-section">
-        <h3>Chat Actions</h3>
+        <h3>{t('help.chatActions')}</h3>
         <div className="shortcut-item">
           <kbd>Enter</kbd>
-          <span>Send message</span>
+          <span>{t('help.shortcuts.sendMessage')}</span>
         </div>
         <div className="shortcut-item">
           <kbd>Esc</kbd>
-          <span>Clear input field</span>
+          <span>{t('help.shortcuts.clearInput')}</span>
         </div>
         <div className="shortcut-item">
           <kbd>Ctrl</kbd> + <kbd>K</kbd>
-          <span>Clear entire chat</span>
+          <span>{t('help.shortcuts.clearChat')}</span>
         </div>
         <div className="shortcut-item">
           <kbd>Ctrl</kbd> + <kbd>L</kbd>
-          <span>Focus input field</span>
+          <span>{t('help.shortcuts.focusInput')}</span>
         </div>
       </div>
 
       <div className="shortcuts-section">
-        <h3>Quick Access</h3>
+        <h3>{t('help.quickAccess')}</h3>
         <div className="shortcut-item">
           <kbd>/</kbd>
-          <span>Focus input field (from anywhere)</span>
+          <span>{t('help.shortcuts.focusInput')} (from anywhere)</span>
         </div>
         <div className="shortcut-item">
           <kbd>Ctrl</kbd> + <kbd>/</kbd>
-          <span>Show this help</span>
+          <span>{t('help.shortcuts.showHelp')}</span>
         </div>
         <div className="shortcut-item">
           <kbd>Esc</kbd>
-          <span>Close this help modal</span>
+          <span>{t('help.shortcuts.closeModal')}</span>
         </div>
-      </div>
-
-      <div className="modal-footer">
-        <p>Tip: Use <kbd>Tab</kbd> to navigate between interactive elements.</p>
+      </div>      <div className="modal-footer">
+        <p>{t('help.footer')}</p>
       </div>
     </Modal>
   );

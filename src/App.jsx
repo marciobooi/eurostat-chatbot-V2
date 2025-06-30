@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import './i18n'; // Initialize i18n
 
 import { runTests } from "./utils/test";
 import Chat from "./components/Chat";

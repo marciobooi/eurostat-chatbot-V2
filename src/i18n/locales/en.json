@@ -1,0 +1,147 @@
+{
+  "chat": {
+    "title": "Eurostat Energy Chatbot",
+    "description": "Ask about energy definitions and fuel codes",
+    "inputPlaceholder": "Ask about energy data, fuel codes, or statistical definitions...",
+    "sendButton": "Send message",
+    "clearChat": "Clear chat history",
+    "settings": "Open settings",
+    "help": "Show keyboard shortcuts",
+    "skipToInput": "Skip to chat input"
+  },
+  "messages": {
+    "botTyping": "Bot is typing...",
+    "source": "source",
+    "timestamp": {
+      "invalidTime": "Invalid time"
+    },
+    "matchFound": "Match found using {{method}} method with {{confidence}}% confidence.",
+    "errorOccurred": "This message indicates an error occurred"
+  },
+  "help": {
+    "title": "Keyboard Shortcuts",
+    "messageNavigation": "Message Navigation",
+    "chatActions": "Chat Actions",
+    "quickAccess": "Quick Access",
+    "shortcuts": {
+      "navigateMessages": "Navigate through messages",
+      "firstMessage": "Go to first message",
+      "lastMessage": "Go to last message",
+      "sendMessage": "Send message",
+      "clearInput": "Clear input field",
+      "clearChat": "Clear entire chat",
+      "focusInput": "Focus input field",
+      "showHelp": "Show this help",
+      "closeModal": "Close modal or dialog"
+    },
+    "footer": "Tip: Use Tab to navigate between interactive elements."
+  },
+  "settings": {
+    "title": "Settings",
+    "tabs": {
+      "preferences": "Preferences",
+      "charts": "Charts",
+      "data": "Data"
+    },
+    "preferences": {
+      "title": "General Preferences",
+      "autoSave": "Auto-save chat history",
+      "autoSaveDesc": "Automatically save your chat messages for future sessions",
+      "showWelcome": "Show welcome message",
+      "showWelcomeDesc": "Display a welcome message when starting a new chat",
+      "defaultCountry": "Default country",
+      "defaultCountryDesc": "Default country selection for data queries",
+      "language": "Language",
+      "languageDesc": "Interface language",
+      "maxMessages": "Maximum messages",
+      "maxMessagesDesc": "Maximum number of chat messages to keep in history"
+    },
+    "charts": {
+      "title": "Chart Settings",
+      "showLegend": "Show legend",
+      "showLegendDesc": "Show chart legend for pie and stacked charts",
+      "showTooltips": "Show tooltips",
+      "showTooltipsDesc": "Show tooltips when hovering over chart elements",
+      "enableAnimations": "Enable animations",
+      "enableAnimationsDesc": "Enable chart animations and transitions",
+      "defaultType": "Default chart type",
+      "defaultTypeDesc": "Default visualization type for data displays",
+      "chartTypes": {
+        "pie": "Pie Chart",
+        "column": "Column Chart",
+        "line": "Line Chart",
+        "stacked": "Stacked Chart"
+      }
+    },
+    "data": {
+      "title": "Data Management",
+      "storage": "Storage Information",
+      "messagesStored": "Messages stored",
+      "storageUsed": "Storage used",
+      "lastUpdated": "Last updated",
+      "actions": "Data Actions",
+      "exportData": "Export Chat Data",
+      "exportDesc": "Download your chat history as JSON",
+      "importData": "Import Chat Data",
+      "importDesc": "Upload a previously exported chat file",
+      "clearData": "Clear All Data",
+      "clearDataDesc": "⚠️ This will permanently delete all chat history and settings"
+    }
+  },
+  "chart": {
+    "loadingTitle": "Loading chart...",
+    "switchType": "Switch to {{type}} chart",
+    "availableTypes": "Available chart types:",
+    "types": {
+      "pie": "pie",
+      "column": "column", 
+      "line": "line",
+      "stacked": "stacked"
+    }
+  },
+  "subfuels": {
+    "title": "Related fuel categories:",
+    "clickToExplore": "Click to explore"
+  },
+  "countries": {
+    "EU27_2020": "European Union (27 countries)",
+    "BE": "Belgium",
+    "BG": "Bulgaria", 
+    "CZ": "Czech Republic",
+    "DK": "Denmark",
+    "DE": "Germany",
+    "EE": "Estonia",
+    "IE": "Ireland",
+    "EL": "Greece",
+    "ES": "Spain",
+    "FR": "France",
+    "HR": "Croatia",
+    "IT": "Italy",
+    "CY": "Cyprus",
+    "LV": "Latvia",
+    "LT": "Lithuania",
+    "LU": "Luxembourg",
+    "HU": "Hungary",
+    "MT": "Malta",
+    "NL": "Netherlands",
+    "AT": "Austria",
+    "PL": "Poland",
+    "PT": "Portugal",
+    "RO": "Romania",
+    "SI": "Slovenia",
+    "SK": "Slovakia",
+    "FI": "Finland",
+    "SE": "Sweden"
+  },
+  "errors": {
+    "somethingWentWrong": "Something went wrong",
+    "tryAgain": "Please try again"
+  },  "accessibility": {
+    "closeModal": "Close modal",
+    "botMessage": "Bot message",
+    "userMessage": "User message",
+    "botSaid": "Eurostat Energy Bot said:",
+    "youSaid": "You said:",
+    "messageBeingProcessed": "Message is being processed"
+  }
+}

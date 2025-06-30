@@ -1,0 +1,147 @@
+{
+  "chat": {
+    "title": "Eurostat Energie Chatbot",
+    "description": "Fragen Sie nach Energiedefinitionen und Brennstoffcodes",
+    "inputPlaceholder": "Fragen Sie nach Energiedaten, Brennstoffcodes oder statistischen Definitionen...",
+    "sendButton": "Nachricht senden",
+    "clearChat": "Chat-Verlauf löschen",
+    "settings": "Einstellungen öffnen",
+    "help": "Tastenkombinationen anzeigen",
+    "skipToInput": "Zum Eingabefeld springen"
+  },
+  "messages": {
+    "botTyping": "Bot tippt...",
+    "source": "quelle",
+    "timestamp": {
+      "invalidTime": "Ungültige Zeit"
+    },
+    "matchFound": "Übereinstimmung gefunden mit der {{method}} Methode mit {{confidence}}% Vertrauen.",
+    "errorOccurred": "Diese Nachricht zeigt an, dass ein Fehler aufgetreten ist"
+  },
+  "help": {
+    "title": "Tastenkombinationen",
+    "messageNavigation": "Nachrichten-Navigation",
+    "chatActions": "Chat-Aktionen",
+    "quickAccess": "Schnellzugriff",
+    "shortcuts": {
+      "navigateMessages": "Durch Nachrichten navigieren",
+      "firstMessage": "Zur ersten Nachricht gehen",
+      "lastMessage": "Zur letzten Nachricht gehen",
+      "sendMessage": "Nachricht senden",
+      "clearInput": "Eingabefeld löschen",
+      "clearChat": "Gesamten Chat löschen",
+      "focusInput": "Eingabefeld fokussieren",
+      "showHelp": "Diese Hilfe anzeigen",
+      "closeModal": "Modal oder Dialog schließen"
+    },
+    "footer": "Tipp: Verwenden Sie Tab, um zwischen interaktiven Elementen zu navigieren."
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "tabs": {
+      "preferences": "Präferenzen",
+      "charts": "Diagramme",
+      "data": "Daten"
+    },
+    "preferences": {
+      "title": "Allgemeine Präferenzen",
+      "autoSave": "Chat-Verlauf automatisch speichern",
+      "autoSaveDesc": "Ihre Chat-Nachrichten automatisch für zukünftige Sitzungen speichern",
+      "showWelcome": "Willkommensnachricht anzeigen",
+      "showWelcomeDesc": "Eine Willkommensnachricht beim Start eines neuen Chats anzeigen",
+      "defaultCountry": "Standardland",
+      "defaultCountryDesc": "Standard-Länderauswahl für Datenabfragen",
+      "language": "Sprache",
+      "languageDesc": "Oberflächensprache",
+      "maxMessages": "Maximale Nachrichten",
+      "maxMessagesDesc": "Maximale Anzahl von Chat-Nachrichten im Verlauf zu behalten"
+    },
+    "charts": {
+      "title": "Diagramm-Einstellungen",
+      "showLegend": "Legende anzeigen",
+      "showLegendDesc": "Diagrammlegende für Kreisdiagramme und gestapelte Diagramme anzeigen",
+      "showTooltips": "Tooltips anzeigen",
+      "showTooltipsDesc": "Tooltips beim Überfahren von Diagrammelementen anzeigen",
+      "enableAnimations": "Animationen aktivieren",
+      "enableAnimationsDesc": "Diagrammanimationen und -übergänge aktivieren",
+      "defaultType": "Standard-Diagrammtyp",
+      "defaultTypeDesc": "Standard-Visualisierungstyp für Datenanzeigen",
+      "chartTypes": {
+        "pie": "Kreisdiagramm",
+        "column": "Säulendiagramm",
+        "line": "Liniendiagramm",
+        "stacked": "Gestapeltes Diagramm"
+      }
+    },
+    "data": {
+      "title": "Datenverwaltung",
+      "storage": "Speicher-Informationen",
+      "messagesStored": "Gespeicherte Nachrichten",
+      "storageUsed": "Verwendeter Speicher",
+      "lastUpdated": "Zuletzt aktualisiert",
+      "actions": "Daten-Aktionen",
+      "exportData": "Chat-Daten exportieren",
+      "exportDesc": "Ihren Chat-Verlauf als JSON herunterladen",
+      "importData": "Chat-Daten importieren",
+      "importDesc": "Eine zuvor exportierte Chat-Datei hochladen",
+      "clearData": "Alle Daten löschen",
+      "clearDataDesc": "⚠️ Dies wird dauerhaft den gesamten Chat-Verlauf und Einstellungen löschen"
+    }
+  },
+  "chart": {
+    "loadingTitle": "Diagramm wird geladen...",
+    "switchType": "Zu {{type}} Diagramm wechseln",
+    "availableTypes": "Verfügbare Diagrammtypen:",
+    "types": {
+      "pie": "kreis",
+      "column": "säulen",
+      "line": "linien",
+      "stacked": "gestapelt"
+    }
+  },
+  "subfuels": {
+    "title": "Verwandte Brennstoffkategorien:",
+    "clickToExplore": "Klicken zum Erkunden"
+  },
+  "countries": {
+    "EU27_2020": "Europäische Union (27 Länder)",
+    "BE": "Belgien",
+    "BG": "Bulgarien",
+    "CZ": "Tschechische Republik",
+    "DK": "Dänemark",
+    "DE": "Deutschland",
+    "EE": "Estland",
+    "IE": "Irland",
+    "EL": "Griechenland",
+    "ES": "Spanien",
+    "FR": "Frankreich",
+    "HR": "Kroatien",
+    "IT": "Italien",
+    "CY": "Zypern",
+    "LV": "Lettland",
+    "LT": "Litauen",
+    "LU": "Luxemburg",
+    "HU": "Ungarn",
+    "MT": "Malta",
+    "NL": "Niederlande",
+    "AT": "Österreich",
+    "PL": "Polen",
+    "PT": "Portugal",
+    "RO": "Rumänien",
+    "SI": "Slowenien",
+    "SK": "Slowakei",
+    "FI": "Finnland",
+    "SE": "Schweden"
+  },
+  "errors": {
+    "somethingWentWrong": "Etwas ist schief gelaufen",
+    "tryAgain": "Bitte versuchen Sie es erneut"
+  },  "accessibility": {
+    "closeModal": "Modal schließen",
+    "botMessage": "Bot-Nachricht",
+    "userMessage": "Benutzer-Nachricht",
+    "botSaid": "Eurostat Energie Bot sagte:",
+    "youSaid": "Sie sagten:",
+    "messageBeingProcessed": "Nachricht wird verarbeitet"
+  }
+}
