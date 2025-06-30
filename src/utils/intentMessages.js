@@ -8,6 +8,7 @@ import { energyKeywords, isEnergyRelated } from '../data/EnergyKeywords.js';
 import { isAmbiguousPhrase, isAmbiguousWord, AMBIGUOUS_QUESTION_WORDS } from '../data/AmbiguousPhrases.js';
 import { getRandomStarter, getConfidencePhrase, getSubfuelIntro } from '../data/DefinitionStarters.js';
 import { isDataQuery, formatDataQueryResponse } from './dataQuery.js';
+import { containsCountry, getAllCountryPatterns } from '../data/Countries.js';
 import nspell from 'nspell';
 
 /**
@@ -113,6 +114,16 @@ const correctSpelling = (word) => {
     return word; // Return the year unchanged
   }
   
+  // Don't correct country names - check if the word is a known country
+  const countryPatterns = getAllCountryPatterns();
+  const isCountryName = countryPatterns.some(country => 
+    country.toLowerCase() === lowerWord
+  );
+  if (isCountryName) {
+    console.log(`🌍 Protected country name from spell correction: "${word}"`);
+    return word; // Return the country name unchanged
+  }
+  
   // First check our custom corrections dictionary
   if (spellingCorrections[lowerWord]) {
     return spellingCorrections[lowerWord];
@@ -137,6 +148,16 @@ const correctSpelling = (word) => {
       if (energySuggestion) {
         console.log(`🔧 Energy-focused spell correction: "${word}" → "${energySuggestion}"`);
         return energySuggestion;
+      }
+      
+      // Check if any suggestion is a country name - avoid correcting to wrong countries
+      const countrySuggestion = suggestions.find(suggestion =>
+        countryPatterns.some(country => country.toLowerCase() === suggestion.toLowerCase())
+      );
+      
+      if (countrySuggestion) {
+        console.log(`🌍 Country-focused spell correction: "${word}" → "${countrySuggestion}"`);
+        return countrySuggestion;
       }
       
       // Return the first (most likely) suggestion

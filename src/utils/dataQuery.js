@@ -158,16 +158,47 @@ export const extractDataQueryEntities = (text, tokens) => {
 /**
  * Format data query response with extracted entities and actual API data
  */
-export const formatDataQueryResponse = async (text, tokens) => {
-  const transformation = transformToStructuredFormat(text, tokens);
+export const formatDataQueryResponse = async (text, tokens) => {  const transformation = transformToStructuredFormat(text, tokens);
   const entities = transformation.entities;
   
-  try {
-    // Get the fuel definition to extract dataset and indicator_type
+  // Debug logging for data query entity extraction
+  console.log('🔍 Data query entity extraction:', {
+    originalText: text,
+    extractedCountry: entities.country,
+    extractedFuel: entities.fuel,
+    extractedDate: entities.date,
+    transformedCountryCode: transformation.transformed?.countryCode,
+    transformedFuelCode: transformation.transformed?.fuelCode,
+    transformedDate: transformation.transformed?.date
+  });
+  
+  try {    // Get the fuel definition to extract dataset and indicator_type
     const fuelDefinition = getFuelDefinition(entities.fuel);
-      // Use dynamic parameters from the fuel definition, with fallbacks
+    
+    // Debug logging for data queries
+    console.log('🔍 Data query fuel definition lookup:', {
+      fuelName: entities.fuel,
+      foundDefinition: !!fuelDefinition,
+      hasVisualization: fuelDefinition?.hasVisualization,
+      visualizationType: fuelDefinition?.visualizationType,
+      fuelCode: fuelDefinition?.fuelCode,
+      nrgBal: fuelDefinition?.nrg_bal
+    });
+    
+    // Use dynamic parameters from the fuel definition, with fallbacks
     const dataset = fuelDefinition?.dataset || 'nrg_bal_c';
     const indicator_type = fuelDefinition?.indicator_type || 'SIEC';
+    
+    // Extract visualization and chart parameters from fuel definition
+    const hasVisualization = fuelDefinition?.hasVisualization || false;
+    const visualizationType = fuelDefinition?.visualizationType || [];
+    const fuelCode = fuelDefinition?.fuelCode || '';
+    
+    // Extract nrg_bal codes for stacked charts if available
+    const nrgBalCodes = (fuelDefinition?.visualizationType && 
+                         fuelDefinition.visualizationType.includes('stacked') && 
+                         fuelDefinition.nrg_bal && 
+                         Array.isArray(fuelDefinition.nrg_bal)) ? fuelDefinition.nrg_bal : null;
       // Get appropriate year for the dataset (hack for nrg_bal_c limitation)
     const availableYear = getAvailableYear(transformation.transformed?.date || transformation.entities?.date, dataset);
       // Debug: Log the transformation data
@@ -207,8 +238,7 @@ export const formatDataQueryResponse = async (text, tokens) => {
       const yearMessage = availableYear !== transformation.year ? 
         `**${entities.date}** (showing data for ${availableYear} - latest available)` : 
         `**${entities.date}**`;
-      
-      return {
+        return {
         type: 'data_query_response',
         content: `Here's what I found for **${fuelName}** in **${countryName}** for ${yearMessage}:\n\n**${balanceType}**: ${dataValue} ${unit}\n\nThis data represents the energy supply from ${fuelName.toLowerCase()} in ${countryName} for the specified period.`,
         entities: entities,
@@ -217,36 +247,42 @@ export const formatDataQueryResponse = async (text, tokens) => {
         dataValue: dataValue,
         unit: unit,
         apiData: apiData,
-        hasVisualization: true,
-        visualizationType: ['chart', 'table'],
+        hasVisualization: hasVisualization,
+        visualizationType: visualizationType,
         dataset: dataset,
         indicator_type: indicator_type,
+        fuelCode: fuelCode,
+        nrgBalCodes: nrgBalCodes,
         nrg_bal: 'NRGSUP',
         isError: false
       };
-    } else {
-      return {
+    } else {      return {
         type: 'data_query_response',
         content: `I searched for **${entities.fuel}** data in **${entities.country}** for **${entities.date}**, but couldn't find specific data for this combination. This might be because the data is not available for this time period or the specific fuel type.`,
         entities: entities,
         transformation: transformation,
-        hasVisualization: false,
-        visualizationType: [],
+        hasVisualization: hasVisualization,
+        visualizationType: visualizationType,
         dataset: dataset,
         indicator_type: indicator_type,
+        fuelCode: fuelCode,
+        nrgBalCodes: nrgBalCodes,
         nrg_bal: 'NRGSUP',
         isError: false
       };
     }
   } catch (error) {
-    console.error('Error fetching data:', error);
-    return {
+    console.error('Error fetching data:', error);    return {
       type: 'data_query_response', 
       content: `I tried to fetch **${entities.fuel}** data for **${entities.country}** in **${entities.date}**, but encountered an error accessing the Eurostat database. Please try again later.`,
       entities: entities,
       transformation: transformation,
       hasVisualization: false,
       visualizationType: [],
+      dataset: dataset || 'nrg_bal_c',
+      indicator_type: indicator_type || 'SIEC',
+      fuelCode: fuelCode || '',
+      nrgBalCodes: null,
       isError: true
     };
   }

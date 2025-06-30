@@ -80,13 +80,26 @@ export const extractCountry = (text) => {
   const lowerText = text.toLowerCase();
   const patterns = getAllCountryPatterns();
   
+  console.log('🌍 Country extraction debug:', {
+    originalText: text,
+    lowerText: lowerText,
+    containsSpain: lowerText.includes('spain'),
+    containsSlovenia: lowerText.includes('slovenia'),
+    patternsLength: patterns.length
+  });
+  
   for (const country of patterns) {
     if (lowerText.includes(country.toLowerCase())) {
-      // Return the alternative name if it exists, otherwise return the matched pattern
-      return COUNTRIES.alternatives[country] || country;
+      const result = COUNTRIES.alternatives[country] || country;
+      console.log('🎯 Country found:', {
+        matchedPattern: country,
+        finalResult: result
+      });
+      return result;
     }
   }
   
+  console.log('❌ No country found in text');
   return null;
 };
 
@@ -121,11 +134,25 @@ export const getCountryCode = (countryName) => {
   
   const lowerName = countryName.toLowerCase();
   
+  console.log('🗺️ Country code mapping debug:', {
+    originalCountryName: countryName,
+    lowerName: lowerName,
+    isAlreadyCode: lowerName.length === 2,
+    mappingExists: !!COUNTRY_TO_CODE_MAP[lowerName]
+  });
+  
   // Check if it's already a code
   if (lowerName.length === 2 && COUNTRIES.euCodes.concat(COUNTRIES.otherCodes).includes(lowerName)) {
+    console.log('✅ Already a country code:', lowerName);
     return lowerName;
   }
   
   // Look up in the mapping
-  return COUNTRY_TO_CODE_MAP[lowerName] || null;
+  const result = COUNTRY_TO_CODE_MAP[lowerName] || null;
+  console.log('🎯 Country code result:', {
+    input: lowerName,
+    output: result
+  });
+  
+  return result;
 };
