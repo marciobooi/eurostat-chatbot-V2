@@ -12,6 +12,20 @@ import {
 import Chart from './Chart';
 import './MessageList.css';
 
+// Helper function to safely format timestamps
+const formatTimestamp = (timestamp) => {
+  try {
+    const date = timestamp instanceof Date ? timestamp : new Date(timestamp);
+    if (isNaN(date.getTime())) {
+      return 'Invalid time';
+    }
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  } catch (error) {
+    console.warn('Error formatting timestamp:', error);
+    return 'Invalid time';
+  }
+};
+
 const MessageList = forwardRef(({
   messages,
   focusedMessageIndex,
@@ -174,10 +188,8 @@ const Message = ({
               </button>
             )}
           </div>
-        )}
-        
-        <div className="message-timestamp" aria-hidden="true">
-          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        )}        <div className="message-timestamp" aria-hidden="true">
+          {formatTimestamp(message.timestamp)}
         </div>
         
         {/* Additional information for screen readers */}

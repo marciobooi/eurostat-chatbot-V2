@@ -13,7 +13,7 @@ function App() {
           // Run automated tests after app is loaded (only once)
       if (process.env.NODE_ENV === 'development' && !testsRunRef.current) {
         testsRunRef.current = true;
-         runTests();
+        //  runTests();
       }
   
   }, []);

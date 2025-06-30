@@ -371,13 +371,12 @@ class StorageManager {
   getChatHistory() {
     return this.getItem(STORAGE_KEYS.CHAT_HISTORY) || [];
   }
-
   addChatMessage(message) {
     const history = this.getChatHistory();
     const messageWithId = {
       ...message,
       id: Date.now() + Math.random(),
-      timestamp: new Date().toISOString()
+      timestamp: message.timestamp || new Date()
     };
     
     history.push(messageWithId);
