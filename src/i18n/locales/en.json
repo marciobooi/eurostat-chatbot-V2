@@ -72,8 +72,7 @@
         "line": "Line Chart",
         "stacked": "Stacked Chart"
       }
-    },
-    "data": {
+    },    "data": {
       "title": "Data Management",
       "storage": "Storage Information",
       "messagesStored": "Messages stored",
@@ -85,7 +84,29 @@
       "importData": "Import Chat Data",
       "importDesc": "Upload a previously exported chat file",
       "clearData": "Clear All Data",
-      "clearDataDesc": "⚠️ This will permanently delete all chat history and settings"
+      "clearDataDesc": "⚠️ This will permanently delete all chat history and settings",
+      "localStorage": "Local Storage",
+      "sessionStorage": "Session Storage",
+      "available": "Available",
+      "notAvailable": "Not Available",
+      "exportImport": "Export & Import",
+      "clearDataSection": "Clear Data",
+      "clearChatHistory": "Clear Chat History",
+      "clearSearchHistory": "Clear Search History",
+      "exportDataAction": "Export Data",
+      "importDataAction": "Import Data",
+      "exportImportDesc": "Export your data for backup or import data from a previous export",
+      "clearDataWarning": "Warning: These actions cannot be undone. Consider exporting your data first.",
+      "confirmClearAll": "Are you sure you want to clear all stored data? This action cannot be undone.",
+      "confirmClearChat": "Are you sure you want to clear your chat history?",
+      "confirmClearSearch": "Are you sure you want to clear your search history?",
+      "dataCleared": "All data cleared successfully!",
+      "chatHistoryCleared": "Chat history cleared successfully!",
+      "searchHistoryCleared": "Search history cleared successfully!",
+      "dataImported": "Data imported successfully!",
+      "importFailed": "Failed to import data. Please check the file format.",
+      "exportFailed": "Failed to export data: ",
+      "invalidFileFormat": "Invalid file format: "
     }
   },
   "chart": {

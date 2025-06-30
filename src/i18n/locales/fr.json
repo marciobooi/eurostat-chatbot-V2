@@ -72,8 +72,7 @@
         "line": "Graphique Linéaire",
         "stacked": "Graphique Empilé"
       }
-    },
-    "data": {
+    },    "data": {
       "title": "Gestion des Données",
       "storage": "Informations de Stockage",
       "messagesStored": "Messages stockés",
@@ -85,7 +84,29 @@
       "importData": "Importer les Données du Chat",
       "importDesc": "Téléverser un fichier de chat précédemment exporté",
       "clearData": "Effacer Toutes les Données",
-      "clearDataDesc": "⚠️ Ceci supprimera définitivement tout l'historique du chat et les paramètres"
+      "clearDataDesc": "⚠️ Ceci supprimera définitivement tout l'historique du chat et les paramètres",
+      "localStorage": "Stockage Local",
+      "sessionStorage": "Stockage de Session",
+      "available": "Disponible",
+      "notAvailable": "Non Disponible",
+      "exportImport": "Exporter et Importer",
+      "clearDataSection": "Effacer les Données",
+      "clearChatHistory": "Effacer l'Historique du Chat",
+      "clearSearchHistory": "Effacer l'Historique de Recherche",
+      "exportDataAction": "Exporter les Données",
+      "importDataAction": "Importer les Données",
+      "exportImportDesc": "Exportez vos données pour sauvegarde ou importez des données d'un export précédent",
+      "clearDataWarning": "Attention : Ces actions ne peuvent pas être annulées. Considérez exporter vos données d'abord.",
+      "confirmClearAll": "Êtes-vous sûr de vouloir effacer toutes les données stockées ? Cette action ne peut pas être annulée.",
+      "confirmClearChat": "Êtes-vous sûr de vouloir effacer votre historique de chat ?",
+      "confirmClearSearch": "Êtes-vous sûr de vouloir effacer votre historique de recherche ?",
+      "dataCleared": "Toutes les données ont été effacées avec succès !",
+      "chatHistoryCleared": "L'historique du chat a été effacé avec succès !",
+      "searchHistoryCleared": "L'historique de recherche a été effacé avec succès !",
+      "dataImported": "Données importées avec succès !",
+      "importFailed": "Échec de l'importation des données. Veuillez vérifier le format du fichier.",
+      "exportFailed": "Échec de l'exportation des données : ",
+      "invalidFileFormat": "Format de fichier invalide : "
     }
   },
   "chart": {

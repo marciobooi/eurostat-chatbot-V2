@@ -72,8 +72,7 @@
         "line": "Liniendiagramm",
         "stacked": "Gestapeltes Diagramm"
       }
-    },
-    "data": {
+    },    "data": {
       "title": "Datenverwaltung",
       "storage": "Speicher-Informationen",
       "messagesStored": "Gespeicherte Nachrichten",
@@ -85,7 +84,29 @@
       "importData": "Chat-Daten importieren",
       "importDesc": "Eine zuvor exportierte Chat-Datei hochladen",
       "clearData": "Alle Daten löschen",
-      "clearDataDesc": "⚠️ Dies wird dauerhaft den gesamten Chat-Verlauf und Einstellungen löschen"
+      "clearDataDesc": "⚠️ Dies wird dauerhaft den gesamten Chat-Verlauf und Einstellungen löschen",
+      "localStorage": "Lokaler Speicher",
+      "sessionStorage": "Sitzungsspeicher",
+      "available": "Verfügbar",
+      "notAvailable": "Nicht Verfügbar",
+      "exportImport": "Exportieren & Importieren",
+      "clearDataSection": "Daten löschen",
+      "clearChatHistory": "Chat-Verlauf löschen",
+      "clearSearchHistory": "Suchverlauf löschen",
+      "exportDataAction": "Daten exportieren",
+      "importDataAction": "Daten importieren",
+      "exportImportDesc": "Exportieren Sie Ihre Daten für Backups oder importieren Sie Daten aus einem vorherigen Export",
+      "clearDataWarning": "Warnung: Diese Aktionen können nicht rückgängig gemacht werden. Erwägen Sie zuerst Ihre Daten zu exportieren.",
+      "confirmClearAll": "Sind Sie sicher, dass Sie alle gespeicherten Daten löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "confirmClearChat": "Sind Sie sicher, dass Sie Ihren Chat-Verlauf löschen möchten?",
+      "confirmClearSearch": "Sind Sie sicher, dass Sie Ihren Suchverlauf löschen möchten?",
+      "dataCleared": "Alle Daten erfolgreich gelöscht!",
+      "chatHistoryCleared": "Chat-Verlauf erfolgreich gelöscht!",
+      "searchHistoryCleared": "Suchverlauf erfolgreich gelöscht!",
+      "dataImported": "Daten erfolgreich importiert!",
+      "importFailed": "Import der Daten fehlgeschlagen. Bitte überprüfen Sie das Dateiformat.",
+      "exportFailed": "Export der Daten fehlgeschlagen: ",
+      "invalidFileFormat": "Ungültiges Dateiformat: "
     }
   },
   "chart": {

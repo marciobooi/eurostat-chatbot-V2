@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faTimes,
@@ -26,6 +27,7 @@ import {
 import './SettingsModal.css';
 
 const SettingsModal = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
   const [preferences, setPreferences] = useState({});
   const [chartSettings, setChartSettings] = useState({});
   const [storageInfo, setStorageInfo] = useState({});
@@ -54,7 +56,6 @@ const SettingsModal = ({ isOpen, onClose }) => {
     setChartSettings(updated);
     updateChartSettings({ [key]: value });
   };
-
   const handleExportData = () => {
     try {
       const data = exportData();
@@ -68,10 +69,9 @@ const SettingsModal = ({ isOpen, onClose }) => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (error) {
-      alert('Failed to export data: ' + error.message);
+      alert(t('settings.data.exportFailed') + error.message);
     }
   };
-
   const handleImportData = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -82,39 +82,38 @@ const SettingsModal = ({ isOpen, onClose }) => {
         const data = JSON.parse(e.target.result);
         const success = importData(data);
         if (success) {
-          alert('Data imported successfully!');
+          alert(t('settings.data.dataImported'));
           loadSettings();
         } else {
-          alert('Failed to import data. Please check the file format.');
+          alert(t('settings.data.importFailed'));
         }
       } catch (error) {
-        alert('Invalid file format: ' + error.message);
+        alert(t('settings.data.invalidFileFormat') + error.message);
       }
     };
     reader.readAsText(file);
     event.target.value = ''; // Reset file input
   };
-
   const handleClearAllData = () => {
-    if (window.confirm('Are you sure you want to clear all stored data? This action cannot be undone.')) {
+    if (window.confirm(t('settings.data.confirmClearAll'))) {
       clearAllStorage();
-      alert('All data cleared successfully!');
+      alert(t('settings.data.dataCleared'));
       loadSettings();
     }
   };
 
   const handleClearChatHistory = () => {
-    if (window.confirm('Are you sure you want to clear your chat history?')) {
+    if (window.confirm(t('settings.data.confirmClearChat'))) {
       clearChatHistory();
-      alert('Chat history cleared successfully!');
+      alert(t('settings.data.chatHistoryCleared'));
       loadSettings();
     }
   };
 
   const handleClearSearchHistory = () => {
-    if (window.confirm('Are you sure you want to clear your search history?')) {
+    if (window.confirm(t('settings.data.confirmClearSearch'))) {
       clearSearchHistory();
-      alert('Search history cleared successfully!');
+      alert(t('settings.data.searchHistoryCleared'));
       loadSettings();
     }
   };
@@ -123,46 +122,42 @@ const SettingsModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="settings-modal-overlay" onClick={onClose}>
-      <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="settings-header">
-          <h2>Settings</h2>
+      <div className="settings-modal" onClick={(e) => e.stopPropagation()}>        <div className="settings-header">
+          <h2>{t('settings.title')}</h2>
           <button className="close-button" onClick={onClose}>
             <FontAwesomeIcon icon={faTimes} />
           </button>
-        </div>
-
-        <div className="settings-tabs">
+        </div>        <div className="settings-tabs">
           <button
             className={`tab-button ${activeTab === 'preferences' ? 'active' : ''}`}
             onClick={() => setActiveTab('preferences')}
           >
             <FontAwesomeIcon icon={faToggleOn} />
-            Preferences
+            {t('settings.tabs.preferences')}
           </button>
           <button
             className={`tab-button ${activeTab === 'charts' ? 'active' : ''}`}
             onClick={() => setActiveTab('charts')}
           >
             <FontAwesomeIcon icon={faChartBar} />
-            Charts
+            {t('settings.tabs.charts')}
           </button>
           <button
             className={`tab-button ${activeTab === 'data' ? 'active' : ''}`}
             onClick={() => setActiveTab('data')}
           >
             <FontAwesomeIcon icon={faDatabase} />
-            Data
+            {t('settings.tabs.data')}
           </button>
         </div>
 
-        <div className="settings-content">
-          {activeTab === 'preferences' && (
+        <div className="settings-content">          {activeTab === 'preferences' && (
             <div className="settings-section">
-              <h3>General Preferences</h3>
+              <h3>{t('settings.preferences.title')}</h3>
               
               <div className="setting-item">
                 <label>
-                  <span>Auto-save chat history</span>
+                  <span>{t('settings.preferences.autoSave')}</span>
                   <button
                     className={`toggle-button ${preferences.autoSave ? 'on' : 'off'}`}
                     onClick={() => handlePreferenceChange('autoSave', !preferences.autoSave)}
@@ -171,13 +166,13 @@ const SettingsModal = ({ isOpen, onClose }) => {
                   </button>
                 </label>
                 <p className="setting-description">
-                  Automatically save your chat messages for future sessions
+                  {t('settings.preferences.autoSaveDesc')}
                 </p>
               </div>
 
               <div className="setting-item">
                 <label>
-                  <span>Show welcome message</span>
+                  <span>{t('settings.preferences.showWelcome')}</span>
                   <button
                     className={`toggle-button ${preferences.showWelcomeMessage ? 'on' : 'off'}`}
                     onClick={() => handlePreferenceChange('showWelcomeMessage', !preferences.showWelcomeMessage)}
@@ -186,35 +181,33 @@ const SettingsModal = ({ isOpen, onClose }) => {
                   </button>
                 </label>
                 <p className="setting-description">
-                  Display a welcome message when starting a new chat
+                  {t('settings.preferences.showWelcomeDesc')}
                 </p>
               </div>
 
               <div className="setting-item">
                 <label>
-                  <span>Default country</span>
+                  <span>{t('settings.preferences.defaultCountry')}</span>
                   <select
                     value={preferences.defaultCountry || 'EU27_2020'}
                     onChange={(e) => handlePreferenceChange('defaultCountry', e.target.value)}
                   >
-                    <option value="EU27_2020">European Union</option>
-                    <option value="DE">Germany</option>
-                    <option value="FR">France</option>
-                    <option value="IT">Italy</option>
-                    <option value="ES">Spain</option>
-                    <option value="NL">Netherlands</option>
-                    <option value="BE">Belgium</option>
-                    <option value="PL">Poland</option>
+                    <option value="EU27_2020">{t('countries.EU27_2020')}</option>                    <option value="DE">{t('countries.DE')}</option>
+                    <option value="FR">{t('countries.FR')}</option>
+                    <option value="IT">{t('countries.IT')}</option>
+                    <option value="ES">{t('countries.ES')}</option>
+                    <option value="NL">{t('countries.NL')}</option>
+                    <option value="BE">{t('countries.BE')}</option>
+                    <option value="PL">{t('countries.PL')}</option>
                   </select>
-                </label>
-                <p className="setting-description">
-                  Default country for energy data queries
+                </label>                <p className="setting-description">
+                  {t('settings.preferences.defaultCountryDesc')}
                 </p>
               </div>
 
               <div className="setting-item">
                 <label>
-                  <span>Max chat history</span>
+                  <span>{t('settings.preferences.maxMessages')}</span>
                   <select
                     value={preferences.maxChatHistory || 100}
                     onChange={(e) => handlePreferenceChange('maxChatHistory', parseInt(e.target.value))}
@@ -226,19 +219,17 @@ const SettingsModal = ({ isOpen, onClose }) => {
                   </select>
                 </label>
                 <p className="setting-description">
-                  Maximum number of chat messages to keep in history
+                  {t('settings.preferences.maxMessagesDesc')}
                 </p>
               </div>
             </div>
-          )}
-
-          {activeTab === 'charts' && (
+          )}          {activeTab === 'charts' && (
             <div className="settings-section">
-              <h3>Chart Settings</h3>
+              <h3>{t('settings.charts.title')}</h3>
               
               <div className="setting-item">
                 <label>
-                  <span>Show legend</span>
+                  <span>{t('settings.charts.showLegend')}</span>
                   <button
                     className={`toggle-button ${chartSettings.showLegend ? 'on' : 'off'}`}
                     onClick={() => handleChartSettingChange('showLegend', !chartSettings.showLegend)}
@@ -247,13 +238,13 @@ const SettingsModal = ({ isOpen, onClose }) => {
                   </button>
                 </label>
                 <p className="setting-description">
-                  Show chart legend for pie and stacked charts
+                  {t('settings.charts.showLegendDesc')}
                 </p>
               </div>
 
               <div className="setting-item">
                 <label>
-                  <span>Show tooltips</span>
+                  <span>{t('settings.charts.showTooltips')}</span>
                   <button
                     className={`toggle-button ${chartSettings.showTooltip ? 'on' : 'off'}`}
                     onClick={() => handleChartSettingChange('showTooltip', !chartSettings.showTooltip)}
@@ -262,13 +253,13 @@ const SettingsModal = ({ isOpen, onClose }) => {
                   </button>
                 </label>
                 <p className="setting-description">
-                  Show tooltips when hovering over chart elements
+                  {t('settings.charts.showTooltipsDesc')}
                 </p>
               </div>
 
               <div className="setting-item">
                 <label>
-                  <span>Enable animations</span>
+                  <span>{t('settings.charts.enableAnimations')}</span>
                   <button
                     className={`toggle-button ${chartSettings.animationEnabled ? 'on' : 'off'}`}
                     onClick={() => handleChartSettingChange('animationEnabled', !chartSettings.animationEnabled)}
@@ -277,58 +268,56 @@ const SettingsModal = ({ isOpen, onClose }) => {
                   </button>
                 </label>
                 <p className="setting-description">
-                  Enable chart animations and transitions
+                  {t('settings.charts.enableAnimationsDesc')}
                 </p>
               </div>
 
               <div className="setting-item">
                 <label>
-                  <span>Default chart type</span>
+                  <span>{t('settings.charts.defaultType')}</span>
                   <select
                     value={chartSettings.defaultType || 'pie'}
                     onChange={(e) => handleChartSettingChange('defaultType', e.target.value)}
                   >
-                    <option value="pie">Pie Chart</option>
-                    <option value="bar">Bar Chart</option>
-                    <option value="line">Line Chart</option>
-                    <option value="stacked">Stacked Chart</option>
+                    <option value="pie">{t('settings.charts.chartTypes.pie')}</option>
+                    <option value="bar">{t('settings.charts.chartTypes.column')}</option>
+                    <option value="line">{t('settings.charts.chartTypes.line')}</option>
+                    <option value="stacked">{t('settings.charts.chartTypes.stacked')}</option>
                   </select>
                 </label>
                 <p className="setting-description">
-                  Default chart type for data visualizations
+                  {t('settings.charts.defaultTypeDesc')}
                 </p>
               </div>
             </div>
-          )}
-
-          {activeTab === 'data' && (
+          )}          {activeTab === 'data' && (
             <div className="settings-section">
-              <h3>Data Management</h3>
+              <h3>{t('settings.data.title')}</h3>
               
               <div className="storage-info">
-                <h4>Storage Information</h4>
+                <h4>{t('settings.data.storage')}</h4>
                 <div className="info-grid">
                   <div className="info-item">
                     <FontAwesomeIcon icon={faInfo} />
-                    <span>Local Storage: {storageInfo.localStorage?.available ? 'Available' : 'Not Available'}</span>
+                    <span>{t('settings.data.localStorage')}: {storageInfo.localStorage?.available ? t('settings.data.available') : t('settings.data.notAvailable')}</span>
                   </div>
                   <div className="info-item">
                     <FontAwesomeIcon icon={faInfo} />
-                    <span>Session Storage: {storageInfo.sessionStorage?.available ? 'Available' : 'Not Available'}</span>
+                    <span>{t('settings.data.sessionStorage')}: {storageInfo.sessionStorage?.available ? t('settings.data.available') : t('settings.data.notAvailable')}</span>
                   </div>
                 </div>
               </div>
 
               <div className="data-actions">
-                <h4>Export & Import</h4>
+                <h4>{t('settings.data.exportImport')}</h4>
                 <div className="action-buttons">
                   <button className="action-button primary" onClick={handleExportData}>
                     <FontAwesomeIcon icon={faDownload} />
-                    Export Data
+                    {t('settings.data.exportDataAction')}
                   </button>
                   <label className="action-button secondary">
                     <FontAwesomeIcon icon={faUpload} />
-                    Import Data
+                    {t('settings.data.importDataAction')}
                     <input
                       type="file"
                       accept=".json"
@@ -338,28 +327,28 @@ const SettingsModal = ({ isOpen, onClose }) => {
                   </label>
                 </div>
                 <p className="action-description">
-                  Export your data for backup or import data from a previous export
+                  {t('settings.data.exportImportDesc')}
                 </p>
               </div>
 
               <div className="data-actions">
-                <h4>Clear Data</h4>
+                <h4>{t('settings.data.clearDataSection')}</h4>
                 <div className="action-buttons">
                   <button className="action-button danger" onClick={handleClearChatHistory}>
                     <FontAwesomeIcon icon={faTrash} />
-                    Clear Chat History
+                    {t('settings.data.clearChatHistory')}
                   </button>
                   <button className="action-button danger" onClick={handleClearSearchHistory}>
                     <FontAwesomeIcon icon={faTrash} />
-                    Clear Search History
+                    {t('settings.data.clearSearchHistory')}
                   </button>
                   <button className="action-button danger" onClick={handleClearAllData}>
                     <FontAwesomeIcon icon={faTrash} />
-                    Clear All Data
+                    {t('settings.data.clearData')}
                   </button>
                 </div>
                 <p className="action-description warning">
-                  Warning: These actions cannot be undone. Consider exporting your data first.
+                  {t('settings.data.clearDataWarning')}
                 </p>
               </div>
             </div>
