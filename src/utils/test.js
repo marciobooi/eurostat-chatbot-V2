@@ -33,7 +33,12 @@ const chatInputs = [
   "xyz123",
   // "random stuff",
   // "tell me about",
-  
+
+  // Testing queries
+  "what is solid fossil fuels?",
+  "can you tell me the consume of solid fossil fuels for spain in year 2022?",
+
+
   // Testing longer definitions
   // "what is electricity",
   // "define renewable energy sources",
