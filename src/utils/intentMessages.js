@@ -1,10 +1,10 @@
 import { findBestMatch } from './ruler.js';
 import { getGreetingWords, getGreetingResponses } from '../data/greetings.js';
 import { getGoodbyeWords, getFarewellResponses } from '../data/farewell.js';
-import { spellingCorrections, containsIntentException, isWordInIntentException } from '../data/SpellingCorrections.js';
+import { spellingCorrections } from '../data/SpellingCorrections.js';
 import { applyPhraseCorrections } from '../data/PhraseCorrections.js';
 import { getRandomUnknownResponse } from '../data/UnknownResponses.js';
-import { getEnergyKeywords, isEnergyRelated } from '../data/EnergyKeywords.js';
+import { energyKeywords, isEnergyRelated } from '../data/EnergyKeywords.js';
 import { isAmbiguousPhrase, isAmbiguousWord } from '../data/AmbiguousPhrases.js';
 import { getRandomStarter, getConfidencePhrase, getSubfuelIntro } from '../data/DefinitionStarters.js';
 import { isDataQuery, formatDataQueryResponse } from './dataQuery.js';
@@ -57,75 +57,39 @@ export const RESPONSE_TYPES = {
   FALLBACK: 'fallback_response'
 };
 
-// Initialize spell checker (will be loaded asynchronously based on language)
+// Initialize spell checker (will be loaded asynchronously)
 let spellChecker = null;
-let currentSpellCheckerLanguage = null;
 
 /**
- * Initialize spell checker for a specific language
+ * Initialize spell checker with fallback to corrections dictionary
  */
-const initSpellChecker = async (language = 'en') => {
+const initSpellChecker = async () => {
   try {
     if (typeof window !== 'undefined') {
-      // Only reload if language has changed or spellChecker is null
-      if (currentSpellCheckerLanguage === language && spellChecker !== null) {
-        return; // Already loaded for this language
-      }
-      
-      // Browser environment - try to load dictionary files for the specified language
+      // Browser environment - try to load dictionary files
       try {
         const [affResponse, dicResponse] = await Promise.all([
-          fetch(`dictionaries/${language}.aff`),
-          fetch(`dictionaries/${language}.dic`)
+          fetch('dictionaries/en.aff'),
+          fetch('dictionaries/en.dic')
         ]);
         
         if (affResponse.ok && dicResponse.ok) {
           const aff = await affResponse.text();
           const dic = await dicResponse.text();
           spellChecker = nspell(aff, dic);
-          currentSpellCheckerLanguage = language;
-          console.log(`Spell checker initialized with ${language.toUpperCase()} dictionary files`);
-        } else {
-          console.log(`Dictionary files for ${language} not available, using corrections only`);
-          spellChecker = null;
-          currentSpellCheckerLanguage = null;
+          console.log('Spell checker initialized with dictionary files');
         }
       } catch (error) {
-        console.log(`Dictionary files for ${language} not available, using corrections only`);
-        spellChecker = null;
-        currentSpellCheckerLanguage = null;
+        console.log('Dictionary files not available, using corrections only');
       }
     }
   } catch (error) {
-    console.log(`Spell checker initialization failed for ${language}, using corrections only`);
-    spellChecker = null;
-    currentSpellCheckerLanguage = null;
+    console.log('Spell checker initialization failed, using corrections only');
   }
 };
 
-/**
- * Ensure spell checker is loaded for the current language
- */
-const ensureSpellCheckerForCurrentLanguage = async () => {
-  const currentLanguage = i18n.language || 'en';
-  
-  // Only initialize if we don't have a spell checker for the current language
-  if (currentSpellCheckerLanguage !== currentLanguage) {
-    await initSpellChecker(currentLanguage);
-  }
-};
-
-// Spell checker will be initialized on-demand based on current language
-
-// Listen for language changes and reinitialize spell checker
-if (typeof window !== 'undefined') {
-  i18n.on('languageChanged', (lng) => {
-    console.log(`Language changed to ${lng}, will reload spell checker on next use`);
-    // Reset current language tracker so spell checker reloads on next use
-    currentSpellCheckerLanguage = null;
-    spellChecker = null;
-  });
-}
+// Initialize spell checker
+initSpellChecker();
 
 /**
  * Simple tokenization - split on whitespace and punctuation
@@ -141,9 +105,9 @@ const tokenize = (text) => {
 
 /**
  * Spell correction using nspell or fallback corrections
- * Enhanced for data query context and intent preservation
+ * Enhanced for data query context
  */
-const correctSpelling = async (word, fullText = '') => {
+const correctSpelling = (word) => {
   const lowerWord = word.toLowerCase();
   
   // Don't correct valid years (1990-2030)
@@ -152,18 +116,11 @@ const correctSpelling = async (word, fullText = '') => {
     return word; // Return the year unchanged
   }
   
-  // Don't correct words that are part of intent exceptions (greetings, farewells)
-  if (fullText && isWordInIntentException(word, fullText)) {
-    console.log(`[correctSpelling] Preserving intent exception word: "${word}" in context: "${fullText}"`);
-    return word; // Return the word unchanged to preserve intent
-  }
-  
   // Don't correct country names - check if the word is a known country
   const countryPatterns = getAllCountryPatterns();
   const isCountryName = countryPatterns.some(country => 
     country.toLowerCase() === lowerWord
-  );
-  if (isCountryName) {
+  );  if (isCountryName) {
     return word; // Return the country name unchanged
   }
   
@@ -171,9 +128,6 @@ const correctSpelling = async (word, fullText = '') => {
   if (spellingCorrections[lowerWord]) {
     return spellingCorrections[lowerWord];
   }
-  
-  // Ensure spell checker is loaded for current language
-  await ensureSpellCheckerForCurrentLanguage();
   
   // Then try nspell if available
   if (spellChecker) {
@@ -186,12 +140,11 @@ const correctSpelling = async (word, fullText = '') => {
     const suggestions = spellChecker.suggest(lowerWord);
     if (suggestions.length > 0) {
       // For data queries, prefer energy-related suggestions
-      const currentEnergyKeywords = getEnergyKeywords();
       const energySuggestion = suggestions.find(suggestion => 
         isEnergyRelated(suggestion) || 
-        currentEnergyKeywords.some(keyword => keyword.includes(suggestion.toLowerCase()))
+        energyKeywords.some(keyword => keyword.includes(suggestion.toLowerCase()))
       );
-      if (energySuggestion) {
+        if (energySuggestion) {
         return energySuggestion;
       }
       
@@ -214,32 +167,19 @@ const correctSpelling = async (word, fullText = '') => {
 
 /**
  * Apply spell correction to a text string with enhanced data query support
- * and intent preservation
  */
-const correctText = async (text) => {
+const correctText = (text) => {
   let correctedText = text;
-  
-  // Check if the text contains intent exceptions that should be preserved
-  if (containsIntentException(text)) {
-    console.log(`[correctText] Text contains intent exceptions, applying limited correction: "${text}"`);
-    
-    // For intent exception texts, only apply phrase corrections but be very conservative with spell correction
-    correctedText = applyPhraseCorrections(correctedText);
-    
-    // Skip individual word spell correction for intent exception phrases to preserve them
-    return correctedText;
-  }
-  
-  // First apply context-aware phrase corrections from the PhraseCorrections dictionary
+    // First apply context-aware phrase corrections from the PhraseCorrections dictionary
   correctedText = applyPhraseCorrections(correctedText);
   
   // Then apply individual word spell correction to remaining words
   const tokens = tokenize(correctedText);
   
-  const correctedTokens = await Promise.all(tokens.map(async (token) => {
-    const corrected = await correctSpelling(token, text); // Pass full text for context
+  const correctedTokens = tokens.map(token => {
+    const corrected = correctSpelling(token);
     return corrected;
-  }));
+  });
   
   const finalText = correctedTokens.join(' ');
   
@@ -334,7 +274,7 @@ const detectFarewell = (tokens) => {
  */
 const getRandomResponse = (responseArray) => {
   if (!Array.isArray(responseArray) || responseArray.length === 0) {
-    return i18n.t('errors.noSpecificResponse');
+    return "I understand, but I don't have a specific response for that right now.";
   }
   const randomIndex = Math.floor(Math.random() * responseArray.length);
   return responseArray[randomIndex];
@@ -488,25 +428,16 @@ export const processMessage = async (userInput) => {
     if (!cleanInput) {
       return {
         type: RESPONSE_TYPES.ERROR,
-        content: i18n.t('errors.emptyMessage'),
+        content: "Please enter a message.",
         isError: true
       };
-    }
-    
-    // Step 2: Tokenize input
+    }    // Step 2: Tokenize input
     const tokens = tokenize(cleanInput);
+      // Step 3: Apply enhanced spell correction for data queries
+    const correctedText = correctText(cleanInput);
     
-    // Step 3: Apply enhanced spell correction for data queries
-    const correctedText = await correctText(cleanInput);
-    
-    // Step 4: Classify intent - use original text for intent exceptions, corrected text otherwise
-    const textForIntent = containsIntentException(cleanInput) ? cleanInput : correctedText;
-    const tokensForIntent = tokenize(textForIntent);
-    const intent = classifyIntent(textForIntent, tokensForIntent);
-    
-    console.log(`[processMessage] Original: "${cleanInput}", Corrected: "${correctedText}", Intent text: "${textForIntent}", Intent: ${intent}`);
-    
-    // Step 5: Generate response based on intent
+    // Step 4: Classify intent using corrected text
+    const intent = classifyIntent(correctedText, tokenize(correctedText));// Step 5: Generate response based on intent
     switch (intent) {
       case INTENT_TYPES.GREETING:
         return {
@@ -521,8 +452,7 @@ export const processMessage = async (userInput) => {
           content: getRandomResponse(getFarewellResponses()),
           isError: false
         };
-        
-      case INTENT_TYPES.DATA_QUERY:
+        case INTENT_TYPES.DATA_QUERY:
         return await formatDataQueryResponse(correctedText, tokens);
       
       case INTENT_TYPES.UNKNOWN:
@@ -531,14 +461,12 @@ export const processMessage = async (userInput) => {
           content: getRandomUnknownResponse('clarification'),
           isError: false
         };
-        
-      case INTENT_TYPES.DEFINITION:
-        // Clean question text for better definition matching
+        case INTENT_TYPES.DEFINITION:        // Clean question text for better definition matching
         const cleanedText = isDefinitionQuestion(correctedText) ? 
           cleanQuestionForDefinition(correctedText) : correctedText;
         
         // Delegate to ruler for definition matching
-        const result = await findBestMatch(cleanedText);
+        const result = findBestMatch(cleanedText);
         return formatDefinitionResponse(result?.match, result);
         
       default:
@@ -553,7 +481,7 @@ export const processMessage = async (userInput) => {
     console.error('Error processing message:', error);
     return {
       type: RESPONSE_TYPES.ERROR,
-      content: i18n.t('errors.processingError'),
+      content: "Sorry, I encountered an error while processing your request. Please try again.",
       isError: true
     };
   }

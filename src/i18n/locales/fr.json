@@ -12,15 +12,11 @@
   "messages": {
     "botTyping": "Le bot écrit...",
     "source": "source",
-    "openExternalLink": "Ouvrir le lien externe",
-    "viewSourceInfo": "Voir la source ou des informations supplémentaires",
     "timestamp": {
       "invalidTime": "Heure invalide"
     },
     "matchFound": "Correspondance trouvée en utilisant la méthode {{method}} avec {{confidence}}% de confiance.",
-    "errorOccurred": "Ce message indique qu'une erreur s'est produite",
-    "fallbackResponse": "Je suis là pour vous aider avec les questions liées à l'énergie. Que souhaitez-vous savoir ?",
-    "newBotResponse": "Nouvelle réponse du bot : {{content}}"
+    "errorOccurred": "Ce message indique qu'une erreur s'est produite"
   },
   "help": {
     "title": "Raccourcis Clavier",
@@ -161,10 +157,7 @@
     "SE": "Suède"
   },  "errors": {
     "somethingWentWrong": "Quelque chose s'est mal passé",
-    "tryAgain": "Veuillez réessayer",
-    "emptyMessage": "Veuillez saisir un message.",
-    "processingError": "Désolé, j'ai rencontré une erreur lors du traitement de votre demande. Veuillez réessayer.",
-    "noSpecificResponse": "Je comprends, mais je n'ai pas de réponse spécifique pour cela en ce moment."
+    "tryAgain": "Veuillez réessayer"
   },
   "toast": {
     "dataExported": "Données exportées avec succès !",
@@ -179,25 +172,12 @@
     "confirmClearSearch": "Êtes-vous sûr de vouloir effacer votre historique de recherche ?",
     "confirm": "Confirmer",
     "cancel": "Annuler"
-  },  "accessibility": {
+  },"accessibility": {
     "closeModal": "Fermer la fenêtre",
     "botMessage": "Message du bot",
     "userMessage": "Message utilisateur",
     "botSaid": "Le Bot Énergie Eurostat a dit:",
     "youSaid": "Vous avez dit:",
-    "messageBeingProcessed": "Message en cours de traitement",
-    "keyboardInstructions": "Utilisez les flèches pour naviguer dans les messages, Entrée pour interagir, / pour focus sur l'entrée",
-    "chatConversation": "Conversation de chat",
-    "messageActions": "Actions de message",
-    "viewChart": "Voir le graphique {{chartType}}",
-    "appDescription": "Chatbot Énergie Eurostat",
-    "loading": "Chargement",
-    "messageAnnouncement": "{{type}} : {{content}}",
-    "chatCleared": "Chat effacé",
-    "inputCleared": "Entrée effacée",
-    "keyboardShortcutsOpened": "Aide des raccourcis clavier ouverte",
-    "keyboardShortcutsClosed": "Aide des raccourcis clavier fermée",
-    "settingsOpened": "Fenêtre des paramètres ouverte",
-    "settingsClosed": "Fenêtre des paramètres fermée"
+    "messageBeingProcessed": "Message en cours de traitement"
   }
 }

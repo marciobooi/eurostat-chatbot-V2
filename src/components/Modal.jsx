@@ -1,7 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { useTranslation } from 'react-i18next';
 import './Modal.css';
 
 const Modal = ({ 
@@ -12,7 +11,6 @@ const Modal = ({
   ariaLabelledBy,
   ariaDescribedBy 
 }) => {
-  const { t } = useTranslation();
   const modalRef = useRef(null);
   const backdropRef = useRef(null);
 
@@ -77,7 +75,7 @@ const Modal = ({
           <h2 id={ariaLabelledBy}>{title}</h2>          <button 
             onClick={onClose}
             className="modal-close-button"
-            aria-label={t('accessibility.closeModal')}
+            aria-label="Close modal"
             type="button"
           >
             <FontAwesomeIcon icon={faTimes} />
