@@ -57,39 +57,75 @@ export const RESPONSE_TYPES = {
   FALLBACK: 'fallback_response'
 };
 
-// Initialize spell checker (will be loaded asynchronously)
+// Initialize spell checker (will be loaded asynchronously based on language)
 let spellChecker = null;
+let currentSpellCheckerLanguage = null;
 
 /**
- * Initialize spell checker with fallback to corrections dictionary
+ * Initialize spell checker for a specific language
  */
-const initSpellChecker = async () => {
+const initSpellChecker = async (language = 'en') => {
   try {
     if (typeof window !== 'undefined') {
-      // Browser environment - try to load dictionary files
+      // Only reload if language has changed or spellChecker is null
+      if (currentSpellCheckerLanguage === language && spellChecker !== null) {
+        return; // Already loaded for this language
+      }
+      
+      // Browser environment - try to load dictionary files for the specified language
       try {
         const [affResponse, dicResponse] = await Promise.all([
-          fetch('dictionaries/en.aff'),
-          fetch('dictionaries/en.dic')
+          fetch(`dictionaries/${language}.aff`),
+          fetch(`dictionaries/${language}.dic`)
         ]);
         
         if (affResponse.ok && dicResponse.ok) {
           const aff = await affResponse.text();
           const dic = await dicResponse.text();
           spellChecker = nspell(aff, dic);
-          console.log('Spell checker initialized with dictionary files');
+          currentSpellCheckerLanguage = language;
+          console.log(`Spell checker initialized with ${language.toUpperCase()} dictionary files`);
+        } else {
+          console.log(`Dictionary files for ${language} not available, using corrections only`);
+          spellChecker = null;
+          currentSpellCheckerLanguage = null;
         }
       } catch (error) {
-        console.log('Dictionary files not available, using corrections only');
+        console.log(`Dictionary files for ${language} not available, using corrections only`);
+        spellChecker = null;
+        currentSpellCheckerLanguage = null;
       }
     }
   } catch (error) {
-    console.log('Spell checker initialization failed, using corrections only');
+    console.log(`Spell checker initialization failed for ${language}, using corrections only`);
+    spellChecker = null;
+    currentSpellCheckerLanguage = null;
   }
 };
 
-// Initialize spell checker
-initSpellChecker();
+/**
+ * Ensure spell checker is loaded for the current language
+ */
+const ensureSpellCheckerForCurrentLanguage = async () => {
+  const currentLanguage = i18n.language || 'en';
+  
+  // Only initialize if we don't have a spell checker for the current language
+  if (currentSpellCheckerLanguage !== currentLanguage) {
+    await initSpellChecker(currentLanguage);
+  }
+};
+
+// Spell checker will be initialized on-demand based on current language
+
+// Listen for language changes and reinitialize spell checker
+if (typeof window !== 'undefined') {
+  i18n.on('languageChanged', (lng) => {
+    console.log(`Language changed to ${lng}, will reload spell checker on next use`);
+    // Reset current language tracker so spell checker reloads on next use
+    currentSpellCheckerLanguage = null;
+    spellChecker = null;
+  });
+}
 
 /**
  * Simple tokenization - split on whitespace and punctuation
@@ -107,7 +143,7 @@ const tokenize = (text) => {
  * Spell correction using nspell or fallback corrections
  * Enhanced for data query context and intent preservation
  */
-const correctSpelling = (word, fullText = '') => {
+const correctSpelling = async (word, fullText = '') => {
   const lowerWord = word.toLowerCase();
   
   // Don't correct valid years (1990-2030)
@@ -135,6 +171,9 @@ const correctSpelling = (word, fullText = '') => {
   if (spellingCorrections[lowerWord]) {
     return spellingCorrections[lowerWord];
   }
+  
+  // Ensure spell checker is loaded for current language
+  await ensureSpellCheckerForCurrentLanguage();
   
   // Then try nspell if available
   if (spellChecker) {
@@ -176,7 +215,7 @@ const correctSpelling = (word, fullText = '') => {
  * Apply spell correction to a text string with enhanced data query support
  * and intent preservation
  */
-const correctText = (text) => {
+const correctText = async (text) => {
   let correctedText = text;
   
   // Check if the text contains intent exceptions that should be preserved
@@ -196,10 +235,10 @@ const correctText = (text) => {
   // Then apply individual word spell correction to remaining words
   const tokens = tokenize(correctedText);
   
-  const correctedTokens = tokens.map(token => {
-    const corrected = correctSpelling(token, text); // Pass full text for context
+  const correctedTokens = await Promise.all(tokens.map(async (token) => {
+    const corrected = await correctSpelling(token, text); // Pass full text for context
     return corrected;
-  });
+  }));
   
   const finalText = correctedTokens.join(' ');
   
@@ -457,7 +496,7 @@ export const processMessage = async (userInput) => {
     const tokens = tokenize(cleanInput);
     
     // Step 3: Apply enhanced spell correction for data queries
-    const correctedText = correctText(cleanInput);
+    const correctedText = await correctText(cleanInput);
     
     // Step 4: Classify intent - use original text for intent exceptions, corrected text otherwise
     const textForIntent = containsIntentException(cleanInput) ? cleanInput : correctedText;
@@ -498,7 +537,7 @@ export const processMessage = async (userInput) => {
           cleanQuestionForDefinition(correctedText) : correctedText;
         
         // Delegate to ruler for definition matching
-        const result = findBestMatch(cleanedText);
+        const result = await findBestMatch(cleanedText);
         return formatDefinitionResponse(result?.match, result);
         
       default:

@@ -39,18 +39,24 @@ import nspell from 'nspell';
 
 // Initialize nspell for intelligent spelling correction
 let spellChecker = null;
+let currentSpellCheckerLanguage = null;
 
-// Initialize spell checker with browser-compatible approach
-const initSpellChecker = async () => {
+// Initialize spell checker with browser-compatible approach for specific language
+const initSpellChecker = async (language = 'en') => {
   try {
     // In browser environment, we'll try to fetch dictionary files
     // If that fails, we'll rely on the centralized spelling corrections only
-      if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') {
+      // Only reload if language has changed or spellChecker is null
+      if (currentSpellCheckerLanguage === language && spellChecker !== null) {
+        return; // Already loaded for this language
+      }
+      
       // Browser environment - fetch dictionary files from public folder
       try {
         const [dicResponse, affResponse] = await Promise.all([
-          fetch('dictionaries/en.dic'),
-          fetch('dictionaries/en.aff')
+          fetch(`dictionaries/${language}.dic`),
+          fetch(`dictionaries/${language}.aff`)
         ]);
         
         if (dicResponse.ok && affResponse.ok) {
@@ -63,18 +69,21 @@ const initSpellChecker = async () => {
             aff: affContent
           });
           
-        
+          currentSpellCheckerLanguage = language;
+          console.log(`Ruler spell checker initialized with ${language.toUpperCase()} dictionary files`);
         } else {
-          throw new Error('Dictionary files not accessible via fetch');
+          throw new Error(`Dictionary files for ${language} not accessible via fetch`);
         }
       } catch (fetchError) {
-        console.warn('⚠️ Could not fetch dictionary files, using centralized corrections only');
+        console.warn(`⚠️ Could not fetch ${language} dictionary files, using centralized corrections only`);
         spellChecker = null;
+        currentSpellCheckerLanguage = null;
       }
     } else {
       // Non-browser environment - disable nspell for now
       console.warn('⚠️ nspell disabled in non-browser environment, using centralized corrections only');
       spellChecker = null;
+      currentSpellCheckerLanguage = null;
     }
     
     // Add energy-specific terms if spell checker is available
@@ -101,11 +110,33 @@ const initSpellChecker = async () => {
   } catch (error) {
     console.warn('⚠️ Spell checker initialization failed:', error.message);
     spellChecker = null;
+    currentSpellCheckerLanguage = null;
   }
 };
 
-// Initialize spell checker when module loads
-initSpellChecker();
+/**
+ * Ensure spell checker is loaded for the current language
+ */
+const ensureSpellCheckerForCurrentLanguage = async () => {
+  const currentLanguage = i18n.language || 'en';
+  
+  // Only initialize if we don't have a spell checker for the current language
+  if (currentSpellCheckerLanguage !== currentLanguage) {
+    await initSpellChecker(currentLanguage);
+  }
+};
+
+// Listen for language changes and reinitialize spell checker
+if (typeof window !== 'undefined') {
+  i18n.on('languageChanged', (lng) => {
+    console.log(`Language changed to ${lng}, will reload ruler spell checker on next use`);
+    // Reset current language tracker so spell checker reloads on next use
+    currentSpellCheckerLanguage = null;
+    spellChecker = null;
+  });
+}
+
+// Spell checker will be initialized on-demand based on current language
 
 // Global variable to store the last ruler result
 let globalRulerResult = null;
@@ -157,12 +188,14 @@ const normalizeInput = (input) => {
 /**
  * Step 2: Intelligent spelling correction using nspell + centralized energy dictionary
  */
-const correctSpelling = (term) => {
+const correctSpelling = async (term) => {
   // First check our centralized energy spelling corrections
   if (spellingCorrections[term]) {
-  
     return spellingCorrections[term];
   }
+  
+  // Ensure spell checker is loaded for current language
+  await ensureSpellCheckerForCurrentLanguage();
   
   // If nspell is available, use it for intelligent correction
   if (spellChecker) {
@@ -170,7 +203,8 @@ const correctSpelling = (term) => {
     if (spellChecker.correct(term)) {
       return term;
     }
-      // Get suggestions for misspelled words
+    
+    // Get suggestions for misspelled words
     const suggestions = spellChecker.suggest(term);
     
     if (suggestions.length > 0) {
@@ -178,14 +212,12 @@ const correctSpelling = (term) => {
       for (const suggestion of suggestions) {
         // Use centralized energy keyword checking
         if (isEnergyRelated(suggestion)) {
-        
           return suggestion;
         }
       }
       
       // Fallback to first suggestion if no energy context found
       const bestSuggestion = suggestions[0];
-    
       return bestSuggestion;
     }
   }
@@ -479,16 +511,14 @@ const stemmingMatch = (query) => {
 /**
  * Main ruler function - ALWAYS performs all 10 steps and chooses the best result
  */
-export const findBestMatch = (userQuery) => {
-
+export const findBestMatch = async (userQuery) => {
   
   // Step 1: Normalize input
   let processedQuery = normalizeInput(userQuery);
-
   
   // Step 2: Spelling correction
   const words = processedQuery.split(/\s+/);
-  const correctedWords = words.map(correctSpelling);
+  const correctedWords = await Promise.all(words.map(word => correctSpelling(word)));
   processedQuery = correctedWords.join(' ');
 
   
