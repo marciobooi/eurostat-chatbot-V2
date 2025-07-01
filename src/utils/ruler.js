@@ -2,8 +2,8 @@ import { energyDefinitionsEn } from '../data/DefinitionsEn.js';
 import { spellingCorrections } from '../data/SpellingCorrections.js';
 import { getAbbreviations } from '../data/Abbreviations.js';
 import { getSynonyms } from '../data/Synonyms.js';
-import { stopwords } from '../data/Stopwords.js';
-import { suffixes, minWordLength, stemExceptions } from '../data/Suffixes.js';
+import { getStopwords } from '../data/Stopwords.js';
+import { getSuffixes, minWordLength, getStemExceptions } from '../data/Suffixes.js';
 import { isEnergyRelated } from '../data/EnergyKeywords.js';
 import Fuse from 'fuse.js';
 import { removeStopwords } from 'stopword';
@@ -228,8 +228,9 @@ const extractMeaningfulTerms = (text) => {
   
   // Remove stopwords using both library and custom stopwords
   const libCleanTerms = removeStopwords(allTerms, ['en']);
+  const customStopwords = getStopwords();
   const customCleanTerms = libCleanTerms.filter(term => 
-    !stopwords.includes(term.toLowerCase())
+    !customStopwords.includes(term.toLowerCase())
   );
   
   // Filter out very short terms
@@ -420,6 +421,8 @@ const phoneticMatch = (query) => {
  */
 const hybridStem = (word) => {
   const lowercaseWord = word.toLowerCase();
+  const stemExceptions = getStemExceptions();
+  const suffixes = getSuffixes();
   
   // Check for irregular forms first
   if (stemExceptions[lowercaseWord]) {

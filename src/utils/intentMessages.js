@@ -1,6 +1,6 @@
 import { findBestMatch } from './ruler.js';
-import { GREETING_WORDS, GREETING_RESPONSES } from '../data/greetings.js';
-import { goodbyeWords, FAREWELL_RESPONSES } from '../data/farewell.js';
+import { getGreetingWords, getGreetingResponses } from '../data/greetings.js';
+import { getGoodbyeWords, getFarewellResponses } from '../data/farewell.js';
 import { spellingCorrections } from '../data/SpellingCorrections.js';
 import { applyPhraseCorrections } from '../data/PhraseCorrections.js';
 import { getRandomUnknownResponse } from '../data/UnknownResponses.js';
@@ -10,6 +10,8 @@ import { getRandomStarter, getConfidencePhrase, getSubfuelIntro } from '../data/
 import { isDataQuery, formatDataQueryResponse } from './dataQuery.js';
 import { containsCountry, getAllCountryPatterns } from '../data/Countries.js';
 import { isDefinitionQuestion, cleanQuestionForDefinition } from '../data/QuestionPatterns.js';
+import { containsIntentException, isWordInIntentException } from '../data/IntentExceptions.js';
+import i18n from '../i18n/index.js';
 import nspell from 'nspell';
 
 /**
@@ -104,9 +106,9 @@ const tokenize = (text) => {
 
 /**
  * Spell correction using nspell or fallback corrections
- * Enhanced for data query context
+ * Enhanced for data query context and intent preservation
  */
-const correctSpelling = (word) => {
+const correctSpelling = (word, fullText = '') => {
   const lowerWord = word.toLowerCase();
   
   // Don't correct valid years (1990-2030)
@@ -115,11 +117,18 @@ const correctSpelling = (word) => {
     return word; // Return the year unchanged
   }
   
+  // Don't correct words that are part of intent exceptions (greetings, farewells)
+  if (fullText && isWordInIntentException(word, fullText)) {
+    console.log(`[correctSpelling] Preserving intent exception word: "${word}" in context: "${fullText}"`);
+    return word; // Return the word unchanged to preserve intent
+  }
+  
   // Don't correct country names - check if the word is a known country
   const countryPatterns = getAllCountryPatterns();
   const isCountryName = countryPatterns.some(country => 
     country.toLowerCase() === lowerWord
-  );  if (isCountryName) {
+  );
+  if (isCountryName) {
     return word; // Return the country name unchanged
   }
   
@@ -143,7 +152,7 @@ const correctSpelling = (word) => {
         isEnergyRelated(suggestion) || 
         energyKeywords.some(keyword => keyword.includes(suggestion.toLowerCase()))
       );
-        if (energySuggestion) {
+      if (energySuggestion) {
         return energySuggestion;
       }
       
@@ -166,17 +175,30 @@ const correctSpelling = (word) => {
 
 /**
  * Apply spell correction to a text string with enhanced data query support
+ * and intent preservation
  */
 const correctText = (text) => {
   let correctedText = text;
-    // First apply context-aware phrase corrections from the PhraseCorrections dictionary
+  
+  // Check if the text contains intent exceptions that should be preserved
+  if (containsIntentException(text)) {
+    console.log(`[correctText] Text contains intent exceptions, applying limited correction: "${text}"`);
+    
+    // For intent exception texts, only apply phrase corrections but be very conservative with spell correction
+    correctedText = applyPhraseCorrections(correctedText);
+    
+    // Skip individual word spell correction for intent exception phrases to preserve them
+    return correctedText;
+  }
+  
+  // First apply context-aware phrase corrections from the PhraseCorrections dictionary
   correctedText = applyPhraseCorrections(correctedText);
   
   // Then apply individual word spell correction to remaining words
   const tokens = tokenize(correctedText);
   
   const correctedTokens = tokens.map(token => {
-    const corrected = correctSpelling(token);
+    const corrected = correctSpelling(token, text); // Pass full text for context
     return corrected;
   });
   
@@ -189,7 +211,10 @@ const correctText = (text) => {
  * Check if input contains greeting words
  */
 const detectGreeting = (tokens) => {
-  const greetingWords = GREETING_WORDS.en || [];
+  const currentLanguage = i18n.language || 'en';
+  const greetingWords = getGreetingWords();
+  
+  console.log(`[detectGreeting] Current language: ${currentLanguage}, Greeting words:`, greetingWords.slice(0, 5), '...');
   
   // Join tokens to check for multi-word greetings first
   const fullText = tokens.join(' ');
@@ -201,6 +226,7 @@ const detectGreeting = (tokens) => {
   });
   
   if (multiWordMatch) {
+    console.log(`[detectGreeting] Multi-word greeting detected: "${fullText}"`);
     return true;
   }
   
@@ -212,9 +238,13 @@ const detectGreeting = (tokens) => {
     // Only allow partial matches for tokens that are reasonable substrings of greetings
     // Avoid matching common question words like "what", "how", etc. unless they're standalone greetings
     const meaningfulPartialMatch = token.length >= 3 && greetingWords.some(greeting => {
-      const greetingWords = greeting.toLowerCase().split(/\s+/);
-      return greetingWords.includes(token) && !['what', 'how', 'when', 'where', 'why', 'who', 'are'].includes(token);
+      const greetingTokens = greeting.toLowerCase().split(/\s+/);
+      return greetingTokens.includes(token) && !['what', 'how', 'when', 'where', 'why', 'who', 'are'].includes(token);
     });
+    
+    if (directMatch || meaningfulPartialMatch) {
+      console.log(`[detectGreeting] Single token greeting detected: "${token}"`);
+    }
     
     return directMatch || meaningfulPartialMatch;
   });
@@ -226,7 +256,10 @@ const detectGreeting = (tokens) => {
  * Check if input contains farewell words
  */
 const detectFarewell = (tokens) => {
-  const farewellWords = goodbyeWords.en || [];
+  const currentLanguage = i18n.language || 'en';
+  const farewellWords = getGoodbyeWords();
+  
+  console.log(`[detectFarewell] Current language: ${currentLanguage}, Farewell words:`, farewellWords.slice(0, 5), '...');
   
   // Join tokens to check for multi-word farewells first
   const fullText = tokens.join(' ');
@@ -234,7 +267,11 @@ const detectFarewell = (tokens) => {
   // Check for exact multi-word farewell matches first
   const multiWordMatch = farewellWords.some(farewell => {
     const normalizedFarewell = farewell.toLowerCase().trim();
-    return fullText === normalizedFarewell || fullText.startsWith(normalizedFarewell + ' ') || fullText.endsWith(' ' + normalizedFarewell);
+    const match = fullText === normalizedFarewell || fullText.startsWith(normalizedFarewell + ' ') || fullText.endsWith(' ' + normalizedFarewell);
+    if (match) {
+      console.log(`[detectFarewell] Multi-word farewell detected: "${fullText}" matches "${normalizedFarewell}"`);
+    }
+    return match;
   });
   
   if (multiWordMatch) {
@@ -242,9 +279,15 @@ const detectFarewell = (tokens) => {
   }
   
   // For single token matches, be more strict - only exact matches
-  return tokens.some(token => 
-    farewellWords.some(farewell => farewell.toLowerCase() === token)
-  );
+  const singleTokenMatch = tokens.some(token => {
+    const match = farewellWords.some(farewell => farewell.toLowerCase() === token);
+    if (match) {
+      console.log(`[detectFarewell] Single token farewell detected: "${token}"`);
+    }
+    return match;
+  });
+  
+  return singleTokenMatch;
 };
 
 /**
@@ -278,8 +321,8 @@ const needsClarification = (text, tokens) => {
   // Single word that's not a greeting, farewell, or energy-related term
   if (tokens.length === 1) {
     const token = tokens[0];
-    const greetingWords = GREETING_WORDS.en || [];
-    const farewellWords = goodbyeWords.en || [];
+    const greetingWords = getGreetingWords();
+    const farewellWords = getGoodbyeWords();
     
     // Check if it's an ambiguous word
     if (isAmbiguousWord(token)) {
@@ -409,28 +452,38 @@ export const processMessage = async (userInput) => {
         content: "Please enter a message.",
         isError: true
       };
-    }    // Step 2: Tokenize input
+    }
+    
+    // Step 2: Tokenize input
     const tokens = tokenize(cleanInput);
-      // Step 3: Apply enhanced spell correction for data queries
+    
+    // Step 3: Apply enhanced spell correction for data queries
     const correctedText = correctText(cleanInput);
     
-    // Step 4: Classify intent using corrected text
-    const intent = classifyIntent(correctedText, tokenize(correctedText));// Step 5: Generate response based on intent
+    // Step 4: Classify intent - use original text for intent exceptions, corrected text otherwise
+    const textForIntent = containsIntentException(cleanInput) ? cleanInput : correctedText;
+    const tokensForIntent = tokenize(textForIntent);
+    const intent = classifyIntent(textForIntent, tokensForIntent);
+    
+    console.log(`[processMessage] Original: "${cleanInput}", Corrected: "${correctedText}", Intent text: "${textForIntent}", Intent: ${intent}`);
+    
+    // Step 5: Generate response based on intent
     switch (intent) {
       case INTENT_TYPES.GREETING:
         return {
           type: RESPONSE_TYPES.GREETING,
-          content: getRandomResponse(GREETING_RESPONSES.en),
+          content: getRandomResponse(getGreetingResponses()),
           isError: false
         };
       
       case INTENT_TYPES.FAREWELL:
         return {
           type: RESPONSE_TYPES.FAREWELL,
-          content: getRandomResponse(FAREWELL_RESPONSES.en),
+          content: getRandomResponse(getFarewellResponses()),
           isError: false
         };
-        case INTENT_TYPES.DATA_QUERY:
+        
+      case INTENT_TYPES.DATA_QUERY:
         return await formatDataQueryResponse(correctedText, tokens);
       
       case INTENT_TYPES.UNKNOWN:
@@ -439,7 +492,9 @@ export const processMessage = async (userInput) => {
           content: getRandomUnknownResponse('clarification'),
           isError: false
         };
-        case INTENT_TYPES.DEFINITION:        // Clean question text for better definition matching
+        
+      case INTENT_TYPES.DEFINITION:
+        // Clean question text for better definition matching
         const cleanedText = isDefinitionQuestion(correctedText) ? 
           cleanQuestionForDefinition(correctedText) : correctedText;
         
