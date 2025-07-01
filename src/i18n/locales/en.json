@@ -12,12 +12,15 @@
   "messages": {
     "botTyping": "Bot is typing...",
     "source": "source",
+    "openExternalLink": "Open external link",
+    "viewSourceInfo": "View source or additional information",
     "timestamp": {
       "invalidTime": "Invalid time"
     },
     "matchFound": "Match found using {{method}} method with {{confidence}}% confidence.",
     "errorOccurred": "This message indicates an error occurred",
-    "fallbackResponse": "I'm here to help with energy-related questions. What would you like to know?"
+    "fallbackResponse": "I'm here to help with energy-related questions. What would you like to know?",
+    "newBotResponse": "New bot response: {{content}}"
   },
   "help": {
     "title": "Keyboard Shortcuts",
@@ -161,7 +164,16 @@
     "tryAgain": "Please try again",
     "emptyMessage": "Please enter a message.",
     "processingError": "Sorry, I encountered an error while processing your request. Please try again.",
-    "noSpecificResponse": "I understand, but I don't have a specific response for that right now."
+    "noSpecificResponse": "I understand, but I don't have a specific response for that right now.",
+    "subfuelLookupError": "Sorry, I encountered an error while looking up that fuel type. Please try again.",
+    "invalidTime": "Invalid time"
+  },
+  "dataQuery": {
+    "foundDataMessage": "Here's what I found for **{{fuelName}}** in **{{countryName}}** for {{yearMessage}}:",
+    "dataRepresents": "This data represents the energy supply from {{fuelName}} in {{countryName}} for the specified period.",
+    "noDataFound": "I searched for **{{fuel}}** data in **{{country}}** for **{{date}}**, but couldn't find specific data for this combination. This might be because the data is not available for this time period or the specific fuel type.",
+    "errorFetching": "I tried to fetch **{{fuel}}** data for **{{country}}** in **{{date}}**, but encountered an error accessing the Eurostat database. Please try again later.",
+    "latestAvailable": "{{date}} (showing data for {{year}} - latest available)"
   },
   "toast": {
     "dataExported": "Data exported successfully!",
@@ -176,12 +188,25 @@
     "confirmClearSearch": "Are you sure you want to clear your search history?",
     "confirm": "Confirm",
     "cancel": "Cancel"
-  },"accessibility": {
+  },  "accessibility": {
     "closeModal": "Close modal",
     "botMessage": "Bot message",
     "userMessage": "User message",
     "botSaid": "Eurostat Energy Bot said:",
     "youSaid": "You said:",
-    "messageBeingProcessed": "Message is being processed"
+    "messageBeingProcessed": "Message is being processed",
+    "keyboardInstructions": "Use arrow keys to navigate messages, Enter to interact, / to focus input",
+    "chatConversation": "Chat conversation",
+    "messageActions": "Message actions",
+    "viewChart": "View {{chartType}} chart",
+    "appDescription": "Eurostat Energy Chatbot",
+    "loading": "Loading",
+    "messageAnnouncement": "{{type}}: {{content}}",
+    "chatCleared": "Chat cleared",
+    "inputCleared": "Input cleared",
+    "keyboardShortcutsOpened": "Keyboard shortcuts help opened",
+    "keyboardShortcutsClosed": "Keyboard shortcuts help closed",
+    "settingsOpened": "Settings modal opened",
+    "settingsClosed": "Settings modal closed"
   }
 }

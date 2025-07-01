@@ -1,13 +1,19 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRobot } from '@fortawesome/free-solid-svg-icons';
+import { useTranslation } from 'react-i18next';
 import './TypingIndicator.css';
 
 const TypingIndicator = ({ 
   isVisible = false, 
-  message = "Bot is typing...",
+  message,
   showAvatar = true,
   size = "default" // "small", "default", "large"
 }) => {
+  const { t } = useTranslation();
+  
+  // Use provided message or fall back to translation
+  const displayMessage = message || t('messages.botTyping');
+  
   if (!isVisible) return null;
 
   return (
@@ -32,11 +38,11 @@ const TypingIndicator = ({
         </div>
         
         {/* Screen reader only content */}
-        <div className="sr-only">{message}</div>
+        <div className="sr-only">{displayMessage}</div>
         
         {/* Optional visible message */}
         <div className="typing-message" aria-hidden="true">
-          {message}
+          {displayMessage}
         </div>
       </div>
     </div>

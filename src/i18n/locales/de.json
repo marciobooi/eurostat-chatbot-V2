@@ -12,12 +12,15 @@
   "messages": {
     "botTyping": "Bot tippt...",
     "source": "quelle",
+    "openExternalLink": "Externen Link öffnen",
+    "viewSourceInfo": "Quelle oder zusätzliche Informationen anzeigen",
     "timestamp": {
       "invalidTime": "Ungültige Zeit"
     },
     "matchFound": "Übereinstimmung gefunden mit der {{method}} Methode mit {{confidence}}% Vertrauen.",
     "errorOccurred": "Diese Nachricht zeigt an, dass ein Fehler aufgetreten ist",
-    "fallbackResponse": "Ich bin hier, um bei energiebezogenen Fragen zu helfen. Was möchten Sie wissen?"
+    "fallbackResponse": "Ich bin hier, um bei energiebezogenen Fragen zu helfen. Was möchten Sie wissen?",
+    "newBotResponse": "Neue Bot-Antwort: {{content}}"
   },
   "help": {
     "title": "Tastenkombinationen",
@@ -161,7 +164,16 @@
     "tryAgain": "Bitte versuchen Sie es erneut",
     "emptyMessage": "Bitte geben Sie eine Nachricht ein.",
     "processingError": "Entschuldigung, ich bin beim Verarbeiten Ihrer Anfrage auf einen Fehler gestoßen. Bitte versuchen Sie es erneut.",
-    "noSpecificResponse": "Ich verstehe, aber ich habe im Moment keine spezifische Antwort dafür."
+    "noSpecificResponse": "Ich verstehe, aber ich habe im Moment keine spezifische Antwort dafür.",
+    "subfuelLookupError": "Entschuldigung, ich bin beim Nachschlagen dieses Brennstofftyps auf einen Fehler gestoßen. Bitte versuchen Sie es erneut.",
+    "invalidTime": "Ungültige Zeit"
+  },
+  "dataQuery": {
+    "foundDataMessage": "Hier ist, was ich für **{{fuelName}}** in **{{countryName}}** für {{yearMessage}} gefunden habe:",
+    "dataRepresents": "Diese Daten repräsentieren die Energieversorgung von {{fuelName}} in {{countryName}} für den angegebenen Zeitraum.",
+    "noDataFound": "Ich habe nach **{{fuel}}**-Daten in **{{country}}** für **{{date}}** gesucht, konnte aber keine spezifischen Daten für diese Kombination finden. Dies könnte daran liegen, dass die Daten für diesen Zeitraum oder den spezifischen Brennstofftyp nicht verfügbar sind.",
+    "errorFetching": "Ich habe versucht, **{{fuel}}**-Daten für **{{country}}** in **{{date}}** abzurufen, bin aber auf einen Fehler beim Zugriff auf die Eurostat-Datenbank gestoßen. Bitte versuchen Sie es später erneut.",
+    "latestAvailable": "{{date}} (zeigt Daten für {{year}} - neueste verfügbare)"
   },
   "toast": {
     "dataExported": "Daten erfolgreich exportiert!",
@@ -176,12 +188,25 @@
     "confirmClearSearch": "Sind Sie sicher, dass Sie Ihren Suchverlauf löschen möchten?",
     "confirm": "Bestätigen",
     "cancel": "Abbrechen"
-  },"accessibility": {
+  },  "accessibility": {
     "closeModal": "Modal schließen",
     "botMessage": "Bot-Nachricht",
     "userMessage": "Benutzer-Nachricht",
     "botSaid": "Eurostat Energie Bot sagte:",
     "youSaid": "Sie sagten:",
-    "messageBeingProcessed": "Nachricht wird verarbeitet"
+    "messageBeingProcessed": "Nachricht wird verarbeitet",
+    "keyboardInstructions": "Verwenden Sie die Pfeiltasten zum Navigieren durch Nachrichten, Eingabetaste zum Interagieren, / zum Fokussieren der Eingabe",
+    "chatConversation": "Chat-Unterhaltung",
+    "messageActions": "Nachrichtenaktionen",
+    "viewChart": "{{chartType}}-Diagramm anzeigen",
+    "appDescription": "Eurostat Energie Chatbot",
+    "loading": "Laden",
+    "messageAnnouncement": "{{type}}: {{content}}",
+    "chatCleared": "Chat gelöscht",
+    "inputCleared": "Eingabe gelöscht",
+    "keyboardShortcutsOpened": "Tastaturkürzel-Hilfe geöffnet",
+    "keyboardShortcutsClosed": "Tastaturkürzel-Hilfe geschlossen",
+    "settingsOpened": "Einstellungsmodal geöffnet",
+    "settingsClosed": "Einstellungsmodal geschlossen"
   }
 }

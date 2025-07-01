@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner, faCircleNotch, faCog } from '@fortawesome/free-solid-svg-icons';
+import { useTranslation } from 'react-i18next';
 import './LoadingSpinner.css';
 
 const LoadingSpinner = ({ 
@@ -10,6 +11,7 @@ const LoadingSpinner = ({
   message = null,
   inline = false
 }) => {
+  const { t } = useTranslation();
   if (!isLoading) return null;
 
   const getSpinnerIcon = () => {
@@ -54,7 +56,7 @@ const LoadingSpinner = ({
 
   if (inline) {
     return (
-      <span className="loading-spinner-inline" role="status" aria-label="Loading">
+      <span className="loading-spinner-inline" role="status" aria-label={t('accessibility.loading')}>
         {renderSpinner()}
         {message && <span className="loading-message">{message}</span>}
       </span>
@@ -66,7 +68,7 @@ const LoadingSpinner = ({
       className={`loading-spinner-container ${size}`} 
       role="status" 
       aria-live="polite"
-      aria-label={message || "Loading"}
+      aria-label={message || t('accessibility.loading')}
     >
       {renderSpinner()}
       {message && (

@@ -5,6 +5,7 @@ import { getSynonyms } from '../data/Synonyms.js';
 import { getStopwords } from '../data/Stopwords.js';
 import { getSuffixes, minWordLength, getStemExceptions } from '../data/Suffixes.js';
 import { isEnergyRelated } from '../data/EnergyKeywords.js';
+import i18n from '../i18n/index.js';
 import Fuse from 'fuse.js';
 import { removeStopwords } from 'stopword';
 import nlp from 'compromise';

@@ -1,4 +1,5 @@
 import { forwardRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faRobot, 
@@ -12,20 +13,6 @@ import {
 import Chart from './Chart';
 import './MessageList.css';
 
-// Helper function to safely format timestamps
-const formatTimestamp = (timestamp) => {
-  try {
-    const date = timestamp instanceof Date ? timestamp : new Date(timestamp);
-    if (isNaN(date.getTime())) {
-      return 'Invalid time';
-    }
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  } catch (error) {
-    console.warn('Error formatting timestamp:', error);
-    return 'Invalid time';
-  }
-};
-
 const MessageList = forwardRef(({
   messages,
   focusedMessageIndex,
@@ -35,18 +22,34 @@ const MessageList = forwardRef(({
   onVisualizationClick,
   onLinkClick
 }, messagesContainerRef) => {
+  const { t } = useTranslation();
+
+  // Helper function to safely format timestamps
+  const formatTimestamp = (timestamp) => {
+    try {
+      const date = timestamp instanceof Date ? timestamp : new Date(timestamp);
+      if (isNaN(date.getTime())) {
+        return t('errors.invalidTime');
+      }
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch (error) {
+      console.warn('Error formatting timestamp:', error);
+      return t('errors.invalidTime');
+    }
+  };
+
   return (
     <div 
       className="messages-container"
       ref={messagesContainerRef}
       role="log"
       aria-live="polite"
-      aria-label="Chat conversation"
+      aria-label={t('accessibility.chatConversation')}
       aria-describedby="chat-description"
       tabIndex="0"
     >
       <div className="keyboard-instructions" aria-hidden={!isKeyboardUser}>
-        Use arrow keys to navigate messages, Enter to interact, / to focus input
+        {t('accessibility.keyboardInstructions')}
       </div>
       
       {messages.map((message, index) => (
@@ -57,6 +60,7 @@ const MessageList = forwardRef(({
           isTyping={false}
           isFocused={index === focusedMessageIndex}
           formatMessage={formatMessage}
+          formatTimestamp={formatTimestamp}
           onVisualizationClick={onVisualizationClick}
           onLinkClick={onLinkClick}
         />
@@ -73,6 +77,7 @@ const Message = ({
   isTyping, 
   isFocused, 
   formatMessage,
+  formatTimestamp,
   onVisualizationClick,
   onLinkClick
 }) => {
@@ -113,7 +118,7 @@ const Message = ({
     <div 
       className={`message ${message.type} ${message.isError ? 'error' : ''} ${isFocused ? 'focused' : ''}`}
       role="article"
-      aria-label={`${message.type === 'bot' ? 'Bot' : 'User'} message`}
+      aria-label={`${message.type === 'bot' ? t('accessibility.botMessage') : t('accessibility.userMessage')}`}
       tabIndex="-1"
       data-message-index={index}
     >
@@ -131,7 +136,7 @@ const Message = ({
       
       <div className="message-content">
         <div className="message-header sr-only">
-          {message.type === 'bot' ? 'Eurostat Energy Bot' : 'You'} said:
+          {message.type === 'bot' ? t('accessibility.botSaid') : t('accessibility.youSaid')}
         </div>
           <div 
           className="message-text"
@@ -156,7 +161,7 @@ const Message = ({
         
         {/* Visualization and Link buttons for bot messages */}
         {message.type === 'bot' && (message.hasVisualization || message.link) && (
-          <div className="message-actions" role="group" aria-label="Message actions">
+          <div className="message-actions" role="group" aria-label={t('accessibility.messageActions')}>
             {/* Visualization buttons - only show if no chart is currently displayed */}
             {message.hasVisualization && message.visualizationType && message.visualizationType.length > 0 && !currentChartType && (
               <div className="visualization-buttons">
@@ -165,7 +170,7 @@ const Message = ({
                     key={idx}
                     className="action-button visualization-button"
                     onClick={() => handleVisualizationClick(chartType)}
-                    aria-label={`View ${chartType} chart`}
+                    aria-label={t('accessibility.viewChart', { chartType })}
                     title={`View as ${chartType} chart`}
                   >
                     <FontAwesomeIcon icon={getChartIcon(chartType)} />
@@ -180,11 +185,11 @@ const Message = ({
               <button
                 className="action-button link-button"
                 onClick={() => onLinkClick(message.link)}
-                aria-label="Open external link"
-                title="View source or additional information"
+                aria-label={t('messages.openExternalLink')}
+                title={t('messages.viewSourceInfo')}
               >
                 <FontAwesomeIcon icon={faExternalLinkAlt} />
-                <span className="button-label">source</span>
+                <span className="button-label">{t('messages.source')}</span>
               </button>
             )}
           </div>
@@ -195,13 +200,16 @@ const Message = ({
         {/* Additional information for screen readers */}
         {message.matchData && (
           <div className="sr-only">
-            Match found using {message.matchData.method} method with {Math.round(message.matchData.confidence * 100)}% confidence.
+            {t('messages.matchFound', { 
+              method: message.matchData.method, 
+              confidence: Math.round(message.matchData.confidence * 100) 
+            })}
           </div>
         )}
         
         {message.isError && (
           <div className="error-indicator sr-only">
-            This message indicates an error occurred
+            {t('messages.errorOccurred')}
           </div>
         )}
       </div>

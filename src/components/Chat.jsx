@@ -95,23 +95,23 @@ const Chat = () => {
   // Help modal functions
   const openHelpModal = () => {
     setShowHelpModal(true);
-    announceToScreenReader('Keyboard shortcuts help opened');
+    announceToScreenReader(t('accessibility.keyboardShortcutsOpened'));
   };
   const closeHelpModal = () => {
     setShowHelpModal(false);
-    announceToScreenReader('Keyboard shortcuts help closed');
+    announceToScreenReader(t('accessibility.keyboardShortcutsClosed'));
     // Return focus to help button
     helpButtonRef.current?.focus();
   };
 
   const openSettingsModal = () => {
     setShowSettingsModal(true);
-    announceToScreenReader('Settings modal opened');
+    announceToScreenReader(t('accessibility.settingsOpened'));
   };
 
   const closeSettingsModal = () => {
     setShowSettingsModal(false);
-    announceToScreenReader('Settings modal closed');
+    announceToScreenReader(t('accessibility.settingsClosed'));
     // Return focus to settings button
     settingsButtonRef.current?.focus();
   };  const clearChat = () => {
@@ -217,7 +217,7 @@ const Chat = () => {
       const errorResponse = {
         id: Date.now() + 1,
         type: 'bot',
-        content: 'Sorry, I encountered an error while looking up that fuel type. Please try again.',
+        content: t('errors.subfuelLookupError'),
         timestamp: new Date(),
         isError: true
       };
@@ -275,7 +275,9 @@ const Chat = () => {
     if (messages.length > 1) {
       const lastMessage = messages[messages.length - 1];
       if (lastMessage.type === 'bot') {
-        const announcement = `New bot response: ${lastMessage.content.substring(0, 100)}${lastMessage.content.length > 100 ? '...' : ''}`;
+        const announcement = t('messages.newBotResponse', { 
+          content: lastMessage.content.substring(0, 100) + (lastMessage.content.length > 100 ? '...' : '') 
+        });
         announceToScreenReader(announcement);
       }
     }
@@ -349,14 +351,13 @@ const Chat = () => {
       }
       
     } catch (error) {
-      console.error('Error processing message:', error);
-      const errorResponse = {
-        id: Date.now() + 1,
-        type: 'bot',
-        content: 'Sorry, I encountered an error while processing your request. Please try again.',
-        timestamp: new Date(),
-        isError: true
-      };
+      console.error('Error processing message:', error);    const errorResponse = {
+      id: Date.now() + 1,
+      type: 'bot',
+      content: t('errors.processingError'),
+      timestamp: new Date(),
+      isError: true
+    };
       setMessages(prev => [...prev, errorResponse]);
         // Save error message to storage
       try {
@@ -383,7 +384,7 @@ const Chat = () => {
     <div 
       className={`chat-container ${isKeyboardUser ? 'keyboard-navigation' : ''}`}
       role="application"
-      aria-label="Eurostat Energy Chatbot"
+      aria-label={t('accessibility.appDescription')}
     >
       {/* Live region for screen reader announcements */}
       <div

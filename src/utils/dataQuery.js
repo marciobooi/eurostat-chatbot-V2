@@ -13,6 +13,7 @@ import { extractDate, containsDate, resolveRelativeDate } from '../data/DatePatt
 import { getEnergyKeywords, isEnergyRelated } from '../data/EnergyKeywords.js';
 import { energyDefinitionsEn } from '../data/DefinitionsEn.js';
 import { fetchEurostatData } from '../services/eurostatAPI.js';
+import i18n from '../i18n/index.js';
 
 /**
  * Extract fuel terms from the energy definitions database
@@ -206,11 +207,23 @@ export const formatDataQueryResponse = async (text, tokens) => {  const transfor
       
       // Check if we used a different year than requested
       const yearMessage = availableYear !== transformation.year ? 
-        `**${entities.date}** (showing data for ${availableYear} - latest available)` : 
+        i18n.t('dataQuery.latestAvailable', { date: entities.date, year: availableYear }) : 
         `**${entities.date}**`;
+        
+        const foundDataMessage = i18n.t('dataQuery.foundDataMessage', { 
+          fuelName, 
+          countryName, 
+          yearMessage 
+        });
+        
+        const dataRepresents = i18n.t('dataQuery.dataRepresents', { 
+          fuelName: fuelName.toLowerCase(), 
+          countryName 
+        });
+        
         return {
         type: 'data_query_response',
-        content: `Here's what I found for **${fuelName}** in **${countryName}** for ${yearMessage}:\n\n**${balanceType}**: ${dataValue} ${unit}\n\nThis data represents the energy supply from ${fuelName.toLowerCase()} in ${countryName} for the specified period.`,
+        content: `${foundDataMessage}\n\n**${balanceType}**: ${dataValue} ${unit}\n\n${dataRepresents}`,
         entities: entities,
         transformation: transformation,
         actualYear: availableYear,
@@ -228,7 +241,11 @@ export const formatDataQueryResponse = async (text, tokens) => {  const transfor
       };
     } else {      return {
         type: 'data_query_response',
-        content: `I searched for **${entities.fuel}** data in **${entities.country}** for **${entities.date}**, but couldn't find specific data for this combination. This might be because the data is not available for this time period or the specific fuel type.`,
+        content: i18n.t('dataQuery.noDataFound', { 
+          fuel: entities.fuel, 
+          country: entities.country, 
+          date: entities.date 
+        }),
         entities: entities,
         transformation: transformation,
         hasVisualization: hasVisualization,
@@ -244,7 +261,11 @@ export const formatDataQueryResponse = async (text, tokens) => {  const transfor
   } catch (error) {
     console.error('Error fetching data:', error);    return {
       type: 'data_query_response', 
-      content: `I tried to fetch **${entities.fuel}** data for **${entities.country}** in **${entities.date}**, but encountered an error accessing the Eurostat database. Please try again later.`,
+      content: i18n.t('dataQuery.errorFetching', { 
+        fuel: entities.fuel, 
+        country: entities.country, 
+        date: entities.date 
+      }),
       entities: entities,
       transformation: transformation,
       hasVisualization: false,

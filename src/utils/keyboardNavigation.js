@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export const useKeyboardNavigation = ({
   messages,
@@ -17,6 +18,7 @@ export const useKeyboardNavigation = ({
   onAnnounce,
   onSubmit
 }) => {
+  const { t } = useTranslation();
   const [focusedMessageIndex, setFocusedMessageIndex] = useState(-1);
   const [isKeyboardUser, setIsKeyboardUser] = useState(false);
 
@@ -39,7 +41,10 @@ export const useKeyboardNavigation = ({
       // Announce message to screen reader
       const message = messages[index];
       if (message && onAnnounce) {
-        const announcement = `${message.type === 'bot' ? 'Bot' : 'User'} message: ${message.content}`;
+        const announcement = t('accessibility.messageAnnouncement', {
+          type: message.type === 'bot' ? t('accessibility.botMessage') : t('accessibility.userMessage'),
+          content: message.content
+        });
         onAnnounce(announcement);
       }
     }
@@ -55,7 +60,7 @@ export const useKeyboardNavigation = ({
         case 'k':
           e.preventDefault();
           onClearChat();
-          onAnnounce && onAnnounce('Chat cleared');
+          onAnnounce && onAnnounce(t('accessibility.chatCleared'));
           break;
         case 'l':
           e.preventDefault();
@@ -104,7 +109,7 @@ export const useKeyboardNavigation = ({
     } else if (e.key === 'Escape') {
       e.preventDefault();
       e.target.value = '';
-      onAnnounce && onAnnounce('Input cleared');
+      onAnnounce && onAnnounce(t('accessibility.inputCleared'));
       // Trigger change event to update parent state
       const event = new Event('input', { bubbles: true });
       e.target.dispatchEvent(event);
