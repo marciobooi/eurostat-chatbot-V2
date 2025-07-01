@@ -5,7 +5,7 @@ import { spellingCorrections } from '../data/SpellingCorrections.js';
 import { applyPhraseCorrections } from '../data/PhraseCorrections.js';
 import { getRandomUnknownResponse } from '../data/UnknownResponses.js';
 import { energyKeywords, isEnergyRelated } from '../data/EnergyKeywords.js';
-import { isAmbiguousPhrase, isAmbiguousWord, AMBIGUOUS_QUESTION_WORDS } from '../data/AmbiguousPhrases.js';
+import { isAmbiguousPhrase, isAmbiguousWord } from '../data/AmbiguousPhrases.js';
 import { getRandomStarter, getConfidencePhrase, getSubfuelIntro } from '../data/DefinitionStarters.js';
 import { isDataQuery, formatDataQueryResponse } from './dataQuery.js';
 import { containsCountry, getAllCountryPatterns } from '../data/Countries.js';

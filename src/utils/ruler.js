@@ -1,7 +1,7 @@
 import { energyDefinitionsEn } from '../data/DefinitionsEn.js';
 import { spellingCorrections } from '../data/SpellingCorrections.js';
 import { getAbbreviations } from '../data/Abbreviations.js';
-import { synonyms } from '../data/Synonyms.js';
+import { getSynonyms } from '../data/Synonyms.js';
 import { stopwords } from '../data/Stopwords.js';
 import { suffixes, minWordLength, stemExceptions } from '../data/Suffixes.js';
 import { isEnergyRelated } from '../data/EnergyKeywords.js';
@@ -80,6 +80,7 @@ const initSpellChecker = async () => {
     // Add energy-specific terms if spell checker is available
     if (spellChecker) {
       const abbreviations = getAbbreviations();
+      const synonyms = getSynonyms();
       const energyTerms = [
         ...Object.keys(spellingCorrections),
         ...Object.values(spellingCorrections),
@@ -208,6 +209,7 @@ const expandAbbreviations = (term) => {
  * Step 4: Synonym mapping using dictionary
  */
 const expandSynonyms = (term) => {
+  const synonyms = getSynonyms();
   return synonyms[term] || term;
 };
 
