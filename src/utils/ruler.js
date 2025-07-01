@@ -1,6 +1,6 @@
 import { energyDefinitionsEn } from '../data/DefinitionsEn.js';
 import { spellingCorrections } from '../data/SpellingCorrections.js';
-import { abbreviations } from '../data/Abbreviations.js';
+import { getAbbreviations } from '../data/Abbreviations.js';
 import { synonyms } from '../data/Synonyms.js';
 import { stopwords } from '../data/Stopwords.js';
 import { suffixes, minWordLength, stemExceptions } from '../data/Suffixes.js';
@@ -79,6 +79,7 @@ const initSpellChecker = async () => {
     
     // Add energy-specific terms if spell checker is available
     if (spellChecker) {
+      const abbreviations = getAbbreviations();
       const energyTerms = [
         ...Object.keys(spellingCorrections),
         ...Object.values(spellingCorrections),
@@ -199,6 +200,7 @@ const correctSpelling = (term) => {
  * Step 3: Expand abbreviations using dictionary
  */
 const expandAbbreviations = (term) => {
+  const abbreviations = getAbbreviations();
   return abbreviations[term] || term;
 };
 
