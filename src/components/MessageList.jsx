@@ -63,6 +63,7 @@ const MessageList = forwardRef(({
           formatTimestamp={formatTimestamp}
           onVisualizationClick={onVisualizationClick}
           onLinkClick={onLinkClick}
+          t={t}
         />
       ))}
       
@@ -79,7 +80,8 @@ const Message = ({
   formatMessage,
   formatTimestamp,
   onVisualizationClick,
-  onLinkClick
+  onLinkClick,
+  t
 }) => {
   // State to track which chart is currently displayed
   const [currentChartType, setCurrentChartType] = useState(null);
