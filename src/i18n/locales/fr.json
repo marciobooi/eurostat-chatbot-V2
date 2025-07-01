@@ -16,7 +16,8 @@
       "invalidTime": "Heure invalide"
     },
     "matchFound": "Correspondance trouvée en utilisant la méthode {{method}} avec {{confidence}}% de confiance.",
-    "errorOccurred": "Ce message indique qu'une erreur s'est produite"
+    "errorOccurred": "Ce message indique qu'une erreur s'est produite",
+    "fallbackResponse": "Je suis là pour vous aider avec les questions liées à l'énergie. Que souhaitez-vous savoir ?"
   },
   "help": {
     "title": "Raccourcis Clavier",

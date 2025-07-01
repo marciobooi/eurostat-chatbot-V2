@@ -16,7 +16,8 @@
       "invalidTime": "Invalid time"
     },
     "matchFound": "Match found using {{method}} method with {{confidence}}% confidence.",
-    "errorOccurred": "This message indicates an error occurred"
+    "errorOccurred": "This message indicates an error occurred",
+    "fallbackResponse": "I'm here to help with energy-related questions. What would you like to know?"
   },
   "help": {
     "title": "Keyboard Shortcuts",

@@ -150,7 +150,7 @@ export const getRandomUnknownResponse = (responseType = 'unknown') => {
   }
   
   if (!Array.isArray(responses) || responses.length === 0) {
-    return "I'm here to help with energy-related questions. What would you like to know?";
+    return i18n.t('messages.fallbackResponse');
   }
   
   const randomIndex = Math.floor(Math.random() * responses.length);

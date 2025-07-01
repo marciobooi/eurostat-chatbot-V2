@@ -16,7 +16,8 @@
       "invalidTime": "Ungültige Zeit"
     },
     "matchFound": "Übereinstimmung gefunden mit der {{method}} Methode mit {{confidence}}% Vertrauen.",
-    "errorOccurred": "Diese Nachricht zeigt an, dass ein Fehler aufgetreten ist"
+    "errorOccurred": "Diese Nachricht zeigt an, dass ein Fehler aufgetreten ist",
+    "fallbackResponse": "Ich bin hier, um bei energiebezogenen Fragen zu helfen. Was möchten Sie wissen?"
   },
   "help": {
     "title": "Tastenkombinationen",
