@@ -10,7 +10,7 @@
 
 import { extractCountry, containsCountry, getCountryCode } from '../data/Countries.js';
 import { extractDate, containsDate, resolveRelativeDate } from '../data/DatePatterns.js';
-import { energyKeywords, isEnergyRelated } from '../data/EnergyKeywords.js';
+import { getEnergyKeywords, isEnergyRelated } from '../data/EnergyKeywords.js';
 import { energyDefinitionsEn } from '../data/DefinitionsEn.js';
 import { fetchEurostatData } from '../services/eurostatAPI.js';
 
@@ -92,7 +92,7 @@ export const extractFuel = (text) => {
   }
   
   // If no compound term found, try individual keywords (sorted by length)
-  const sortedEnergyKeywords = energyKeywords.sort((a, b) => b.length - a.length);
+  const sortedEnergyKeywords = getEnergyKeywords().sort((a, b) => b.length - a.length);
   for (const term of sortedEnergyKeywords) {
     if (lowerText.includes(term.toLowerCase())) {
       return term;
@@ -312,11 +312,13 @@ export const transformToStructuredFormat = (text, tokens) => {
  * @returns {object} Object containing compound terms and basic keywords
  */
 export const getAvailableFuelTerms = () => {
+  const currentEnergyKeywords = getEnergyKeywords();
   return {
     compoundTerms: COMPOUND_FUEL_TERMS.slice(0, 20), // First 20 for brevity
     totalCompoundTerms: COMPOUND_FUEL_TERMS.length,
-    basicKeywords: energyKeywords.slice(0, 20), // First 20 for brevity
-    totalBasicKeywords: energyKeywords.length  };
+    basicKeywords: currentEnergyKeywords.slice(0, 20), // First 20 for brevity
+    totalBasicKeywords: currentEnergyKeywords.length
+  };
 };
 
 /**

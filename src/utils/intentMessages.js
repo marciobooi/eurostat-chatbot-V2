@@ -4,7 +4,7 @@ import { getGoodbyeWords, getFarewellResponses } from '../data/farewell.js';
 import { spellingCorrections, containsIntentException, isWordInIntentException } from '../data/SpellingCorrections.js';
 import { applyPhraseCorrections } from '../data/PhraseCorrections.js';
 import { getRandomUnknownResponse } from '../data/UnknownResponses.js';
-import { energyKeywords, isEnergyRelated } from '../data/EnergyKeywords.js';
+import { getEnergyKeywords, isEnergyRelated } from '../data/EnergyKeywords.js';
 import { isAmbiguousPhrase, isAmbiguousWord } from '../data/AmbiguousPhrases.js';
 import { getRandomStarter, getConfidencePhrase, getSubfuelIntro } from '../data/DefinitionStarters.js';
 import { isDataQuery, formatDataQueryResponse } from './dataQuery.js';
@@ -186,9 +186,10 @@ const correctSpelling = async (word, fullText = '') => {
     const suggestions = spellChecker.suggest(lowerWord);
     if (suggestions.length > 0) {
       // For data queries, prefer energy-related suggestions
+      const currentEnergyKeywords = getEnergyKeywords();
       const energySuggestion = suggestions.find(suggestion => 
         isEnergyRelated(suggestion) || 
-        energyKeywords.some(keyword => keyword.includes(suggestion.toLowerCase()))
+        currentEnergyKeywords.some(keyword => keyword.includes(suggestion.toLowerCase()))
       );
       if (energySuggestion) {
         return energySuggestion;
