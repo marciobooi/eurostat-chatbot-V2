@@ -176,8 +176,8 @@
 }
 
 .storage-info {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--neutral-300);
+  border: 1px solid var(--neutral-400);
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 24px;
@@ -365,4 +365,42 @@
   .info-item {
     color: #94a3b8;
   }
+}
+
+body.dark-mode {
+  background: #181a1b;
+  color: #f1f1f1;
+}
+
+.settings-modal.dark-mode,
+body.dark-mode .settings-modal {
+  background: #23272f;
+  color: #f1f1f1;
+  border-color: #333;
+}
+
+body.dark-mode .settings-modal input,
+body.dark-mode .settings-modal select,
+body.dark-mode .settings-modal textarea {
+  background: #23272f;
+  color: #f1f1f1;
+  border: 1px solid #444;
+}
+
+body.dark-mode .settings-modal .toggle-button {
+  background: #23272f;
+  color: #ffd700;
+  border: 1px solid #444;
+}
+
+body.dark-mode .settings-modal .toggle-button.on {
+  color: #4caf50;
+}
+
+body.dark-mode .settings-modal .toggle-button.off {
+  color: #888;
+}
+
+body.dark-mode .settings-modal .setting-description {
+  color: #b0b0b0;
 }

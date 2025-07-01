@@ -116,7 +116,7 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  background: var(--neutral-300);
   overflow: hidden;
   min-height: 0;
 }
@@ -124,9 +124,9 @@
 /* Input Form */
 .chat-input-form {
   padding: var(--spacing-6) var(--spacing-8);
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--neutral-300);
   backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  border-top: 1px solid var(--neutral-400);
 }
 
 .input-group {
@@ -138,11 +138,11 @@
 .chat-input {
   flex: 1;
   padding: var(--spacing-4) var(--spacing-5);
-  border: 2px solid rgba(79, 70, 229, 0.1);
+  border: 2px solid var(--neutral-400);
   border-radius: 20px;
   font-size: var(--font-size-base);
   font-family: inherit;
-  background: var(--neutral-100);
+  background: var(--neutral-200);
   color: var(--neutral-700);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   resize: none;
@@ -414,6 +414,83 @@
   .chat-input::placeholder {
     color: var(--neutral-400);
   }
+}
+
+/* Dark Mode Styles for Chat */
+body.dark-mode .chat-container {
+  background: var(--neutral-200);
+  border: 1px solid var(--neutral-400);
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.4),
+    0 10px 10px -5px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .chat-header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 50%, #6366f1 100%);
+  color: var(--text-primary);
+}
+
+body.dark-mode .chat-title h1 {
+  color: var(--text-primary);
+}
+
+body.dark-mode .chat-controls button {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .chat-controls button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .message-list {
+  background: var(--neutral-200);
+}
+
+body.dark-mode .message {
+  color: var(--text-primary);
+}
+
+body.dark-mode .message.user {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  color: white;
+}
+
+body.dark-mode .message.assistant {
+  background: var(--neutral-300);
+  color: var(--text-primary);
+  border: 1px solid var(--neutral-400);
+}
+
+body.dark-mode .chat-input-form {
+  background: var(--neutral-300);
+  border-top: 1px solid var(--neutral-400);
+}
+
+body.dark-mode .chat-input {
+  background: var(--neutral-300);
+  color: var(--text-primary);
+  border: 1px solid var(--neutral-400);
+}
+
+body.dark-mode .chat-input::placeholder {
+  color: var(--neutral-600);
+}
+
+body.dark-mode .send-button {
+  background: var(--primary-color);
+  color: white;
+}
+
+body.dark-mode .send-button:hover {
+  background: var(--primary-dark);
+}
+
+body.dark-mode .send-button:disabled {
+  background: var(--neutral-500);
+  color: var(--neutral-700);
 }
 
 /* Subfuel Section Styles */

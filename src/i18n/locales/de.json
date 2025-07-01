@@ -54,7 +54,9 @@
       "language": "Sprache",
       "languageDesc": "Oberflächensprache",
       "maxMessages": "Maximale Nachrichten",
-      "maxMessagesDesc": "Maximale Anzahl von Chat-Nachrichten im Verlauf zu behalten"
+      "maxMessagesDesc": "Maximale Anzahl von Chat-Nachrichten im Verlauf zu behalten",
+      "darkMode": "Dunkler Modus",
+      "darkModeDesc": "Aktivieren Sie den dunklen Modus für eine augenfreundlichere, dunklere Oberfläche."
     },
     "charts": {
       "title": "Diagramm-Einstellungen",

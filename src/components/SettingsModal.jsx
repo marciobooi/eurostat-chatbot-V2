@@ -40,6 +40,23 @@ const SettingsModal = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
+  // Apply dark mode class to body
+  useEffect(() => {
+    if (preferences.darkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+  }, [preferences.darkMode]);
+
+  // Initialize dark mode on component mount
+  useEffect(() => {
+    const currentPreferences = getUserPreferences();
+    if (currentPreferences.darkMode) {
+      document.body.classList.add('dark-mode');
+    }
+  }, []);
+
   const loadSettings = async () => {
     setPreferences(getUserPreferences());
     setChartSettings(getChartSettings());
@@ -262,6 +279,21 @@ const SettingsModal = ({ isOpen, onClose }) => {
                 </label>
                 <p className="setting-description">
                   {t('settings.preferences.maxMessagesDesc')}
+                </p>
+              </div>
+
+              <div className="setting-item">
+                <label>
+                  <span>{t('settings.preferences.darkMode')}</span>
+                  <button
+                    className={`toggle-button ${preferences.darkMode ? 'on' : 'off'}`}
+                    onClick={() => handlePreferenceChange('darkMode', !preferences.darkMode)}
+                  >
+                    <FontAwesomeIcon icon={preferences.darkMode ? faToggleOn : faToggleOff} />
+                  </button>
+                </label>
+                <p className="setting-description">
+                  {t('settings.preferences.darkModeDesc')}
                 </p>
               </div>
             </div>

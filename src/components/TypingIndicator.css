@@ -167,6 +167,18 @@
   .typing-message {
     color: var(--neutral-400);
   }
+  
+  body.dark-mode .typing-indicator {
+    color: var(--text-secondary);
+  }
+
+  body.dark-mode .typing-dots .dot {
+    background-color: var(--primary-color);
+  }
+
+  body.dark-mode .typing-text {
+    color: var(--text-secondary);
+  }
 }
 
 /* Reduced motion support */

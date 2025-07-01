@@ -54,7 +54,9 @@
       "language": "Language",
       "languageDesc": "Interface language",
       "maxMessages": "Maximum messages",
-      "maxMessagesDesc": "Maximum number of chat messages to keep in history"
+      "maxMessagesDesc": "Maximum number of chat messages to keep in history",
+      "darkMode": "Dark mode",
+      "darkModeDesc": "Enable dark mode for a darker, eye-friendly interface."
     },
     "charts": {
       "title": "Chart Settings",

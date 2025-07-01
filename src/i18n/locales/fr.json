@@ -54,7 +54,9 @@
       "language": "Langue",
       "languageDesc": "Langue de l'interface",
       "maxMessages": "Messages maximum",
-      "maxMessagesDesc": "Nombre maximum de messages de chat à conserver dans l'historique"
+      "maxMessagesDesc": "Nombre maximum de messages de chat à conserver dans l'historique",
+      "darkMode": "Mode sombre",
+      "darkModeDesc": "Activez le mode sombre pour une interface plus sombre et agréable pour les yeux."
     },
     "charts": {
       "title": "Paramètres des Graphiques",

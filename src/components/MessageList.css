@@ -7,9 +7,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-4);
-  background: linear-gradient(180deg, 
-    rgba(248, 250, 252, 0.8) 0%, 
-    rgba(241, 245, 249, 0.9) 100%);
+  background: var(--neutral-300);
   backdrop-filter: blur(10px);
   border-radius: 24px 24px 0 0;
   margin: var(--spacing-4);
@@ -337,6 +335,73 @@
     background: rgba(79, 70, 229, 0.1);
     border-color: rgba(79, 70, 229, 0.2);
     color: var(--neutral-300);  }
+}
+
+/* Dark Mode Styles for Message List */
+body.dark-mode .message-list {
+  background: var(--neutral-200);
+}
+
+body.dark-mode .message-container {
+  color: var(--text-primary);
+}
+
+body.dark-mode .message {
+  color: var(--text-primary);
+}
+
+body.dark-mode .message.user {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  color: white;
+}
+
+body.dark-mode .message.assistant {
+  background: var(--neutral-300);
+  color: var(--text-primary);
+  border: 1px solid var(--neutral-400);
+}
+
+body.dark-mode .message-content {
+  color: inherit;
+}
+
+body.dark-mode .message-timestamp {
+  color: var(--neutral-600);
+}
+
+body.dark-mode .message-actions button {
+  background: var(--neutral-400);
+  color: var(--text-primary);
+  border: 1px solid var(--neutral-500);
+}
+
+body.dark-mode .message-actions button:hover {
+  background: var(--neutral-500);
+}
+
+body.dark-mode .welcome-message {
+  background: var(--neutral-300);
+  color: var(--text-primary);
+  border: 1px solid var(--neutral-400);
+}
+
+body.dark-mode .welcome-message h3 {
+  color: var(--text-primary);
+}
+
+body.dark-mode .code-block {
+  background: var(--neutral-800);
+  color: var(--neutral-100);
+  border: 1px solid var(--neutral-600);
+}
+
+body.dark-mode .copy-button {
+  background: var(--neutral-600);
+  color: var(--neutral-100);
+}
+
+body.dark-mode .copy-button:hover {
+  background: var(--neutral-500);
 }
 
 /* Message Action Buttons (Visualization & Link) */

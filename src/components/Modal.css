@@ -170,6 +170,52 @@
   }
 }
 
+/* Dark Mode Styles for Modal */
+body.dark-mode .modal-overlay {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+body.dark-mode .modal {
+  background: var(--neutral-200);
+  color: var(--text-primary);
+  border: 1px solid var(--neutral-400);
+}
+
+body.dark-mode .modal-header {
+  border-bottom: 1px solid var(--neutral-400);
+}
+
+body.dark-mode .modal-header h2 {
+  color: var(--text-primary);
+}
+
+body.dark-mode .modal-content {
+  color: var(--text-primary);
+}
+
+body.dark-mode .modal-footer {
+  border-top: 1px solid var(--neutral-400);
+}
+
+body.dark-mode .modal-footer button {
+  background: var(--neutral-400);
+  color: var(--text-primary);
+  border: 1px solid var(--neutral-500);
+}
+
+body.dark-mode .modal-footer button:hover {
+  background: var(--neutral-500);
+}
+
+body.dark-mode .modal-footer button.primary {
+  background: var(--primary-color);
+  color: white;
+}
+
+body.dark-mode .modal-footer button.primary:hover {
+  background: var(--primary-dark);
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .modal-backdrop {

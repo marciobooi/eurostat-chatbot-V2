@@ -334,6 +334,59 @@
   }
 }
 
+/* Dark Mode Styles for Chart */
+body.dark-mode .chart-container {
+  background: var(--neutral-200);
+  border: 1px solid var(--neutral-400);
+}
+
+body.dark-mode .chart-header h3 {
+  color: var(--text-primary);
+}
+
+body.dark-mode .chart-controls {
+  background: var(--neutral-300);
+  border: 1px solid var(--neutral-400);
+}
+
+body.dark-mode .chart-controls button {
+  background: var(--neutral-400);
+  color: var(--text-primary);
+  border: 1px solid var(--neutral-500);
+}
+
+body.dark-mode .chart-controls button:hover {
+  background: var(--neutral-500);
+}
+
+body.dark-mode .chart-controls button.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+body.dark-mode .chart-wrapper {
+  background: var(--neutral-200);
+}
+
+/* Dark mode chart text colors */
+body.dark-mode .recharts-text {
+  fill: var(--text-primary) !important;
+}
+
+body.dark-mode .recharts-cartesian-axis-tick-value {
+  fill: var(--text-primary) !important;
+}
+
+body.dark-mode .recharts-legend-item-text {
+  color: var(--text-primary) !important;
+}
+
+body.dark-mode .recharts-tooltip-wrapper {
+  background: var(--neutral-300) !important;
+  border: 1px solid var(--neutral-400) !important;
+  color: var(--text-primary) !important;
+}
+
 /* Chart animation states */
 .chart-enter {
   opacity: 0;

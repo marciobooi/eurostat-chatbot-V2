@@ -181,6 +181,20 @@
   .loading-message {
     color: var(--neutral-400);
   }
+  
+  /* Dark Mode Styles for Loading Spinner */
+  body.dark-mode .loading-spinner {
+    color: var(--primary-color);
+  }
+
+  body.dark-mode .loading-text {
+    color: var(--text-primary);
+  }
+
+  body.dark-mode .spinner {
+    border-top-color: var(--primary-color);
+    border-right-color: var(--primary-color);
+  }
 }
 
 /* Reduced motion support */
