@@ -1,7 +1,7 @@
 import { findBestMatch } from './ruler.js';
 import { getGreetingWords, getGreetingResponses } from '../data/greetings.js';
 import { getGoodbyeWords, getFarewellResponses } from '../data/farewell.js';
-import { spellingCorrections } from '../data/SpellingCorrections.js';
+import { spellingCorrections, containsIntentException, isWordInIntentException } from '../data/SpellingCorrections.js';
 import { applyPhraseCorrections } from '../data/PhraseCorrections.js';
 import { getRandomUnknownResponse } from '../data/UnknownResponses.js';
 import { energyKeywords, isEnergyRelated } from '../data/EnergyKeywords.js';
@@ -10,7 +10,6 @@ import { getRandomStarter, getConfidencePhrase, getSubfuelIntro } from '../data/
 import { isDataQuery, formatDataQueryResponse } from './dataQuery.js';
 import { containsCountry, getAllCountryPatterns } from '../data/Countries.js';
 import { isDefinitionQuestion, cleanQuestionForDefinition } from '../data/QuestionPatterns.js';
-import { containsIntentException, isWordInIntentException } from '../data/IntentExceptions.js';
 import i18n from '../i18n/index.js';
 import nspell from 'nspell';
 
