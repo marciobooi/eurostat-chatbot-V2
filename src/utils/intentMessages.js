@@ -294,7 +294,7 @@ const detectFarewell = (tokens) => {
  */
 const getRandomResponse = (responseArray) => {
   if (!Array.isArray(responseArray) || responseArray.length === 0) {
-    return "I understand, but I don't have a specific response for that right now.";
+    return i18n.t('errors.noSpecificResponse');
   }
   const randomIndex = Math.floor(Math.random() * responseArray.length);
   return responseArray[randomIndex];
@@ -448,7 +448,7 @@ export const processMessage = async (userInput) => {
     if (!cleanInput) {
       return {
         type: RESPONSE_TYPES.ERROR,
-        content: "Please enter a message.",
+        content: i18n.t('errors.emptyMessage'),
         isError: true
       };
     }
@@ -513,7 +513,7 @@ export const processMessage = async (userInput) => {
     console.error('Error processing message:', error);
     return {
       type: RESPONSE_TYPES.ERROR,
-      content: "Sorry, I encountered an error while processing your request. Please try again.",
+      content: i18n.t('errors.processingError'),
       isError: true
     };
   }

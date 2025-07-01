@@ -158,7 +158,10 @@
     "SE": "Schweden"
   },  "errors": {
     "somethingWentWrong": "Etwas ist schief gelaufen",
-    "tryAgain": "Bitte versuchen Sie es erneut"
+    "tryAgain": "Bitte versuchen Sie es erneut",
+    "emptyMessage": "Bitte geben Sie eine Nachricht ein.",
+    "processingError": "Entschuldigung, ich bin beim Verarbeiten Ihrer Anfrage auf einen Fehler gestoßen. Bitte versuchen Sie es erneut.",
+    "noSpecificResponse": "Ich verstehe, aber ich habe im Moment keine spezifische Antwort dafür."
   },
   "toast": {
     "dataExported": "Daten erfolgreich exportiert!",

@@ -158,7 +158,10 @@
     "SE": "Suède"
   },  "errors": {
     "somethingWentWrong": "Quelque chose s'est mal passé",
-    "tryAgain": "Veuillez réessayer"
+    "tryAgain": "Veuillez réessayer",
+    "emptyMessage": "Veuillez saisir un message.",
+    "processingError": "Désolé, j'ai rencontré une erreur lors du traitement de votre demande. Veuillez réessayer.",
+    "noSpecificResponse": "Je comprends, mais je n'ai pas de réponse spécifique pour cela en ce moment."
   },
   "toast": {
     "dataExported": "Données exportées avec succès !",

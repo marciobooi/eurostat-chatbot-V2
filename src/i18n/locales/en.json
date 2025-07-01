@@ -158,7 +158,10 @@
     "SE": "Sweden"
   },  "errors": {
     "somethingWentWrong": "Something went wrong",
-    "tryAgain": "Please try again"
+    "tryAgain": "Please try again",
+    "emptyMessage": "Please enter a message.",
+    "processingError": "Sorry, I encountered an error while processing your request. Please try again.",
+    "noSpecificResponse": "I understand, but I don't have a specific response for that right now."
   },
   "toast": {
     "dataExported": "Data exported successfully!",
