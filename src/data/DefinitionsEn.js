@@ -18628,7 +18628,7 @@ export const energyDefinitionsEn = {
       "Major Categories",
       "Hydro"
     ],
-    "hasVisualization": true,
+    "hasVisualization": false,
     "visualizationType": [
       "pie",
       "bar",

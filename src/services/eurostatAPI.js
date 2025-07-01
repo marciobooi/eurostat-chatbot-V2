@@ -343,15 +343,59 @@ export const getAvailableCountries = (data) => {
  * @returns {Object} Eurostat API parameters
  */
 const buildChartAPIParams = ({ dataset, fuelCode, chartType, selectedCountry, nrgBalCodes }) => {
+  
+  const unit = dataset === "nrg_cb_pem" ? "GWH" : 'KTOE';
+   
+  
   const baseParams = {
     dataset,
     format: 'JSON',
-    unit: 'KTOE',
+    unit: unit,
     siec: fuelCode,
     lang: 'en'
   };
 
-  // Different parameter sets based on chart type
+  // Handle nrg_cb_pem dataset differently (no nrg_bal dimension)
+  if (dataset === "nrg_cb_pem") {
+    switch (chartType) {
+      case 'line':
+        // Line chart: one country, all available years
+        return {
+          ...baseParams,
+          geo: selectedCountry
+          // No time parameter = get all available years
+          // No nrg_bal parameter for this dataset
+        };
+      
+      case 'bar':
+        // Bar chart: all countries, latest year
+        return {
+          ...baseParams,
+          time: '2023'
+          // No geo parameter = get all available countries
+          // No nrg_bal parameter for this dataset
+        };
+      
+      case 'pie':
+        // Pie chart: all countries, latest year
+        return {
+          ...baseParams,
+          time: '2023'
+          // No geo parameter = get all available countries
+          // No nrg_bal parameter for this dataset
+        };
+        
+      case 'stacked':
+        // For nrg_cb_pem, we can't do stacked by nrg_bal since it doesn't exist
+        // Fall back to regular chart or throw error
+        throw new Error('Stacked charts not supported for nrg_cb_pem dataset (no nrg_bal dimension)');
+      
+      default:
+        return baseParams;
+    }
+  }
+
+  // Different parameter sets based on chart type for other datasets
   switch (chartType) {
     case 'line':
       // Line chart: one country, all available years
